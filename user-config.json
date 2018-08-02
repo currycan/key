@@ -2,7 +2,7 @@
   "server": "0.0.0.0",
   "server_ipv6": "::",
   "local_address": "127.0.0.1",
-  "local_port": 1089,
+  "local_port": 10086,
   "port_password": {
     "12018": {
       "protocol": "auth_sha1_v4",
