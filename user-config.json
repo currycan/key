@@ -1,0 +1,21 @@
+{
+  "server": "0.0.0.0",
+  "server_ipv6": "::",
+  "local_address": "127.0.0.1",
+  "local_port": 1089,
+  "port_password": {
+    "12018": {
+      "protocol": "auth_sha1_v4",
+      "protocol_param": "www.ibm.com",
+      "password": "zzt2008zzt",
+      "obfs": "tls1.2_ticket_auth",
+      "obfs_param": "www.ibm.com"
+    }
+  },
+  "timeout": 300,
+  "method": "rc4-md5",
+  "redirect": "bing.com",
+  "dns_ipv6": false,
+  "fast_open": true,
+  "workers": 2
+}
