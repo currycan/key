@@ -14,7 +14,7 @@
   },
   "timeout": 300,
   "method": "rc4-md5",
-  "redirect": "bing.com",
+  "redirect": "www.bing.com",
   "dns_ipv6": false,
   "fast_open": true,
   "workers": 2
