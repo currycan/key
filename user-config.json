@@ -17,5 +17,5 @@
   "redirect": "www.bing.com",
   "dns_ipv6": false,
   "fast_open": true,
-  "workers": 2
+  "workers": 1
 }
