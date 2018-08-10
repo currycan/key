@@ -5,7 +5,7 @@
   "local_port": 10086,
   "port_password": {
     "12018": {
-      "protocol": "auth_sha1_v4",
+      "protocol": "auth_chain_f",
       "protocol_param": "www.ibm.com",
       "password": "zzt2008zzt",
       "obfs": "tls1.2_ticket_auth",
@@ -13,7 +13,7 @@
     }
   },
   "timeout": 300,
-  "method": "rc4-md5",
+  "method": "none",
   "redirect": "www.bing.com",
   "dns_ipv6": false,
   "fast_open": true,
