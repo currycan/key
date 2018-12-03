@@ -6,14 +6,14 @@
   "port_password": {
     "12018": {
       "protocol": "auth_chain_f",
-      "protocol_param": "www.ibm.com",
+      "protocol_param": "5",
       "password": "zzt2008zzt",
       "obfs": "tls1.2_ticket_auth",
       "obfs_param": "www.ibm.com"
     },
     "12019": {
       "protocol": "auth_chain_b",
-      "protocol_param": "www.ibm.com",
+      "protocol_param": "5",
       "password": "zzt2008zzt",
       "obfs": "tls1.2_ticket_auth",
       "obfs_param": "www.ibm.com"
@@ -21,8 +21,10 @@
   },
   "timeout": 300,
   "method": "none",
-  "redirect": "www.bing.com",
+  "redirect":["bing.com", "baidu.com"],
+  "speed_limit_per_con": 0,
+  "speed_limit_per_user": 0,
   "dns_ipv6": false,
-  "fast_open": true,
-  "workers": 1
+  "fast_open": false,
+  "workers": 2
 }
