@@ -16,3 +16,8 @@ alias l='ls $LS_OPTIONS -lA'
 alias rm='rm -i'
 alias cp='cp -i'
 alias mv='mv -i'
+
+# Source global definitions
+if [ -f /etc/bashrc ]; then
+	. /etc/bashrc
+fi
