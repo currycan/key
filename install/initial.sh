@@ -35,11 +35,17 @@ create_user(){
 }
 
 pip_install(){
-    VERSION=$(pip --version |tr -s ' '| cut -d' ' -f2 | cut -d'.' -f1)
-    if [ $VERSION != 19 ];then
+    if [ $(which pip | wc -l) == 0 ];then
         curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
         python get-pip.py
         rm -f get-pip.py
+    else
+        VERSION=$(pip --version |tr -s ' '| cut -d' ' -f2 | cut -d'.' -f1)
+        if [ $VERSION != 19 ];then
+            curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+            python get-pip.py
+            rm -f get-pip.py
+        fi
     fi
 }
 
