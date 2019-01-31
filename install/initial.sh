@@ -44,6 +44,14 @@ pip_install(){
     fi
 }
 
+down_key(){
+    mkdir -p /app/andrew/.ssh/
+    curl -so /app/andrew/.ssh/authorized_keys https://raw.githubusercontent.com/currycan/key/master/authorized_keys
+    curl -so /app/andrew/.ssh/id_rsa.pub https://raw.githubusercontent.com/currycan/key/master/id_rsa.pub
+    chmod 600  /app/andrew/.ssh/*
+    chown -R andrew:andrew /app/andrew/.ssh/
+}
+
 init_centos(){
     echo "ZZT520.596msl*18" |passwd --stdin root
     yum update -y
@@ -76,10 +84,7 @@ EOF
 }
 
 ssh_centos(){
-    mkdir -p /app/andrew/.ssh/
-    curl -so /app/andrew/.ssh/authorized_keys https://raw.githubusercontent.com/currycan/key/master/authorized_keys
-    curl -so /app/andrew/.ssh/id_rsa.pub https://raw.githubusercontent.com/currycan/key/master/id_rsa.pub
-    chmod 600  /app/andrew/.ssh/*
+    down_key
     cat << EOF > /etc/ssh/sshd_config
 Port 38666
 SyslogFacility AUTHPRIV
@@ -101,10 +106,7 @@ EOF
 }
 
 ssh_init(){
-    mkdir -p /app/andrew/.ssh/
-    curl -so /app/andrew/.ssh/authorized_keys https://raw.githubusercontent.com/currycan/key/master/authorized_keys
-    curl -so /app/andrew/.ssh/id_rsa.pub https://raw.githubusercontent.com/currycan/key/master/id_rsa.pub
-    chmod 600  /app/andrew/.ssh/*
+    down_key
     cat << EOF > /etc/ssh/sshd_config
 Port 38666
 SyslogFacility AUTHPRIV
