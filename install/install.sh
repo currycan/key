@@ -21,8 +21,6 @@ HOSTNAME=$(hostname)
 FLAG_IP=$(grep "${HOST_IP} ${HOSTNAME}" /etc/hosts | wc -l)
 if [ FLAG_IP == 0 ];then
     echo "${HOST_IP} ${HOSTNAME}" >> /etc/hosts
-    sudo su root
-    cd ~
 fi
 
 if [ $(id -u) != "0" ]; then
