@@ -11,7 +11,9 @@
 ------
 ```Bash
 wget --no-check-certificate -O ./ssr_install.sh https://raw.githubusercontent.com/currycan/key/master/install/install.sh
-chmod 700 ./ssr_install.sh
+wget --no-check-certificate -O ./initial.sh https://raw.githubusercontent.com/currycan/key/master/install/initial.sh
+chmod 700 ./*.sh
+./initial.sh
 ./ssr_install.sh
 ```
 ------
