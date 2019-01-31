@@ -7,6 +7,7 @@ export PATH
 #   Intro: https://github.com/mongomongu/kcptun_for_ss_ssr/issues
 #===============================================================================================
 version="0.0.1"
+sudo su root
 if [ $(id -u) != "0" ]; then
     echo "Error: You must be root to run this script, please use root to install ssrr"
     exit 1
