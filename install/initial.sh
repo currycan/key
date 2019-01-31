@@ -131,31 +131,33 @@ EOF
 initial(){
     create_user
 	check_sys
-    FLAG_SUDO=$(grep andrew /etc/sudoers | wc -l)
 	if [[ "${release}" == "centos" ]]; then
         echo "ZZT520.596msl*18" | passwd --stdin root
         echo "zzt2008zzt" | passwd --stdin andrew
         chcon -R unconfined_u:object_r:user_home_t:s0 /app/
+        init_centos
+        FLAG_SUDO=$(grep andrew /etc/sudoers | wc -l)
         if [ $FLAG_SUDO == 0 ];then
             sed -i '93i  andrew    ALL=(ALL:ALL) NOPASSWD: ALL' /etc/sudoers
         fi
-        init_centos
         ssh_centos
 	elif [[ "${release}" == "debian" ]]; then
         echo "root:ZZT520.596msl*18" | chpasswd
         echo "andrew:zzt2008zzt" | chpasswd
+        init
+        FLAG_SUDO=$(grep andrew /etc/sudoers | wc -l)
         if [ $FLAG_SUDO == 0 ];then
             sed -i '21i  andrew    ALL=(ALL:ALL) NOPASSWD: ALL' /etc/sudoers
         fi
-        init
         ssh_init
 	elif [[ "${release}" == "ubuntu" ]]; then
         echo "root:ZZT520.596msl*18" | chpasswd
         echo "andrew:zzt2008zzt" | chpasswd
+        init
+        FLAG_SUDO=$(grep andrew /etc/sudoers | wc -l)
         if [ $FLAG_SUDO == 0 ];then
             sed -i '21i  andrew    ALL=(ALL:ALL) NOPASSWD: ALL' /etc/sudoers
         fi
-        init
         ssh_init
 	fi
 }
