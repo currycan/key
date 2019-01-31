@@ -136,3 +136,5 @@ initial(){
         ssh_init
 	fi
 }
+
+initial
