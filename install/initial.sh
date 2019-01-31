@@ -27,7 +27,6 @@ create_user(){
     groupadd andrew
     useradd -m andrew -g andrew -s /bin/bash -d /app/andrew
     echo "zzt2008zzt" |passwd --stdin andrew
-    chcon -R unconfined_u:object_r:user_home_t:s0 /app/
 }
 
 init_centos(){
@@ -123,6 +122,7 @@ initial(){
     create_user
 	check_version
 	if [[ "${release}" == "centos" ]]; then
+        chcon -R unconfined_u:object_r:user_home_t:s0 /app/
         sed -i '93i  andrew    ALL=(ALL:ALL) NOPASSWD: ALL' /etc/sudoers
         init_centos
         ssh_centos
