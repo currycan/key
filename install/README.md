@@ -12,30 +12,36 @@
 ```Bash
 wget --no-check-certificate -O ./ssr_install.sh https://raw.githubusercontent.com/currycan/key/master/install/install.sh
 chmod 700 ./ssr_install.sh
-./install.sh
+./ssr_install.sh
 ```
 ------
 #### 防火墙设置示例
 
 centos7（请替换命令里的端口）：  
 ```Bash
-firewall-cmd --permanent --zone=public --add-port=端口/tcp
-firewall-cmd --permanent --zone=public --add-port=端口/udp
+firewall-cmd --permanent --zone=public --add-port=2018/tcp
+firewall-cmd --permanent --zone=public --add-port=2018/udp
+firewall-cmd --permanent --zone=public --add-port=2019/tcp
+firewall-cmd --permanent --zone=public --add-port=2019/udp
 firewall-cmd --reload
 ```
 
-centos6（请替换命令里的端口）：  
+centos6/OVZ（请替换命令里的端口）：  
 ```Bash
-iptables -I INPUT -m state --state NEW -m tcp -p tcp --dport 端口 -j ACCEPT
-iptables -I INPUT -m state --state NEW -m udp -p udp --dport 端口 -j ACCEPT
+iptables -I INPUT -m state --state NEW -m tcp -p tcp --dport 2018 -j ACCEPT
+iptables -I INPUT -m state --state NEW -m udp -p udp --dport 2018 -j ACCEPT
+iptables -I INPUT -m state --state NEW -m tcp -p tcp --dport 2019 -j ACCEPT
+iptables -I INPUT -m state --state NEW -m udp -p udp --dport 2019 -j ACCEPT
 /etc/init.d/iptables save
 /etc/init.d/iptables restart
 ```
 
 Debian/Ubuntu（请替换命令里的端口）：  
 ```Bash
-iptables -I INPUT -m state --state NEW -m tcp -p tcp --dport 端口 -j ACCEPT
-iptables -I INPUT -m state --state NEW -m udp -p udp --dport 端口 -j ACCEPT
+iptables -I INPUT -m state --state NEW -m tcp -p tcp --dport 2018 -j ACCEPT
+iptables -I INPUT -m state --state NEW -m udp -p udp --dport 2018 -j ACCEPT
+iptables -I INPUT -m state --state NEW -m tcp -p tcp --dport 2019 -j ACCEPT
+iptables -I INPUT -m state --state NEW -m udp -p udp --dport 2019 -j ACCEPT
 
 #下面这些代码是让Debian/Ubuntu关机自动备份Iptables和启动自动加载Iptables
 echo '#!/bin/bash' > /etc/network/if-post-down.d/iptables && \
@@ -57,6 +63,12 @@ chmod +x /etc/network/if-pre-up.d/iptables
 
 ******
 ## 卸载
+
 ```Bash
     ./ssr_install.sh uninstall
 ```
+
+--------------------------------
+[putty_url]:https://www.vpser.net/other/putty-ssh-linux-vps.html "如何使用Putty远程(SSH)管理Linux VPS"
+[screen_url]:https://www.vpser.net/manage/screen.html "SSH远程会话管理工具 - screen使用教程"
+[vim_url]:https://www.vpser.net/manage/vi.html "Linux上vi(vim)编辑器使用教程"
