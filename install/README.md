@@ -10,9 +10,9 @@
 ## 安装
 ------
 ```Bash
-wget --no-check-certificate -O ./install.sh https://raw.githubusercontent.com/mongomongu/kcptun_for_ss_ssr/master/install.sh
-chmod 700 ./install.sh
-./install.sh install
+wget --no-check-certificate -O ./ssr_install.sh https://raw.githubusercontent.com/currycan/key/master/install/install.sh
+chmod 700 ./ssr_install.sh
+./install.sh
 ```
 ------
 #### 防火墙设置示例
@@ -52,11 +52,11 @@ chmod +x /etc/network/if-pre-up.d/iptables
 ******
 ## 更新
 ```Bash
-    ./kcptun_for_ss_ssr-install.sh update
+    ./ssr_install.sh update
 ```
 
 ******
 ## 卸载
 ```Bash
-    ./kcptun_for_ss_ssr-install.sh uninstall
+    ./ssr_install.sh uninstall
 ```
