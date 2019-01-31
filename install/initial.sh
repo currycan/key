@@ -25,9 +25,12 @@ check_sys(){
 
 create_user(){
     mkdir -p /app
+    FLAG_GROUP=$(grep andrew /etc/group | wc -l)
     FLAG_USER=$(ls -la /app/andrew/.bashrc | wc -l)
-    if [ $FLAG_USER == 1 ];then 
+    if [ $FLAG_GROUP == 0 ];then 
         groupadd andrew
+    fi
+    if [ $FLAG_USER == 0 ];then 
         useradd -m andrew -g andrew -s /bin/bash -d /app/andrew
     fi
 }
