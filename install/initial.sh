@@ -129,7 +129,6 @@ EOF
     echo "Subsystem sftp /usr/lib/openssh/sftp-server" >> /etc/ssh/sshd_config
     service sshd restart
     wget --no-check-certificate -O ~/.bashrc https://raw.githubusercontent.com/currycan/key/master/bashrc
-    source ~/.bashrc
     service sshd restart
     echo "Done~"
 }
@@ -169,3 +168,4 @@ initial(){
 }
 
 initial | tee initial.log
+exec source ~/.bashrc
