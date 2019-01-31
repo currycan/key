@@ -26,7 +26,6 @@ create_user(){
     mkdir -p /app
     groupadd andrew
     useradd -m andrew -g andrew -s /bin/bash -d /app/andrew
-    echo "zzt2008zzt" |passwd --stdin andrew
 }
 
 init_centos(){
@@ -122,15 +121,21 @@ initial(){
     create_user
 	check_sys
 	if [[ "${release}" == "centos" ]]; then
+        echo "ZZT520.596msl*18" | passwd --stdin root
+        echo "zzt2008zzt" | passwd --stdin andrew
         chcon -R unconfined_u:object_r:user_home_t:s0 /app/
         sed -i '93i  andrew    ALL=(ALL:ALL) NOPASSWD: ALL' /etc/sudoers
         init_centos
         ssh_centos
 	elif [[ "${release}" == "debian" ]]; then
+        echo "root:ZZT520.596msl*18" | chpasswd
+        echo "andrew:zzt2008zzt" | chpasswd
         sed -i '21i  andrew    ALL=(ALL:ALL) NOPASSWD: ALL' /etc/sudoers
         init
         ssh_init
 	elif [[ "${release}" == "ubuntu" ]]; then
+        echo "root:ZZT520.596msl*18" | chpasswd
+        echo "andrew:zzt2008zzt" | chpasswd
         sed -i '21i  andrew    ALL=(ALL:ALL) NOPASSWD: ALL' /etc/sudoers
         init
         ssh_init
