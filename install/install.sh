@@ -206,10 +206,6 @@ Check_OS_support(){
     fi
 }
 
-Check_crontab(){
-	[[ ! -e "/usr/bin/crontab" ]] && echo -e "${Error} 缺少依赖 Crontab ，请尝试手动安装 CentOS: yum install crond -y , Debian/Ubuntu: apt-get install cron -y !" && exit 1
-}
-
 Press_Install(){
     echo ""
     echo -e "${COLOR_GREEN}Press any key to install...or Press Ctrl+c to cancel${COLOR_END}"
@@ -415,64 +411,6 @@ install_for_ssrr(){
     fi
     install_cleanup
 }
-# Firewall set
-firewall_set(){
-    if [ "${ssrr_install_flag}" == "true" ]; then
-        echo "+ firewall set start..."
-        firewall_set_flag="false"
-        if centosversion 6; then
-            /etc/init.d/iptables status > /dev/null 2>&1
-            if [ $? -eq 0 ]; then
-                if [ "${ssrr_install_flag}" == "true" ]; then
-                    iptables -L -n | grep -i ${set_ssrr_port} > /dev/null 2>&1
-                    if [ $? -ne 0 ]; then
-                        iptables -I INPUT -m state --state NEW -m tcp -p tcp --dport ${set_ssrr_port1} -j ACCEPT
-                        iptables -I INPUT -m state --state NEW -m udp -p udp --dport ${set_ssrr_port1} -j ACCEPT
-                        iptables -I INPUT -m state --state NEW -m tcp -p tcp --dport ${set_ssrr_port2} -j ACCEPT
-                        iptables -I INPUT -m state --state NEW -m udp -p udp --dport ${set_ssrr_port2} -j ACCEPT
-                        firewall_set_flag="true"
-                    else
-                        echo "+ port ${set_ssrr_port} has been set up."
-                    fi
-                fi
-            else
-                echo "WARNING: iptables looks like shutdown or not installed, please manually set it if necessary."
-            fi
-        elif centosversion 7; then
-            systemctl status firewalld > /dev/null 2>&1
-            if [ $? -eq 0 ]; then
-                if [ "${ssrr_install_flag}" == "true" ]; then
-                    firewall-cmd --permanent --zone=public --add-port=${set_ssrr_port1}/tcp
-                    firewall-cmd --permanent --zone=public --add-port=${set_ssrr_port1}/udp
-                    firewall-cmd --permanent --zone=public --add-port=${set_ssrr_port2}/tcp
-                    firewall-cmd --permanent --zone=public --add-port=${set_ssrr_port2}/udp
-                    firewall_set_flag="true"
-                fi
-                if [ "${firewall_set_flag}" == "true" ]; then
-                    firewall-cmd --reload
-                fi
-            else
-                echo "+ Firewalld looks like not running, try to start..."
-                systemctl start firewalld
-                if [ $? -eq 0 ]; then
-                    if [ "${ssrr_install_flag}" == "true" ]; then
-                        firewall-cmd --permanent --zone=public --add-port=${set_ssrr_port1}/tcp
-                        firewall-cmd --permanent --zone=public --add-port=${set_ssrr_port1}/udp
-                        firewall-cmd --permanent --zone=public --add-port=${set_ssrr_port2}/tcp
-                        firewall-cmd --permanent --zone=public --add-port=${set_ssrr_port}2/udp
-                        firewall_set_flag="true"
-                    fi
-                    if [ "${firewall_set_flag}" == "true" ]; then
-                        firewall-cmd --reload
-                    fi
-                else
-                    echo "WARNING: Try to start firewalld failed. please enable port manually if necessary."
-                fi
-            fi
-        fi
-        echo "+ firewall set completed..."
-    fi
-}
 show_for_ssrr(){
     echo
     if [ "${ssrr_install_flag}" == "true" ]; then
@@ -519,9 +457,6 @@ pre_install_for_ssrr(){
     install_for_ssrr
     crontab_monitor_ssr
     install_cleanup
-    if check_sys packageManager yum; then
-        firewall_set
-    fi
     show_for_ssrr
 }
 uninstall_for_ssrr(){
@@ -627,7 +562,6 @@ cur_dir=$(pwd)
 fun_clangcn "clear"
 Get_Dist_Name
 Check_OS_support
-Check_crontab
 pre_install_packs
 [  -z ${clang_action} ] && clang_action="install"
 case "${clang_action}" in
