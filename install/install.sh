@@ -7,6 +7,9 @@ export PATH
 #   Intro: https://github.com/mongomongu/kcptun_for_ss_ssr/issues
 #===============================================================================================
 version="0.0.1"
+HOST_IP=$(get_ip)
+HOSTNAME=$(hostname)
+echo "${HOST_IP} ${HOSTNAME}" >> /etc/hosts
 sudo su root
 cd ~
 if [ $(id -u) != "0" ]; then
