@@ -7,11 +7,19 @@ export PATH
 #   Intro: https://github.com/mongomongu/kcptun_for_ss_ssr/issues
 #===============================================================================================
 version="0.0.1"
+
+get_ip(){
+    local IP=$(ip addr | egrep -o '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | egrep -v "^192\.168|^172\.1[6-9]\.|^172\.2[0-9]\.|^172\.3[0-2]\.|^10\.|^127\.|^255\.|^0\." | head -n 1)
+    [ -z ${IP} ] && IP=$(wget -qO- -t1 -T2 ip.clang.cn | sed -r 's/\r//')
+    [ -z ${IP} ] && IP=$(wget -qO- -t1 -T2 ipv4.icanhazip.com | sed -r 's/\r//')
+    [ ! -z ${IP} ] && echo ${IP} || echo
+}
 HOST_IP=$(get_ip)
 HOSTNAME=$(hostname)
 echo "${HOST_IP} ${HOSTNAME}" >> /etc/hosts
 sudo su root
 cd ~
+
 if [ $(id -u) != "0" ]; then
     echo "Error: You must be root to run this script, please use root to install ssrr"
     exit 1
@@ -253,12 +261,6 @@ pre_install_packs(){
             apt-get -y update && apt-get -y install wget psmisc net-tools
         fi
     fi
-}
-get_ip(){
-    local IP=$(ip addr | egrep -o '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | egrep -v "^192\.168|^172\.1[6-9]\.|^172\.2[0-9]\.|^172\.3[0-2]\.|^10\.|^127\.|^255\.|^0\." | head -n 1)
-    [ -z ${IP} ] && IP=$(wget -qO- -t1 -T2 ip.clang.cn | sed -r 's/\r//')
-    [ -z ${IP} ] && IP=$(wget -qO- -t1 -T2 ipv4.icanhazip.com | sed -r 's/\r//')
-    [ ! -z ${IP} ] && echo ${IP} || echo
 }
 # Install cleanup
 install_cleanup(){
