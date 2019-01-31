@@ -67,10 +67,10 @@ EOF
 }
 
 ssh_centos(){
-    mkdir -p ~/.ssh/
-    curl -so ~/.ssh/authorized_keys https://raw.githubusercontent.com/currycan/key/master/authorized_keys
-    curl -so ~/.ssh/id_rsa.pub https://raw.githubusercontent.com/currycan/key/master/id_rsa.pub
-    chmod 600  ~/.ssh/*
+    mkdir -p /app/andrew/.ssh/
+    curl -so /app/andrew/.ssh/authorized_keys https://raw.githubusercontent.com/currycan/key/master/authorized_keys
+    curl -so /app/andrew/.ssh/id_rsa.pub https://raw.githubusercontent.com/currycan/key/master/id_rsa.pub
+    chmod 600  /app/andrew/.ssh/*
     cat << EOF > /etc/ssh/sshd_config
 Port 38666
 SyslogFacility AUTHPRIV
@@ -92,10 +92,10 @@ EOF
 }
 
 ssh_init(){
-    mkdir -p ~/.ssh/
-    curl -so ~/.ssh/authorized_keys https://raw.githubusercontent.com/currycan/key/master/authorized_keys
-    curl -so ~/.ssh/id_rsa.pub https://raw.githubusercontent.com/currycan/key/master/id_rsa.pub
-    chmod 600  ~/.ssh/*
+    mkdir -p /app/andrew/.ssh/
+    curl -so /app/andrew/.ssh/authorized_keys https://raw.githubusercontent.com/currycan/key/master/authorized_keys
+    curl -so /app/andrew/.ssh/id_rsa.pub https://raw.githubusercontent.com/currycan/key/master/id_rsa.pub
+    chmod 600  /app/andrew/.ssh/*
     cat << EOF > /etc/ssh/sshd_config
 Port 38666
 SyslogFacility AUTHPRIV
@@ -137,4 +137,4 @@ initial(){
 	fi
 }
 
-initial
+initial | tee initial.log
