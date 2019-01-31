@@ -18,9 +18,12 @@ get_ip(){
 }
 HOST_IP=$(get_ip)
 HOSTNAME=$(hostname)
-echo "${HOST_IP} ${HOSTNAME}" >> /etc/hosts
-sudo su root
-cd ~
+FLAG_IP=$(grep "${HOST_IP} ${HOSTNAME}" /etc/hosts | wc-l)
+if [ FLAG_IP == 0 ];then
+    echo "${HOST_IP} ${HOSTNAME}" >> /etc/hosts
+    sudo su root
+    cd ~
+fi
 
 if [ $(id -u) != "0" ]; then
     echo "Error: You must be root to run this script, please use root to install ssrr"
