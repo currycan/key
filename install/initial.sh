@@ -2,6 +2,7 @@
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 
+set -e
 
 #检查系统
 check_sys(){
@@ -34,6 +35,7 @@ init_centos(){
     yum -y install vim wget net-tools telnet lrzsz lsof bash-completion epel-release
     curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
     python get-pip.py
+    rm -f get-pip.py
     pip install -U speedtest-cli
     yum install firewalld -y
     systemctl enable firewalld && systemctl start firewalld.service
@@ -62,6 +64,7 @@ from pip import __main__
 if __name__ == '__main__':
     sys.exit(__main__._main())
 EOF
+    rm -f get-pip.py
     pip install -U speedtest-cli
 }
 
