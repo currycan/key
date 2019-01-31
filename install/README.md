@@ -1,5 +1,5 @@
 ******
-##<a name="plan"/>安装前的准备工作
+## 安装前的准备工作
 
 命令都是在你的服务器上运行的，  
 首先你要知道如何通过SSH远程登录到你的服务器上 [SSH教程][putty_url]  
@@ -7,22 +7,15 @@
 最后要会一点点的VI(VIM)编辑器使用方法 [VI/VIM教程][vim_url]
 
 ******
-##<a name="Install"/>安装
+## 安装
 ------
-###<a name="Install_command">安装命令
-```Bash
-wget --no-check-certificate -O ./kcptun_for_ss_ssr-install.sh https://raw.githubusercontent.com/mongomongu/kcptun_for_ss_ssr/master/kcptun_for_ss_ssr-install.sh
-chmod 700 ./kcptun_for_ss_ssr-install.sh
-./kcptun_for_ss_ssr-install.sh install
-```
-自用：
 ```Bash
 wget --no-check-certificate -O ./install.sh https://raw.githubusercontent.com/mongomongu/kcptun_for_ss_ssr/master/install.sh
 chmod 700 ./install.sh
 ./install.sh install
 ```
 ------
-####<a name="Firewall">防火墙设置示例
+#### 防火墙设置示例
 
 centos7（请替换命令里的端口）：  
 ```Bash
@@ -57,13 +50,13 @@ chmod +x /etc/network/if-pre-up.d/iptables
 ```
 
 ******
-##<a name="Update"/>更新
+## 更新
 ```Bash
     ./kcptun_for_ss_ssr-install.sh update
 ```
 
 ******
-##<a name="UnInstall"/>卸载
+## 卸载
 ```Bash
     ./kcptun_for_ss_ssr-install.sh uninstall
 ```
