@@ -132,7 +132,7 @@ initial(){
         echo "ZZT520.596msl*18" | passwd --stdin root
         echo "zzt2008zzt" | passwd --stdin andrew
         chcon -R unconfined_u:object_r:user_home_t:s0 /app/
-        if [ $FLAG_SUDO == 0 ];
+        if [ $FLAG_SUDO == 0 ];then
             sed -i '93i  andrew    ALL=(ALL:ALL) NOPASSWD: ALL' /etc/sudoers
         fi
         init_centos
@@ -140,7 +140,7 @@ initial(){
 	elif [[ "${release}" == "debian" ]]; then
         echo "root:ZZT520.596msl*18" | chpasswd
         echo "andrew:zzt2008zzt" | chpasswd
-        if [ $FLAG_SUDO == 0 ];
+        if [ $FLAG_SUDO == 0 ];then
             sed -i '21i  andrew    ALL=(ALL:ALL) NOPASSWD: ALL' /etc/sudoers
         fi
         init
@@ -148,7 +148,7 @@ initial(){
 	elif [[ "${release}" == "ubuntu" ]]; then
         echo "root:ZZT520.596msl*18" | chpasswd
         echo "andrew:zzt2008zzt" | chpasswd
-        if [ $FLAG_SUDO == 0 ];
+        if [ $FLAG_SUDO == 0 ];then
             sed -i '21i  andrew    ALL=(ALL:ALL) NOPASSWD: ALL' /etc/sudoers
         fi
         init
