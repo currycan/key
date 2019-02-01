@@ -201,7 +201,7 @@ get_ip(){
 # Install cleanup
 install_cleanup(){
     cd ${cur_dir}
-    rm -rf .version.sh shadowsocks-libev-* manyuser.zip shadowsocksr-manyuser shadowsocks-manyuser kcptun-linux-* libsodium-* mbedtls-* shadowsocksr-master ssrr.zip
+    rm -rf .version.sh shadowsocks-libev-* manyuser.zip shadowsocksr-manyuser shadowsocks-manyuser kcptun-linux-* libsodium-* mbedtls-* shadowsocksr-* ssrr.zip
 }
 # Check installed
 check_ssr_installed(){
@@ -256,10 +256,10 @@ download_for_ssrr(){
         fi
     fi
     if [[ "${ssrr_installed_flag}" == "false" && "${action}" =~ ^[Ii]|[Ii][Nn]|[Ii][Nn][Ss][Tt][Aa][Ll][Ll]|-[Ii]|--[Ii]$ ]] || [[ "${ssrr_installed_flag}" == "true" && "${ssrr_update_flag}" == "true" && "${action}" =~ ^[Uu]|[Uu][Pp][Dd][Aa][Tt][Ee]|-[Uu]|--[Uu]|[Uu][Pp]|-[Uu][Pp]|--[Uu][Pp]$ ]]; then
-        if [ -f ${ssrr_latest_ver}.tar.gz ]; then
-            echo "${ssrr_latest_ver}.tar.gz [found]"
+        if [ -f shadowsocksr-${ssrr_latest_ver}.tar.gz ]; then
+            echo "shadowsocksr-${ssrr_latest_ver}.tar.gz [found]"
         else
-            if ! wget --no-check-certificate -O ${ssrr_latest_ver}.tar.gz ${ssrr_download_link}; then
+            if ! wget --no-check-certificate -O shadowsocksr-${ssrr_latest_ver}.tar.gz ${ssrr_download_link}; then
                 echo -e "${COLOR_RED}Failed to download Shadowsocksrr file!${COLOR_END}"
                 exit 1
             fi
@@ -315,9 +315,9 @@ install_for_ssrr(){
         #echo "/usr/lib" > /etc/ld.so.conf.d/local.conf
     fi
     if [[ "${ssrr_installed_flag}" == "false" && "${action}" =~ ^[Ii]|[Ii][Nn]|[Ii][Nn][Ss][Tt][Aa][Ll][Ll]|-[Ii]|--[Ii]$ ]] || [[ "${ssrr_installed_flag}" == "true" && "${ssrr_update_flag}" == "true" && "${action}" =~ ^[Uu]|[Uu][Pp][Dd][Aa][Tt][Ee]|-[Uu]|--[Uu]|[Uu][Pp]|-[Uu][Pp]|--[Uu][Pp]$ ]]; then
-        cd ${cur_dir}     
-        tar xzf ${ssrr_latest_ver}.tar.gz
-        mv shadowsocksr-master/* /usr/local/shadowsocksrr/
+        cd ${cur_dir}
+        tar xzf shadowsocksr-${ssrr_latest_ver}.tar.gz
+        mv shadowsocksr-${ssrr_latest_ver}/* /usr/local/shadowsocksrr/
         if [ -x /usr/local/shadowsocksrr/shadowsocks/server.py ] && [ -s /usr/local/shadowsocksrr/shadowsocks/__init__.py ]; then
             chmod +x /etc/init.d/ssrr
             if check_sys packageManager yum; then
