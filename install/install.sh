@@ -6,9 +6,6 @@ export PATH
 #   Description:  A tool to auto-compile & install ssrr on Linux
 #===============================================================================================
 version="0.0.1"
-
-# set -ex
-
 if [ $(id -u) != "0" ]; then
     echo "Error: You must be root to run this script, please use root to install ssrr"
     exit 1
@@ -18,15 +15,12 @@ fi
 export LIBSODIUM_VER=$(wget -qO- "https://github.com/jedisct1/libsodium/tags"|grep "/jedisct1/libsodium/releases/tag/"|head -1|sed -r 's/.*tag\/(.+)\">.*/\1/')
 export LIBSODIUM_LINK="https://github.com/jedisct1/libsodium/releases/download/${LIBSODIUM_VER}/libsodium-${LIBSODIUM_VER}.tar.gz"
 # MBEDTLS
-export MBEDTLS_VER=2.16.0
+export MBEDTLS_VER=$(wget -qO- "https://tls.mbed.org/download"|grep "(GPL)"|cut -d'-' -f2)
 export MBEDTLS_LINK="https://tls.mbed.org/download/mbedtls-${MBEDTLS_VER}-gpl.tgz"
 # SSRR
-# export SSRR_VER=$(wget --no-check-certificate -qO- https://raw.githubusercontent.com/currycan/shadowsocksr/manyuser/shadowsocks/version.py| grep return | cut -d\' -f2 | awk '{print $1}')
-export SSRR_VER=$(wget --no-check-certificate -qO- https://raw.githubusercontent.com/shadowsocksrr/shadowsocksr/manyuser/shadowsocks/version.py| grep return | cut -d\' -f2 | awk '{print $1}')
-
-export SSRR_LINK="https://github.com/shadowsocksrr/shadowsocksr/archive/master.zip"
-export SSRR_YUM_INIT="https://raw.githubusercontent.com/currycan/key/master/install/ssrr.init"
-export SSRR_APT_INIT="https://raw.githubusercontent.com/currycan/key/master/install/ssrr_apt.init"
+export SSRR_VER=$(wget -qO- "https://github.com/shadowsocksrr/shadowsocksr/tags"|grep "/shadowsocksrr/shadowsocksr/releases/tag/"|head -1|sed -r 's/.*tag\/(.+)\">.*/\1/')
+export SSRR_LINK="https://github.com/shadowsocksrr/shadowsocksr/archive/${SSRR_VER}.tar.gz"
+export SSRR_INIT="https://raw.githubusercontent.com/currycan/key/master/install/ssrr.init"
 ssrr_config="/usr/local/shadowsocksrr/user-config.json"
 
 
@@ -54,8 +48,15 @@ fun_set_text_color(){
     COLOR_GREEN_LIGHTNING='\033[32m \033[05m'
     COLOR_END='\E[0m'
 }
+# Disable selinux
+disable_selinux(){
+    if [ -s /etc/selinux/config ] && grep 'SELINUX=enforcing' /etc/selinux/config; then
+        sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
+        setenforce 0
+    fi
+}
 # Check OS
-Check_system(){
+Get_Dist_Name(){
     release=''
     systemPackage=''
     DISTRO=''
@@ -127,11 +128,11 @@ check_sys(){
 }
 # Get version
 getversion(){
-if [[ -s /etc/redhat-release ]]; then
-    grep -oE  "[0-9.]+" /etc/redhat-release
-else
-    grep -oE  "[0-9.]+" /etc/issue
-fi
+    if [[ -s /etc/redhat-release ]]; then
+        grep -oE  "[0-9.]+" /etc/redhat-release
+    else
+        grep -oE  "[0-9.]+" /etc/issue
+    fi
 }
 # CentOS version
 centosversion(){
@@ -183,7 +184,6 @@ Check_OS_support(){
         fi
     fi
 }
-
 Print_Sys_Info(){
     cat /etc/issue
     cat /etc/*-release
@@ -191,18 +191,6 @@ Print_Sys_Info(){
     MemTotal=`free -m | grep Mem | awk '{print  $2}'`
     echo "Memory is: ${MemTotal} MB "
     df -h
-}
-Disable_Selinux(){
-    if [ -s /etc/selinux/config ]; then
-        sed -i 's/^SELINUX=.*/SELINUX=disabled/g' /etc/selinux/config
-    fi
-}
-pre_install_packs(){
-    if check_sys packageManager yum; then
-        yum install -y wget psmisc net-tools
-    elif check_sys packageManager apt; then
-        apt-get -y update && apt-get -y install wget psmisc net-tools
-    fi
 }
 get_ip(){
     local IP=$(ip addr | egrep -o '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | egrep -v "^192\.168|^172\.1[6-9]\.|^172\.2[0-9]\.|^172\.3[0-2]\.|^10\.|^127\.|^255\.|^0\." | head -n 1)
@@ -215,6 +203,7 @@ install_cleanup(){
     cd ${cur_dir}
     rm -rf .version.sh shadowsocks-libev-* manyuser.zip shadowsocksr-manyuser shadowsocks-manyuser kcptun-linux-* libsodium-* mbedtls-* shadowsocksr-master ssrr.zip
 }
+# Check installed
 check_ssr_installed(){
     ssrr_install_flag=""
     if [[ -x /usr/local/shadowsocksrr/shadowsocks/server.py ]] && [[ -s /usr/local/shadowsocksrr/shadowsocks/__init__.py ]]; then
@@ -223,9 +212,10 @@ check_ssr_installed(){
         ssrr_installed_flag="false"
     fi
 }
+# Get latest version
 get_latest_version(){
     rm -f ${cur_dir}/.api_*.txt
-    if [ ! -f /usr/lib/libsodium.a ] && [ ! -L /usr/lib/libsodium.so ]; then
+    if [ ! -f /usr/lib/libsodium.a ] && [ ! -L /usr/local/lib/libsodium.so ]; then
         #echo -e "Loading libsodium version, please wait..."
         libsodium_laster_ver="libsodium-${LIBSODIUM_VER}"
         if [ "${libsodium_laster_ver}" == "" ] || [ "${LIBSODIUM_LINK}" == "" ]; then
@@ -247,19 +237,15 @@ get_latest_version(){
         echo -e "Loading Shadowsocksrr version, please wait..."
         ssrr_download_link="${SSRR_LINK}"
         ssrr_latest_ver="${SSRR_VER}"
-        if check_sys packageManager yum; then
-            ssrr_init_link="${SSRR_YUM_INIT}"
-        elif check_sys packageManager apt; then
-            ssrr_init_link="${SSRR_APT_INIT}"
-        fi
-        if [[ "${ssrr_installed_flag}" == "false" && "${clang_action}" =~ ^[Ii]|[Ii][Nn]|[Ii][Nn][Ss][Tt][Aa][Ll][Ll]|-[Ii]|--[Ii]$ ]]; then
+        ssrr_init_link="${SSRR_INIT}"
+        if [[ "${ssrr_installed_flag}" == "false" && "${action}" =~ ^[Ii]|[Ii][Nn]|[Ii][Nn][Ss][Tt][Aa][Ll][Ll]|-[Ii]|--[Ii]$ ]]; then
             echo -e "Get the Shadowsocksrr version:${COLOR_GREEN} ${SSRR_VER}${COLOR_END}"
         fi
     fi
 }
 # Download latest
 download_for_ssrr(){
-    if [ ! -f /usr/lib/libsodium.a ] && [ ! -L /usr/lib/libsodium.so ]; then
+    if [ ! -f /usr/lib/libsodium.a ] && [ ! -L /usr/local/lib/libsodium.so ]; then
         if [ -f ${libsodium_laster_ver}.tar.gz ]; then
             echo "${libsodium_laster_ver}.tar.gz [found]"
         else
@@ -269,7 +255,7 @@ download_for_ssrr(){
             fi
         fi
     fi
-    if [[ "${ssrr_installed_flag}" == "false" && "${clang_action}" =~ ^[Ii]|[Ii][Nn]|[Ii][Nn][Ss][Tt][Aa][Ll][Ll]|-[Ii]|--[Ii]$ ]] || [[ "${ssrr_installed_flag}" == "true" && "${ssrr_update_flag}" == "true" && "${clang_action}" =~ ^[Uu]|[Uu][Pp][Dd][Aa][Tt][Ee]|-[Uu]|--[Uu]|[Uu][Pp]|-[Uu][Pp]|--[Uu][Pp]$ ]]; then
+    if [[ "${ssrr_installed_flag}" == "false" && "${action}" =~ ^[Ii]|[Ii][Nn]|[Ii][Nn][Ss][Tt][Aa][Ll][Ll]|-[Ii]|--[Ii]$ ]] || [[ "${ssrr_installed_flag}" == "true" && "${ssrr_update_flag}" == "true" && "${action}" =~ ^[Uu]|[Uu][Pp][Dd][Aa][Tt][Ee]|-[Uu]|--[Uu]|[Uu][Pp]|-[Uu][Pp]|--[Uu][Pp]$ ]]; then
         if [ -f ssrr.zip ]; then
             echo "ssrr.zip [found]"
         else
@@ -284,10 +270,7 @@ download_for_ssrr(){
         fi
     fi
 }
-config_for_ssrr(){
-    rm -f /usr/local/shadowsocksrr/user-config.json
-    wget --no-check-certificate -P /usr/local/shadowsocksrr/ https://raw.githubusercontent.com/currycan/key/master/user-config.json
-}
+# Install ssr
 install_for_ssrr(){
     if check_sys packageManager yum; then
         yum install -y epel-release
@@ -316,7 +299,7 @@ install_for_ssrr(){
         echo "+ Install libsodium"
         tar xzf ${libsodium_laster_ver}.tar.gz
         cd ${libsodium_laster_ver}
-        ./configure --disable-maintainer-mode --prefix=/usr && make -j2 && make install
+        ./configure && make -j4 && make install
         if [ $? -ne 0 ]; then
             install_cleanup
             echo -e "${COLOR_RED}libsodium install failed!${COLOR_END}"
@@ -325,7 +308,7 @@ install_for_ssrr(){
         ldconfig
         #echo "/usr/lib" > /etc/ld.so.conf.d/local.conf
     fi
-    if [[ "${ssrr_installed_flag}" == "false" && "${clang_action}" =~ ^[Ii]|[Ii][Nn]|[Ii][Nn][Ss][Tt][Aa][Ll][Ll]|-[Ii]|--[Ii]$ ]] || [[ "${ssrr_installed_flag}" == "true" && "${ssrr_update_flag}" == "true" && "${clang_action}" =~ ^[Uu]|[Uu][Pp][Dd][Aa][Tt][Ee]|-[Uu]|--[Uu]|[Uu][Pp]|-[Uu][Pp]|--[Uu][Pp]$ ]]; then
+    if [[ "${ssrr_installed_flag}" == "false" && "${action}" =~ ^[Ii]|[Ii][Nn]|[Ii][Nn][Ss][Tt][Aa][Ll][Ll]|-[Ii]|--[Ii]$ ]] || [[ "${ssrr_installed_flag}" == "true" && "${ssrr_update_flag}" == "true" && "${action}" =~ ^[Uu]|[Uu][Pp][Dd][Aa][Tt][Ee]|-[Uu]|--[Uu]|[Uu][Pp]|-[Uu][Pp]|--[Uu][Pp]$ ]]; then
         cd ${cur_dir}
         mkdir -p /usr/local/shadowsocksrr
         unzip -qo ssrr.zip
@@ -355,6 +338,12 @@ install_for_ssrr(){
     fi
     install_cleanup
 }
+# Downlaod config
+config_for_ssrr(){
+    rm -f /usr/local/shadowsocksrr/user-config.json
+    wget --no-check-certificate -P /usr/local/shadowsocksrr/ https://raw.githubusercontent.com/currycan/key/master/user-config.json
+}
+# Show config
 show_for_ssrr(){
     echo
     if [ "${ssrr_install_flag}" == "true" ]; then
@@ -367,6 +356,7 @@ show_for_ssrr(){
     nl ${ssrr_config}
     echo
 }
+# check ssr
 crontab_monitor_ssr(){
     curl -o /usr/local/bin/check.sh https://raw.githubusercontent.com/currycan/check/master/check.sh
     chmod +x /usr/local/bin/check.sh
@@ -374,7 +364,7 @@ crontab_monitor_ssr(){
     (crontab -l ; echo "*/5 * * * * /usr/local/bin/check.sh") | crontab -
     crontab -u root -l
 }
-
+# install
 pre_install_for_ssrr(){
     fun_clear "clear"
     Print_Sys_Info
@@ -393,15 +383,15 @@ pre_install_for_ssrr(){
         exit 0
     fi
     get_latest_version
-    config_for_ssrr
     download_for_ssrr
     install_for_ssrr
+    config_for_ssrr
     crontab_monitor_ssr
     install_cleanup
     show_for_ssrr
 }
 uninstall_for_ssrr(){
-    Check_system
+    Get_Dist_Name
     fun_clear "clear"
     echo -e "${COLOR_PINK}You will Uninstall Shadowsocksrr(python)${COLOR_END}"
     check_ssr_installed
@@ -426,11 +416,7 @@ uninstall_for_ssrr(){
     fi
     install_cleanup
 }
-configure_for_ssr(){
-    if [ -f ${ssrr_config} ]; then
-        echo -e "Shadowsocksrr config file:  ${COLOR_GREEN}${ssrr_config}${COLOR_END}"
-    fi
-}
+
 update_for_ssr(){
     ssr_update_flag="false"
     fun_clear "clear"
@@ -496,15 +482,15 @@ update_for_ssr(){
 
 fun_set_text_color
 # Initialization
-clang_action=$1
+action=$1
 clear
 cur_dir=$(pwd)
 fun_clear "clear"
-Check_system
+Get_Dist_Name
 Check_OS_support
 pre_install_packs
-[  -z ${clang_action} ] && clang_action="install"
-case "${clang_action}" in
+[  -z ${action} ] && action="install"
+case "${action}" in
 [Ii]|[Ii][Nn]|[Ii][Nn][Ss][Tt][Aa][Ll][Ll]|-[Ii]|--[Ii])
     pre_install_for_ssrr 2>&1 | tee ${cur_dir}/ssr_install.log
     ;;
@@ -516,7 +502,7 @@ case "${clang_action}" in
     ;;
 *)
     fun_clear "clear"
-    echo "Arguments error! [${clang_action}]"
+    echo "Arguments error! [${action}]"
     echo "Usage: `basename $0` {install|uninstall|update}"
     ;;
 esac
