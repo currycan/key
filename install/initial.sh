@@ -60,7 +60,7 @@ down_key(){
 init_centos(){
     echo "ZZT520.596msl*18" |passwd --stdin root
     yum update -y
-    yum install -y vim wget net-tools telnet lrzsz lsof bash-completion epel-release crond git
+    yum install -y vim wget net-tools telnet lrzsz lsof bash-completion epel-release psmisc crond git
     pip_install
     pip install -U speedtest-cli
     systemctl stop firewalld && systemctl disable firewalld
@@ -70,7 +70,7 @@ init(){
     echo "root:ZZT520.596msl*18" | chpasswd
     apt update 
     apt upgrade -y
-    apt install -y sudo vim wget net-tools telnet lrzsz lsof bash-completion curl cron git
+    apt install -y sudo vim wget net-tools telnet lrzsz lsof bash-completion curl psmisc cron git
     pip_install
     cat << EOF > /usr/bin/pip
 #!/usr/bin/python
