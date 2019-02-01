@@ -406,10 +406,7 @@ uninstall_for_ssrr(){
     echo -e "${COLOR_PINK}You will Uninstall Shadowsocksrr(python)${COLOR_END}"
     check_ssr_installed
     if [ "${ssrr_installed_flag}" == "true" ]; then
-        /etc/init.d/ssrr status > /dev/null 2>&1
-        if [ $? -eq 0 ]; then
-            /etc/init.d/ssrr stop
-        fi
+        pkill -9 python
         if check_sys packageManager yum; then
             chkconfig --del ssrr
         elif check_sys packageManager apt; then
