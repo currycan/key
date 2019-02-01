@@ -327,7 +327,6 @@ config_for_ssrr(){
     if [[ "${ssrr_installed_flag}" == "false" && "${clang_action}" =~ ^[Ii]|[Ii][Nn]|[Ii][Nn][Ss][Tt][Aa][Ll][Ll]|-[Ii]|--[Ii]$ ]]; then
         [ ! -d /usr/local/shadowsocksrr ] && mkdir -p /usr/local/shadowsocksrr
     fi
-    curl -o /usr/local/shadowsocksrr/user-config.json https://raw.githubusercontent.com/currycan/key/master/user-config.json
 }
 install_for_ssrr(){
     #if [[ "${ss_libev_installed_flag}" == "false" && "${clang_action}" =~ ^[Ii]|[Ii][Nn]|[Ii][Nn][Ss][Tt][Aa][Ll][Ll]|-[Ii]|--[Ii]$ ]] || [[ "${ssr_installed_flag}" == "false" && "${clang_action}" =~ ^[Ii]|[Ii][Nn]|[Ii][Nn][Ss][Tt][Aa][Ll][Ll]|-[Ii]|--[Ii]$ ]] || [[ "${kcptun_installed_flag}" == "false" && "${clang_action}" =~ ^[Ii]|[Ii][Nn]|[Ii][Nn][Ss][Tt][Aa][Ll][Ll]|-[Ii]|--[Ii]$ ]]; then
@@ -429,6 +428,7 @@ pre_install_for_ssrr(){
         echo
         echo "=========================================================="
         echo -e "${COLOR_PINK}configure Shadowsocksrr(SSRR) setting:${COLOR_END}"
+        rm -f /usr/local/shadowsocksrr/user-config.json
         curl -o /usr/local/shadowsocksrr/user-config.json https://raw.githubusercontent.com/currycan/key/master/user-config.json
         echo "=========================================================="
     elif [ "${ssrr_installed_flag}" == "true" ]; then
