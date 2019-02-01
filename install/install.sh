@@ -243,22 +243,10 @@ Disable_Selinux(){
     fi
 }
 pre_install_packs(){
-    local wget_flag=''
-    local killall_flag=''
-    local netstat_flag=''
-    wget --version > /dev/null 2>&1
-    wget_flag=$?
-    killall -V >/dev/null 2>&1
-    killall_flag=$?
-    netstat --version >/dev/null 2>&1
-    netstat_flag=$?
-    if [[ ${wget_flag} -gt 1 ]] || [[ ${killall_flag} -gt 1 ]] || [[ ${netstat_flag} -gt 6 ]];then
-        echo -e "${COLOR_GREEN} Install support packs...${COLOR_END}"
-        if check_sys packageManager yum; then
-            yum install -y wget psmisc net-tools
-        elif check_sys packageManager apt; then
-            apt-get -y update && apt-get -y install wget psmisc net-tools
-        fi
+    if check_sys packageManager yum; then
+        yum install -y wget psmisc net-tools
+    elif check_sys packageManager apt; then
+        apt-get -y update && apt-get -y install wget psmisc net-tools
     fi
 }
 # Install cleanup
