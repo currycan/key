@@ -343,10 +343,10 @@ case "${action}" in
     install 2>&1 | tee ${cur_dir}/speed.log
     ;;
 [Uu][Nn]|[Uu][Nn][Ii][Nn][Ss][Tt][Aa][Ll][Ll]|[Uu][Nn]|-[Uu][Nn]|--[Uu][Nn])
-    remove_all 2>&1
+    remove_all
     ;;
 [Ss]|[Ss][Tt][Aa][Tt][Uu][Ss]|-[Ss])
-    check_status 2>&1 
+    check_status
     ;;	
 *)
     clear
