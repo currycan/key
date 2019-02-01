@@ -300,7 +300,7 @@ install_for_ssrr(){
             exit 1
         fi
     fi
-    if [ ! -f /usr/lib/libsodium.a ] && [ ! -L /usr/lib/libsodium.so ]; then
+    if [ ! -f /usr/lib/libsodium.a ] && [ ! -L /usr/local/lib/libsodium.so ]; then
         cd ${cur_dir}
         echo "+ Install libsodium"
         tar xzf ${libsodium_laster_ver}.tar.gz
