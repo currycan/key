@@ -10,11 +10,13 @@
 ## 安装
 ------
 ```Bash
-wget --no-check-certificate -O ./ssr_install.sh https://raw.githubusercontent.com/currycan/key/master/install/install.sh
 wget --no-check-certificate -O ./initial.sh https://raw.githubusercontent.com/currycan/key/master/install/initial.sh
+wget --no-check-certificate -O ./ssr_install.sh https://raw.githubusercontent.com/currycan/key/master/install/install.sh
+wget --no-check-certificate -O ./initial.sh https://raw.githubusercontent.com/currycan/key/master/install/tcp.sh
 chmod 700 ./*.sh
 ./initial.sh
 ./ssr_install.sh
+./tcp.sh
 ```
 ------
 #### 防火墙设置示例
