@@ -168,4 +168,4 @@ initial(){
 }
 
 initial | tee initial.log
-exec source ~/.bashrc
+exec bash source ~/.bashrc
