@@ -331,18 +331,26 @@ install(){
 	startlotserver
 }
 
+action=$1
+clear
 cur_dir=$(pwd)
 check_sys
 check_version
 [[ ${release} != "debian" ]] && [[ ${release} != "ubuntu" ]] && [[ ${release} != "centos" ]] && echo -e "${Error} 本脚本不支持当前系统 ${release} !" && exit 1
 [  -z ${action} ] && action="install"
-if [ ${action} = "install" ];then
-	install 2>&1 | tee ${cur_dir}/speed.log
-elif [ ${action} = "uninstall" ];then
-	remove_all 2>&1
-elif [ ${action} = "status" ];then
-	check_status 2>&1
-else
-	echo "Arguments error! [${action}]"
+case "${action}" in
+[Ii]|[Ii][Nn]|[Ii][Nn][Ss][Tt][Aa][Ll][Ll]|-[Ii]|--[Ii])
+    install 2>&1 | tee ${cur_dir}/speed.log
+    ;;
+[Uu][Nn]|[Uu][Nn][Ii][Nn][Ss][Tt][Aa][Ll][Ll]|[Uu][Nn]|-[Uu][Nn]|--[Uu][Nn])
+    remove_all 2>&1
+    ;;
+[Ss]|[Ss][Tt][Aa][Tt][Uu][Ss]|-[Ss])
+    check_status 2>&1 
+    ;;	
+*)
+    clear
+    echo "Arguments error! [${action}]"
     echo "Usage: `basename $0` {install|uninstall|status}"
-fi
+    ;;
+esac
