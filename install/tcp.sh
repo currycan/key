@@ -345,3 +345,4 @@ elif [ ${action} = "status" ];then
 else
 	echo "Arguments error! [${action}]"
     echo "Usage: `basename $0` {install|uninstall|status}"
+fi
