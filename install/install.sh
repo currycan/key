@@ -49,7 +49,7 @@ fun_set_text_color(){
     COLOR_END='\E[0m'
 }
 # Disable selinux
-disable_selinux(){
+Disable_Selinux(){
     if [ -s /etc/selinux/config ] && grep 'SELINUX=enforcing' /etc/selinux/config; then
         sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
         setenforce 0
