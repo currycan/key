@@ -28,10 +28,6 @@ if [ $(id -u) != "0" ]; then
     exit 1
 fi
 
-# PORT
-set_ssrr_port1=2018
-set_ssrr_port2=2019
-
 # LIBSODIUM
 export LIBSODIUM_VER=$(wget -qO- "https://github.com/jedisct1/libsodium/tags"|grep "/jedisct1/libsodium/releases/tag/"|head -1|sed -r 's/.*tag\/(.+)\">.*/\1/')
 export LIBSODIUM_LINK="https://github.com/jedisct1/libsodium/releases/download/${LIBSODIUM_VER}/libsodium-${LIBSODIUM_VER}.tar.gz"
