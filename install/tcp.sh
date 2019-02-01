@@ -330,6 +330,15 @@ install(){
 	check_sys_Lotsever
 	startlotserver
 }
+status(){
+	check_status
+	if [[ ${kernel_status} == "Lotserver" ]]; then
+		echo -e " 当前状态: ${Green_font_prefix}已安装${Font_color_suffix} ${_font_prefix}${kernel_status}${Font_color_suffix} 加速内核 , ${Green_font_prefix}${run_status}${Font_color_suffix}"
+	else
+		echo -e " 当前状态: ${Green_font_prefix}未安装${Font_color_suffix} 加速内核 ${Red_font_prefix}请先安装内核${Font_color_suffix}"
+		
+	fi
+}
 
 action=$1
 clear
@@ -343,10 +352,10 @@ case "${action}" in
     install 2>&1 | tee ${cur_dir}/speed.log
     ;;
 [Uu][Nn]|[Uu][Nn][Ii][Nn][Ss][Tt][Aa][Ll][Ll]|[Uu][Nn]|-[Uu][Nn]|--[Uu][Nn])
-    remove_all
+    remove_all 2>&1
     ;;
 [Ss]|[Ss][Tt][Aa][Tt][Uu][Ss]|-[Ss])
-    check_status
+    status 2>&1 
     ;;	
 *)
     clear
