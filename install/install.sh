@@ -327,6 +327,9 @@ install_for_ssrr(){
     fi
     if [[ "${ssrr_installed_flag}" == "false" && "${clang_action}" =~ ^[Ii]|[Ii][Nn]|[Ii][Nn][Ss][Tt][Aa][Ll][Ll]|-[Ii]|--[Ii]$ ]] || [[ "${ssrr_installed_flag}" == "true" && "${ssrr_update_flag}" == "true" && "${clang_action}" =~ ^[Uu]|[Uu][Pp][Dd][Aa][Tt][Ee]|-[Uu]|--[Uu]|[Uu][Pp]|-[Uu][Pp]|--[Uu][Pp]$ ]]; then
         cd ${cur_dir}
+        mkdir -p /usr/local/shadowsocksrr
+        unzip -qo ssrr.zip
+        mv shadowsocksr-master/* /usr/local/shadowsocksrr/
         if [ -x /usr/local/shadowsocksrr/shadowsocks/server.py ] && [ -s /usr/local/shadowsocksrr/shadowsocks/__init__.py ]; then
             chmod +x /etc/init.d/ssrr
             if check_sys packageManager yum; then
@@ -344,9 +347,6 @@ install_for_ssrr(){
             fi
             ssrr_install_flag="true"
         else
-            mkdir -p /usr/local/shadowsocksrr
-            unzip -qo ssrr.zip
-            mv shadowsocksr-master/* /usr/local/shadowsocksrr/
             install_cleanup
             echo
             echo -e "${COLOR_RED}Shadowsocksrr install failed!${COLOR_END}"
@@ -503,13 +503,13 @@ pre_install_packs
 [  -z ${clang_action} ] && clang_action="install"
 case "${clang_action}" in
 [Ii]|[Ii][Nn]|[Ii][Nn][Ss][Tt][Aa][Ll][Ll]|-[Ii]|--[Ii])
-    pre_install_for_ssrr 2>&1 | tee ${cur_dir}/install.log
+    pre_install_for_ssrr 2>&1 | tee ${cur_dir}/ssr_install.log
     ;;
 [Uu][Nn]|[Uu][Nn][Ii][Nn][Ss][Tt][Aa][Ll][Ll]|[Uu][Nn]|-[Uu][Nn]|--[Uu][Nn])
-    uninstall_for_ssrr 2>&1 | tee ${cur_dir}/uninstall.log
+    uninstall_for_ssrr 2>&1 | tee ${cur_dir}/ssr_uninstall.log
     ;;
 [Uu]|[Uu][Pp][Dd][Aa][Tt][Ee]|-[Uu]|--[Uu]|[Uu][Pp]|-[Uu][Pp]|--[Uu][Pp])
-    update_for_ssr 2>&1 | tee ${cur_dir}/update.log
+    update_for_ssr 2>&1 | tee ${cur_dir}/ssr_update.log
     ;;
 *)
     fun_clear "clear"
