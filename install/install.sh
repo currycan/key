@@ -250,7 +250,7 @@ check_ssr_installed(){
 }
 get_latest_version(){
     rm -f ${cur_dir}/.api_*.txt
-    if [ ! -f /usr/lib/libsodium.a ] && [ ! -L /usr/local/lib/libsodium.so ]; then
+    if [ ! -f /usr/lib/libsodium.a ] && [ ! -L /usr/lib/libsodium.so ]; then
         #echo -e "Loading libsodium version, please wait..."
         libsodium_laster_ver="libsodium-${LIBSODIUM_VER}"
         if [ "${libsodium_laster_ver}" == "" ] || [ "${LIBSODIUM_LINK}" == "" ]; then
@@ -284,7 +284,7 @@ get_latest_version(){
 }
 # Download latest
 download_for_ssrr(){
-    if [ ! -f /usr/lib/libsodium.a ] && [ ! -L /usr/local/lib/libsodium.so ]; then
+    if [ ! -f /usr/lib/libsodium.a ] && [ ! -L /usr/lib/libsodium.so ]; then
         if [ -f ${libsodium_laster_ver}.tar.gz ]; then
             echo "${libsodium_laster_ver}.tar.gz [found]"
         else
@@ -339,12 +339,13 @@ install_for_ssrr(){
             fi
         fi
     #fi
-    if [ ! -f /usr/lib/libsodium.a ] && [ ! -L /usr/local/lib/libsodium.so ]; then
+    if [ ! -f /usr/lib/libsodium.a ] && [ ! -L /usr/lib/libsodium.so ]; then
         cd ${cur_dir}
         echo "+ Install libsodium for SS-Libev/SSR/KCPTUN"
         tar xzf ${libsodium_laster_ver}.tar.gz
         cd ${libsodium_laster_ver}
-        ./configure --prefix=/usr && make && make install
+        ./configure  && make && make install
+        ./configure --disable-maintainer-mode --prefix=/usr && make -j2 && make install
         if [ $? -ne 0 ]; then
             install_cleanup
             echo -e "${COLOR_RED}libsodium install failed!${COLOR_END}"
