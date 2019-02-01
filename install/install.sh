@@ -4,25 +4,10 @@ export PATH
 #===============================================================================================
 #   System Required:  CentOS Debian or Ubuntu (32bit/64bit)
 #   Description:  A tool to auto-compile & install ssrr on Linux
-#   Intro: https://github.com/mongomongu/kcptun_for_ss_ssr/issues
 #===============================================================================================
 version="0.0.1"
 
 set -e
-
-get_ip(){
-    local IP=$(ip addr | egrep -o '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | egrep -v "^192\.168|^172\.1[6-9]\.|^172\.2[0-9]\.|^172\.3[0-2]\.|^10\.|^127\.|^255\.|^0\." | head -n 1)
-    [ -z ${IP} ] && IP=$(wget -qO- -t1 -T2 ip.clang.cn | sed -r 's/\r//')
-    [ -z ${IP} ] && IP=$(wget -qO- -t1 -T2 ipv4.icanhazip.com | sed -r 's/\r//')
-    [ ! -z ${IP} ] && echo ${IP} || echo
-}
-HOST_IP=$(get_ip)
-HOSTNAME=$(hostname)
-echo "${HOST_IP} ${HOSTNAME}"
-FLAG_HOST=$(grep "${HOST_IP} ${HOSTNAME}" /etc/hosts | wc -l)
-if [ FLAG_HOST == 0 ];then
-    echo "${HOST_IP} ${HOSTNAME}" >> /etc/hosts
-fi
 
 if [ $(id -u) != "0" ]; then
     echo "Error: You must be root to run this script, please use root to install ssrr"
@@ -40,10 +25,10 @@ export MBEDTLS_LINK="https://tls.mbed.org/download/mbedtls-${MBEDTLS_VER}-gpl.tg
 export SSRR_VER=$(wget --no-check-certificate -qO- https://raw.githubusercontent.com/shadowsocksrr/shadowsocksr/manyuser/shadowsocks/version.py| grep return | cut -d\' -f2 | awk '{print $1}')
 
 export SSRR_LINK="https://github.com/shadowsocksrr/shadowsocksr/archive/master.zip"
-export SSRR_YUM_INIT="https://raw.githubusercontent.com/mongomongu/kcptun_for_ss_ssr/master/ssrr.init"
-export SSRR_APT_INIT="https://raw.githubusercontent.com/mongomongu/kcptun_for_ss_ssr/master/ssrr_apt.init"
+export SSRR_YUM_INIT="https://raw.githubusercontent.com/currycan/key/master/install/ssrr.init"
+export SSRR_APT_INIT="https://raw.githubusercontent.com/currycan/key/master/install/ssrr_apt.init"
 ssrr_config="/usr/local/shadowsocksrr/user-config.json"
-contact_us="https://github.com/mongomongu/kcptun_for_ss_ssr/issues"
+
 
 fun_clangcn(){
     local clear_flag=""
@@ -56,8 +41,6 @@ fun_clangcn(){
     echo "|                    ssrr on Linux Server                        |"
     echo "+----------------------------------------------------------------+"
     echo "|  A tool to auto-compile & install ssrr on Linux   |"
-    echo "+----------------------------------------------------------------+"
-    echo "| Intro: ${contact_us} |"
     echo "+----------------------------------------------------------------+"
     echo ""
 }
@@ -246,6 +229,12 @@ pre_install_packs(){
         apt-get -y update && apt-get -y install wget psmisc net-tools
     fi
 }
+get_ip(){
+    local IP=$(ip addr | egrep -o '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | egrep -v "^192\.168|^172\.1[6-9]\.|^172\.2[0-9]\.|^172\.3[0-2]\.|^10\.|^127\.|^255\.|^0\." | head -n 1)
+    [ -z ${IP} ] && IP=$(wget -qO- -t1 -T2 ip.clang.cn | sed -r 's/\r//')
+    [ -z ${IP} ] && IP=$(wget -qO- -t1 -T2 ipv4.icanhazip.com | sed -r 's/\r//')
+    [ ! -z ${IP} ] && echo ${IP} || echo
+}
 # Install cleanup
 install_cleanup(){
     cd ${cur_dir}
@@ -387,7 +376,7 @@ install_for_ssrr(){
         else
             install_cleanup
             echo
-            echo -e "${COLOR_RED}Shadowsocksrr install failed! Please visit ${contact_us} and contact.${COLOR_END}"
+            echo -e "${COLOR_RED}Shadowsocksrr install failed!${COLOR_END}"
             exit 1
         fi
     fi
@@ -419,6 +408,7 @@ pre_install_for_ssrr(){
     Print_Sys_Info
     Disable_Selinux
     check_ssr_installed
+    config_for_ssrr
     cd ${cur_dir}
     ###############################   Shadowsocksrr   ###############################
     if [ "${ssrr_installed_flag}" == "false" ]; then
@@ -426,7 +416,7 @@ pre_install_for_ssrr(){
         echo "=========================================================="
         echo -e "${COLOR_PINK}configure Shadowsocksrr(SSRR) setting:${COLOR_END}"
         rm -f /usr/local/shadowsocksrr/user-config.json
-        curl -o /usr/local/shadowsocksrr/user-config.json https://raw.githubusercontent.com/currycan/key/master/user-config.json
+        wget --no-check-certificate -P /usr/local/shadowsocksrr/ https://raw.githubusercontent.com/currycan/key/master/user-config.json
         echo "=========================================================="
     elif [ "${ssrr_installed_flag}" == "true" ]; then
         echo
@@ -436,7 +426,6 @@ pre_install_for_ssrr(){
     # Press_Start
     get_latest_version
     download_for_ssrr
-    config_for_ssrr
     install_for_ssrr
     crontab_monitor_ssr
     install_cleanup
@@ -532,7 +521,7 @@ update_for_ssr(){
         echo
     else
         echo
-        echo -e "${COLOR_RED}Update failed! Please visit ${contact_us} and contact.${COLOR_END}"
+        echo -e "${COLOR_RED}Update failed!${COLOR_END}"
         exit 1
     fi
 }
