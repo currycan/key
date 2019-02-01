@@ -7,7 +7,7 @@ export PATH
 #===============================================================================================
 version="0.0.1"
 
-set -e
+set -ex
 
 if [ $(id -u) != "0" ]; then
     echo "Error: You must be root to run this script, please use root to install ssrr"
