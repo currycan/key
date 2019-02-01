@@ -18,8 +18,9 @@ get_ip(){
 }
 HOST_IP=$(get_ip)
 HOSTNAME=$(hostname)
-FLAG_IP=$(grep "${HOST_IP} ${HOSTNAME}" /etc/hosts | wc -l)
-if [ FLAG_IP == 0 ];then
+echo "${HOST_IP} ${HOSTNAME}"
+FLAG_HOST=$(grep "${HOST_IP} ${HOSTNAME}" /etc/hosts | wc -l)
+if [ FLAG_HOST == 0 ];then
     echo "${HOST_IP} ${HOSTNAME}" >> /etc/hosts
 fi
 
