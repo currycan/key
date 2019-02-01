@@ -30,7 +30,7 @@ export SSRR_APT_INIT="https://raw.githubusercontent.com/currycan/key/master/inst
 ssrr_config="/usr/local/shadowsocksrr/user-config.json"
 
 
-fun_clangcn(){
+fun_clear(){
     local clear_flag=""
     clear_flag=$1
     if [[ ${clear_flag} == "clear" ]]; then
@@ -55,7 +55,7 @@ fun_set_text_color(){
     COLOR_END='\E[0m'
 }
 # Check OS
-Get_Dist_Name(){
+Check_system(){
     release=''
     systemPackage=''
     DISTRO=''
@@ -184,31 +184,6 @@ Check_OS_support(){
     fi
 }
 
-Press_Install(){
-    echo ""
-    echo -e "${COLOR_GREEN}Press any key to install...or Press Ctrl+c to cancel${COLOR_END}"
-    OLDCONFIG=`stty -g`
-    stty -icanon -echo min 1 time 0
-    dd count=1 2>/dev/null
-    stty ${OLDCONFIG}
-}
-
-Press_Start(){
-    echo ""
-    echo -e "${COLOR_GREEN}Press any key to continue...or Press Ctrl+c to cancel${COLOR_END}"
-    OLDCONFIG=`stty -g`
-    stty -icanon -echo min 1 time 0
-    dd count=1 2>/dev/null
-    stty ${OLDCONFIG}
-}
-Press_Exit(){
-    echo ""
-    echo -e "${COLOR_GREEN}Press any key to Exit...or Press Ctrl+c${COLOR_END}"
-    OLDCONFIG=`stty -g`
-    stty -icanon -echo min 1 time 0
-    dd count=1 2>/dev/null
-    stty ${OLDCONFIG}
-}
 Print_Sys_Info(){
     cat /etc/issue
     cat /etc/*-release
@@ -310,41 +285,37 @@ download_for_ssrr(){
     fi
 }
 config_for_ssrr(){
-    if [[ "${ssrr_installed_flag}" == "false" && "${clang_action}" =~ ^[Ii]|[Ii][Nn]|[Ii][Nn][Ss][Tt][Aa][Ll][Ll]|-[Ii]|--[Ii]$ ]]; then
-        [ ! -d /usr/local/shadowsocksrr ] && mkdir -p /usr/local/shadowsocksrr
-    fi
+    rm -f /usr/local/shadowsocksrr/user-config.json
+    wget --no-check-certificate -P /usr/local/shadowsocksrr/ https://raw.githubusercontent.com/currycan/key/master/user-config.json
 }
 install_for_ssrr(){
-    #if [[ "${ss_libev_installed_flag}" == "false" && "${clang_action}" =~ ^[Ii]|[Ii][Nn]|[Ii][Nn][Ss][Tt][Aa][Ll][Ll]|-[Ii]|--[Ii]$ ]] || [[ "${ssr_installed_flag}" == "false" && "${clang_action}" =~ ^[Ii]|[Ii][Nn]|[Ii][Nn][Ss][Tt][Aa][Ll][Ll]|-[Ii]|--[Ii]$ ]] || [[ "${kcptun_installed_flag}" == "false" && "${clang_action}" =~ ^[Ii]|[Ii][Nn]|[Ii][Nn][Ss][Tt][Aa][Ll][Ll]|-[Ii]|--[Ii]$ ]]; then
-        if check_sys packageManager yum; then
-            yum install -y epel-release
-            yum install -y unzip openssl-devel gcc swig autoconf libtool libevent vim automake make psmisc curl curl-devel zlib-devel perl perl-devel cpio expat-devel gettext-devel xmlto asciidoc pcre pcre-devel python python-devel python-setuptools udns-devel libev-devel c-ares-devel mbedtls-devel
-            if [ $? -gt 1 ]; then
-                echo
-                echo -e "${COLOR_RED}Install support packs failed!${COLOR_END}"
-                exit 1
-            fi
-        elif check_sys packageManager apt; then
-            if debianversion 7; then
-                grep "jessie" /etc/apt/sources.list > /dev/null 2>&1
-                if [ $? -ne 0 ] && [ -r /etc/apt/sources.list ]; then
-                    echo "deb http://http.us.debian.org/debian jessie main" >> /etc/apt/sources.list
-                fi
-            fi
-            apt-get -y update && apt-get -y install --no-install-recommends gettext curl wget vim unzip psmisc gcc swig autoconf automake make perl cpio build-essential libtool openssl libssl-dev zlib1g-dev xmlto asciidoc libpcre3 libpcre3-dev python python-dev python-pip python-m2crypto libev-dev libc-ares-dev libudns-dev
-            if [ $? -gt 1 ]; then
-                echo
-                echo -e "${COLOR_RED}Install support packs failed!${COLOR_END}"
-                exit 1
+    if check_sys packageManager yum; then
+        yum install -y epel-release
+        yum install -y unzip openssl-devel gcc swig autoconf libtool libevent vim automake make psmisc curl curl-devel zlib-devel perl perl-devel cpio expat-devel gettext-devel xmlto asciidoc pcre pcre-devel python python-devel python-setuptools udns-devel libev-devel c-ares-devel mbedtls-devel
+        if [ $? -gt 1 ]; then
+            echo
+            echo -e "${COLOR_RED}Install support packs failed!${COLOR_END}"
+            exit 1
+        fi
+    elif check_sys packageManager apt; then
+        if debianversion 7; then
+            grep "jessie" /etc/apt/sources.list > /dev/null 2>&1
+            if [ $? -ne 0 ] && [ -r /etc/apt/sources.list ]; then
+                echo "deb http://http.us.debian.org/debian jessie main" >> /etc/apt/sources.list
             fi
         fi
-    #fi
+        apt-get -y update && apt-get -y install --no-install-recommends gettext curl wget vim unzip psmisc gcc swig autoconf automake make perl cpio build-essential libtool openssl libssl-dev zlib1g-dev xmlto asciidoc libpcre3 libpcre3-dev python python-dev python-pip python-m2crypto libev-dev libc-ares-dev libudns-dev
+        if [ $? -gt 1 ]; then
+            echo
+            echo -e "${COLOR_RED}Install support packs failed!${COLOR_END}"
+            exit 1
+        fi
+    fi
     if [ ! -f /usr/lib/libsodium.a ] && [ ! -L /usr/lib/libsodium.so ]; then
         cd ${cur_dir}
-        echo "+ Install libsodium for SS-Libev/SSR/KCPTUN"
+        echo "+ Install libsodium"
         tar xzf ${libsodium_laster_ver}.tar.gz
         cd ${libsodium_laster_ver}
-        ./configure  && make && make install
         ./configure --disable-maintainer-mode --prefix=/usr && make -j2 && make install
         if [ $? -ne 0 ]; then
             install_cleanup
@@ -356,8 +327,6 @@ install_for_ssrr(){
     fi
     if [[ "${ssrr_installed_flag}" == "false" && "${clang_action}" =~ ^[Ii]|[Ii][Nn]|[Ii][Nn][Ss][Tt][Aa][Ll][Ll]|-[Ii]|--[Ii]$ ]] || [[ "${ssrr_installed_flag}" == "true" && "${ssrr_update_flag}" == "true" && "${clang_action}" =~ ^[Uu]|[Uu][Pp][Dd][Aa][Tt][Ee]|-[Uu]|--[Uu]|[Uu][Pp]|-[Uu][Pp]|--[Uu][Pp]$ ]]; then
         cd ${cur_dir}
-        unzip -qo ssrr.zip
-        mv shadowsocksr-master/* /usr/local/shadowsocksrr/
         if [ -x /usr/local/shadowsocksrr/shadowsocks/server.py ] && [ -s /usr/local/shadowsocksrr/shadowsocks/__init__.py ]; then
             chmod +x /etc/init.d/ssrr
             if check_sys packageManager yum; then
@@ -375,6 +344,9 @@ install_for_ssrr(){
             fi
             ssrr_install_flag="true"
         else
+            mkdir -p /usr/local/shadowsocksrr
+            unzip -qo ssrr.zip
+            mv shadowsocksr-master/* /usr/local/shadowsocksrr/
             install_cleanup
             echo
             echo -e "${COLOR_RED}Shadowsocksrr install failed!${COLOR_END}"
@@ -387,7 +359,7 @@ show_for_ssrr(){
     echo
     if [ "${ssrr_install_flag}" == "true" ]; then
         SERVER_IP=$(get_ip)
-        fun_clangcn
+        fun_clear
         echo "Congratulations, install completed!"
         echo -e "========================= Your Server Setting ========================="
         echo -e "Your Server IP: ${COLOR_GREEN}${SERVER_IP}${COLOR_END}"
@@ -404,28 +376,24 @@ crontab_monitor_ssr(){
 }
 
 pre_install_for_ssrr(){
-    fun_clangcn "clear"
-    # Press_Install
+    fun_clear "clear"
     Print_Sys_Info
     Disable_Selinux
     check_ssr_installed
-    config_for_ssrr
     cd ${cur_dir}
     ###############################   Shadowsocksrr   ###############################
     if [ "${ssrr_installed_flag}" == "false" ]; then
         echo
         echo "=========================================================="
-        echo -e "${COLOR_PINK}configure Shadowsocksrr(SSRR) setting:${COLOR_END}"
-        rm -f /usr/local/shadowsocksrr/user-config.json
-        wget --no-check-certificate -P /usr/local/shadowsocksrr/ https://raw.githubusercontent.com/currycan/key/master/user-config.json
+        echo -e "${COLOR_PINK}configure Shadowsocksrr(SSRR) setting:${COLOR_END}"   
         echo "=========================================================="
     elif [ "${ssrr_installed_flag}" == "true" ]; then
         echo
         echo -e "${COLOR_PINK}Shadowsocksrr has been installed, nothing to do...${COLOR_END}"
         exit 0
     fi
-    # Press_Start
     get_latest_version
+    config_for_ssrr
     download_for_ssrr
     install_for_ssrr
     crontab_monitor_ssr
@@ -433,10 +401,9 @@ pre_install_for_ssrr(){
     show_for_ssrr
 }
 uninstall_for_ssrr(){
-    Get_Dist_Name
-    fun_clangcn "clear"
+    Check_system
+    fun_clear "clear"
     echo -e "${COLOR_PINK}You will Uninstall Shadowsocksrr(python)${COLOR_END}"
-    # Press_Start
     check_ssr_installed
     if [ "${ssrr_installed_flag}" == "true" ]; then
         /etc/init.d/ssrr status > /dev/null 2>&1
@@ -457,6 +424,7 @@ uninstall_for_ssrr(){
     else
         echo -e "${COLOR_GREEN}Shadowsocksrr not install!${COLOR_END}"
     fi
+    install_cleanup
 }
 configure_for_ssr(){
     if [ -f ${ssrr_config} ]; then
@@ -465,7 +433,7 @@ configure_for_ssr(){
 }
 update_for_ssr(){
     ssr_update_flag="false"
-    fun_clangcn "clear"
+    fun_clear "clear"
     echo -e "${COLOR_PINK}You will update Shadowsocksrr(python)${COLOR_END}"
     check_ssr_installed
     get_latest_version
@@ -489,7 +457,6 @@ update_for_ssr(){
     if [[ "${ssrr_update_flag}" == "true" ]]; then
         echo "+-------------------------------------------------------------+"
         echo -e "${COLOR_GREEN}Found a new version,update now...${COLOR_END}"
-        # Press_Start
     fi
     if [[ "${ssrr_installed_flag}" == "true" && "${ssrr_update_flag}" == "true" ]]; then
         /etc/init.d/ssrr status > /dev/null 2>&1
@@ -517,7 +484,7 @@ update_for_ssr(){
         exit 1
     fi
     if [[ "${ssrr_install_flag}" == "true" ]]; then
-        fun_clangcn
+        fun_clear
         echo "Congratulations, update completed, Enjoy it!"
         echo
     else
@@ -532,17 +499,14 @@ fun_set_text_color
 clang_action=$1
 clear
 cur_dir=$(pwd)
-fun_clangcn "clear"
-Get_Dist_Name
+fun_clear "clear"
+Check_system
 Check_OS_support
 pre_install_packs
 [  -z ${clang_action} ] && clang_action="install"
 case "${clang_action}" in
 [Ii]|[Ii][Nn]|[Ii][Nn][Ss][Tt][Aa][Ll][Ll]|-[Ii]|--[Ii])
     pre_install_for_ssrr 2>&1 | tee ${cur_dir}/install.log
-    ;;
-[Cc]|[Cc][Oo][Nn][Ff][Ii][Gg]|-[Cc]|--[Cc])
-    configure_for_ssr
     ;;
 [Uu][Nn]|[Uu][Nn][Ii][Nn][Ss][Tt][Aa][Ll][Ll]|[Uu][Nn]|-[Uu][Nn]|--[Uu][Nn])
     uninstall_for_ssrr 2>&1 | tee ${cur_dir}/uninstall.log
@@ -551,8 +515,8 @@ case "${clang_action}" in
     update_for_ssr 2>&1 | tee ${cur_dir}/update.log
     ;;
 *)
-    fun_clangcn "clear"
+    fun_clear "clear"
     echo "Arguments error! [${clang_action}]"
-    echo "Usage: `basename $0` {install|uninstall|update|config}"
+    echo "Usage: `basename $0` {install|uninstall|update}"
     ;;
 esac
