@@ -301,12 +301,8 @@ check_sys_Lotsever(){
 check_status(){
 	kernel_version=`uname -r | awk -F "-" '{print $1}'`
 	kernel_version_full=`uname -r`
-	if [[ ${kernel_version_full} = "4.14.91-bbrplus" ]]; then
-		kernel_status="BBRplus"
-	elif [[ ${kernel_version} = "3.10.0" || ${kernel_version} = "3.16.0" || ${kernel_version} = "3.2.0" || ${kernel_version} = "4.4.0" || ${kernel_version} = "3.13.0"  || ${kernel_version} = "2.6.32" ]]; then
+	if [[ ${kernel_version} = "3.10.0" || ${kernel_version} = "3.16.0" || ${kernel_version} = "3.2.0" || ${kernel_version} = "4.4.0" || ${kernel_version} = "3.13.0"  || ${kernel_version} = "2.6.32" ]]; then
 		kernel_status="Lotserver"
-	elif [[ `echo ${kernel_version} | awk -F'.' '{print $1}'` == "4" ]] && [[ `echo ${kernel_version} | awk -F'.' '{print $2}'` -ge 9 ]]; then
-		kernel_status="BBR"
 	else 
 		kernel_status="noinstall"
 	fi
@@ -352,7 +348,7 @@ case "${action}" in
     remove_all 2>&1
     ;;
 [Ss]|[Ss][Tt][Aa][Tt][Uu][Ss]|-[Ss])
-    check_sys_Lotsever 2>&1 
+    check_status 2>&1 
     ;;	
 *)
     clear
