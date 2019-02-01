@@ -215,6 +215,7 @@ BBR_grub(){
             grub2-set-default 0
         fi
     elif [[ "${release}" == "debian" || "${release}" == "ubuntu" ]]; then
+		sed -i /etc/default/grub -e "s/^GRUB_DEFAULT=.*/GRUB_DEFAULT=\"Advanced options for Debian GNU\/Linux>Debian GNU\/Linux, with Linux 3.16.0-4-amd64\"/g"
         /usr/sbin/update-grub
     fi
 }
@@ -318,13 +319,12 @@ check_status(){
 }
 
 #############系统检测组件#############
-install(){
+install_kernel(){
 	check_status
 	if [[ ${kernel_status} == "noinstall" ]]; then
 		echo -e " 当前状态: ${Green_font_prefix}未安装${Font_color_suffix} 加速内核 ${Red_font_prefix}请先安装内核${Font_color_suffix}"
 		optimizing_system
 		check_sys_Lotsever
-		startlotserver
 	else
 		echo -e " 当前状态: ${Green_font_prefix}已安装${Font_color_suffix} ${_font_prefix}${kernel_status}${Font_color_suffix} 加速内核 , ${Green_font_prefix}${run_status}${Font_color_suffix}"
 	fi
@@ -348,17 +348,20 @@ check_version
 [  -z ${action} ] && action="install"
 case "${action}" in
 [Ii]|[Ii][Nn]|[Ii][Nn][Ss][Tt][Aa][Ll][Ll]|-[Ii]|--[Ii])
-    install 2>&1 | tee ${cur_dir}/speed.log
+    install_kernel 2>&1 | tee ${cur_dir}/speed.log
+    ;;
+[Ss][Tt][Aa][Rr][Tt])
+    startlotserver 2>&1
     ;;
 [Uu][Nn]|[Uu][Nn][Ii][Nn][Ss][Tt][Aa][Ll][Ll]|[Uu][Nn]|-[Uu][Nn]|--[Uu][Nn])
     remove_all 2>&1
     ;;
-[Ss]|[Ss][Tt][Aa][Tt][Uu][Ss]|-[Ss])
+[Ss][Tt][Aa][Tt][Uu][Ss])
     status 2>&1 
     ;;	
 *)
     clear
     echo "Arguments error! [${action}]"
-    echo "Usage: `basename $0` {install|uninstall|status}"
+    echo "Usage: `basename $0` {install|uninstall|start|status}"
     ;;
 esac
