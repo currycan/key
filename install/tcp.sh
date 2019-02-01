@@ -270,26 +270,22 @@ check_sys_Lotsever(){
 			echo -e "${Error} Lotsever不支持当前系统 ${release} ${version} ${bit} !" && exit 1
 		fi
 	elif [[ "${release}" == "debian" ]]; then
-		if [[ ${version} -ge "7" ]]; then
-			if [[ ${bit} == "x64" ]]; then
-				kernel_version="3.16.0-4"
-				installlot
-			elif [[ ${bit} == "x32" ]]; then
-				kernel_version="3.2.0-4"
-				installlot
-			fi
+		if [[ ${bit} == "x64" ]]; then
+			kernel_version="3.16.0-4"
+			installlot
+		elif [[ ${bit} == "x32" ]]; then
+			kernel_version="3.2.0-4"
+			installlot
 		else
 			echo -e "${Error} Lotsever不支持当前系统 ${release} ${version} ${bit} !" && exit 1
 		fi
 	elif [[ "${release}" == "ubuntu" ]]; then
-		if [[ ${version} -ge "12" ]]; then
-			if [[ ${bit} == "x64" ]]; then
-				kernel_version="4.4.0-47"
-				installlot
-			elif [[ ${bit} == "x32" ]]; then
-				kernel_version="3.13.0-29"
-				installlot
-			fi
+		if [[ ${bit} == "x64" ]]; then
+			kernel_version="4.4.0-47"
+			installlot
+		elif [[ ${bit} == "x32" ]]; then
+			kernel_version="3.13.0-29"
+			installlot
 		else
 			echo -e "${Error} Lotsever不支持当前系统 ${release} ${version} ${bit} !" && exit 1
 		fi
@@ -340,19 +336,12 @@ check_sys
 check_version
 [[ ${release} != "debian" ]] && [[ ${release} != "ubuntu" ]] && [[ ${release} != "centos" ]] && echo -e "${Error} 本脚本不支持当前系统 ${release} !" && exit 1
 [  -z ${action} ] && action="install"
-case "${action}" in
-[Ii]|[Ii][Nn]|[Ii][Nn][Ss][Tt][Aa][Ll][Ll]|-[Ii]|--[Ii])
-    install 2>&1 | tee ${cur_dir}/speed.log
-    ;;
-[Uu][Nn]|[Uu][Nn][Ii][Nn][Ss][Tt][Aa][Ll][Ll]|[Uu][Nn]|-[Uu][Nn]|--[Uu][Nn])
-    remove_all 2>&1
-    ;;
-[Ss]|[Ss][Tt][Aa][Tt][Uu][Ss]|-[Ss])
-    check_status 2>&1 
-    ;;	
-*)
-    clear
-    echo "Arguments error! [${action}]"
+if [ ${action} = "install" ];then
+	install 2>&1 | tee ${cur_dir}/speed.log
+elif [ ${action} = "uninstall" ];then
+	remove_all 2>&1
+elif [ ${action} = "status" ];then
+	check_status 2>&1
+else
+	echo "Arguments error! [${action}]"
     echo "Usage: `basename $0` {install|uninstall|status}"
-    ;;
-esac
