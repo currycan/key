@@ -23,6 +23,21 @@ check_sys(){
     fi
 }
 
+#检查Linux版本
+check_version(){
+	if [[ -s /etc/redhat-release ]]; then
+		version=`grep -oE  "[0-9.]+" /etc/redhat-release | cut -d . -f 1`
+	else
+		version=`grep -oE  "[0-9.]+" /etc/issue | cut -d . -f 1`
+	fi
+	bit=`uname -m`
+	if [[ ${bit} = "x86_64" ]]; then
+		bit="x64"
+	else
+		bit="x32"
+	fi
+}
+
 create_user(){
     mkdir -p /app
     FLAG_GROUP=$(grep andrew /etc/group | wc -l)
@@ -63,7 +78,6 @@ init_centos(){
     yum install -y vim wget net-tools telnet lrzsz lsof bash-completion epel-release python psmisc crond git
     pip_install
     pip install -U speedtest-cli
-    systemctl stop firewalld && systemctl disable firewalld
 }
 
 init(){
@@ -138,6 +152,7 @@ EOF
 initial(){
     create_user
 	check_sys
+    check_version
 	if [[ "${release}" == "centos" ]]; then
         echo "ZZT520.596msl*18" | passwd --stdin root
         echo "zzt2008zzt" | passwd --stdin andrew
@@ -147,10 +162,18 @@ initial(){
         if [ $FLAG_SUDO == 0 ];then
             sed -i '93i  andrew    ALL=(ALL:ALL) NOPASSWD: ALL' /etc/sudoers
         fi
+        if [[ ${version} == "6" ]]; then
+            echo "centos 6"
+		elif [[ ${version} == "7" ]]; then
+            systemctl stop firewalld && systemctl disable firewalld
+		else
+			echo "unkown error"
+		fi
         ssh_centos
 	elif [[ "${release}" == "debian" ]]; then
         echo "root:ZZT520.596msl*18" | chpasswd
         echo "andrew:zzt2008zzt" | chpasswd
+        systemctl stop firewalld && systemctl disable firewalld
         init
         FLAG_SUDO=$(grep andrew /etc/sudoers | wc -l)
         if [ $FLAG_SUDO == 0 ];then
@@ -160,6 +183,7 @@ initial(){
 	elif [[ "${release}" == "ubuntu" ]]; then
         echo "root:ZZT520.596msl*18" | chpasswd
         echo "andrew:zzt2008zzt" | chpasswd
+        systemctl stop firewalld && systemctl disable firewalld
         init
         FLAG_SUDO=$(grep andrew /etc/sudoers | wc -l)
         if [ $FLAG_SUDO == 0 ];then
