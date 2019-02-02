@@ -18,7 +18,7 @@ FOLDER=/usr/local/shadowsocksrr
 BIN=/usr/local/shadowsocksrr/shadowsocks/server.py
 BINR=/usr/local/shadowsocksrr/server.py
 Info_font_prefix="\033[32m" && Error_font_prefix="\033[31m" && Info_background_prefix="\033[42;37m" && Error_background_prefix="\033[41;37m" && Font_suffix="\033[0m"
-CONF=/usr/local/shadowsocksrr/user-config.json
+CONF=/usr/local/shadowsocksrr/user-configR.json
 RETVAL=0
 
 [ -x ${BIN} ] || exit 0
