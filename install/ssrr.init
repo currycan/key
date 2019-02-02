@@ -64,6 +64,7 @@ do_stop(){
         # python_ver=$(ls /usr/bin|grep -e "^python[23]\.[1-9]\+$"|tail -1)
         python_ver="python"
         eval $(ps -ef | grep "[0-9] ${python_ver} server\\.py m" | awk '{print "kill "$2}')
+		kill -9 ${PID}
 		RETVAL=$?
 		if [[ $RETVAL -eq 0 ]]; then
 			echo -e "${Info_font_prefix}[信息]${Font_suffix} $NAME 停止成功 !"
