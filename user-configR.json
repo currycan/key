@@ -5,7 +5,7 @@
   "local_port": 10086,
   "port_password": {
     "2018": {
-      "protocol": "auth_akarin_spec_a",
+      "protocol": "auth_chain_f",
       "protocol_param": "www.ibm.com",
       "password": "zzt2008zzt",
       "obfs": "tls1.2_ticket_auth_compatible",
