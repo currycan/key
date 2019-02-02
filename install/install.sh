@@ -369,7 +369,7 @@ show_for_ssrr(){
     fi
     nl ${ssrr_config}
     echo "=========================================="
-    nl ${${config_user_file}}
+    nl ${config_user_file}
     echo "=========================================="
     echo
 }
