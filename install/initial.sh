@@ -104,42 +104,15 @@ EOF
 
 ssh_centos(){
     down_key
-    cat << EOF > /etc/ssh/sshd_config
-Port 38666
-SyslogFacility AUTHPRIV
-PermitRootLogin no
-RSAAuthentication yes 
-PermitRootLogin yes
-PubkeyAuthentication yes
-AuthorizedKeysFile .ssh/authorized_keys
-PasswordAuthentication no
-ChallengeResponseAuthentication no
-GSSAPICleanupCredentials yes
-UsePAM yes
-X11Forwarding no
-EOF
+    wget --no-check-certificate -O /etc/ssh/sshd_config https://raw.githubusercontent.com/currycan/key/master/sshd_config
     echo "Subsystem sftp /usr/libexec/openssh/sftp-server" >> /etc/ssh/sshd_config
-    echo "Subsystem sftp /usr/lib/openssh/sftp-server" >> /etc/ssh/sshd_config
     service sshd restart
     echo "Done~"
 }
 
 ssh_init(){
     down_key
-    cat << EOF > /etc/ssh/sshd_config
-Port 38666
-SyslogFacility AUTHPRIV
-PermitRootLogin no
-RSAAuthentication yes 
-PermitRootLogin yes
-PubkeyAuthentication yes
-AuthorizedKeysFile .ssh/authorized_keys
-PasswordAuthentication no
-ChallengeResponseAuthentication no
-GSSAPICleanupCredentials yes
-UsePAM yes
-X11Forwarding no
-EOF
+    wget --no-check-certificate -O /etc/ssh/sshd_config https://raw.githubusercontent.com/currycan/key/master/sshd_config
     echo "Subsystem sftp /usr/lib/openssh/sftp-server" >> /etc/ssh/sshd_config
     service sshd restart
     wget --no-check-certificate -O ~/.bashrc https://raw.githubusercontent.com/currycan/key/master/bashrc
