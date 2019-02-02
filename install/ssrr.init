@@ -13,64 +13,77 @@
 ### END INIT INFO
 
 NAME=Shadowsocksrr
+NAME_BIN="server.py"
+FOLDER=/usr/local/shadowsocksrr
 BIN=/usr/local/shadowsocksrr/shadowsocks/server.py
+BINR=/usr/local/shadowsocksrr/server.py
+Info_font_prefix="\033[32m" && Error_font_prefix="\033[31m" && Info_background_prefix="\033[42;37m" && Error_background_prefix="\033[41;37m" && Font_suffix="\033[0m"
 CONF=/usr/local/shadowsocksrr/user-config.json
-version="1.0"
 RETVAL=0
+
 [ -x ${BIN} ] || exit 0
 if [ ! -r ${CONF} ]; then
     echo "config file ${CONF} not found"
     exit 1
 fi
+
 check_running(){
-    PID=`ps -ef | grep -v grep | grep -i "${BIN}" | awk '{print $2}'`
-    if [[ ! -z $PID ]]; then
-        return 0
-    else
-        return 1
-    fi
+	PID=`ps -ef |grep "${NAME_BIN}" |grep -v "grep" |grep -v "init.d" |grep -v "service" |awk '{print $2}'`
+	if [[ ! -z ${PID} ]]; then
+		return 0
+	else
+		return 1
+	fi
 }
 
 do_start(){
-    check_running
-    if [ $? -eq 0 ]; then
-        echo "$NAME (pid $PID) is already running..."
-        exit 0
-    else
+	check_running
+	if [[ $? -eq 0 ]]; then
+		echo -e "${Info_font_prefix}[信息]${Font_suffix} $NAME (PID ${PID}) 正在运行..." && exit 0
+	else
         $BIN -c $CONF -d start
-        RETVAL=$?
-        if [ $RETVAL -eq 0 ]; then
-            echo "Starting $NAME success"
-        else
-            echo "Starting $NAME failed"
-        fi
-    fi
+		cd ${FOLDER}
+		#python_ver=$(ls /usr/bin|grep -e "^python[23]\.[1-9]\+$"|tail -1)
+		python_ver="python"
+		ulimit -n 512000
+		nohup "${python_ver}" "$BINR" a >> ssserver.log 2>&1 &
+		sleep 2s
+		check_running
+		if [[ $? -eq 0 ]]; then
+			echo -e "${Info_font_prefix}[信息]${Font_suffix} $NAME 启动成功 !"
+		else
+			echo -e "${Error_font_prefix}[错误]${Font_suffix} $NAME 启动失败 !"
+		fi
+	fi
 }
 
 do_stop(){
-    check_running
-    if [ $? -eq 0 ]; then
+	check_running
+	if [[ $? -eq 0 ]]; then
         $BIN -c $CONF -d stop
-        RETVAL=$?
-        if [ $RETVAL -eq 0 ]; then
-            echo "Stopping $NAME success"
-        else
-            echo "Stopping $NAME failed"
-        fi
-    else
-        echo "$NAME is stopped"
-        RETVAL=1
-    fi
+        # python_ver=$(ls /usr/bin|grep -e "^python[23]\.[1-9]\+$"|tail -1)
+        python_ver="python"
+        eval $(ps -ef | grep "[0-9] ${python_ver} server\\.py m" | awk '{print "kill "$2}')
+		RETVAL=$?
+		if [[ $RETVAL -eq 0 ]]; then
+			echo -e "${Info_font_prefix}[信息]${Font_suffix} $NAME 停止成功 !"
+		else
+			echo -e "${Error_font_prefix}[错误]${Font_suffix} $NAME 停止失败 !"
+		fi
+	else
+		echo -e "${Info_font_prefix}[信息]${Font_suffix} $NAME 未运行"
+		RETVAL=1
+	fi
 }
 
 do_status(){
-    check_running
-    if [ $? -eq 0 ]; then
-        echo "$NAME (pid $PID) is running..."
-    else
-        echo "$NAME is stopped"
-        RETVAL=1
-    fi
+	check_running
+	if [[ $? -eq 0 ]]; then
+		echo -e "${Info_font_prefix}[信息]${Font_suffix} $NAME (PID ${PID}) 正在运行..."
+	else
+		echo -e "${Info_font_prefix}[信息]${Font_suffix} $NAME 未运行 !"
+		RETVAL=1
+	fi
 }
 
 do_restart(){
