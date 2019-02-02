@@ -322,9 +322,12 @@ install_for_ssrr(){
         #echo "/usr/lib" > /etc/ld.so.conf.d/local.conf
     fi
     if [[ "${ssrr_installed_flag}" == "false" && "${action}" =~ ^[Ii]|[Ii][Nn]|[Ii][Nn][Ss][Tt][Aa][Ll][Ll]|-[Ii]|--[Ii]$ ]] || [[ "${ssrr_installed_flag}" == "true" && "${ssrr_update_flag}" == "true" && "${action}" =~ ^[Uu]|[Uu][Pp][Dd][Aa][Tt][Ee]|-[Uu]|--[Uu]|[Uu][Pp]|-[Uu][Pp]|--[Uu][Pp]$ ]]; then
-        cd ${cur_dir}
-        tar xzf shadowsocksr-${ssrr_latest_ver}.tar.gz
-        mv shadowsocksr-${ssrr_latest_ver}/* /usr/local/shadowsocksrr/
+        # cd ${cur_dir}
+        # tar xzf shadowsocksr-${ssrr_latest_ver}.tar.gz
+        # mv shadowsocksr-${ssrr_latest_ver}/* /usr/local/shadowsocksrr/
+        cd "/usr/local"
+        git clone -b akkariiin/dev https://github.com/shadowsocksrr/shadowsocksr.git
+        mv shadowsocksr shadowsocksrr
         cp "${ssr_folder}/apiconfig.py" "${config_user_api_file}"
         cp "${ssr_folder}/config.json" "${config_user_file}"
         cp "${ssr_folder}/mysql.json" "${ssr_folder}/usermysql.json"
@@ -335,6 +338,7 @@ install_for_ssrr(){
         sed -i "s/SERVER_PUB_ADDR = '${server_pub_addr}'/SERVER_PUB_ADDR = '${ssr_server_pub_addr}'/" ${config_user_api_file}
         sed -i 's/ \/\/ only works under multi-user mode//g' "${config_user_file}"
         wget --no-check-certificate -O ${mudbjson} https://raw.githubusercontent.com/currycan/key/master/mudb.json
+
         if [ -x /usr/local/shadowsocksrr/shadowsocks/server.py ] && [ -s /usr/local/shadowsocksrr/shadowsocks/__init__.py ]; then
             chmod +x /etc/init.d/ssrr
             if check_sys packageManager yum; then
