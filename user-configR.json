@@ -15,12 +15,12 @@
       "protocol": "auth_chain_b",
       "protocol_param": "www.ibm.com",
       "password": "zzt2008zzt",
-      "obfs": "tls1.2_ticket_auth_compatible",
+      "obfs": "tls1.2_ticket_auth",
       "obfs_param": "www.ibm.com"
     }
   },
   "timeout": 300,
-  "method": "chacha20-ietf",
+  "method": "none",
   "forbidden_port": "",
   "redirect":["bing.com", "ibm.com","amazon.com"],
   "speed_limit_per_con": 0,
