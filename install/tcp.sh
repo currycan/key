@@ -347,16 +347,18 @@ check_version
 [[ ${release} != "debian" ]] && [[ ${release} != "ubuntu" ]] && [[ ${release} != "centos" ]] && echo -e "${Error} 本脚本不支持当前系统 ${release} !" && exit 1
 [  -z ${action} ] && action="install"
 case "${action}" in
-[Ii]|[Ii][Nn]|[Ii][Nn][Ss][Tt][Aa][Ll][Ll]|-[Ii]|--[Ii])
+install)
     install_kernel 2>&1 | tee ${cur_dir}/speed.log
+	rm -f 1 Debian
     ;;
-[Ss][Tt][Aa][Rr][Tt])
+start)
     startlotserver 2>&1
+	rm -f 1 Debian
     ;;
-[Uu][Nn]|[Uu][Nn][Ii][Nn][Ss][Tt][Aa][Ll][Ll]|[Uu][Nn]|-[Uu][Nn]|--[Uu][Nn])
+uninstall)
     remove_all 2>&1
     ;;
-[Ss][Tt][Aa][Tt][Uu][Ss])
+status)
     status 2>&1 
     ;;	
 *)
