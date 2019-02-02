@@ -368,6 +368,9 @@ show_for_ssrr(){
         echo -e "Your Server IP: ${COLOR_GREEN}${SERVER_IP}${COLOR_END}"
     fi
     nl ${ssrr_config}
+    echo "=========================================="
+    nl ${${config_user_file}}
+    echo "=========================================="
     echo
 }
 # check ssr
