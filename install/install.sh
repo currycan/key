@@ -21,7 +21,11 @@ export MBEDTLS_LINK="https://tls.mbed.org/download/mbedtls-${MBEDTLS_VER}-gpl.tg
 export SSRR_VER=$(wget -qO- "https://github.com/shadowsocksrr/shadowsocksr/tags"|grep "/shadowsocksrr/shadowsocksr/releases/tag/"|head -1|sed -r 's/.*tag\/(.+)\">.*/\1/')
 export SSRR_LINK="https://github.com/shadowsocksrr/shadowsocksr/archive/${SSRR_VER}.tar.gz"
 export SSRR_INIT="https://raw.githubusercontent.com/currycan/key/master/install/ssrr.init"
-ssrr_config="/usr/local/shadowsocksrr/user-config.json"
+
+ssr_folder="/usr/local/shadowsocksrr/"
+config_user_api_file="${ssr_folder}/userapiconfig.py"
+config_user_file="${ssr_folder}/user-config.json"
+ssrr_config="/usr/local/shadowsocksrr/user-configR.json"
 
 
 fun_clear(){
@@ -273,8 +277,9 @@ download_for_ssrr(){
 # Downlaod config
 config_for_ssrr(){
     mkdir -p /usr/local/shadowsocksrr
-    rm -f /usr/local/shadowsocksrr/user-config.json
-    wget --no-check-certificate -P /usr/local/shadowsocksrr/ https://raw.githubusercontent.com/currycan/key/master/user-config.json
+    wget --no-check-certificate -O /usr/local/shadowsocksrr/user-configR.json https://raw.githubusercontent.com/currycan/key/master/user-configR.json
+    wget --no-check-certificate -O /usr/local/shadowsocksrr/user-config.json https://raw.githubusercontent.com/currycan/key/master/user-config.json
+    wget --no-check-certificate -O /usr/local/shadowsocksrr/mudb.json https://raw.githubusercontent.com/currycan/key/master/mudb.json
 }
 # Install ssr
 install_for_ssrr(){
@@ -318,6 +323,15 @@ install_for_ssrr(){
         cd ${cur_dir}
         tar xzf shadowsocksr-${ssrr_latest_ver}.tar.gz
         mv shadowsocksr-${ssrr_latest_ver}/* /usr/local/shadowsocksrr/
+        cp "${ssr_folder}/apiconfig.py" "${config_user_api_file}"
+        cp "${ssr_folder}/config.json" "${config_user_file}"
+        cp "${ssr_folder}/mysql.json" "${ssr_folder}/usermysql.json"
+        [[ ! -e ${config_user_api_file} ]] && echo -e "${Error} ShadowsocksR服务端 apiconfig.py 复制失败 !" && exit 1
+	    sed -i "s/API_INTERFACE = 'sspanelv2'/API_INTERFACE = 'mudbjson'/" ${config_user_api_file}
+        server_pub_addr=$(cat ${config_user_api_file}|grep "SERVER_PUB_ADDR = "|awk -F "[']" '{print $2}')
+        ssr_server_pub_addr=$(get_ip)
+        sed -i "s/SERVER_PUB_ADDR = '${server_pub_addr}'/SERVER_PUB_ADDR = '${ssr_server_pub_addr}'/" ${config_user_api_file}
+        sed -i 's/ \/\/ only works under multi-user mode//g' "${config_user_file}"
         if [ -x /usr/local/shadowsocksrr/shadowsocks/server.py ] && [ -s /usr/local/shadowsocksrr/shadowsocks/__init__.py ]; then
             chmod +x /etc/init.d/ssrr
             if check_sys packageManager yum; then
