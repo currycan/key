@@ -29,10 +29,16 @@ fi
 
 check_running(){
 	PID=`ps -ef |grep "${NAME_BIN}" |grep -v "grep" |grep -v "init.d" |grep -v "service" |awk '{print $2}'`
+	SRV=`ps -ef |grep "${NAME_BIN}" |grep -v "grep" |grep -v "init.d" |grep -v "service" |awk '{print $9}'|grep '/usr/local/shadowsocksrr/server.py'`
 	if [[ ! -z ${PID} ]]; then
 		return 0
 	else
-		return 1
+		if [[ ! -z ${SRV} ]]; then
+			echo -e "${Error_font_prefix}[错误]${Font_suffix} auth_akarin_spec_a 加密方式启动失败!"
+			return 0
+		else
+			return 1
+		fi
 	fi
 }
 
