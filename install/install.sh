@@ -26,6 +26,7 @@ ssr_folder="/usr/local/shadowsocksrr/"
 config_user_api_file="${ssr_folder}/userapiconfig.py"
 config_user_file="${ssr_folder}/user-config.json"
 ssrr_config="/usr/local/shadowsocksrr/user-configR.json"
+mudbjson="/usr/local/shadowsocksrr/mudb.json"
 
 
 fun_clear(){
@@ -368,6 +369,8 @@ show_for_ssrr(){
         echo -e "Your Server IP: ${COLOR_GREEN}${SERVER_IP}${COLOR_END}"
     fi
     nl ${ssrr_config}
+    echo "=========================================="
+    nl ${mudbjson}
     echo "=========================================="
     nl ${config_user_file}
     echo "=========================================="
