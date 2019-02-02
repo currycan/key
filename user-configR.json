@@ -1,0 +1,33 @@
+{
+  "server": "0.0.0.0",
+  "server_ipv6": "[::]",
+  "local_address": "127.0.0.1",
+  "local_port": 10086,
+  "port_password": {
+    "2018": {
+      "protocol": "auth_akarin_spec_a",
+      "protocol_param": "www.ibm.com",
+      "password": "zzt2008zzt",
+      "obfs": "tls1.2_ticket_auth_compatible",
+      "obfs_param": "www.ibm.com"
+    },
+    "2019": {
+      "protocol": "auth_chain_b",
+      "protocol_param": "www.ibm.com",
+      "password": "zzt2008zzt",
+      "obfs": "tls1.2_ticket_auth_compatible",
+      "obfs_param": "www.ibm.com"
+    }
+  },
+  "timeout": 300,
+  "method": "chacha20-ietf",
+  "forbidden_port": "",
+  "redirect":["bing.com", "ibm.com","amazon.com"],
+  "speed_limit_per_con": 0,
+  "speed_limit_per_user": 0,
+  "dns_ipv6": false,
+  "fast_open": false,
+  "transfer_enable": 900727656415232,
+  "workers": 2
+}
+
