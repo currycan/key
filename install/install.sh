@@ -26,6 +26,7 @@ ssr_folder="/usr/local/shadowsocksrr/"
 config_user_api_file="${ssr_folder}/userapiconfig.py"
 config_user_file="${ssr_folder}/user-config.json"
 ssrr_config="/usr/local/shadowsocksrr/user-configR.json"
+ssr_config="/usr/local/shadowsocksrr/user-config.json"
 mudbjson="/usr/local/shadowsocksrr/mudb.json"
 
 
@@ -278,9 +279,10 @@ download_for_ssrr(){
 # Downlaod config
 config_for_ssrr(){
     mkdir -p /usr/local/shadowsocksrr
-    wget --no-check-certificate -O /usr/local/shadowsocksrr/user-configR.json https://raw.githubusercontent.com/currycan/key/master/user-configR.json
-    wget --no-check-certificate -O /usr/local/shadowsocksrr/user-config.json https://raw.githubusercontent.com/currycan/key/master/user-config.json
-    wget --no-check-certificate -O /usr/local/shadowsocksrr/mudb.json https://raw.githubusercontent.com/currycan/key/master/mudb.json
+    rm -f ${ssrr_config} ${ssr_config} ${mudbjson}
+    wget --no-check-certificate -O ${ssrr_config} https://raw.githubusercontent.com/currycan/key/master/user-configR.json
+    wget --no-check-certificate -O ${ssr_config} https://raw.githubusercontent.com/currycan/key/master/user-config.json
+    wget --no-check-certificate -O ${mudbjson} https://raw.githubusercontent.com/currycan/key/master/mudb.json
 }
 # Install ssr
 install_for_ssrr(){
