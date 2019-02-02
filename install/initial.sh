@@ -75,7 +75,7 @@ down_key(){
 init_centos(){
     echo "ZZT520.596msl*18" |passwd --stdin root
     yum update -y
-    yum install -y vim wget net-tools telnet lrzsz lsof bash-completion epel-release python psmisc crond git
+    yum install -y sudo vim wget net-tools telnet lrzsz lsof bash-completion epel-release python psmisc crond git
     pip_install
     pip install -U speedtest-cli
 }
