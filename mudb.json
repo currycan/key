@@ -5,7 +5,7 @@
         "forbidden_port": "",
         "method": "xchacha20",
         "obfs": "tls1.2_ticket_auth_compatible",
-        "passwd": ".zzt2008zzt",
+        "passwd": "zzt2008zzt",
         "port": 2020,
         "protocol": "auth_akarin_spec_a",
         "protocol_param": "",
