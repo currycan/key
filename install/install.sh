@@ -279,10 +279,9 @@ download_for_ssrr(){
 # Downlaod config
 config_for_ssrr(){
     mkdir -p /usr/local/shadowsocksrr
-    rm -f ${ssrr_config} ${ssr_config} ${mudbjson}
+    rm -f ${ssrr_config} ${ssr_config}
     wget --no-check-certificate -O ${ssrr_config} https://raw.githubusercontent.com/currycan/key/master/user-configR.json
     wget --no-check-certificate -O ${ssr_config} https://raw.githubusercontent.com/currycan/key/master/user-config.json
-    wget --no-check-certificate -O ${mudbjson} https://raw.githubusercontent.com/currycan/key/master/mudb.json
 }
 # Install ssr
 install_for_ssrr(){
@@ -335,6 +334,7 @@ install_for_ssrr(){
         ssr_server_pub_addr=$(get_ip)
         sed -i "s/SERVER_PUB_ADDR = '${server_pub_addr}'/SERVER_PUB_ADDR = '${ssr_server_pub_addr}'/" ${config_user_api_file}
         sed -i 's/ \/\/ only works under multi-user mode//g' "${config_user_file}"
+        wget --no-check-certificate -O ${mudbjson} https://raw.githubusercontent.com/currycan/key/master/mudb.json
         if [ -x /usr/local/shadowsocksrr/shadowsocks/server.py ] && [ -s /usr/local/shadowsocksrr/shadowsocks/__init__.py ]; then
             chmod +x /etc/init.d/ssrr
             if check_sys packageManager yum; then
