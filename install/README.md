@@ -16,7 +16,9 @@ wget --no-check-certificate -O ./speed.sh https://raw.githubusercontent.com/curr
 chmod 700 ./*.sh
 ./initial.sh
 ./ssr_install.sh
-./speed.sh
+./speed.sh install
+./speed.sh start
+./speed.sh status
 ```
 ------
 #### 防火墙设置示例
