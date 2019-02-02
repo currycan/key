@@ -325,9 +325,8 @@ install_for_ssrr(){
         # cd ${cur_dir}
         # tar xzf shadowsocksr-${ssrr_latest_ver}.tar.gz
         # mv shadowsocksr-${ssrr_latest_ver}/* /usr/local/shadowsocksrr/
-        cd "/usr/local"
         git clone -b akkariiin/dev https://github.com/shadowsocksrr/shadowsocksr.git
-        mv shadowsocksr shadowsocksrr
+        mv shadowsocksr/* /usr/local/shadowsocksrr/
         cp "${ssr_folder}/apiconfig.py" "${config_user_api_file}"
         cp "${ssr_folder}/config.json" "${config_user_file}"
         cp "${ssr_folder}/mysql.json" "${ssr_folder}/usermysql.json"
