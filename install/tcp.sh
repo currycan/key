@@ -352,8 +352,8 @@ install)
 	rm -f 1 Debian
     ;;
 start)
-    startlotserver 2>&1
 	optimizing_system
+    startlotserver 2>&1
 	rm -f 1 Debian
     ;;
 uninstall)
