@@ -320,6 +320,7 @@ check_status(){
 
 #############系统检测组件#############
 install_kernel(){
+	optimizing_system
 	check_status
 	if [[ ${kernel_status} == "noinstall" ]]; then
 		echo -e " 当前状态: ${Green_font_prefix}未安装${Font_color_suffix} 加速内核 ${Red_font_prefix}请先安装内核${Font_color_suffix}"
