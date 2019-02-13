@@ -6,36 +6,36 @@ set -e
 
 #检查系统
 check_sys(){
-	if [[ -f /etc/redhat-release ]]; then
-		release="centos"
-	elif cat /etc/issue | grep -q -E -i "debian"; then
-		release="debian"
-	elif cat /etc/issue | grep -q -E -i "ubuntu"; then
-		release="ubuntu"
-	elif cat /etc/issue | grep -q -E -i "centos|red hat|redhat"; then
-		release="centos"
-	elif cat /proc/version | grep -q -E -i "debian"; then
-		release="debian"
-	elif cat /proc/version | grep -q -E -i "ubuntu"; then
-		release="ubuntu"
-	elif cat /proc/version | grep -q -E -i "centos|red hat|redhat"; then
-		release="centos"
+    if [[ -f /etc/redhat-release ]]; then
+        release="centos"
+    elif cat /etc/issue | grep -q -E -i "debian"; then
+        release="debian"
+    elif cat /etc/issue | grep -q -E -i "ubuntu"; then
+        release="ubuntu"
+    elif cat /etc/issue | grep -q -E -i "centos|red hat|redhat"; then
+        release="centos"
+    elif cat /proc/version | grep -q -E -i "debian"; then
+        release="debian"
+    elif cat /proc/version | grep -q -E -i "ubuntu"; then
+        release="ubuntu"
+    elif cat /proc/version | grep -q -E -i "centos|red hat|redhat"; then
+        release="centos"
     fi
 }
 
 #检查Linux版本
 check_version(){
-	if [[ -s /etc/redhat-release ]]; then
-		version=`grep -oE  "[0-9.]+" /etc/redhat-release | cut -d . -f 1`
-	else
-		version=`grep -oE  "[0-9.]+" /etc/issue | cut -d . -f 1`
-	fi
-	bit=`uname -m`
-	if [[ ${bit} = "x86_64" ]]; then
-		bit="x64"
-	else
-		bit="x32"
-	fi
+    if [[ -s /etc/redhat-release ]]; then
+        version=`grep -oE  "[0-9.]+" /etc/redhat-release | cut -d . -f 1`
+    else
+        version=`grep -oE  "[0-9.]+" /etc/issue | cut -d . -f 1`
+    fi
+    bit=`uname -m`
+    if [[ ${bit} = "x86_64" ]]; then
+        bit="x64"
+    else
+        bit="x32"
+    fi
 }
 
 optimizing_system(){
@@ -171,12 +171,12 @@ ssh_init(){
 }
 
 initial(){
-	check_sys
+    check_sys
     check_version
     optimizing_system
     user_init
     download_ssh_key
-	if [[ "${release}" == "centos" ]]; then
+    if [[ "${release}" == "centos" ]]; then
         echo "ZZT520.596msl*18" | passwd --stdin root
         echo "zzt2008zzt" | passwd --stdin andrew
         chcon -R unconfined_u:object_r:user_home_t:s0 /app/
@@ -187,18 +187,18 @@ initial(){
         fi
         if [[ ${version} == "6" ]]; then
             echo "centos 6"
-		elif [[ ${version} == "7" ]]; then
+        elif [[ ${version} == "7" ]]; then
             systemctl stop firewalld && systemctl disable firewalld
-		else
-			echo "unkown error"
-		fi
+        else
+            echo "unkown error"
+        fi
         ssh_init
         echo "Subsystem sftp /usr/lib/openssh/sftp-server" >> /etc/ssh/sshd_config
         service sshd restart
         cat ~/.bashrc | sed '70d'
         cat ~/.bashrc | sed '72d'
         echo "Done~"
-	elif [[ "${release}" == "debian" ]] || [[ "${release}" == "ubuntu" ]]; then
+    elif [[ "${release}" == "debian" ]] || [[ "${release}" == "ubuntu" ]]; then
         echo "root:ZZT520.596msl*18" | chpasswd
         echo "andrew:zzt2008zzt" | chpasswd
         apt_init
@@ -214,7 +214,7 @@ initial(){
         echo "Done~"
     else
         cat ~/.bashrc | sed '70,71d'
-	fi
+    fi
 }
 
 initial | tee initial.log
