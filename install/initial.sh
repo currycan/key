@@ -123,7 +123,7 @@ ssh_init(){
 }
 
 optimizing_system(){
-    cat >>/etc/sysctl.conf<<EOF
+    cat << EOF > /etc/sysctl.conf
 fs.nr_open = 6553600
 fs.file-max = 6553600
 fs.inotify.max_user_instances = 8192
