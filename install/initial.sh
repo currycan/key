@@ -115,7 +115,7 @@ ssh_init(){
     wget --no-check-certificate -O /etc/ssh/sshd_config https://raw.githubusercontent.com/currycan/key/master/sshd_config
     echo "Subsystem sftp /usr/lib/openssh/sftp-server" >> /etc/ssh/sshd_config
     service sshd restart
-    wget --no-check-certificate -O ~/.bashrc https://raw.githubusercontent.com/currycan/key/master/bashrc
+    wget --no-check-certificate -O ~/.bashrc https://raw.githubusercontent.com/currycan/key/master/bashrc_root
     wget --no-check-certificate -O /app/andrew/.bashrc https://raw.githubusercontent.com/currycan/key/master/bashrc
     chown -R andrew:andrew /app/andrew/.bashrc
     service sshd restart
