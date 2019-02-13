@@ -174,6 +174,10 @@ EOF
 *        hard    memlock unlimited
 EOF
     sysctl -p
+    FLAG_PROFILE=$(grep "ulimit -SHn 1000000" /etc/profile | wc -l)
+    if [ FLAG_PROFILE != 0 ];then
+        echo "ulimit -SHn 1000000">>/etc/profile
+    fi
 }
 
 initial(){
