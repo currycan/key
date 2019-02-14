@@ -210,6 +210,12 @@ initial(){
         echo "unkown system"
     fi
     optimizing_system
+    stty erase '^H' && read -p "需要重启VPS，是否现在重启 ? [Y/n] :" yn
+    [ -z "${yn}" ] && yn="y"
+    if [[ $yn == [Yy] ]]; then
+        echo -e "${Info} VPS 重启中..."
+        reboot
+    fi
     sysctl -p
 }
 
