@@ -170,7 +170,6 @@ ssh_init(){
 initial(){
     check_sys
     check_version
-    optimizing_system
     user_init
     download_ssh_key
     if [[ "${release}" == "centos" ]]; then
@@ -212,6 +211,7 @@ initial(){
     else
         cat ~/.bashrc | sed '70,71d'
     fi
+    optimizing_system
 }
 
 initial | tee initial.log
