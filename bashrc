@@ -25,11 +25,6 @@ shopt -s checkwinsize
 # match all files and zero or more directories and subdirectories.
 shopt -s globstar
 
-# set a fancy prompt (non-color, unless we know we "want" color)
-case "$TERM" in
-    xterm-color|*-256color) color_prompt=yes;;
-esac
-
 # Alias definitions.
 # You may want to put all your additions into a separate file like
 # ~/.bash_aliases, instead of adding them here directly.
@@ -66,7 +61,3 @@ alias mkdir='mkdir -p'
 if [ -f /etc/bashrc ]; then
     . /etc/bashrc
 fi
-
-export PS1="\[\e[31;40m\]\u\[\e[37;40m\]@\[\e[32;40m\]\h\[\e[33;40m\]:\w\[\e[0m\]\\$ "
-export PS1="[\[\e[31;40m\]\u\[\e[37;40m\]@\[\e[32;40m\]\h\[\e[33;40m\] \w\[\e[0m\]]\\$ "
-export PS1='\u@\h:\w\$ '
