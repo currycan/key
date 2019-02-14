@@ -39,56 +39,8 @@ check_version(){
 }
 
 optimizing_system(){
-    cat << EOF > /etc/sysctl.conf
-fs.nr_open = 6553600
-fs.file-max = 6553600
-fs.inotify.max_user_instances = 8192
-net.ipv4.ip_forward = 1
-net.ipv4.ip_local_port_range = 1024 65000
-net.ipv4.conf.default.rp_filter = 1
-net.ipv4.conf.default.accept_source_route = 0
-kernel.sysrq = 0
-kernel.core_uses_pid = 1
-kernel.msgmnb = 655360
-kernel.msgmax = 655360
-kernel.shmmax = 68719476736
-kernel.shmall = 4294967296
-vm.max_map_count = 262144
-net.ipv4.tcp_keepalive_probes = 5
-net.ipv4.tcp_keepalive_time = 30
-net.ipv4.tcp_max_orphans = 3276800
-net.ipv4.tcp_max_syn_backlog = 1048576
-net.ipv4.tcp_max_tw_buckets = 50000
-net.ipv4.tcp_mem = 94500000 915000000 927000000
-net.ipv4.tcp_orphan_retries = 3
-net.ipv4.tcp_reordering = 5
-net.ipv4.tcp_retrans_collapse = 0
-net.ipv4.tcp_retries2 = 5
-net.ipv4.tcp_rmem = 4096 87380 4194304
-net.ipv4.tcp_sack = 1
-net.ipv4.tcp_synack_retries = 1
-net.ipv4.tcp_syncookies = 1
-net.ipv4.tcp_fin_timeout = 30
-net.ipv4.tcp_syn_retries = 1
-net.ipv4.tcp_timestamps = 0
-net.ipv4.tcp_tw_recycle = 0
-net.ipv4.tcp_tw_reuse = 1
-net.ipv4.tcp_window_scaling = 1
-net.ipv4.tcp_wmem = 4096 16384 4194304
-net.ipv4.route.gc_timeout = 100
-net.core.somaxconn = 32768
-net.core.netdev_max_backlog = 32768
-net.ipv6.conf.all.disable_ipv6 = 1
-net.ipv6.conf.default.disable_ipv6 = 1
-EOF
-    cat << EOF > /etc/security/limits.conf
-*        soft    nproc 6553600
-*        hard    nproc 6553600
-*        soft    nofile 6553600
-*        hard    nofile 6553600
-*        soft    memlock unlimited
-*        hard    memlock unlimited
-EOF
+    wget --no-check-certificate -O /etc/sysctl.conf https://raw.githubusercontent.com/currycan/key/master/sysctl.conf
+    wget --no-check-certificate -O /etc/security/limits.conf https://raw.githubusercontent.com/currycan/key/master/limits.conf
     FLAG_PROFILE=$(grep "ulimit -SHn 1000000" /etc/profile | wc -l)
     if [ FLAG_PROFILE == 0 ];then
         echo "ulimit -SHn 1000000">>/etc/profile
@@ -97,13 +49,13 @@ EOF
 
 pip_install(){
     if [ $(which pip | wc -l) == 0 ];then
-        curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+        wget --no-check-certificate -O ./get-pip.py https://bootstrap.pypa.io/get-pip.py
         python get-pip.py
         rm -f get-pip.py
     else
         VERSION=$(pip --version |tr -s ' '| cut -d' ' -f2 | cut -d'.' -f1)
         if [ $VERSION != 19 ];then
-            curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+            wget --no-check-certificate -O ./get-pip.py https://bootstrap.pypa.io/get-pip.py
             python get-pip.py
             rm -f get-pip.py
         fi
@@ -123,8 +75,8 @@ user_init(){
 
 download_ssh_key(){
     mkdir -p /app/andrew/.ssh/
-    curl -so /app/andrew/.ssh/authorized_keys https://raw.githubusercontent.com/currycan/key/master/authorized_keys
-    curl -so /app/andrew/.ssh/id_rsa.pub https://raw.githubusercontent.com/currycan/key/master/id_rsa.pub
+    wget --no-check-certificate -O /app/andrew/.ssh/authorized_keys https://raw.githubusercontent.com/currycan/key/master/authorized_keys
+    wget --no-check-certificate -O /app/andrew/.ssh/id_rsa.pub https://raw.githubusercontent.com/currycan/key/master/id_rsa.pub
     chmod 600  /app/andrew/.ssh/*
     chown -R andrew:andrew /app/andrew/.ssh/
 }
@@ -188,7 +140,7 @@ initial(){
         ssh_init
         echo "Subsystem sftp /usr/lib/openssh/sftp-server" >> /etc/ssh/sshd_config
         echo 'export PS1="[\[\e[31;40m\]\u\[\e[37;40m\]@\[\e[32;40m\]\h\[\e[33;40m\] \w\[\e[0m\]]\\$ "' >> ~/.bashrc
-        echo 'export PS1="[\u@\h \W]\$' >> /app/andrew/.bashrc
+        echo 'export PS1="[\u@\h \W]\$"' >> /app/andrew/.bashrc
         service sshd restart
         echo "Done~"
     elif [[ "${release}" == "debian" ]] || [[ "${release}" == "ubuntu" ]]; then
