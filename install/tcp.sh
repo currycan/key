@@ -2,6 +2,9 @@
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 
+set -ex
+
+github="raw.githubusercontent.com/chiakge/Linux-NetSpeed/master"
 Green_font_prefix="\033[32m" && Red_font_prefix="\033[31m" && Green_background_prefix="\033[42;37m" && Red_background_prefix="\033[41;37m" && Font_color_suffix="\033[0m"
 Info="${Green_font_prefix}[信息]${Font_color_suffix}"
 Error="${Red_font_prefix}[错误]${Font_color_suffix}"
@@ -18,7 +21,7 @@ installlot(){
         yum install -y http://${github}/lotserver/${release}/${version}/${bit}/kernel-headers-${kernel_version}.rpm
         yum install -y http://${github}/lotserver/${release}/${version}/${bit}/kernel-devel-${kernel_version}.rpm
     elif [[ "${release}" == "ubuntu" ]]; then
-        mkdir bbr && cd bbr
+        mkdir -p bbr && cd bbr
         wget -N --no-check-certificate http://${github}/lotserver/${release}/${bit}/linux-headers-${kernel_version}-all.deb
         wget -N --no-check-certificate http://${github}/lotserver/${release}/${bit}/linux-headers-${kernel_version}.deb
         wget -N --no-check-certificate http://${github}/lotserver/${release}/${bit}/linux-image-${kernel_version}.deb
@@ -28,7 +31,7 @@ installlot(){
         dpkg -i linux-image-${kernel_version}.deb
         cd .. && rm -rf bbr
     elif [[ "${release}" == "debian" ]]; then
-        mkdir bbr && cd bbr
+        mkdir -p bbr && cd bbr
         wget -N --no-check-certificate http://${github}/lotserver/${release}/${bit}/linux-image-${kernel_version}.deb
     
         dpkg -i linux-image-${kernel_version}.deb
