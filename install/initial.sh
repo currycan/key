@@ -161,7 +161,6 @@ ssh_init(){
     wget --no-check-certificate -O /etc/ssh/sshd_config https://raw.githubusercontent.com/currycan/key/master/sshd_config
     wget --no-check-certificate -O ~/.bashrc https://raw.githubusercontent.com/currycan/key/master/bashrc
     wget --no-check-certificate -O /app/andrew/.bashrc https://raw.githubusercontent.com/currycan/key/master/bashrc
-    sed '70,71d' -i /app/andrew/.bashrc
     chown -R andrew:andrew /app/andrew/.bashrc
 }
 
@@ -188,8 +187,8 @@ initial(){
         fi
         ssh_init
         echo "Subsystem sftp /usr/lib/openssh/sftp-server" >> /etc/ssh/sshd_config
-        sed '70d' -i ~/.bashrc
-        sed '72d' -i ~/.bashrc
+        echo 'export PS1="[\[\e[31;40m\]\u\[\e[37;40m\]@\[\e[32;40m\]\h\[\e[33;40m\] \w\[\e[0m\]]\\$ "' >> ~/.bashrc
+        echo 'export PS1="[\u@\h \W]\$' >> /app/andrew/.bashrc
         service sshd restart
         echo "Done~"
     elif [[ "${release}" == "debian" ]] || [[ "${release}" == "ubuntu" ]]; then
@@ -203,7 +202,8 @@ initial(){
         fi
         ssh_init
         echo "Subsystem sftp /usr/lib/openssh/sftp-server" >> /etc/ssh/sshd_config
-        sed '71,72d' -i ~/.bashrc
+        echo 'export PS1="\[\e[31;40m\]\u\[\e[37;40m\]@\[\e[32;40m\]\h\[\e[33;40m\]:\w\[\e[0m\]\\$ "' >> ~/.bashrc
+        echo 'export PS1="\u@\h:\w\$ "' >> /app/andrew/.bashrc
         service sshd restart
         echo "Done~"
     else
