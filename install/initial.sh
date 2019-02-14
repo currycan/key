@@ -141,7 +141,7 @@ initial(){
         echo "Subsystem sftp /usr/lib/openssh/sftp-server" >> /etc/ssh/sshd_config
         echo 'export PS1="[\[\e[31;40m\]\u\[\e[37;40m\]@\[\e[32;40m\]\h\[\e[33;40m\] \w\[\e[0m\]]\\$ "' >> ~/.bashrc
         echo 'export PS1="[\u@\h \W]\$"' >> /app/andrew/.bashrc
-        sed "s/6553600/65536/" -i /etc/security/limits.conf
+        sed "s/nofile 6553600/nofile 65536/" -i /etc/security/limits.conf
         service sshd restart
         echo "Done~"
     elif [[ "${release}" == "debian" ]] || [[ "${release}" == "ubuntu" ]]; then
