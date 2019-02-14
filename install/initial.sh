@@ -140,7 +140,7 @@ initial(){
         fi
         ssh_init
         echo "Subsystem sftp /usr/lib/openssh/sftp-server" >> /etc/ssh/sshd_config
-        echo 'export PS1="[\[\e[31;40m\]\u\[\e[37;40m\]@\[\e[32;40m\]\h\[\e[33;40m\] \w\[\e[0m\]]\\$ "' >> ~/.bashrc
+        echo 'export PS1="[\[\e[31;43m\]\[\e[5m\]\u\[\e[0m\]\[\e[37;40m\]@\[\e[32;40m\]\h\[\e[33;40m\] \w\[\e[0m\]]\\$ "' >> ~/.bashrc
         echo 'export PS1="[\u@\h \W]\$"' >> /app/andrew/.bashrc
         sed "s/nofile 6553600/nofile 65536/g" -i /etc/security/limits.conf
         service sshd restart
@@ -156,7 +156,7 @@ initial(){
         fi
         ssh_init
         echo "Subsystem sftp /usr/lib/openssh/sftp-server" >> /etc/ssh/sshd_config
-        echo 'export PS1="\[\e[31;40m\]\u\[\e[37;40m\]@\[\e[32;40m\]\h\[\e[33;40m\]:\w\[\e[0m\]\\$ "' >> ~/.bashrc
+        echo 'export PS1="\[\e[31;43m\]\[\e[5m\]\u\[\e[0m\]\[\e[37;40m\]@\[\e[32;40m\]\h\[\e[33;40m\]:\w\[\e[0m\]\\$ "' >> ~/.bashrc
         echo 'export PS1="\u@\h:\w\$ "' >> /app/andrew/.bashrc
         service sshd restart
         echo "Done~"
