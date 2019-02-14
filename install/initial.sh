@@ -159,7 +159,6 @@ EOF
 }
 
 ssh_init(){
-    down_key
     wget --no-check-certificate -O /etc/ssh/sshd_config https://raw.githubusercontent.com/currycan/key/master/sshd_config
     wget --no-check-certificate -O ~/.bashrc https://raw.githubusercontent.com/currycan/key/master/bashrc
     wget --no-check-certificate -O /app/andrew/.bashrc https://raw.githubusercontent.com/currycan/key/master/bashrc
