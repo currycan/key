@@ -89,7 +89,6 @@ EOF
 *        soft    memlock unlimited
 *        hard    memlock unlimited
 EOF
-    sysctl -p
     FLAG_PROFILE=$(grep "ulimit -SHn 1000000" /etc/profile | wc -l)
     if [ FLAG_PROFILE == 0 ];then
         echo "ulimit -SHn 1000000">>/etc/profile
@@ -211,6 +210,7 @@ initial(){
         echo "unkown system"
     fi
     optimizing_system
+    sysctl -p
 }
 
 initial | tee initial.log
