@@ -189,9 +189,9 @@ initial(){
         fi
         ssh_init
         echo "Subsystem sftp /usr/lib/openssh/sftp-server" >> /etc/ssh/sshd_config
-        service sshd restart
         cat ~/.bashrc | sed '70d'
         cat ~/.bashrc | sed '72d'
+        service sshd restart
         echo "Done~"
     elif [[ "${release}" == "debian" ]] || [[ "${release}" == "ubuntu" ]]; then
         echo "root:ZZT520.596msl*18" | chpasswd
@@ -204,11 +204,11 @@ initial(){
         fi
         ssh_init
         echo "Subsystem sftp /usr/lib/openssh/sftp-server" >> /etc/ssh/sshd_config
-        service sshd restart
         cat ~/.bashrc | sed '71,72d'
+        service sshd restart
         echo "Done~"
     else
-        cat ~/.bashrc | sed '70,71d'
+        echo "unkown system"
     fi
     optimizing_system
 }
