@@ -131,7 +131,6 @@ download_ssh_key(){
 }
 
 yum_init(){
-    echo "ZZT520.596msl*18" |passwd --stdin root
     yum update -y
     yum install -y sudo vim wget net-tools telnet lrzsz lsof bash-completion epel-release python psmisc crond git
     pip_install
@@ -139,7 +138,6 @@ yum_init(){
 }
 
 apt_init(){
-    echo "root:ZZT520.596msl*18" | chpasswd
     apt update 
     apt upgrade -y
     apt install -y sudo vim wget net-tools telnet lrzsz lsof bash-completion python curl psmisc cron git
@@ -163,11 +161,10 @@ EOF
 ssh_init(){
     down_key
     wget --no-check-certificate -O /etc/ssh/sshd_config https://raw.githubusercontent.com/currycan/key/master/sshd_config
-    service sshd restart
     wget --no-check-certificate -O ~/.bashrc https://raw.githubusercontent.com/currycan/key/master/bashrc
     wget --no-check-certificate -O /app/andrew/.bashrc https://raw.githubusercontent.com/currycan/key/master/bashrc
-    chown -R andrew:andrew /app/andrew/.bashrc
     cat /app/andrew/.bashrc | sed '70,71d'
+    chown -R andrew:andrew /app/andrew/.bashrc
 }
 
 initial(){
