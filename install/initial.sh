@@ -119,6 +119,7 @@ ssh_init(){
 initial(){
     check_sys
     check_version
+    optimizing_system
     user_init
     download_ssh_key
     if [[ "${release}" == "centos" ]]; then
@@ -141,7 +142,7 @@ initial(){
         echo "Subsystem sftp /usr/lib/openssh/sftp-server" >> /etc/ssh/sshd_config
         echo 'export PS1="[\[\e[31;40m\]\u\[\e[37;40m\]@\[\e[32;40m\]\h\[\e[33;40m\] \w\[\e[0m\]]\\$ "' >> ~/.bashrc
         echo 'export PS1="[\u@\h \W]\$"' >> /app/andrew/.bashrc
-        sed "s/nofile 6553600/nofile 65536/" -i /etc/security/limits.conf
+        sed "s/nofile 6553600/nofile 65536/g" -i /etc/security/limits.conf
         service sshd restart
         echo "Done~"
     elif [[ "${release}" == "debian" ]] || [[ "${release}" == "ubuntu" ]]; then
@@ -162,7 +163,6 @@ initial(){
     else
         echo "unkown system"
     fi
-    optimizing_system
     stty erase '^H' && read -p "需要重启VPS，是否现在重启 ? [Y/n] :" yn
     [ -z "${yn}" ] && yn="y"
     if [[ $yn == [Yy] ]]; then
