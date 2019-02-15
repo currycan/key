@@ -10,6 +10,41 @@ Info="${Green_font_prefix}[信息]${Font_color_suffix}"
 Error="${Red_font_prefix}[错误]${Font_color_suffix}"
 Tip="${Green_font_prefix}[注意]${Font_color_suffix}"
 
+#############系统检测组件#############
+#检查系统
+check_sys(){
+    if [[ -f /etc/redhat-release ]]; then
+        release="centos"
+    elif cat /etc/issue | grep -q -E -i "debian"; then
+        release="debian"
+    elif cat /etc/issue | grep -q -E -i "ubuntu"; then
+        release="ubuntu"
+    elif cat /etc/issue | grep -q -E -i "centos|red hat|redhat"; then
+        release="centos"
+    elif cat /proc/version | grep -q -E -i "debian"; then
+        release="debian"
+    elif cat /proc/version | grep -q -E -i "ubuntu"; then
+        release="ubuntu"
+    elif cat /proc/version | grep -q -E -i "centos|red hat|redhat"; then
+        release="centos"
+    fi
+}
+
+#检查Linux版本
+check_version(){
+    if [[ -s /etc/redhat-release ]]; then
+        version=`grep -oE  "[0-9.]+" /etc/redhat-release | cut -d . -f 1`
+    else
+        version=`grep -oE  "[0-9.]+" /etc/issue | cut -d . -f 1`
+    fi
+    bit=`uname -m`
+    if [[ ${bit} = "x86_64" ]]; then
+        bit="x64"
+    else
+        bit="x32"
+    fi
+}
+
 #安装Lotserver内核
 installlot(){
     if [[ "${release}" == "centos" ]]; then
@@ -134,40 +169,7 @@ BBR_grub(){
 }
 #############内核管理组件#############
 
-#############系统检测组件#############
-#检查系统
-check_sys(){
-    if [[ -f /etc/redhat-release ]]; then
-        release="centos"
-    elif cat /etc/issue | grep -q -E -i "debian"; then
-        release="debian"
-    elif cat /etc/issue | grep -q -E -i "ubuntu"; then
-        release="ubuntu"
-    elif cat /etc/issue | grep -q -E -i "centos|red hat|redhat"; then
-        release="centos"
-    elif cat /proc/version | grep -q -E -i "debian"; then
-        release="debian"
-    elif cat /proc/version | grep -q -E -i "ubuntu"; then
-        release="ubuntu"
-    elif cat /proc/version | grep -q -E -i "centos|red hat|redhat"; then
-        release="centos"
-    fi
-}
 
-#检查Linux版本
-check_version(){
-    if [[ -s /etc/redhat-release ]]; then
-        version=`grep -oE  "[0-9.]+" /etc/redhat-release | cut -d . -f 1`
-    else
-        version=`grep -oE  "[0-9.]+" /etc/issue | cut -d . -f 1`
-    fi
-    bit=`uname -m`
-    if [[ ${bit} = "x86_64" ]]; then
-        bit="x64"
-    else
-        bit="x32"
-    fi
-}
 
 #检查安装Lotsever的系统要求
 check_sys_Lotsever(){
