@@ -211,9 +211,8 @@ check_sys_Lotsever(){
 }
 
 check_status(){
-    kernel_version=`uname -r | awk -F "-" '{print $1}'`
-    kernel_version_full=`uname -r`
-    if [[ ${kernel_version} = "3.10.0" || ${kernel_version} = "3.16.0" || ${kernel_version} = "3.2.0" || ${kernel_version} = "4.4.0" || ${kernel_version} = "3.13.0"  || ${kernel_version} = "2.6.32" ]]; then
+    kernel_version=`uname -r | awk -F "-" '{print $1}'`-`uname -r | awk -F "-" '{print $2}' | awk -F "." '{print $1}'`
+    if [[ ${kernel_version} = "3.13.0-29" || ${kernel_version} = "3.16.0-4" || ${kernel_version} = "3.2.0-4" || ${kernel_version} = "4.4.0-47" || ${kernel_version} = "3.13.0-29"  || ${kernel_version} = "2.6.32-504" ]]; then
         kernel_status="Lotserver"
     else 
         kernel_status="noinstall"
