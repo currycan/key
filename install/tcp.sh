@@ -45,6 +45,67 @@ check_version(){
     fi
 }
 
+#检查安装Lotsever的系统要求
+check_sys_Lotsever(){
+    check_version
+    if [[ "${release}" == "centos" ]]; then
+        if [[ ${version} == "6" ]]; then
+            kernel_version="2.6.32-504"
+            installlot
+        elif [[ ${version} == "7" ]]; then
+            yum -y install net-tools
+            kernel_version="3.10.0-327"
+            installlot
+        else
+            echo -e "${Error} Lotsever不支持当前系统 ${release} ${version} ${bit} !" && exit 1
+        fi
+    elif [[ "${release}" == "debian" ]]; then
+        if [[ ${bit} == "x64" ]]; then
+            kernel_version="3.16.0-4"
+            installlot
+        elif [[ ${bit} == "x32" ]]; then
+            kernel_version="3.2.0-4"
+            installlot
+        else
+            echo -e "${Error} Lotsever不支持当前系统 ${release} ${version} ${bit} !" && exit 1
+        fi
+    elif [[ "${release}" == "ubuntu" ]]; then
+        if [[ ${bit} == "x64" ]]; then
+            kernel_version="4.4.0-47"
+            installlot
+        elif [[ ${bit} == "x32" ]]; then
+            kernel_version="3.13.0-29"
+            installlot
+        else
+            echo -e "${Error} Lotsever不支持当前系统 ${release} ${version} ${bit} !" && exit 1
+        fi
+    else
+        echo -e "${Error} Lotsever不支持当前系统 ${release} ${version} ${bit} !" && exit 1
+    fi
+}
+
+check_status(){
+    kernel_version=`uname -r | awk -F "-" '{print $1}'`-`uname -r | awk -F "-" '{print $2}' | awk -F "." '{print $1}'`
+    if [[ ${kernel_version} = "3.13.0-29" || ${kernel_version} = "3.16.0-4" || ${kernel_version} = "3.2.0-4" || ${kernel_version} = "4.4.0-47" || ${kernel_version} = "3.13.0-29"  || ${kernel_version} = "2.6.32-504" ]]; then
+        kernel_status="Lotserver"
+    else 
+        kernel_status="noinstall"
+    fi
+
+    if [[ ${kernel_status} == "Lotserver" ]]; then
+        if [[ -e /appex/bin/serverSpeeder.sh ]]; then
+            run_status=`bash /appex/bin/serverSpeeder.sh status | grep "ServerSpeeder" | awk  '{print $3}'`
+            if [[ ${run_status} = "running!" ]]; then
+                run_status="启动成功"
+            else 
+                run_status="启动失败"
+            fi
+        else 
+            run_status="未安装加速模块"
+        fi
+    fi
+}
+
 #安装Lotserver内核
 installlot(){
     if [[ "${release}" == "centos" ]]; then
@@ -108,8 +169,6 @@ remove_all(){
     sleep 1s
 }
 
-#############内核管理组件#############
-
 #删除多余内核
 detele_kernel(){
     if [[ "${release}" == "centos" ]]; then
@@ -167,72 +226,7 @@ BBR_grub(){
         /usr/sbin/update-grub
     fi
 }
-#############内核管理组件#############
 
-
-
-#检查安装Lotsever的系统要求
-check_sys_Lotsever(){
-    check_version
-    if [[ "${release}" == "centos" ]]; then
-        if [[ ${version} == "6" ]]; then
-            kernel_version="2.6.32-504"
-            installlot
-        elif [[ ${version} == "7" ]]; then
-            yum -y install net-tools
-            kernel_version="3.10.0-327"
-            installlot
-        else
-            echo -e "${Error} Lotsever不支持当前系统 ${release} ${version} ${bit} !" && exit 1
-        fi
-    elif [[ "${release}" == "debian" ]]; then
-        if [[ ${bit} == "x64" ]]; then
-            kernel_version="3.16.0-4"
-            installlot
-        elif [[ ${bit} == "x32" ]]; then
-            kernel_version="3.2.0-4"
-            installlot
-        else
-            echo -e "${Error} Lotsever不支持当前系统 ${release} ${version} ${bit} !" && exit 1
-        fi
-    elif [[ "${release}" == "ubuntu" ]]; then
-        if [[ ${bit} == "x64" ]]; then
-            kernel_version="4.4.0-47"
-            installlot
-        elif [[ ${bit} == "x32" ]]; then
-            kernel_version="3.13.0-29"
-            installlot
-        else
-            echo -e "${Error} Lotsever不支持当前系统 ${release} ${version} ${bit} !" && exit 1
-        fi
-    else
-        echo -e "${Error} Lotsever不支持当前系统 ${release} ${version} ${bit} !" && exit 1
-    fi
-}
-
-check_status(){
-    kernel_version=`uname -r | awk -F "-" '{print $1}'`-`uname -r | awk -F "-" '{print $2}' | awk -F "." '{print $1}'`
-    if [[ ${kernel_version} = "3.13.0-29" || ${kernel_version} = "3.16.0-4" || ${kernel_version} = "3.2.0-4" || ${kernel_version} = "4.4.0-47" || ${kernel_version} = "3.13.0-29"  || ${kernel_version} = "2.6.32-504" ]]; then
-        kernel_status="Lotserver"
-    else 
-        kernel_status="noinstall"
-    fi
-
-    if [[ ${kernel_status} == "Lotserver" ]]; then
-        if [[ -e /appex/bin/serverSpeeder.sh ]]; then
-            run_status=`bash /appex/bin/serverSpeeder.sh status | grep "ServerSpeeder" | awk  '{print $3}'`
-            if [[ ${run_status} = "running!" ]]; then
-                run_status="启动成功"
-            else 
-                run_status="启动失败"
-            fi
-        else 
-            run_status="未安装加速模块"
-        fi
-    fi
-}
-
-#############系统检测组件#############
 install_kernel(){
     check_status
     if [[ ${kernel_status} == "noinstall" ]]; then
@@ -242,6 +236,7 @@ install_kernel(){
         echo -e " 当前状态: ${Green_font_prefix}已安装${Font_color_suffix} ${_font_prefix}${kernel_status}${Font_color_suffix} 加速内核 , ${Green_font_prefix}${run_status}${Font_color_suffix}"
     fi
 }
+
 status(){
     check_status
     if [[ ${kernel_status} == "Lotserver" ]]; then
