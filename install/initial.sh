@@ -117,6 +117,7 @@ ssh_init(){
 }
 
 initial(){
+    timedatectl set-timezone Asia/Shanghai
     check_sys
     check_version
     optimizing_system
