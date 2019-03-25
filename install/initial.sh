@@ -123,7 +123,6 @@ ssh_init(){
     sudo sed -i /etc/ssh/sshd_config -e "s/^PasswordAuthentication.*/PasswordAuthentication yes/g"
     sudo sed -i /etc/ssh/sshd_config -e "s/^#PubkeyAuthentication.*/PubkeyAuthentication yes/g"
     sudo sed -i /etc/ssh/sshd_config -e "s/^[#]*PermitRootLogin.*/PermitRootLogin yes/g"
-
     sudo \curl -SLo/root/.bashrc https://raw.githubusercontent.com/currycan/key/master/bashrc
     sudo \curl -SLo /app/andrew/.bashrc https://raw.githubusercontent.com/currycan/key/master/bashrc
     chown -R andrew:andrew /app/andrew/.bashrc
