@@ -120,6 +120,7 @@ EOF
 }
 
 ssh_init(){
+    sudo sed -i /etc/ssh/sshd_config -e "s/^[#]*Port.*/Port 38666/g"
     sudo sed -i /etc/ssh/sshd_config -e "s/^PasswordAuthentication.*/PasswordAuthentication yes/g"
     sudo sed -i /etc/ssh/sshd_config -e "s/^#PubkeyAuthentication.*/PubkeyAuthentication yes/g"
     sudo sed -i /etc/ssh/sshd_config -e "s/^[#]*PermitRootLogin.*/PermitRootLogin yes/g"
