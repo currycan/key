@@ -13,7 +13,8 @@ fi
 
 # LIBSODIUM
 export LIBSODIUM_VER=$(wget -qO- "https://github.com/jedisct1/libsodium/tags"|grep "/jedisct1/libsodium/releases/tag/"|head -1|sed -r 's/.*tag\/(.+)\">.*/\1/')
-export LIBSODIUM_LINK="https://github.com/jedisct1/libsodium/releases/download/${LIBSODIUM_VER}/libsodium-${LIBSODIUM_VER}.tar.gz"
+export LIBSODIUM_LINK="https://github.com/jedisct1/libsodium/releases/download/${LIBSODIUM_VER}-RELEASE/libsodium-${LIBSODIUM_VER}.tar.gz"
+
 # MBEDTLS
 export MBEDTLS_VER=$(wget -qO- "https://tls.mbed.org/download"|grep "(GPL)"|cut -d'-' -f2)
 export MBEDTLS_LINK="https://tls.mbed.org/download/mbedtls-${MBEDTLS_VER}-gpl.tgz"
