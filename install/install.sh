@@ -256,24 +256,18 @@ download_for_ssrr(){
         if [ -f ${libsodium_laster_ver}.tar.gz ]; then
             echo "${libsodium_laster_ver}.tar.gz [found]"
         else
-            if ! wget --no-check-certificate -O ${libsodium_laster_ver}.tar.gz ${LIBSODIUM_LINK}; then
-                echo -e "${COLOR_RED}Failed to download ${libsodium_laster_ver}.tar.gz${COLOR_END}"
-                exit 1
-            fi
+            echo -e "${COLOR_RED}start to download ${libsodium_laster_ver}.tar.gz${COLOR_END}"
+            wget --no-cookie --no-check-certificate -O ${libsodium_laster_ver}.tar.gz ${LIBSODIUM_LINK}
         fi
     fi
     if [[ "${ssrr_installed_flag}" == "false" && "${action}" =~ ^[Ii]|[Ii][Nn]|[Ii][Nn][Ss][Tt][Aa][Ll][Ll]|-[Ii]|--[Ii]$ ]] || [[ "${ssrr_installed_flag}" == "true" && "${ssrr_update_flag}" == "true" && "${action}" =~ ^[Uu]|[Uu][Pp][Dd][Aa][Tt][Ee]|-[Uu]|--[Uu]|[Uu][Pp]|-[Uu][Pp]|--[Uu][Pp]$ ]]; then
         if [ -f shadowsocksr-${ssrr_latest_ver}.tar.gz ]; then
             echo "shadowsocksr-${ssrr_latest_ver}.tar.gz [found]"
         else
-            if ! wget --no-check-certificate -O shadowsocksr-${ssrr_latest_ver}.tar.gz ${ssrr_download_link}; then
-                echo -e "${COLOR_RED}Failed to download Shadowsocksrr file!${COLOR_END}"
-                exit 1
-            fi
-        fi
-        if ! wget --no-check-certificate -O /etc/init.d/ssrr ${ssrr_init_link}; then
-            echo -e "${COLOR_RED}Failed to download Shadowsocksrr init script!${COLOR_END}"
-            exit 1
+            echo -e "${COLOR_RED}start to download Shadowsocksrr file!${COLOR_END}"
+            wget --no-cookie --no-check-certificate -O shadowsocksr-${ssrr_latest_ver}.tar.gz ${ssrr_download_link}
+            echo -e "${COLOR_RED}start to download Shadowsocksrr init script!${COLOR_END}"
+            wget --no-cookie --no-check-certificate -O /etc/init.d/ssrr ${ssrr_init_link}
         fi
     fi
 }
@@ -281,14 +275,14 @@ download_for_ssrr(){
 config_for_ssrr(){
     mkdir -p /usr/local/shadowsocksrr
     rm -f ${ssrr_config} ${ssr_config}
-    wget --no-check-certificate -O ${ssrr_config} https://raw.githubusercontent.com/currycan/key/master/user-configR.json
-    wget --no-check-certificate -O ${ssr_config} https://raw.githubusercontent.com/currycan/key/master/user-config.json
+    wget --no-cookie --no-check-certificate -O ${ssrr_config} https://raw.githubusercontent.com/currycan/key/master/user-configR.json
+    wget --no-cookie --no-check-certificate -O ${ssr_config} https://raw.githubusercontent.com/currycan/key/master/user-config.json
 }
 # Install ssr
 install_for_ssrr(){
     if check_sys packageManager yum; then
         yum install -y epel-release
-        yum install -y unzip openssl-devel gcc swig autoconf libtool libevent vim automake make psmisc curl curl-devel zlib-devel perl perl-devel cpio expat-devel gettext-devel xmlto asciidoc pcre pcre-devel python python-devel python-setuptools udns-devel libev-devel c-ares-devel mbedtls-devel
+        yum install -y unzip openssl-devel gcc swig autoconf libtool libevent vim automake make psmisc curl curl-devel zlib-devel perl perl-devel cpio expat-devel gettext-devel xmlto asciidoc pcre pcre-devel python3 libev-devel c-ares-devel mbedtls-devel
         if [ $? -gt 1 ]; then
             echo
             echo -e "${COLOR_RED}Install support packs failed!${COLOR_END}"
@@ -337,7 +331,7 @@ install_for_ssrr(){
         ssr_server_pub_addr=$(get_ip)
         sed -i "s/SERVER_PUB_ADDR = '${server_pub_addr}'/SERVER_PUB_ADDR = '${ssr_server_pub_addr}'/" ${config_user_api_file}
         sed -i 's/ \/\/ only works under multi-user mode//g' "${config_user_file}"
-        wget --no-check-certificate -O ${mudbjson} https://raw.githubusercontent.com/currycan/key/master/mudb.json
+        wget --no-cookie --no-check-certificate -O ${mudbjson} https://raw.githubusercontent.com/currycan/key/master/mudb.json
 
         if [ -x /usr/local/shadowsocksrr/shadowsocks/server.py ] && [ -s /usr/local/shadowsocksrr/shadowsocks/__init__.py ]; then
             chmod +x /etc/init.d/ssrr
@@ -512,7 +506,6 @@ cur_dir=$(pwd)
 fun_clear "clear"
 Get_Dist_Name
 Check_OS_support
-pre_install_packs
 [  -z ${action} ] && action="install"
 case "${action}" in
 [Ii]|[Ii][Nn]|[Ii][Nn][Ss][Tt][Aa][Ll][Ll]|-[Ii]|--[Ii])
