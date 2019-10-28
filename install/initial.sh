@@ -89,17 +89,17 @@ download_ssh_key(){
 
 yum_init(){
     sudo yum update -y
-    sudo yum install -y sudo vim wget net-tools telnet lrzsz lsof bash-completion epel-release python psmisc crond git
+    sudo yum install -y sudo vim wget net-tools telnet lrzsz lsof bash-completion epel-release python3 psmisc git
     pip_install
-    pip config set global.index-url https://mirrors.aliyun.com/pypi/simple/
-    pip config set global.trusted-host mirrors.aliyun.com
+    # pip config set global.index-url https://mirrors.aliyun.com/pypi/simple/
+    # pip config set global.trusted-host mirrors.aliyun.com
     pip install -U speedtest-cli
 }
 
 apt_init(){
     apt update
     apt upgrade -y
-    apt install -y sudo vim wget net-tools telnet lrzsz lsof bash-completion python curl psmisc cron git
+    apt install -y sudo vim wget net-tools telnet lrzsz lsof bash-completion python3 curl psmisc cron git
     pip_install
     cat << EOF > /usr/bin/pip
 #!/usr/bin/python
@@ -114,8 +114,8 @@ from pip import __main__
 if __name__ == '__main__':
     sys.exit(__main__._main())
 EOF
-    pip config set global.index-url https://mirrors.aliyun.com/pypi/simple/
-    pip config set global.trusted-host mirrors.aliyun.com
+    # pip config set global.index-url https://mirrors.aliyun.com/pypi/simple/
+    # pip config set global.trusted-host mirrors.aliyun.com
     pip install -U speedtest-cli
 }
 
@@ -148,7 +148,7 @@ initial(){
         fi
         if [[ ${version} == "6" ]]; then
             echo "centos 6"
-        elif [[ ${version} == "7" ]]; then
+        elif [[ ${version} != "6" ]]; then
             sudo systemctl stop firewalld && systemctl disable firewalld
         else
             echo "unkown error"
