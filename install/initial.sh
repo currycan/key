@@ -89,7 +89,14 @@ download_ssh_key(){
 
 yum_init(){
     sudo yum update -y
-    sudo yum install -y sudo vim wget net-tools telnet lrzsz lsof bash-completion epel-release python3 psmisc git
+    sudo yum install -y sudo vim wget net-tools telnet lrzsz lsof bash-completion epel-release psmisc git
+    if [[ ${version} != "8" ]]; then
+        yum install -y python3
+    elif [[ ${version} == "8" ]]; then
+        yum install -y python36
+    else
+        echo "unkown error"
+    fi
     pip_install
     # pip config set global.index-url https://mirrors.aliyun.com/pypi/simple/
     # pip config set global.trusted-host mirrors.aliyun.com
