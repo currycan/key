@@ -142,7 +142,7 @@ initial(){
     if [[ "${release}" == "centos" ]]; then
         sudo echo "ZZT520.596msl*18" | passwd --stdin root
         sudo echo "zzt2008zzt" | passwd --stdin andrew
-        chcon -R unconfined_u:object_r:user_home_t:s0 /app/
+        # chcon -R unconfined_u:object_r:user_home_t:s0 /app/
         yum_init
         FLAG_SUDO=$(grep andrew /etc/sudoers | wc -l)
         if [ $FLAG_SUDO == 0 ];then
