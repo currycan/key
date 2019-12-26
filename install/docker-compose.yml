@@ -1,0 +1,36 @@
+version: "3.7"
+services:
+  ssrkcp:
+    image: currycan/ssrkcp:1.0.0
+    ports:
+      - 2019:8388/tcp
+      - 2019:2019/udp
+      - 2020:2020/udp
+    environment:
+      - SSR=ssr://origin:chacha20-ietf:tls1.2_ticket_auth:p@ssw0rd123
+      - SSR_REDIRECT=["www.alibabagroup.com","www.alibabacloud.com","www.alibaba.co.jp"]
+      - SSR_OBFS_PARAM=alibabagroup.com
+      - KCP_RCVWND=2048
+    restart: always
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 65536
+        hard: 65536
+    sysctls:
+      net.core.somaxconn: 16384
+      net.ipv4.tcp_syncookies: 1
+
+  polipo:
+    image: currycan/polipo:1.0.0
+    ports:
+      - "18080:18080"
+    restart: always
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 65536
+        hard: 65536
+    sysctls:
+      net.core.somaxconn: 16384
+      net.ipv4.tcp_syncookies: 1

@@ -28,7 +28,7 @@ ssr2json(){
   ${cfg},
   "protocol_param": "${ssr_protocol_param}",
   "obfs_param": "${ssr_obfs_param}",
-  "redirect": ${ssr_redirect},
+  "redirect": "${ssr_redirect}",
   "timeout": 120,
   "method": "none",
   "forbidden_port": "",

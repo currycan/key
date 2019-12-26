@@ -24,7 +24,7 @@ RUN set -ex; apk add --update --no-cache curl ca-certificates tzdata python libs
   rm -rf /var/cache/apk/*
 
 ENV SSR=ssr://origin:chacha20-ietf:tls1.2_ticket_auth:p@ssw0rd123 \
-    SSR_REDIRECT='["www.alibabagroup.com","www.alibabacloud.com","www.alibaba.co.jp"]' \
+    SSR_REDIRECT=["www.alibabagroup.com","www.alibabacloud.com","www.alibaba.co.jp"] \
     SSR_OBFS_PARAM=alibabagroup.com \
     SSR_PROTOCOL_PARAM=''
 
