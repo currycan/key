@@ -8,7 +8,7 @@ services:
       - 2019:2019/udp
       - 2020:2020/udp
     environment:
-      - SSR=ssr://origin:chacha20-ietf:tls1.2_ticket_auth:p@ssw0rd123
+      - SSR=ssr://origin:chacha20-ietf:plain:p@ssw0rd123
       - SSR_REDIRECT=[www.alibabagroup.com,www.alibabacloud.com,www.alibaba.co.jp]
       - SSR_OBFS_PARAM=alibabagroup.com
       - KCP_RCVWND=2048

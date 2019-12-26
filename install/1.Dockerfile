@@ -3,9 +3,14 @@ FROM alpine:3.11
 LABEL maintainer="andrew <ansandy@foxmail.com>"
 
 ENV TZ=Asia/Hong_Kong
-RUN set -ex; apk add --update --no-cache curl ca-certificates tzdata python libsodium supervisor && update-ca-certificates; \
+RUN set -ex; apk add --update --no-cache curl ca-certificates make gcc g++ tzdata python supervisor && update-ca-certificates; \
   mkdir -p /ssr/kcptun; \
   cd /ssr; \
+  LIBSODIUM_VER=`curl -s "https://github.com/jedisct1/libsodium/tags"|grep "/jedisct1/libsodium/releases/tag/"|head -1|sed -r 's/.*tag\/(.+)\">.*/\1/'`; \
+  LIBSODIUM_URL="https://github.com/jedisct1/libsodium/releases/download/${LIBSODIUM_VER}-RELEASE/libsodium-${LIBSODIUM_VER}.tar.gz"; \
+  curl -fSL ${LIBSODIUM_URL} | tar xz; \
+  cd libsodium-${LIBSODIUM_VER} && ./configure && make -j4 && make install; \
+  cd /ssr && rm -rf /ssr/libsodium*; \
   SSR_VER=`curl -s https://github.com/shadowsocksrr/shadowsocksr/tags | grep "/shadowsocksrr/shadowsocksr/releases/tag/" | head -1 | sed -r 's/.*tag\/(.+)\">.*/\1/'`; \
   SSR_URL=https://github.com/shadowsocksrr/shadowsocksr/archive/${SSR_VER}.tar.gz; \
   curl -fSL ${SSR_URL} | tar xz; \
@@ -19,7 +24,7 @@ RUN set -ex; apk add --update --no-cache curl ca-certificates tzdata python libs
   mv server_* server; \
   curl -SLo /usr/local/bin/start https://raw.githubusercontent.com/currycan/key/master/entrypoint.sh; \
   chmod 770 /usr/local/bin/start; \
-  apk del curl; \
+  apk del curl make gcc g++; \
   ln -sf /usr/share/zoneinfo/$TZ /etc/localtime; \
   rm -rf /var/cache/apk/*
 
