@@ -23,8 +23,8 @@ ssr2json(){
   cfg=$(echo ${ssr} | sed -n "s#ssr://\([^:]*\):\([^:]*\):\([^:]*\):\([^:]*\).*#${json}#p")
   cat <<EOF
 {
-  "server_port": "${ssr_port}",
-  "server_ipv6": "[::]",
+  "server": "0.0.0.0",
+  "server_port": ${ssr_port},
   ${cfg},
   "protocol_param": "${ssr_protocol_param}",
   "obfs_param": "${ssr_obfs_param}",
@@ -90,7 +90,7 @@ cat > ${cmd_conf} <<EOF
 nodaemon=true
 
 [program:shadowsocks]
-command=/usr/bin/python ${ssr_cli} -c ${ssr_conf}
+command=${ssr_cli} -c ${ssr_conf}
 autorestart=true
 redirect_stderr=true
 stdout_logfile=/dev/stdout
