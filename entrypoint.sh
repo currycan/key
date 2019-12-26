@@ -1,15 +1,5 @@
 #!/bin/sh
 
-# ssr://protocol:method:obfs:pass
-# SSR=${SSR:-ssr://origin:aes-256-cfb:tls1.2_ticket_auth_compatible:12345678}
-# SSR_OBFS_PARAM=${SSR_OBFS_PARAM:-bing.com}
-
-# kcp://mode:crypt:key
-# KCP=${KCP:-kcp://fast2:aes:}
-# KCP_EXTRA_ARGS=${KCP_EXTRA_ARGS:-''}
-
-echo "#CONFIG: ${SSR} ${SSR_OBFS_PARAM}"
-echo "#CONFIG: ${KCP} ${KCP_EXTRA_ARGS}"
 echo '=================================================='
 echo
 
@@ -18,6 +8,7 @@ root_dir=${RUN_ROOT:-'/ssr'}
 ssr_cli="${root_dir}/shadowsocks/server.py"
 kcp_cli="${root_dir}/kcptun/server"
 ssr_conf="${root_dir}/_shadowsocksr.json"
+kcp_conf="${root_dir}/_kcptun.json"
 cmd_conf="${root_dir}/_supervisord.conf"
 ssr_port=2019
 kcp_port=2020
@@ -25,10 +16,10 @@ kcp_port=2020
 # Gen ssr_conf
 ssr2json(){
   ssr=$1
-  ssr_redirect="$2"
+  ssr_redirect=$2
   ssr_obfs_param=$3
   ssr_protocol_param=$4
-  json='"protocol": "\1",\n "method": "\2",\n "obfs": "\3",\n "password": "\4"'
+  json='"protocol": "\1",\n  "method": "\2",\n  "obfs": "\3",\n  "password": "\4"'
   cfg=$(echo ${ssr} | sed -n "s#ssr://\([^:]*\):\([^:]*\):\([^:]*\):\([^:]*\).*#${json}#p")
   cat <<EOF
 {
@@ -53,22 +44,45 @@ EOF
 
 ssr2json ${SSR} "${SSR_REDIRECT}" ${SSR_OBFS_PARAM} ${SSR_PROTOCOL_PARAM} > ${ssr_conf}
 
-
 # Gen kcp_conf
-kcp2cmd(){
-  kcp=$1
-  cmd='--mode \1 --crypt \2'
-  cli=$(echo ${kcp} | sed "s#kcp://\([^:]*\):\([^:]*\):\([^:]*\).*#${cmd}#g")
-  key=$(echo ${kcp} | sed "s#kcp://\([^:]*\):\([^:]*\):\([^:]*\).*#\3#g")
-  [ "Z${key}" = 'Z' ] || cli=$(echo "${cli} --key ${key}")
-  echo "${cli}"
+kcp2json(){
+  kcp_key=$1
+  kcp_crypt=$2
+  kcp_mode=$3
+  kcp_mtu=$4
+  kcp_sndwnd=$5
+  kcp_rcvwnd=$6
+  cat <<EOF
+{
+  "listen": ":${kcp_port}",
+  "target": "127.0.0.1:${ssr_port}",
+  "key": "${kcp_key}",
+  "crypt": "${kcp_crypt}",
+  "mode": "${kcp_mode}",
+  "mtu": ${kcp_mtu},
+  "sndwnd": ${kcp_sndwnd},
+  "rcvwnd": ${kcp_rcvwnd},
+  "datashard": 10,
+  "parityshard": 3,
+  "dscp": 46,
+  "nocomp": true,
+  "acknodelay": false,
+  "nodelay": 1,
+  "interval": 10,
+  "resend": 2,
+  "nc": 1,
+  "sockbuf": 16777217,
+  "smuxver": 1,
+  "smuxbuf": 16777217,
+  "streambuf": 2097152,
+  "keepalive": 10,
+  "pprof":false,
+  "quiet":false,
+  "tcp":false
 }
-
-if [ "Z${KCP_EXTRA_ARGS}" = "Z" ]; then
-  kcp_cmd=$(kcp2cmd ${KCP})
-else
-  kcp_cmd="${KCP_EXTRA_ARGS}"
-fi
+EOF
+}
+kcp2json "${KCP_KEY}" ${KCP_CRYPT} ${KCP_MODE} ${KCP_MTU} ${KCP_SNDWND} ${KCP_RCVWND} > ${kcp_conf}
 
 # Gen supervisord.conf
 cat > ${cmd_conf} <<EOF
@@ -83,7 +97,7 @@ stdout_logfile=/dev/stdout
 stdout_logfile_maxbytes=0
 
 [program:kcptun]
-command=${kcp_cli} -t 127.0.0.1:${ssr_port} -l :${kcp_port} ${kcp_cmd}
+command=${kcp_cli} -c ${kcp_conf}
 autorestart=true
 redirect_stderr=true
 stdout_logfile=/dev/stdout

@@ -24,12 +24,16 @@ RUN set -ex; apk add --update --no-cache curl ca-certificates tzdata python libs
   rm -rf /var/cache/apk/*
 
 ENV SSR=ssr://origin:chacha20-ietf:tls1.2_ticket_auth:p@ssw0rd123 \
-  SSR_REDIRECT='["www.alibabagroup.com","www.alibabacloud.com","www.alibaba.co.jp"]' \
-  SSR_OBFS_PARAM=alibabagroup.com \
-  SSR_PROTOCOL_PARAM=''
+    SSR_REDIRECT='["www.alibabagroup.com","www.alibabacloud.com","www.alibaba.co.jp"]' \
+    SSR_OBFS_PARAM=alibabagroup.com \
+    SSR_PROTOCOL_PARAM=''
 
-ENV KCP=kcp://fast2:aes: \
-  KCP_EXTRA_ARGS=''
+ENV KCP_KEY=p@ssw0rd123 \
+    KCP_CRYPT=aes-128 \
+    KCP_MODE=fast3 \
+    KCP_MTU=1400 \
+    KCP_SNDWND=1024 \
+    KCP_RCVWND=4096
 
 WORKDIR /ssr
 
