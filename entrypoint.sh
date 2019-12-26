@@ -37,7 +37,7 @@ ssr2json(){
   "dns_ipv6": true,
   "fast_open": true,
   "transfer_enable": 900727656415232,
-  "workers": 1
+  "workers": 2
 }
 EOF
 }
