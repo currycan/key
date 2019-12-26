@@ -32,11 +32,21 @@ ssr2json(){
   cfg=$(echo ${ssr} | sed -n "s#ssr://\([^:]*\):\([^:]*\):\([^:]*\):\([^:]*\).*#${json}#p")
   cat <<EOF
 {
- "server_port": "${ssr_port}",
- ${cfg},
- "protocol_param": "${ssr_protocol_param}",
- "obfs_param": "${ssr_obfs_param}",
- "redirect": ${ssr_redirect}
+  "server_port": "${ssr_port}",
+  "server_ipv6": "[::]",
+  ${cfg},
+  "protocol_param": "${ssr_protocol_param}",
+  "obfs_param": "${ssr_obfs_param}",
+  "redirect": ${ssr_redirect},
+  "timeout": 120,
+  "method": "none",
+  "forbidden_port": "",
+  "speed_limit_per_con": 0,
+  "speed_limit_per_user": 0,
+  "dns_ipv6": true,
+  "fast_open": true,
+  "transfer_enable": 900727656415232,
+  "workers": 2
 }
 EOF
 }
