@@ -19,7 +19,8 @@ ssr_cli="${root_dir}/shadowsocks/server.py"
 kcp_cli="${root_dir}/kcptun/server"
 ssr_conf="${root_dir}/_shadowsocksr.json"
 cmd_conf="${root_dir}/_supervisord.conf"
-ssr_port=8388
+ssr_port=2019
+kcp_port=2020
 
 # Gen ssr_conf
 ssr2json(){
@@ -72,7 +73,7 @@ stdout_logfile=/dev/stdout
 stdout_logfile_maxbytes=0
 
 [program:kcptun]
-command=${kcp_cli} -t 127.0.0.1:${ssr_port} -l :1${ssr_port} ${kcp_cmd}
+command=${kcp_cli} -t 127.0.0.1:${ssr_port} -l :${kcp_port} ${kcp_cmd}
 autorestart=true
 redirect_stderr=true
 stdout_logfile=/dev/stdout
