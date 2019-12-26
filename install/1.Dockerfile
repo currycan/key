@@ -28,7 +28,7 @@ ENV SSR=ssr://origin:chacha20-ietf:tls1.2_ticket_auth:p@ssw0rd123 \
     SSR_OBFS_PARAM=alibabagroup.com \
     SSR_PROTOCOL_PARAM=''
 
-ENV KCP_KEY=p@ssw0rd123 \
+ENV KCP_KEY=p@ssw0rd456 \
     KCP_CRYPT=aes-128 \
     KCP_MODE=fast3 \
     KCP_MTU=1400 \

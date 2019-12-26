@@ -2,8 +2,9 @@ version: "3.7"
 services:
   ssrkcp:
     image: currycan/ssrkcp:1.0.0
+    name: ssrkcp
     ports:
-      - 2019:8388/tcp
+      - 2019:2019/tcp
       - 2019:2019/udp
       - 2020:2020/udp
     environment:
@@ -23,6 +24,7 @@ services:
 
   polipo:
     image: currycan/polipo:1.0.0
+    name: polipo
     ports:
       - "18080:18080"
     restart: always
