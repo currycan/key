@@ -9,6 +9,7 @@ services:
        - NET_ADMIN
     environment:
       - raw=NO
+      - enable_kcptun="--plugin kcptun-client-plugin --plugin-opts"
     ulimits:
       nproc: 65535
       nofile:
