@@ -43,6 +43,8 @@ RUN set -ex; \
   | sort -u); \
   cd / && git clone https://github.com/w1ndy/kcptun-plugins.git; \
   cd /kcptun-plugins/ && make install; \
+  curl -SLo /usr/local/bin/start https://raw.githubusercontent.com/currycan/key/master/entrypoint.sh; \
+  chmod 770 /usr/local/bin/start; \
   apk del .build-deps; \
   apk add --update --no-cache libtool curl; \
   ln -sf /usr/share/zoneinfo/$TZ /etc/localtime; \
@@ -54,9 +56,6 @@ RUN set -ex; \
 
 # RUN addgroup -S ssrkcp && adduser -S -G ssrkcp ssrkcp
 # USER ssrkcp
-
-RUN curl -SLo /usr/local/bin/start https://raw.githubusercontent.com/currycan/key/master/entrypoint.sh; \
-  chmod 770 /usr/local/bin/start;
 
 # Set shadowsocks-libev run time env
 ENV server_addr=0.0.0.0 \
@@ -80,6 +79,8 @@ ENV config='' \
   nocomp=true \
   params=''
 
+ENV key=p@ssw0rd456 raw=YES
+
 # Set udp2raw run time env
 ENV raw_config='' \
   raw_mode=faketcp \
@@ -87,4 +88,7 @@ ENV raw_config='' \
   raw_auth=md5 \
   raw_params=''
 
-CMD ["start"]
+CMD ["start", "--plugin kcptun-server-plugin --plugin-opts"]
+
+
+# key=p@ssw0rd456;raw=YES;crypt=aes-128;mode=fast3;mtu=1200;sndwnd=512;rcvwnd=4096;datashard=1;parityshard=1;dscp=46;nocomp=true;autoexpire=1800

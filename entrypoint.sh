@@ -11,4 +11,4 @@
   --mtu 1200 \
   --no-delay \
   ${args} \
-  --plugin kcptun-server-plugin --plugin-opts "key=p@ssw0rd456;raw=YES"
+
