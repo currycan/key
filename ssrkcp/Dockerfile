@@ -65,15 +65,15 @@ RUN set -ex; \
   # Install kcptun-plugins
   cd /tmp && git clone https://github.com/w1ndy/kcptun-plugins.git; \
   cd kcptun-plugins/ && make install; \
-  # Install docker-entrypoint.sh
-  curl -SLo /usr/local/bin/entrypoint.sh https://raw.githubusercontent.com/currycan/key/master/ssrkcp/entrypoint.sh; \
-  chmod 770 /usr/local/bin/entrypoint.sh; \
   # Set timezone
   ln -sf /usr/share/zoneinfo/$TZ /etc/localtime; \
   # Clean all cache and temp files
   apk del --no-network .build-deps; \
   rm -rf /tmp/*; \
   rm -rf /var/cache/apk/*
+
+# Install docker-entrypoint.sh
+ADD https://raw.githubusercontent.com/currycan/key/master/ssrkcp/entrypoint.sh; /usr/local/bin/entrypoint.sh
 
 # Set shadowsocks-libev run time env
 ENV server_addr=0.0.0.0 \
@@ -110,7 +110,7 @@ ENV enable_kcptun="true"
 
 EXPOSE 2019 2020
 
-ENTRYPOINT [ "/usr/local/bin/entrypoint.sh" ]
+ENTRYPOINT [ "sh", "-c", "/usr/local/bin/entrypoint.sh" ]
 
 CMD ss-server -s ${server_addr} \
   -p ${server_port} \

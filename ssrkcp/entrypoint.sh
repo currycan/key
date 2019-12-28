@@ -10,4 +10,5 @@ if [ "${1#-}" = 'ss-server' -a "$(id -u)" = '0' ]; then
   # exec su-exec ssrkcp "$@"
 fi
 
+echo "$@"
 exec "$@"
