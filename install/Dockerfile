@@ -42,8 +42,8 @@ RUN set -ex; \
   | sort -u); \
   cd /tmp && git clone https://github.com/w1ndy/kcptun-plugins.git; \
   cd kcptun-plugins/ && make install; \
-  curl -SLo /usr/local/bin/start https://raw.githubusercontent.com/currycan/key/master/entrypoint.sh; \
-  chmod 770 /usr/local/bin/start; \
+  curl -SLo /usr/local/bin/entrypoint.sh https://raw.githubusercontent.com/currycan/key/master/entrypoint.sh; \
+  chmod 770 /usr/local/bin/entrypoint.sh; \
   apk del .build-deps; \
   apk add --update --no-cache libtool curl; \
   ln -sf /usr/share/zoneinfo/$TZ /etc/localtime; \
@@ -87,7 +87,9 @@ ENV raw_config='' \
   raw_auth=md5 \
   raw_params=''
 
-CMD ["start", "--plugin kcptun-server-plugin --plugin-opts"]
+ENTRYPOINT [ "entrypoint.sh" ]
+
+CMD [ "--plugin kcptun-server-plugin --plugin-opts" ]
 
 
 # key=p@ssw0rd456;raw=YES;crypt=aes-128;mode=fast3;mtu=1200;sndwnd=512;rcvwnd=4096;datashard=1;parityshard=1;dscp=46;nocomp=true;autoexpire=1800
