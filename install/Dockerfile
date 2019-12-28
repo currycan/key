@@ -22,10 +22,9 @@ RUN set -ex; \
   # Get shadowsocks-libev & download source code
   SSR_VER=`curl -s https://github.com/shadowsocks/shadowsocks-libev/tags | grep "/shadowsocks/shadowsocks-libev/releases/tag/" | head -1 | sed -r 's/.*tag\/(.+)\">.*/\1/'`; \
   SSR_URL=https://github.com/shadowsocks/shadowsocks-libev/releases/download/${SSR_VER}/shadowsocks-libev-${SSR_VER:1}.tar.gz; \
-  mkdir -p /tmp/ssr; \
-  curl -fSL ${SSR_URL} | tar xz --strip-components=1 -C /tmp/ssr; \
+  curl -fSL ${SSR_URL} | tar xz --strip-components=0 -C /tmp; \
   # Build & install
-  cd /tmp/ssr; \
+  cd /tmp/shadowsocks-libev*; \
   curl -fSLO https://raw.githubusercontent.com/shadowsocks/shadowsocks-libev/master/autogen.sh && chmod 770 autogen.sh; \
   ./autogen.sh; \
   ./configure --prefix=/usr --disable-documentation; \
@@ -41,8 +40,8 @@ RUN set -ex; \
   $(scanelf --needed --nobanner /usr/bin/ss-* \
   | awk '{ gsub(/,/, "\nso:", $2); print "so:" $2 }' \
   | sort -u); \
-  cd / && git clone https://github.com/w1ndy/kcptun-plugins.git; \
-  cd /kcptun-plugins/ && make install; \
+  cd /tmp && git clone https://github.com/w1ndy/kcptun-plugins.git; \
+  cd kcptun-plugins/ && make install; \
   curl -SLo /usr/local/bin/start https://raw.githubusercontent.com/currycan/key/master/entrypoint.sh; \
   chmod 770 /usr/local/bin/start; \
   apk del .build-deps; \
