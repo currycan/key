@@ -73,7 +73,7 @@ RUN set -ex; \
   rm -rf /var/cache/apk/*
 
 # Install docker-entrypoint.sh
-ADD https://raw.githubusercontent.com/currycan/key/master/ssrkcp/entrypoint.sh; /usr/local/bin/entrypoint.sh
+ADD https://raw.githubusercontent.com/currycan/key/master/ssrkcp/entrypoint.sh /usr/local/bin/entrypoint.sh
 
 # Set shadowsocks-libev run time env
 ENV server_addr=0.0.0.0 \
