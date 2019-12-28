@@ -14,6 +14,6 @@ if [ "${1:0:1}" = '-' ]; then
     --mtu ${mtu} \
     --no-delay \
     ${args} \
-    "$@"
+    [[ ${enable_kcptun} == true ]] && --plugin kcptun-server-plugin --plugin-opts
 fi
 exec "$@"
