@@ -106,7 +106,7 @@ ENV raw_config='' \
   raw_auth=md5 \
   raw_params=''
 
-ENV enable_kcptun="true"
+ENV enable_kcptun=true
 
 EXPOSE 2019 2020
 
