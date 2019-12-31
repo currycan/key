@@ -1,0 +1,11 @@
+{
+  "server": "0.0.0.0",
+  "server_port": "${SS_PORT}",
+  "password": "${SS_PASSWD}",
+  "timeout": "300",
+  "user": "ssrkcp",
+  "method": "${SS_METHOD}",
+  "fast_open": true,
+  "nameserver": "8.8.8.8,8.8.4.4",
+  "mode": "tcp_and_udp"
+}

@@ -2,37 +2,17 @@ FROM alpine:3.11
 
 LABEL maintainer="andrew <ansandy@foxmail.com>"
 
-ARG TZ=Asia/Hong_Kong
-
 # add our user and group first to make sure their IDs get assigned consistently, regardless of whatever dependencies get added
 RUN addgroup -S -g 1000 ssrkcp && adduser -S -G ssrkcp -u 999 ssrkcp
 
+# Install tini su-exec and gosu
 RUN set -ex; \
-  # Build environment setup
-  apk add --update --no-cache --virtual .build-deps \
-    git \
+  apk add --update --no-cache tini su-exec; \
+  apk add --update --no-cache --virtual .gosu-deps \
+    curl \
     dpkg \
     gnupg \
-    ca-certificates \
-    autoconf \
-    automake \
-    build-base \
-    c-ares-dev \
-    libcap \
-    libev-dev \
-    libsodium-dev \
-    linux-headers \
-    mbedtls-dev \
-    pcre-dev; \
-  # Base dependencies setup
-  apk add --update --no-cache  \
-    curl \
-    tzdata \
-    libtool \
-    libstdc++ \
-    iptables \
-    su-exec>=0.2 \
-    tini; \
+    ca-certificates; \
   # Install gosu
   dpkgArch=`dpkg --print-architecture | awk -F- '{ print $NF }'`; \
   GOSU_VERSION=`curl -s https://github.com/tianon/gosu/tags | grep "/tianon/gosu/releases/tag/" | head -1 | sed -r 's/.*tag\/(.+)\">.*/\1/'`; \
@@ -45,6 +25,34 @@ RUN set -ex; \
   rm -rf "$GNUPGHOME" /usr/bin/gosu.asc; \
   chmod +x /usr/bin/gosu; \
   gosu nobody true; \
+  apk del --no-network .gosu-deps; \
+  rm -rf /var/cache/apk/*
+
+RUN set -ex; \
+  # Build environment setup
+  apk add --update --no-cache --virtual .build-deps \
+    git \
+    autoconf \
+    automake \
+    build-base \
+    c-ares-dev \
+    libintl \
+    libcap \
+    libev-dev \
+    libsodium-dev \
+    linux-headers \
+    mbedtls-dev \
+    pcre-dev \
+    libtool \
+    libstdc++ \
+    iptables; \
+  # Base dependencies setup
+  apk add --update --no-cache  \
+    curl \
+    gettext \
+    iproute2 \
+    supervisor \
+    tzdata; \
   # Download shadowsocks-libev source code, build and install
   SSR_VER=`curl -s https://github.com/shadowsocks/shadowsocks-libev/tags | grep "/shadowsocks/shadowsocks-libev/releases/tag/" | head -1 | sed -r 's/.*tag\/(.+)\">.*/\1/'`; \
   SSR_URL=https://github.com/shadowsocks/shadowsocks-libev/releases/download/${SSR_VER}/shadowsocks-libev-${SSR_VER:1}.tar.gz; \
@@ -62,65 +70,60 @@ RUN set -ex; \
     $(scanelf --needed --nobanner /usr/bin/ss-* \
     | awk '{ gsub(/,/, "\nso:", $2); print "so:" $2 }' \
     | sort -u); \
-  # Install kcptun-plugins
-  cd /tmp && git clone https://github.com/w1ndy/kcptun-plugins.git; \
-  cd kcptun-plugins/ && make install; \
+  # Install obfs plgin
+  cd /tmp && git clone https://github.com/shadowsocks/simple-obfs.git; \
+  (cd simple-obfs; \
+  git submodule update --init --recursive; \
+  ./autogen.sh && ./configure --disable-documentation; \
+  make && make install); \
+  # Install v2ray-plugin
+  V2RAY_VER=`curl -s https://github.com/shadowsocks/v2ray-plugin/tags | grep "/shadowsocks/v2ray-plugin/releases/tag/" | head -1 | sed -r 's/.*tag\/(.+)\">.*/\1/'`; \
+  V2RAY_URL=https://github.com/shadowsocks/v2ray-plugin/releases/download/${V2RAY_VER}/v2ray-plugin-linux-amd64-${V2RAY_VER}.tar.gz; \
+  curl -fSL ${V2RAY_URL} | tar xz -C /tmp; \
+  mv /tmp/v2ray-plugin_linux_amd64 /usr/bin/v2ray-plugin; \
+  # Install kcptun server
+  KCP_VER=`curl -s "https://github.com/xtaci/kcptun/tags" | grep "/xtaci/kcptun/releases/tag/" | head -1 | sed -r 's/.*tag\/(.+)\">.*/\1/'`; \
+  KCP_URL=https://github.com/xtaci/kcptun/releases/download/${KCP_VER}/kcptun-linux-amd64-${KCP_VER:1}.tar.gz; \
+  curl -fSL ${KCP_URL} | tar xz -C /tmp; \
+  mv /tmp/server_* /usr/bin/kcptun-server; \
   # Set timezone
-  ln -sf /usr/share/zoneinfo/$TZ /etc/localtime; \
-  # Clean all cache and temp files
+  ln -sf /usr/share/zoneinfo/Asia/Hong_Kong /etc/localtime; \
   apk del --no-network .build-deps; \
   rm -rf /tmp/*; \
   rm -rf /var/cache/apk/*
 
-# Install docker-entrypoint.sh
-ADD https://raw.githubusercontent.com/currycan/key/master/ssrkcp/entrypoint.sh /usr/local/bin/entrypoint.sh
-RUN chmod 770 /usr/local/bin/entrypoint.sh
+WORKDIR /ssrkcp/config
 
+# Install docker-entrypoint.sh
+COPY sources /ssrkcp
+RUN chmod 770 /ssrkcp/entrypoint.sh; \
+  chmod 770 /ssrkcp/ss_plugin.sh; \
+  chmod 770 /ssrkcp/utils/view_config.sh; \
+  ln -sf /ssrkcp/entrypoint.sh /usr/local/bin/entrypoint.sh; \
+  ln -sf /ssrkcp/ss_plugin.sh /usr/local/bin/show
+
+ENV TZ=Asia/Hong_Kong
+ENV PLUGIN_CLIENT_NAME=kcptun
 # Set shadowsocks-libev run time env
-ENV server_addr=0.0.0.0 \
-  server_port=2019 \
-  password=p@ssw0rd12^3a \
-  method=chacha20-ietf-poly1305 \
-  timeout=300 \
-  dns_addrs=8.8.8.8,8.8.4.4 \
-  args=''
+ENV SS_PORT=2019 \
+  SS_PASSWD=p@ssw0rd12^3a \
+  SS_METHOD=xchacha20-ietf-poly1305
 
 # Set kcptun run time env
-ENV config='' \
-  crypt=aes-128 \
-  mode=fast3 \
-  mtu=1200 \
-  sndwnd=1024 \
-  rcvwnd=4096 \
-  datashard=1 \
-  parityshard=1 \
-  dscp=46 \
-  nocomp=true \
-  params=''
+# sndwnd*mtu*8/1024/1024=1024*1024*8/1024/1024
+ENV KCP_PORT=2020 \
+    KCP_PASSWD=p@ssw0rd456 \
+    KCP_CRYPT=blowfish \
+    KCP_MODE=fast2 \
+    KCP_MTU=1400 \
+    KCP_SNDWND=1024 \
+    KCP_RCVWND=4096 \
+    KCP_DATASHARD=10 \
+    KCP_PARITYSHARD=3 \
+    KCP_DSCP=46 \
+    KCP_NOCOMP=true \
+    KCP_TCP=true
 
-ENV key=p@ssw0rd456 raw=YES
+ENTRYPOINT [ "entrypoint.sh" ]
 
-# Set udp2raw run time env
-ENV raw_config='' \
-  raw_mode=faketcp \
-  raw_cipher=aes128cbc \
-  raw_auth=md5 \
-  raw_params=''
-
-ENV enable_kcptun=true
-
-EXPOSE 2019 2020
-
-ENTRYPOINT [ "sh", "-c", "/usr/local/bin/entrypoint.sh" ]
-
-CMD ss-server -s ${server_addr} \
-  -p ${server_port} \
-  -k ${password:-$(hostname)} \
-  -m ${method} \
-  -t ${timeout} \
-  -d ${dns_addrs} \
-  -u \
-  --fast-open \
-  --mtu ${mtu} \
-  --no-delay \
-  ${args}
+CMD  [ "supervisord" ]
