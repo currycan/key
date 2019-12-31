@@ -20,3 +20,9 @@ crypt=blowfish;key=p@ssw0rd456;mtu=1400;sndwnd=4096;rcvwnd=1024;mode=fast2;datas
 ```shell
 docker run --rm -it --name ssrkcp --cap-add=NET_ADMIN --net host currycan/ssrkcp:1.0.0 sh
 ```
+
+获取配置`ss link`
+
+```shell
+docker exec -it ssrkcp show
+```
