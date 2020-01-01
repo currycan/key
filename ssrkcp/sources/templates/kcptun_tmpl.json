@@ -21,7 +21,7 @@
   "smuxbuf": 16777217,
   "streambuf": 2097152,
   "keepalive": 10,
-  "pprof": false,
+  "pprof": ${KCP_PPROF},
   "quiet": false,
   "tcp": ${KCP_TCP}
 }

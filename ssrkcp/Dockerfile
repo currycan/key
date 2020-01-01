@@ -122,6 +122,7 @@ ENV KCP_PORT=2020 \
     KCP_PARITYSHARD=3 \
     KCP_DSCP=46 \
     KCP_NOCOMP=true \
+    KCP_PPROF=false \
     KCP_TCP=true
 
 ENTRYPOINT [ "entrypoint.sh" ]

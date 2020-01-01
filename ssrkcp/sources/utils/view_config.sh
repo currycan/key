@@ -28,12 +28,12 @@ ss_kcptun_link(){
     local link_head="ss://"
     local cipher_pwd=$(get_str_base64_encode "${SS_METHOD}:${SS_PASSWD}")
     local ip_port_plugin="@$(get_ip):${KCP_PORT}/?plugin=${PLUGIN_CLIENT_NAME}"
-    if [[ ${KCP_NOCOMP} == false ]] && [[ ${KCP_TCP} == false ]]; then
-        local plugin_opts=$(get_str_replace ";crypt=${KCP_CRYPT};key=${KCP_PASSWD};mtu=${KCP_MTU};sndwnd=${KCP_RCVWND};rcvwnd=${KCP_SNDWND};mode=${KCP_MODE};datashard=${KCP_DATASHARD};parityshard=${KCP_PARITYSHARD};dscp=${KCP_DSCP}")
-    elif [[ ${KCP_NOCOMP} == true ]] && [[ ${KCP_TCP} == false ]]; then
-        local plugin_opts=$(get_str_replace ";crypt=${KCP_CRYPT};key=${KCP_PASSWD};mtu=${KCP_MTU};sndwnd=${KCP_RCVWND};rcvwnd=${KCP_SNDWND};mode=${KCP_MODE};datashard=${KCP_DATASHARD};parityshard=${KCP_PARITYSHARD};dscp=${KCP_DSCP};nocomp=${KCP_NOCOMP}")
-    else
-        local plugin_opts=$(get_str_replace ";crypt=${KCP_CRYPT};key=${KCP_PASSWD};mtu=${KCP_MTU};sndwnd=${KCP_RCVWND};rcvwnd=${KCP_SNDWND};mode=${KCP_MODE};datashard=${KCP_DATASHARD};parityshard=${KCP_PARITYSHARD};dscp=${KCP_DSCP};nocomp=${KCP_NOCOMP};tcp=${KCP_TCP}")
+    local plugin_opts=";sndwnd=${KCP_RCVWND};rcvwnd=${KCP_SNDWND};datashard=${KCP_DATASHARD};parityshard=${KCP_PARITYSHARD};mtu=${KCP_MTU};mode=${KCP_MODE};crypt=${KCP_CRYPT};key=${KCP_PASSWD};dscp=${KCP_DSCP}"
+    if [[ ${KCP_NOCOMP} == true ]];then
+      plugin_opts=${plugin_opts}";nocomp=${KCP_NOCOMP}"
+      if [[ ${KCP_TCP} == true ]]; then
+        plugin_opts=${plugin_opts}";tcp=${KCP_TCP}"
+      fi
     fi
     ss_link="${link_head}${cipher_pwd}${ip_port_plugin}${plugin_opts}"
 }
@@ -50,17 +50,17 @@ ss_kcptun_show(){
     echo -e " 插件程序 : ${Red}${PLUGIN_CLIENT_NAME}${suffix}" >> ${HUMAN_CONFIG}
     echo -e " 插件选项 :                                      " >> ${HUMAN_CONFIG}
     if [[ ${KCP_NOCOMP} == false ]] && [[ ${KCP_TCP} == false ]]; then
-        echo -e " 插件参数 : ${Red}-l %SS_LOCAL_HOST%:%SS_LOCAL_PORT% -r %SS_REMOTE_HOST%:%SS_REMOTE_PORT% --crypt ${KCP_CRYPT} --key ${KCP_PASSWD} --mtu ${KCP_MTU} --sndwnd ${KCP_RCVWND} --rcvwnd ${KCP_SNDWND} --mode ${KCP_MODE} --datashard ${KCP_DATASHARD} --parityshard ${KCP_PARITYSHARD} --dscp ${KCP_DSCP}${suffix}" >> ${HUMAN_CONFIG}
+        echo -e " 插件参数 : ${Red}-l %SS_LOCAL_HOST%:%SS_LOCAL_PORT% -r %SS_REMOTE_HOST%:%SS_REMOTE_PORT% --sndwnd ${KCP_RCVWND} --rcvwnd ${KCP_SNDWND} --datashard ${KCP_DATASHARD} --parityshard ${KCP_PARITYSHARD} --mtu ${KCP_MTU} --mode ${KCP_MODE}  --crypt ${KCP_CRYPT} --key ${KCP_PASSWD} --dscp ${KCP_DSCP}${suffix}" >> ${HUMAN_CONFIG}
         echo >> ${HUMAN_CONFIG}
-        echo -e " 手机参数 : crypt=${KCP_CRYPT};key=${KCP_PASSWD};mtu=${KCP_MTU};sndwnd=${KCP_RCVWND};rcvwnd=${KCP_SNDWND};mode=${KCP_MODE};datashard=${KCP_DATASHARD};parityshard=${KCP_PARITYSHARD};dscp=${KCP_DSCP}" >> ${HUMAN_CONFIG}
+        echo -e " 手机参数 : sndwnd=${KCP_RCVWND};rcvwnd=${KCP_SNDWND};datashard=${KCP_DATASHARD};parityshard=${KCP_PARITYSHARD};mtu=${KCP_MTU};mode=${KCP_MODE};crypt=${KCP_CRYPT};key=${KCP_PASSWD};dscp=${KCP_DSCP}" >> ${HUMAN_CONFIG}
     elif [[ ${KCP_NOCOMP} == true ]] && [[ ${KCP_TCP} == false ]]; then
-        echo -e " 插件参数 : ${Red}-l %SS_LOCAL_HOST%:%SS_LOCAL_PORT% -r %SS_REMOTE_HOST%:%SS_REMOTE_PORT% --crypt ${KCP_CRYPT} --key ${KCP_PASSWD} --mtu ${KCP_MTU} --sndwnd ${KCP_RCVWND} --rcvwnd ${KCP_SNDWND} --mode ${KCP_MODE} --datashard ${KCP_DATASHARD} --parityshard ${KCP_PARITYSHARD} --dscp ${KCP_DSCP} --nocomp ${KCP_NOCOMP}${suffix}" >> ${HUMAN_CONFIG}
+        echo -e " 插件参数 : ${Red}-l %SS_LOCAL_HOST%:%SS_LOCAL_PORT% -r %SS_REMOTE_HOST%:%SS_REMOTE_PORT% --sndwnd ${KCP_RCVWND} --rcvwnd ${KCP_SNDWND} --datashard ${KCP_DATASHARD} --parityshard ${KCP_PARITYSHARD} --mtu ${KCP_MTU} --mode ${KCP_MODE}  --crypt ${KCP_CRYPT} --key ${KCP_PASSWD} --dscp ${KCP_DSCP} --nocomp ${KCP_NOCOMP}${suffix}" >> ${HUMAN_CONFIG}
         echo >> ${HUMAN_CONFIG}
-        echo -e " 手机参数 : crypt=${KCP_CRYPT};key=${KCP_PASSWD};mtu=${KCP_MTU};sndwnd=${KCP_RCVWND};rcvwnd=${KCP_SNDWND};mode=${KCP_MODE};datashard=${KCP_DATASHARD};parityshard=${KCP_PARITYSHARD};dscp=${KCP_DSCP};nocomp=${KCP_NOCOMP}" >> ${HUMAN_CONFIG}
+        echo -e " 手机参数 : sndwnd=${KCP_RCVWND};rcvwnd=${KCP_SNDWND};datashard=${KCP_DATASHARD};parityshard=${KCP_PARITYSHARD};mtu=${KCP_MTU};mode=${KCP_MODE};crypt=${KCP_CRYPT};key=${KCP_PASSWD};dscp=${KCP_DSCP};nocomp=${KCP_NOCOMP}" >> ${HUMAN_CONFIG}
     else
-        echo -e " 插件参数 : ${Red}-l %SS_LOCAL_HOST%:%SS_LOCAL_PORT% -r %SS_REMOTE_HOST%:%SS_REMOTE_PORT% --crypt ${KCP_CRYPT} --key ${KCP_PASSWD} --mtu ${KCP_MTU} --sndwnd ${KCP_RCVWND} --rcvwnd ${KCP_SNDWND} --mode ${KCP_MODE} --datashard ${KCP_DATASHARD} --parityshard ${KCP_PARITYSHARD} --dscp ${KCP_DSCP} --nocomp ${KCP_NOCOMP} --tcp ${KCP_TCP}${suffix}" >> ${HUMAN_CONFIG}
+        echo -e " 插件参数 : ${Red}-l %SS_LOCAL_HOST%:%SS_LOCAL_PORT% -r %SS_REMOTE_HOST%:%SS_REMOTE_PORT% --sndwnd ${KCP_RCVWND} --rcvwnd ${KCP_SNDWND} --datashard ${KCP_DATASHARD} --parityshard ${KCP_PARITYSHARD} --mtu ${KCP_MTU} --mode ${KCP_MODE}  --crypt ${KCP_CRYPT} --key ${KCP_PASSWD} --dscp ${KCP_DSCP} --nocomp ${KCP_NOCOMP} --tcp ${KCP_TCP}${suffix}" >> ${HUMAN_CONFIG}
         echo >> ${HUMAN_CONFIG}
-        echo -e " 手机参数 : crypt=${KCP_CRYPT};key=${KCP_PASSWD};mtu=${KCP_MTU};sndwnd=${KCP_RCVWND};rcvwnd=${KCP_SNDWND};mode=${KCP_MODE};datashard=${KCP_DATASHARD};parityshard=${KCP_PARITYSHARD};dscp=${KCP_DSCP};nocomp=${KCP_NOCOMP};tcp=${KCP_TCP}" >> ${HUMAN_CONFIG}
+        echo -e " 手机参数 : sndwnd=${KCP_RCVWND};rcvwnd=${KCP_SNDWND};datashard=${KCP_DATASHARD};parityshard=${KCP_PARITYSHARD};mtu=${KCP_MTU};mode=${KCP_MODE};crypt=${KCP_CRYPT};key=${KCP_PASSWD};dscp=${KCP_DSCP};nocomp=${KCP_NOCOMP};tcp=${KCP_TCP}" >> ${HUMAN_CONFIG}
     fi
     echo >> ${HUMAN_CONFIG}
     echo -e " SS  链接 : ${Green}${ss_link}${suffix}" >> ${HUMAN_CONFIG}

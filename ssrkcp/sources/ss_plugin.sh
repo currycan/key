@@ -16,6 +16,7 @@ log(){
 showssrkcp(){
   # Humanization config PATH
   HUMAN_CONFIG="/ssrkcp/config/humanization.conf"
+  rm -f ${HUMAN_CONFIG}
   log
   source /ssrkcp/utils/view_config.sh
   show_config "standalone"
