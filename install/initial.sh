@@ -90,6 +90,9 @@ download_ssh_key(){
 yum_init(){
     sudo yum update -y
     sudo yum install -y sudo vim wget net-tools telnet lrzsz lsof bash-completion epel-release python3 psmisc git
+    yum install -y yum-utils device-mapper-persistent-data lvm2
+    yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+    yum install -y docker-ce docker-ce-cli containerd.io
     if [[ ${version} == "8" ]]; then
         ln -sf /usr/bin/python3 /usr/bin/python
     fi
@@ -103,6 +106,16 @@ apt_init(){
     apt update
     apt upgrade -y
     apt install -y sudo vim wget net-tools telnet lrzsz lsof bash-completion python3 curl psmisc cron git
+    apt install apt-transport-https ca-certificates curl gnupg2 software-properties-common
+    if [[ "${release}" == "ubuntu" ]]; then
+      add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+      curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+    fi
+    if [[ "${release}" == "debian" ]]; then
+      add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable"
+      curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add -
+    fi
+    apt install -y docker-ce docker-ce-cli containerd.io
     pip_install
     cat << EOF > /usr/bin/pip
 #!/usr/bin/python
@@ -177,6 +190,13 @@ initial(){
     else
         echo "unkown system"
     fi
+    COMPOSE_VERSION=`curl -s https://github.com/docker/compose/tags | grep "/docker/compose/releases/tag/" | grep -v "rc" | head -1 | sed -r 's/.*tag\/(.+)\">.*/\1/'`
+    curl -L "https://github.com/docker/compose/releases/download/${COMPOSE_VERSION}/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+    chmod +x /usr/local/bin/docker-compose
+    curl -L https://raw.githubusercontent.com/docker/docker-ce/master/components/cli/contrib/completion/bash/docker -o /etc/bash_completion.d/docker
+    curl -L https://raw.githubusercontent.com/docker/compose/${COMPOSE_VERSION}/contrib/completion/bash/docker-compose -o /etc/bash_completion.d/docker-compose
+    curl -O https://raw.githubusercontent.com/currycan/key/master/ssrkcp/docker-compose.yml
+    systemctl enable --now docker
     service sshd restart
     sudo sysctl -p
 }
