@@ -107,7 +107,7 @@ apt_init(){
     apt update
     apt upgrade -y
     apt install -y sudo vim wget net-tools telnet lrzsz lsof bash-completion python3 curl psmisc cron git
-    apt install apt-transport-https ca-certificates curl gnupg2 software-properties-common
+    apt install -y apt-transport-https ca-certificates curl gnupg2 software-properties-common
     if [[ "${release}" == "ubuntu" ]]; then
       add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
       curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
@@ -116,7 +116,7 @@ apt_init(){
       add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable"
       curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add -
     fi
-    apt install -y docker-ce docker-ce-cli containerd.io
+    apt update && apt install -y docker-ce docker-ce-cli containerd.io
     pip_install
     cat << EOF > /usr/bin/pip
 #!/usr/bin/python
