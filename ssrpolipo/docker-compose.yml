@@ -1,14 +1,8 @@
 version: "3.7"
 services:
-  ssrkcp:
-    image: currycan/ssrkcp:1.0.0
-    container_name: ssrkcp
-    environment:
-      - KCP_MTU=1460
-      - KCP_SNDWND=5120
-      - KCP_RCVWND=1024
-      - KCP_DATASHARD=0
-      - KCP_PARITYSHARD=0
+  polipo:
+    image: currycan/ssrpolipo:1.0.0
+    container_name: polipo
     restart: always
     network_mode: "host"
     ulimits:

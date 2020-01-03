@@ -1,0 +1,13 @@
+{
+  "server": "127.0.0.1",
+  "server_port": "4321",
+  "password": "1qaz2wsx3edc",
+  "timeout": "300",
+  "user": "nobody",
+  "method": "salsa20",
+  "fast_open": true,
+  "nameserver": "8.8.8.8,8.8.4.4",
+  "local_address": "127.0.0.1",
+  "local_port": 1234,
+  "mode": "tcp_and_udp"
+}
