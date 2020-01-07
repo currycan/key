@@ -5,6 +5,15 @@ LABEL maintainer="andrew <ansandy@foxmail.com>"
 # add our user and group first to make sure their IDs get assigned consistently, regardless of whatever dependencies get added
 RUN addgroup -S -g 1000 ssrkcp && adduser -S -G ssrkcp -u 999 ssrkcp
 
+# curl -s https://github.com/tianon/gosu/tags | grep "/tianon/gosu/releases/tag/" | head -1 | sed -r 's/.*tag\/(.+)\">.*/\1/'
+ENV GOSU_VER=1.11
+# curl -s https://github.com/shadowsocks/shadowsocks-libev/tags | grep "/shadowsocks/shadowsocks-libev/releases/tag/" | head -1 | sed -r 's/.*tag\/(.+)\">.*/\1/'
+ENV SSR_VER=v3.3.3
+# curl -s https://github.com/shadowsocks/v2ray-plugin/tags | grep "/shadowsocks/v2ray-plugin/releases/tag/" | head -1 | sed -r 's/.*tag\/(.+)\">.*/\1/'
+ENV V2RAY_VER=v1.2.0
+# curl -s "https://github.com/xtaci/kcptun/tags" | grep "/xtaci/kcptun/releases/tag/" | head -1 | sed -r 's/.*tag\/(.+)\">.*/\1/'
+ENV KCP_VER=v20200103
+
 # Install tini su-exec and gosu
 RUN set -ex; \
   apk add --update --no-cache tini su-exec; \
@@ -15,14 +24,13 @@ RUN set -ex; \
     ca-certificates; \
   # Install gosu
   dpkgArch=`dpkg --print-architecture | awk -F- '{ print $NF }'`; \
-  GOSU_VERSION=`curl -s https://github.com/tianon/gosu/tags | grep "/tianon/gosu/releases/tag/" | head -1 | sed -r 's/.*tag\/(.+)\">.*/\1/'`; \
-  curl -fSLo /usr/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$dpkgArch"; \
-  curl -fSLo /usr/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$dpkgArch.asc"; \
+  curl -fSLo /usr/bin/gosu "https://github.com/tianon/gosu/releases/download/${GOSU_VER}/gosu-${dpkgArch}"; \
+  curl -fSLo /usr/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/${GOSU_VER}/gosu-${dpkgArch}.asc"; \
   export GNUPGHOME=`mktemp -d`; \
   gpg --batch --keyserver hkps://keys.openpgp.org --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4; \
   gpg --batch --verify /usr/bin/gosu.asc /usr/bin/gosu; \
   command -v gpgconf && gpgconf --kill all || :; \
-  rm -rf "$GNUPGHOME" /usr/bin/gosu.asc; \
+  rm -rf "${GNUPGHOME}" /usr/bin/gosu.asc; \
   chmod +x /usr/bin/gosu; \
   gosu nobody true; \
   apk del --no-network .gosu-deps; \
@@ -54,7 +62,6 @@ RUN set -ex; \
     supervisor \
     tzdata; \
   # Download shadowsocks-libev source code, build and install
-  SSR_VER=`curl -s https://github.com/shadowsocks/shadowsocks-libev/tags | grep "/shadowsocks/shadowsocks-libev/releases/tag/" | head -1 | sed -r 's/.*tag\/(.+)\">.*/\1/'`; \
   SSR_URL=https://github.com/shadowsocks/shadowsocks-libev/releases/download/${SSR_VER}/shadowsocks-libev-${SSR_VER:1}.tar.gz; \
   curl -fSL ${SSR_URL} | tar xz --strip-components=0 -C /tmp; \
   cd /tmp/shadowsocks-libev*; \
@@ -77,12 +84,10 @@ RUN set -ex; \
   ./autogen.sh && ./configure --disable-documentation; \
   make && make install); \
   # Install v2ray-plugin
-  V2RAY_VER=`curl -s https://github.com/shadowsocks/v2ray-plugin/tags | grep "/shadowsocks/v2ray-plugin/releases/tag/" | head -1 | sed -r 's/.*tag\/(.+)\">.*/\1/'`; \
   V2RAY_URL=https://github.com/shadowsocks/v2ray-plugin/releases/download/${V2RAY_VER}/v2ray-plugin-linux-amd64-${V2RAY_VER}.tar.gz; \
   curl -fSL ${V2RAY_URL} | tar xz -C /tmp; \
   mv /tmp/v2ray-plugin_linux_amd64 /usr/bin/v2ray-plugin; \
   # Install kcptun server
-  KCP_VER=`curl -s "https://github.com/xtaci/kcptun/tags" | grep "/xtaci/kcptun/releases/tag/" | head -1 | sed -r 's/.*tag\/(.+)\">.*/\1/'`; \
   KCP_URL=https://github.com/xtaci/kcptun/releases/download/${KCP_VER}/kcptun-linux-amd64-${KCP_VER:1}.tar.gz; \
   curl -fSL ${KCP_URL} | tar xz -C /tmp; \
   mv /tmp/server_* /usr/bin/kcptun-server; \
@@ -106,8 +111,8 @@ ENV TZ=Asia/Hong_Kong
 ENV PLUGIN_CLIENT_NAME=kcptun
 # Set shadowsocks-libev run time env
 ENV SS_PORT=2019 \
-  SS_PASSWD=p@ssw0rd12^3a \
-  SS_METHOD=xchacha20-ietf-poly1305
+    SS_PASSWD=p@ssw0rd12^3a \
+    SS_METHOD=chacha20-ietf-poly1305
 
 # Set kcptun run time env
 # sndwnd*mtu*8/1024/1024=1024*1024*8/1024/1024
@@ -124,7 +129,7 @@ ENV KCP_PORT=2020 \
     KCP_SMUXVER=1 \
     KCP_NOCOMP=true \
     KCP_PPROF=false \
-    KCP_TCP=true
+    KCP_TCP=false
 
 ENTRYPOINT [ "entrypoint.sh" ]
 

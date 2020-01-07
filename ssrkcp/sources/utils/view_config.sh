@@ -28,7 +28,7 @@ ss_kcptun_link(){
     local link_head="ss://"
     local cipher_pwd=$(get_str_base64_encode "${SS_METHOD}:${SS_PASSWD}")
     local ip_port_plugin="@$(get_ip):${KCP_PORT}/?plugin=${PLUGIN_CLIENT_NAME}"
-    local plugin_opts=";sndwnd=${KCP_RCVWND};rcvwnd=${KCP_SNDWND};datashard=${KCP_DATASHARD};parityshard=${KCP_PARITYSHARD};mtu=${KCP_MTU};mode=${KCP_MODE};crypt=${KCP_CRYPT};key=${KCP_PASSWD};dscp=${KCP_DSCP}"
+    local plugin_opts=";sndwnd=${KCP_RCVWND};rcvwnd=${KCP_SNDWND};datashard=${KCP_DATASHARD};parityshard=${KCP_PARITYSHARD};mtu=${KCP_MTU};mode=${KCP_MODE};crypt=${KCP_CRYPT};key=${KCP_PASSWD};dscp=${KCP_DSCP};conn=2;autoexpire=1800;scavengettl=600;sockbuf=16777217;smuxbuf=16777217"
     if [[ ${KCP_NOCOMP} == true ]];then
       plugin_opts=${plugin_opts}";nocomp=${KCP_NOCOMP}"
       if [[ ${KCP_TCP} == true ]]; then
