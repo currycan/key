@@ -8,10 +8,10 @@ services:
       - KCP_MTU=1460
       - KCP_SNDWND=5120
       - KCP_RCVWND=1024
-      - KCP_SMUXVER=1
+      - KCP_SMUXVER=2
       - KCP_DATASHARD=0
       - KCP_PARITYSHARD=0
-      - KCP_TCP=false
+      - KCP_TCP=true
     restart: always
     network_mode: "host"
     ulimits:
