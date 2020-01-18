@@ -200,6 +200,9 @@ initial(){
     curl -L https://raw.githubusercontent.com/docker/compose/${COMPOSE_VERSION}/contrib/completion/bash/docker-compose -o /etc/bash_completion.d/docker-compose
     curl -O https://raw.githubusercontent.com/currycan/key/master/ssrkcp/docker-compose.yml
     systemctl enable --now docker
+    echo 'alias show="docker exec -it ssrkcp show"' >> ~/.bashrc
+    echo 'alias logs="docker logs -f ssrkcp"' >> ~/.bashrc
+    echo 'alias restart="docker restart ssrkcp"' >> ~/.bashrc
     service sshd restart
     sudo sysctl -p
 }
