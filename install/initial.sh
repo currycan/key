@@ -101,6 +101,8 @@ yum_init(){
     # pip config set global.index-url https://mirrors.aliyun.com/pypi/simple/
     # pip config set global.trusted-host mirrors.aliyun.com
     pip install -U speedtest-cli
+    echo "LANG=en_US.utf-8" >> /etc/environment
+    echo "LC_ALL=en_US.utf-8" >> /etc/environment
 }
 
 apt_init(){
