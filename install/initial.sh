@@ -101,8 +101,14 @@ yum_init(){
     # pip config set global.index-url https://mirrors.aliyun.com/pypi/simple/
     # pip config set global.trusted-host mirrors.aliyun.com
     pip install -U speedtest-cli
-    echo "LANG=en_US.utf-8" >> /etc/environment
-    echo "LC_ALL=en_US.utf-8" >> /etc/environment
+    FLAG_LAN=`grep 'LANG=en_US.utf-8' /etc/environment | wc -l`
+    if [ $FLAG_LAN == 0 ];then
+      test -s /etc/environment && sed -i '$aLANG=en_US.utf-8' /etc/environment || echo 'LANG=en_US.utf-8' >> /etc/environment
+    fi
+    FLAG_ALL=`grep 'LC_ALL=en_US.utf-8' /etc/environment | wc -l`
+    if [ $FLAG_ALL == 0 ];then
+      sudo sed -i '$aLC_ALL=en_US.utf-8' /etc/environment
+    fi
 }
 
 apt_init(){
@@ -202,9 +208,9 @@ initial(){
     curl -L https://raw.githubusercontent.com/docker/compose/${COMPOSE_VERSION}/contrib/completion/bash/docker-compose -o /etc/bash_completion.d/docker-compose
     curl -O https://raw.githubusercontent.com/currycan/key/master/ssrkcp/docker-compose.yml
     systemctl enable --now docker
-    echo 'alias show="docker exec -it ssrkcp show"' >> ~/.bashrc
-    echo 'alias logs="docker logs -f ssrkcp"' >> ~/.bashrc
-    echo 'alias restart="docker restart ssrkcp"' >> ~/.bashrc
+    [[ `grep 'docker exec -it ssrkcp show' ~/.bashrc | wc -l` == 0 ]] && echo 'alias show="docker exec -it ssrkcp show"' >> ~/.bashrc
+    [[ `grep 'docker logs -f ssrkcp' ~/.bashrc | wc -l` == 0 ]] && echo 'alias logs="docker logs -f ssrkcp"' >> ~/.bashrc
+    [[ `grep 'docker restart ssrkcp' ~/.bashrc | wc -l` == 0 ]] && echo 'alias restart="docker restart ssrkcp"' >> ~/.bashrc
     service sshd restart
     sudo sysctl -p
 }
