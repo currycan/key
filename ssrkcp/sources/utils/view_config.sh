@@ -35,7 +35,7 @@ ss_kcptun_show(){
       #   plugin_opts=${plugin_opts}";tcp=${KCP_TCP}"
       # fi
     fi
-    ss_link="${link_head}${cipher_pwd}${ip_port_plugin};${plugin_opts}"
+    ss_link="${link_head}${cipher_pwd}${ip_port_plugin};${plugin_opts}#$(hostname)"
     local kcptun_paras="--sndwnd ${KCP_RCVWND} --rcvwnd ${KCP_SNDWND} --datashard ${KCP_DATASHARD} --parityshard ${KCP_PARITYSHARD} --mtu ${KCP_MTU} --mode ${KCP_MODE} --crypt ${KCP_CRYPT} --key ${KCP_PASSWD} --dscp ${KCP_DSCP} --smuxver ${KCP_SMUXVER} --conn 2 --keepalive 10 --autoexpire 1800 --scavengettl 600 --sockbuf 16777217 --smuxbuf 16777217 --streambuf 2097152"
     if [[ ${KCP_NOCOMP} == true ]];then
       kcptun_paras=${kcptun_paras}" --nocomp ${KCP_NOCOMP}"
