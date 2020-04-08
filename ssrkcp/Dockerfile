@@ -13,6 +13,10 @@ ENV SSR_VER=v3.3.3
 ENV V2RAY_VER=v1.2.0
 # curl -s "https://github.com/xtaci/kcptun/tags" | grep "/xtaci/kcptun/releases/tag/" | head -1 | sed -r 's/.*tag\/(.+)\">.*/\1/'
 ENV KCP_VER=v20200103
+# curl -s "https://github.com/wangyu-/UDPspeeder/releases" | grep "/wangyu-/UDPspeeder/releases/tag" | head -1 | sed -r 's/.*tag\/(.+)\">.*/\1/'
+ENV UDPSPEEDER_VER=20190121.0
+# curl -s "https://github.com/wangyu-/udp2raw-tunnel/releases" | grep "/wangyu-/udp2raw-tunnel/releases/tag" | grep -v "test" | head -1 | sed -r 's/.*tag\/(.+)\">.*/\1/'
+ENV UDP2RAW_VER=20181113.0
 
 # Install tini su-exec and gosu
 RUN set -ex; \
@@ -91,6 +95,14 @@ RUN set -ex; \
   KCP_URL=https://github.com/xtaci/kcptun/releases/download/${KCP_VER}/kcptun-linux-amd64-${KCP_VER:1}.tar.gz; \
   curl -fSL ${KCP_URL} | tar xz -C /tmp; \
   mv /tmp/server_* /usr/bin/kcptun-server; \
+  # Install UDPspeeder
+  UDPSPEEDER_URL=https://github.com/wangyu-/UDPspeeder/releases/download/20190121.0/speederv2_binaries.tar.gz; \
+  curl -fSL ${UDPSPEEDER_URL} | tar xz -C /tmp; \
+  mv /tmp/speederv2_amd64 /usr/bin/speederv2; \
+  # Install udp2raw
+  UDP2RAW_URL=https://github.com/wangyu-/udp2raw-tunnel/releases/download/${UDP2RAW_VER}/udp2raw_binaries.tar.gz; \
+  curl -fSL ${UDP2RAW_URL} | tar xz -C /tmp; \
+  mv /tmp/udp2raw_amd64_hw_aes /usr/bin/udp2raw; \
   # Set timezone
   ln -sf /usr/share/zoneinfo/Asia/Hong_Kong /etc/localtime; \
   apk del --no-network .build-deps; \

@@ -68,7 +68,7 @@ user_init(){
     if [ $FLAG_GROUP == 0 ];then
         groupadd andrew
     fi
-    if [ ! -f /app/andrew/.bashrc ];then
+    if [[ ! -f /app/andrew/.bashrc ]] && [[ ! -f /home/andrew/.bashrc ]];then
         useradd -m andrew -g andrew -s /bin/bash -d /app/andrew
     fi
 }
