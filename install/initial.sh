@@ -5,7 +5,7 @@ export PATH
 set -e
 
 #检查系统
-check_sys(){
+check_sys() {
     if [[ -f /etc/redhat-release ]]; then
         release="centos"
     elif cat /etc/issue | grep -q -E -i "debian"; then
@@ -24,13 +24,13 @@ check_sys(){
 }
 
 #检查Linux版本
-check_version(){
+check_version() {
     if [[ -s /etc/redhat-release ]]; then
-        version=`grep -oE  "[0-9.]+" /etc/redhat-release | cut -d . -f 1`
+        version=$(grep -oE "[0-9.]+" /etc/redhat-release | cut -d . -f 1)
     else
-        version=`grep -oE  "[0-9.]+" /etc/issue | cut -d . -f 1`
+        version=$(grep -oE "[0-9.]+" /etc/issue | cut -d . -f 1)
     fi
-    bit=`uname -m`
+    bit=$(uname -m)
     if [[ ${bit} = "x86_64" ]]; then
         bit="x64"
     else
@@ -38,23 +38,23 @@ check_version(){
     fi
 }
 
-optimizing_system(){
+optimizing_system() {
     sudo \curl -SLo /etc/sysctl.conf https://raw.githubusercontent.com/currycan/key/master/sysctl.conf
     sudo \curl -SLo /etc/security/limits.conf https://raw.githubusercontent.com/currycan/key/master/limits.conf
     FLAG_PROFILE=$(sudo grep "ulimit -SHn 1000000" /etc/profile | wc -l)
-    if [ FLAG_PROFILE == 0 ];then
-        echo "ulimit -SHn 1000000">>/etc/profile
+    if [ FLAG_PROFILE == 0 ]; then
+        echo "ulimit -SHn 1000000" >>/etc/profile
     fi
 }
 
-pip_install(){
-    if [ $(which pip | wc -l) == 0 ];then
+pip_install() {
+    if [ $(which pip | wc -l) == 0 ]; then
         sudo curl -SLo ./get-pip.py https://bootstrap.pypa.io/get-pip.py
         sudo python get-pip.py
         rm -f get-pip.py
     else
-        VERSION=$(pip --version |tr -s ' '| cut -d' ' -f2 | cut -d'.' -f1)
-        if [ $VERSION != 19 ];then
+        VERSION=$(pip --version | tr -s ' ' | cut -d' ' -f2 | cut -d'.' -f1)
+        if [ $VERSION != 19 ]; then
             sudo curl -SLo ./get-pip.py https://bootstrap.pypa.io/get-pip.py
             sudo python get-pip.py
             rm -f get-pip.py
@@ -62,18 +62,18 @@ pip_install(){
     fi
 }
 
-user_init(){
+user_init() {
     mkdir -p /app
     FLAG_GROUP=$(grep andrew /etc/group | wc -l)
-    if [ $FLAG_GROUP == 0 ];then
+    if [ $FLAG_GROUP == 0 ]; then
         groupadd andrew
     fi
-    if [[ ! -f /app/andrew/.bashrc ]] && [[ ! -f /home/andrew/.bashrc ]];then
+    if [[ ! -f /app/andrew/.bashrc ]] && [[ ! -f /home/andrew/.bashrc ]]; then
         useradd -m andrew -g andrew -s /bin/bash -d /app/andrew
     fi
 }
 
-download_ssh_key(){
+download_ssh_key() {
     sudo mkdir -p ssh /app/andrew/.ssh/ /root/.ssh/
     sudo curl -SLo ssh/id_rsa.pub https://raw.githubusercontent.com/currycan/key/master/id_rsa.pub
     sudo curl -SLo ssh/authorized_keys https://raw.githubusercontent.com/currycan/key/master/authorized_keys
@@ -87,7 +87,7 @@ download_ssh_key(){
     sudo rm -rf ssh
 }
 
-yum_init(){
+yum_init() {
     sudo yum update -y
     sudo yum install -y sudo vim wget net-tools telnet lrzsz lsof bash-completion epel-release python3 psmisc git
     yum install -y yum-utils device-mapper-persistent-data lvm2
@@ -101,32 +101,32 @@ yum_init(){
     # pip config set global.index-url https://mirrors.aliyun.com/pypi/simple/
     # pip config set global.trusted-host mirrors.aliyun.com
     pip install -U speedtest-cli
-    FLAG_LAN=`grep 'LANG=en_US.utf-8' /etc/environment | wc -l`
-    if [ $FLAG_LAN == 0 ];then
-      test -s /etc/environment && sed -i '$aLANG=en_US.utf-8' /etc/environment || echo 'LANG=en_US.utf-8' >> /etc/environment
+    FLAG_LAN=$(grep 'LANG=en_US.utf-8' /etc/environment | wc -l)
+    if [ $FLAG_LAN == 0 ]; then
+        test -s /etc/environment && sed -i '$aLANG=en_US.utf-8' /etc/environment || echo 'LANG=en_US.utf-8' >>/etc/environment
     fi
-    FLAG_ALL=`grep 'LC_ALL=en_US.utf-8' /etc/environment | wc -l`
-    if [ $FLAG_ALL == 0 ];then
-      sudo sed -i '$aLC_ALL=en_US.utf-8' /etc/environment
+    FLAG_ALL=$(grep 'LC_ALL=en_US.utf-8' /etc/environment | wc -l)
+    if [ $FLAG_ALL == 0 ]; then
+        sudo sed -i '$aLC_ALL=en_US.utf-8' /etc/environment
     fi
 }
 
-apt_init(){
+apt_init() {
     apt update
     apt upgrade -y
     apt install -y sudo vim wget net-tools telnet lrzsz lsof bash-completion python3 curl psmisc cron git
     apt install -y apt-transport-https ca-certificates curl gnupg2 software-properties-common
     if [[ "${release}" == "ubuntu" ]]; then
-      add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-      curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+        add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
     fi
     if [[ "${release}" == "debian" ]]; then
-      add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable"
-      curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add -
+        add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable"
+        curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add -
     fi
     apt update && apt install -y docker-ce docker-ce-cli containerd.io
     pip_install
-    cat << EOF > /usr/bin/pip
+    cat <<EOF >/usr/bin/pip
 #!/usr/bin/python
 # GENERATED BY DEBIAN
 
@@ -144,7 +144,7 @@ EOF
     pip install -U speedtest-cli
 }
 
-ssh_init(){
+ssh_init() {
     sudo sed -i /etc/ssh/sshd_config -e "s/^[#]*Port.*/Port 38666/g"
     sudo sed -i /etc/ssh/sshd_config -e "s/^PasswordAuthentication.*/PasswordAuthentication yes/g"
     sudo sed -i /etc/ssh/sshd_config -e "s/^#PubkeyAuthentication.*/PubkeyAuthentication yes/g"
@@ -156,7 +156,7 @@ ssh_init(){
     chown -R andrew:andrew /app/andrew/.bashrc
 }
 
-initial(){
+initial() {
     timedatectl set-timezone Asia/Shanghai
     check_sys
     check_version
@@ -169,7 +169,7 @@ initial(){
         # chcon -R unconfined_u:object_r:user_home_t:s0 /app/
         yum_init
         FLAG_SUDO=$(grep andrew /etc/sudoers | wc -l)
-        if [ $FLAG_SUDO == 0 ];then
+        if [ $FLAG_SUDO == 0 ]; then
             # sudo sed -i '93i  andrew    ALL=(ALL:ALL) NOPASSWD: ALL' /etc/sudoers
             sudo sed -i '101i  %andrew    ALL=(ALL:ALL) NOPASSWD: ALL' /etc/sudoers
         fi
@@ -181,8 +181,8 @@ initial(){
             echo "unkown error"
         fi
         ssh_init
-        sudo echo 'export PS1="[\[\e[31;43m\]\[\e[5m\]\u\[\e[0m\]\[\e[37;40m\]@\[\e[32;40m\]\h\[\e[33;40m\] \w\[\e[0m\]]\\$ "' >> ~/.bashrc
-        sudo echo 'export PS1="[\u@\h \W]\$"' >> /app/andrew/.bashrc
+        sudo echo 'export PS1="[\[\e[31;43m\]\[\e[5m\]\u\[\e[0m\]\[\e[37;40m\]@\[\e[32;40m\]\h\[\e[33;40m\] \w\[\e[0m\]]\\$ "' >>~/.bashrc
+        sudo echo 'export PS1="[\u@\h \W]\$"' >>/app/andrew/.bashrc
         sudo sed "s/nofile 6553600/nofile 65536/g" -i /etc/security/limits.conf
         echo "Done~"
     elif [[ "${release}" == "debian" ]] || [[ "${release}" == "ubuntu" ]]; then
@@ -191,26 +191,32 @@ initial(){
         apt_init
         sudo systemctl stop firewalld && systemctl disable firewalld
         FLAG_SUDO=$(grep andrew /etc/sudoers | wc -l)
-        if [ $FLAG_SUDO == 0 ];then
+        if [ $FLAG_SUDO == 0 ]; then
             sudo sed -i '21i  %andrew    ALL=(ALL:ALL) NOPASSWD: ALL' /etc/sudoers
         fi
         ssh_init
-        sudo echo 'export PS1="\[\e[31;43m\]\[\e[5m\]\u\[\e[0m\]\[\e[37;40m\]@\[\e[32;40m\]\h\[\e[33;40m\]:\w\[\e[0m\]\\$ "' >> ~/.bashrc
-        sudo echo 'export PS1="\u@\h:\w\$ "' >> /app/andrew/.bashrc
+        sudo echo 'export PS1="\[\e[31;43m\]\[\e[5m\]\u\[\e[0m\]\[\e[37;40m\]@\[\e[32;40m\]\h\[\e[33;40m\]:\w\[\e[0m\]\\$ "' >>~/.bashrc
+        sudo echo 'export PS1="\u@\h:\w\$ "' >>/app/andrew/.bashrc
         echo "Done~"
     else
         echo "unkown system"
     fi
-    COMPOSE_VERSION=`curl -s https://github.com/docker/compose/tags | grep "/docker/compose/releases/tag/" | grep -v "rc" | head -1 | sed -r 's/.*tag\/(.+)\">.*/\1/'`
+    COMPOSE_VERSION=$(curl -s https://github.com/docker/compose/tags | grep "/docker/compose/releases/tag/" | grep -v "rc" | head -1 | sed -r 's/.*tag\/(.+)\">.*/\1/')
     curl -L "https://github.com/docker/compose/releases/download/${COMPOSE_VERSION}/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
     chmod +x /usr/local/bin/docker-compose
     curl -L https://raw.githubusercontent.com/docker/docker-ce/master/components/cli/contrib/completion/bash/docker -o /etc/bash_completion.d/docker
     curl -L https://raw.githubusercontent.com/docker/compose/${COMPOSE_VERSION}/contrib/completion/bash/docker-compose -o /etc/bash_completion.d/docker-compose
     curl -O https://raw.githubusercontent.com/currycan/key/master/ssrkcp/docker-compose.yml
     systemctl enable --now docker
-    [[ `grep 'docker exec -it ssrkcp show' ~/.bashrc | wc -l` == 0 ]] && echo 'alias show="docker exec -it ssrkcp show"' >> ~/.bashrc
-    [[ `grep 'docker logs -f ssrkcp' ~/.bashrc | wc -l` == 0 ]] && echo 'alias logs="docker logs -f ssrkcp"' >> ~/.bashrc
-    [[ `grep 'docker restart ssrkcp' ~/.bashrc | wc -l` == 0 ]] && echo 'alias restart="docker restart ssrkcp"' >> ~/.bashrc
+    mkdir -p ~/v2ray
+    curl -o /usr/local/bin/tcp.sh https://raw.githubusercontent.com/chiakge/Linux-NetSpeed/master/tcp.sh
+    curl -o ~/v2ray/install.sh https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_onekey/master/install.sh
+    curl -o /usr/local/bin/superspeed https://raw.githubusercontent.com/ernisn/superspeed/master/superspeed.sh
+    chmod 700 /usr/local/bin/*
+    chmod 700 ~/v2ray/install.sh
+    [[ $(grep 'docker exec -it ssrkcp show' ~/.bashrc | wc -l) == 0 ]] && echo 'alias show="docker exec -it ssrkcp show"' >>~/.bashrc
+    [[ $(grep 'docker logs -f ssrkcp' ~/.bashrc | wc -l) == 0 ]] && echo 'alias logs="docker logs -f ssrkcp"' >>~/.bashrc
+    [[ $(grep 'docker restart ssrkcp' ~/.bashrc | wc -l) == 0 ]] && echo 'alias restart="docker restart ssrkcp"' >>~/.bashrc
     service sshd restart
     sudo sysctl -p
 }
