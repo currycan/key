@@ -109,6 +109,11 @@ yum_init() {
     if [ $FLAG_ALL == 0 ]; then
         sudo sed -i '$aLC_ALL=en_US.utf-8' /etc/environment
     fi
+    sed -e 's/^#exclude=kernel*/exclude=kernel*/g' -i /etc/yum.conf
+    FLAG_KERNEL=$(grep 'exclude=kernel' /etc/yum.conf | wc -l)
+    if [ $FLAG_KERNEL == 0 ]; then
+        echo 'exclude=kernel*' >>/etc/yum.conf
+    fi
 }
 
 apt_init() {
