@@ -211,17 +211,23 @@ initial() {
     chmod +x /usr/local/bin/docker-compose
     curl -L https://raw.githubusercontent.com/docker/docker-ce/master/components/cli/contrib/completion/bash/docker -o /etc/bash_completion.d/docker
     curl -L https://raw.githubusercontent.com/docker/compose/${COMPOSE_VERSION}/contrib/completion/bash/docker-compose -o /etc/bash_completion.d/docker-compose
-    curl -O https://raw.githubusercontent.com/currycan/key/master/ssrkcp/docker-compose.yml
     systemctl enable --now docker
+    mkdir -p ~/ssrkcp
+    curl -o ~/ssrkcp/docker-compose.yml https://raw.githubusercontent.com/currycan/key/master/ssrkcp/docker-compose.yml
+    mkdir -p ~/ssrpolipo
+    curl -o ~/ssrpolipo/docker-compose.yml https://raw.githubusercontent.com/currycan/key/master/ssrpolipo/docker-compose.yml
     mkdir -p ~/v2ray
-    curl -o /usr/local/bin/tcp.sh https://raw.githubusercontent.com/chiakge/Linux-NetSpeed/master/tcp.sh
-    curl -o ~/v2ray/install.sh https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_onekey/master/install.sh
+    curl -o ~/v2ray/docker-compose.yml https://raw.githubusercontent.com/currycan/key/master/v2ray/docker-compose.yml
+    # curl -o /usr/local/bin/tcp.sh https://raw.githubusercontent.com/chiakge/Linux-NetSpeed/master/tcp.sh
+    curl -o /usr/local/bin/tcp.sh https://raw.githubusercontent.com/ylx2016/Linux-NetSpeed/master/tcp.sh
     curl -o /usr/local/bin/superspeed https://raw.githubusercontent.com/ernisn/superspeed/master/superspeed.sh
     chmod 700 /usr/local/bin/*
-    chmod 700 ~/v2ray/install.sh
-    [[ $(grep 'docker exec -it ssrkcp show' ~/.bashrc | wc -l) == 0 ]] && echo 'alias show="docker exec -it ssrkcp show"' >>~/.bashrc
-    [[ $(grep 'docker logs -f ssrkcp' ~/.bashrc | wc -l) == 0 ]] && echo 'alias logs="docker logs -f ssrkcp"' >>~/.bashrc
-    [[ $(grep 'docker restart ssrkcp' ~/.bashrc | wc -l) == 0 ]] && echo 'alias restart="docker restart ssrkcp"' >>~/.bashrc
+    [[ $(grep 'docker exec -it ssrkcp show' ~/.bashrc | wc -l) == 0 ]] && echo 'alias ssrshow="docker exec -it ssrkcp show"' >>~/.bashrc
+    [[ $(grep 'docker logs -f ssrkcp' ~/.bashrc | wc -l) == 0 ]] && echo 'alias ssrlogs="docker logs -f ssrkcp"' >>~/.bashrc
+    [[ $(grep 'docker restart ssrkcp' ~/.bashrc | wc -l) == 0 ]] && echo 'alias ssrrestart="docker restart ssrkcp"' >>~/.bashrc
+    [[ $(grep 'docker exec -it v2ray show' ~/.bashrc | wc -l) == 0 ]] && echo 'alias show="docker exec -it v2ray show"' >>~/.bashrc
+    [[ $(grep 'docker logs -f v2ray' ~/.bashrc | wc -l) == 0 ]] && echo 'alias logs="docker logs -f v2ray"' >>~/.bashrc
+    [[ $(grep 'docker restart v2ray' ~/.bashrc | wc -l) == 0 ]] && echo 'alias restart="docker restart v2ray"' >>~/.bashrc
     service sshd restart
     sudo sysctl -p
 }
