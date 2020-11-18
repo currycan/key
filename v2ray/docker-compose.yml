@@ -8,9 +8,10 @@ services:
     volumes:
       - ./pki:/pki
       - ./acme:/acme.sh
-      - ./nginx:/etc/nginx/conf.d/
-      - ./v2ray:/etc/v2ray/
-      - ./logs:/var/log/v2ray/
+      - ./config/v2ray:/etc/v2ray
+      - ./config/nginx:/etc/nginx/conf.d
+      - ./logs/v2ray:/var/log/v2ray
+      - ./logs/nginx:/var/log/nginx
     # working_dir: /etc/nginx
     restart: always
     network_mode: "host"

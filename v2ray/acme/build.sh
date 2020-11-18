@@ -16,6 +16,7 @@ domain=big.ansandy.com
 docker exec acme.sh --issue -d "${domain}" --standalone -k ec-256 --force --test
 rm -rf /root/acme_out/${domain}_ecc
 docker exec acme.sh --issue -d "${domain}" --standalone -k ec-256 --force
+docker exec acme.sh --installcert -d ${domain} --fullchainpath ${CERT_PATH} --keypath /${KEY_PATH} --ecc --force
 
 # 查看证书信息
 openssl x509 -in /root/acme_out/${domain}_ecc/${domain}.cer -noout -text
