@@ -49,13 +49,13 @@ optimizing_system() {
 
 pip_install() {
     if [ $(which pip | wc -l) == 0 ]; then
-        sudo curl -SLo ./get-pip.py https://bootstrap.pypa.io/get-pip.py
+        sudo curl -SLo ./get-pip.py https://bootstrap.pypa.io/2.7/get-pip.py
         sudo python get-pip.py
         rm -f get-pip.py
     else
         VERSION=$(pip --version | tr -s ' ' | cut -d' ' -f2 | cut -d'.' -f1)
         if [ $VERSION != 19 ]; then
-            sudo curl -SLo ./get-pip.py https://bootstrap.pypa.io/get-pip.py
+            sudo curl -SLo ./get-pip.py https://bootstrap.pypa.io/2.7/get-pip.py
             sudo python get-pip.py
             rm -f get-pip.py
         fi
