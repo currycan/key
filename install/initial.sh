@@ -217,6 +217,7 @@ initial() {
     mkdir -p ~/ssrpolipo
     curl -o ~/ssrpolipo/docker-compose.yml https://raw.githubusercontent.com/currycan/key/master/ssrpolipo/docker-compose.yml
     mkdir -p ~/v2ray
+    echo domain=$(hostname) >~/v2ray/.env
     curl -o ~/v2ray/docker-compose.yml https://raw.githubusercontent.com/currycan/key/master/v2ray/docker-compose.yml
     # curl -o /usr/local/bin/tcp.sh https://raw.githubusercontent.com/chiakge/Linux-NetSpeed/master/tcp.sh
     curl -o /usr/local/bin/tcp.sh https://raw.githubusercontent.com/ylx2016/Linux-NetSpeed/master/tcp.sh
