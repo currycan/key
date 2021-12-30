@@ -1,7 +1,7 @@
 version: "3.7"
 services:
   polipo:
-    image: currycan/v2ray-web:1.0.0
+    image: currycan/v2ray-web:1.0.1
     container_name: v2ray
     environment:
       - DOMAIN=$domain
