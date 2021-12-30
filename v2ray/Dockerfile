@@ -1,4 +1,4 @@
-FROM currycan/acme.sh:1.0.0
+FROM currycan/acme.sh:1.0.1
 
 LABEL maintainer="andrew <ansandy@foxmail.com>"
 
@@ -79,7 +79,7 @@ ENV DOMAIN="baidu.com"
 ENV LISTENING_PORT="443"
 # ENV V2RAY_PORT="34567"
 # ENV VMESS_ID="c87153c0-ff7a-4039-a69f-89aa4a46c9a9"
-ENV ALTERID="88"
+ENV ALTERID="99"
 ENV NETWORK="ws"
 # ENV URL_PATH="/2ba84920/"
 ENV CERT_PATH="/pki/v2ray.crt"

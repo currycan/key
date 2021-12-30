@@ -1,6 +1,6 @@
 # /bin/env bash
 
-docker build -t currycan/acme.sh:1.0.0 .
+docker build -t currycan/acme.sh:1.0.1 .
 
 # 运行服务
 docker run --rm -itd --name=acme.sh \

@@ -6,6 +6,7 @@ tls() {
   if [ -f ${CERT_PATH} ] && [ -f ${KEY_PATH} ]; then
     echo "证书文件已存在"
   else
+    ${HOME}/.acme.sh/acme.sh --register-account -m ansandy@foxmail.com
     if [[ -f "${HOME}/.acme.sh/${DOMAIN}_ecc/${DOMAIN}.key" && -f "$HOME/.acme.sh/${DOMAIN}_ecc/${DOMAIN}.cer" ]]; then
       echo "cer 证书文件已存在"
     else
