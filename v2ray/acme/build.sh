@@ -6,7 +6,7 @@ docker build -t currycan/acme.sh:1.0.1 .
 docker run --rm -itd --name=acme.sh \
   -v /root/acme_out:/acme.sh \
   --net=host \
-  currycan/acme.sh:1.0.0 daemon
+  currycan/acme.sh:1.0.1 daemon
 
 # 生成证书
 docker exec acme.sh --help

@@ -3,14 +3,14 @@ FROM currycan/acme.sh:1.0.1
 LABEL maintainer="andrew <ansandy@foxmail.com>"
 
 RUN set -ex; \
-  runtime_pkgs="bash bash-completion gettext supervisor tzdata vim"; \
+  runtime_pkgs="bash-completion gettext supervisor tzdata vim"; \
   apk add -U --no-cache ${build_pkgs} ${runtime_pkgs}; \
   ln -sf /usr/share/zoneinfo/Asia/Hong_Kong /etc/localtime; \
   rm -rf /tmp/*; \
   rm -rf /var/cache/apk/*
 
-ARG glibc_version="2.32-r0"
-ARG nginx_version="1.19.4"
+ARG glibc_version="2.34-r0"
+ARG nginx_version="1.21.5"
 ARG jemalloc_version="5.2.1"
 RUN set -ex; \
   build_pkgs="build-base linux-headers openssl-dev pcre-dev zlib-dev gcc g++ make libffi-dev libtool"; \
@@ -85,7 +85,7 @@ ENV NETWORK="ws"
 ENV CERT_PATH="/pki/v2ray.crt"
 ENV KEY_PATH="/pki/v2ray.key"
 
-ARG v2ray_version="v4.32.1"
+ARG v2ray_version="v4.44.0"
 RUN set -ex; \
   build_pkgs="unzip"; \
   apk add -U --no-cache ${build_pkgs}; \

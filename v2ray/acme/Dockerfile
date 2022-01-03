@@ -12,6 +12,7 @@ RUN set -ex; \
   socat \
   tzdata \
   oath-toolkit-oathtool \
+  bash \
   tar; \
   rm -rf /var/cache/apk/*
 
@@ -71,7 +72,8 @@ RUN printf "%b" '#!'"/usr/bin/env sh\n \
   crond && while true; do sleep 1; done;\n \
   else \n \
   exec -- \"\$@\"\n \
-  fi" >/entry.sh && chmod +x /entry.sh
+  fi" >/entry.sh && chmod +x /entry.sh; \
+  echo 'export PS1="\u@\h:\w\$ "' > ~/.bashrc
 
 VOLUME /acme.sh
 
