@@ -5,6 +5,7 @@ services:
     container_name: v2ray
     environment:
       - DOMAIN=$domain
+      - ALTERID=0
     volumes:
       - ./pki:/pki
       - ./acme:/acme.sh
