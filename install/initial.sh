@@ -206,10 +206,11 @@ initial() {
     else
         echo "unkown system"
     fi
-    COMPOSE_VERSION=$(curl -s https://github.com/docker/compose/tags | grep "/docker/compose/releases/tag/" | grep -v "rc" | head -1 | sed -r 's/.*tag\/(.+)\">.*/\1/')
+    COMPOSE_VERSION=$(curl -s https://github.com/docker/compose/tags | grep "/docker/compose/releases/tag/" | grep -v "rc" | head -1 | sed -r 's/.*tag\/(.+)\">.*/\1/' | awk -F'"' '{print $1}')
     curl -L "https://github.com/docker/compose/releases/download/${COMPOSE_VERSION}/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
     chmod +x /usr/local/bin/docker-compose
     curl -L https://raw.githubusercontent.com/docker/docker-ce/master/components/cli/contrib/completion/bash/docker -o /etc/bash_completion.d/docker
+    # curl -L https://raw.githubusercontent.com/docker/compose/${COMPOSE_VERSION}/contrib/completion/bash/docker-compose -o /etc/bash_completion.d/docker-compose
     curl -L https://raw.githubusercontent.com/docker/compose/${COMPOSE_VERSION}/contrib/completion/bash/docker-compose -o /etc/bash_completion.d/docker-compose
     systemctl enable --now docker
     mkdir -p ~/ssrkcp
@@ -219,6 +220,9 @@ initial() {
     mkdir -p ~/v2ray
     echo domain=$(hostname) >~/v2ray/.env
     curl -o ~/v2ray/docker-compose.yml https://raw.githubusercontent.com/currycan/key/master/v2ray/docker-compose.yml
+    mkdir -p /root/file/data
+    curl -o /root/file/docker-compose.yml https://raw.githubusercontent.com/currycan/key/master/file/docker-compose.yml
+    cd /root/file/data; dd if=/dev/zero of=`hostname` bs=1M count=1k conv=fdatasync;cd -
     # curl -o /usr/local/bin/tcp.sh https://raw.githubusercontent.com/chiakge/Linux-NetSpeed/master/tcp.sh
     curl -o /usr/local/bin/tcp.sh https://raw.githubusercontent.com/ylx2016/Linux-NetSpeed/master/tcp.sh
     curl -o /usr/local/bin/superspeed https://raw.githubusercontent.com/ernisn/superspeed/master/superspeed.sh
