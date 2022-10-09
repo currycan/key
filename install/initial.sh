@@ -211,7 +211,7 @@ initial() {
     chmod +x /usr/local/bin/docker-compose
     curl -L https://raw.githubusercontent.com/docker/docker-ce/master/components/cli/contrib/completion/bash/docker -o /etc/bash_completion.d/docker
     # curl -L https://raw.githubusercontent.com/docker/compose/${COMPOSE_VERSION}/contrib/completion/bash/docker-compose -o /etc/bash_completion.d/docker-compose
-    curl -L https://raw.githubusercontent.com/docker/compose/${COMPOSE_VERSION}/contrib/completion/bash/docker-compose -o /etc/bash_completion.d/docker-compose
+    curl -L https://raw.githubusercontent.com/docker/compose/1.28.x/contrib/completion/bash/docker-compose -o /etc/bash_completion.d/docker-compose
     systemctl enable --now docker
     mkdir -p ~/ssrkcp
     curl -o ~/ssrkcp/docker-compose.yml https://raw.githubusercontent.com/currycan/key/master/ssrkcp/docker-compose.yml
