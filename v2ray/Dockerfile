@@ -104,6 +104,18 @@ RUN set -ex; \
 
 WORKDIR /v2ray/config
 
+# geoip
+RUN set -ex; \
+  build_pkgs="geoip geoip-dev"; \
+  apk add -U --no-cache ${build_pkgs}; \
+  mkdir -p /usr/share/GeoIP && cd /usr/share/GeoIP/ && \
+  wget https://mailfud.org/geoip-legacy/GeoIP.dat.gz && \
+  wget https://mailfud.org/geoip-legacy/GeoIPCity.dat.gz && \
+  gzip -d *; \
+  rm -rf /tmp/*; \
+  apk del ${build_pkgs}; \
+  rm -rf /var/cache/apk/*
+
 EXPOSE 80 443
 
 VOLUME ["/pki", "/acme.sh", "/var/log/v2ray", "/var/log/nginx"]

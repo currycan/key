@@ -1,6 +1,6 @@
 {
     "v": "2",
-    "ps": "${DOMAIN}",
+    "ps": "${GEOIP_INFO}|${DOMAIN}",
     "add": "${DOMAIN}",
     "port": "${LISTENING_PORT}",
     "id": "${VMESS_ID}",
