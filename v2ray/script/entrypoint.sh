@@ -39,7 +39,7 @@ create_config() {
 }
 
 if [ "${1#-}" = 'supervisord' -a "$(id -u)" = '0' ]; then
-  update_geoip
+  # update_geoip
   create_config
   tls
   set "$@" -c "/v2ray/config/supervisord.conf"
