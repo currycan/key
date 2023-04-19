@@ -1,7 +1,7 @@
 version: "3"
 services:
   v2ray:
-    image: currycan/v2ray-web:1.0.1
+    image: currycan/v2ray-web:1.0.2
     container_name: v2ray
     environment:
       - DOMAIN=$domain
