@@ -119,16 +119,25 @@ yum_init() {
 apt_init() {
     apt update
     apt upgrade -y
+    apt install -y python3-pip vim ca-certificates curl
 
     if [[ "${release}" == "ubuntu" ]]; then
-        add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+        sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+        # Add the repository to Apt sources:
+        echo \
+            "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+            $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+            sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+    elif [[ "${release}" == "debian" ]]; then
+        sudo curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
+        # Add the repository to Apt sources:
+        echo \
+            "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian \
+            $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+            sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
     fi
-    if [[ "${release}" == "debian" ]]; then
-        add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable"
-        curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add -
-    fi
-    apt update && apt install -y python3-pip docker-ce docker-ce-cli containerd.io
+    sudo apt-get update
+    sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
     if [ -f /usr/lib/python3.11/EXTERNALLY-MANAGED ];then
         sudo mv /usr/lib/python3.11/EXTERNALLY-MANAGED /usr/lib/python3.11/EXTERNALLY-MANAGED.old
     fi
@@ -213,6 +222,7 @@ initial() {
     cd /root/file/data; dd if=/dev/zero of=`hostname` bs=1M count=1k conv=fdatasync;cd -
     # curl -o /usr/local/bin/tcp.sh https://raw.githubusercontent.com/chiakge/Linux-NetSpeed/master/tcp.sh
     curl -o /usr/local/bin/tcp.sh https://raw.githubusercontent.com/ylx2016/Linux-NetSpeed/master/tcp.sh
+    curl -Lso /usr/local/bin/kernel.sh https://git.io/kernel.sh
     curl -o /usr/local/bin/superspeed https://raw.githubusercontent.com/ernisn/superspeed/master/superspeed.sh
     chmod 700 /usr/local/bin/*
     [[ $(grep 'docker exec -it ssrkcp show' ~/.bashrc | wc -l) == 0 ]] && echo 'alias ssrshow="docker exec -it ssrkcp show"' >>~/.bashrc
