@@ -137,7 +137,7 @@ apt_init() {
             sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
     fi
     sudo apt-get update
-    sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+    sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
     if [ -f /usr/lib/python3.11/EXTERNALLY-MANAGED ];then
         sudo mv /usr/lib/python3.11/EXTERNALLY-MANAGED /usr/lib/python3.11/EXTERNALLY-MANAGED.old
     fi
