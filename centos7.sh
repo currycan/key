@@ -291,7 +291,6 @@ if [ $SYSCTL -lt 10 ];then
 cat >>/etc/sysctl.conf<<EOF
 net.ipv4.tcp_fin_timeout = 2
 net.ipv4.tcp_tw_reuse = 1
-net.ipv4.tcp_tw_recycle = 1
 net.ipv4.tcp_syncookies = 1
 net.ipv4.tcp_max_syn_backlog = 16384
 net.ipv4.tcp_max_tw_buckets = 36000

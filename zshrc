@@ -125,10 +125,6 @@ source ~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting/zsh-syntax-highlighti
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
-# proxy list
-alias proxy='export all_proxy=socks5://127.0.0.1:10086'
-alias unproxy='unset all_proxy'
-
 export PATH="/usr/local/opt/libpcap/bin:$PATH"
 export PATH="/usr/local/opt/icu4c/bin:$PATH"
 export PATH="/usr/local/opt/icu4c/sbin:$PATH"

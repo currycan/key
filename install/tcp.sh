@@ -769,7 +769,7 @@ remove_all() {
   sed -i '/net.core.somaxconn/d' /etc/sysctl.conf
   sed -i '/net.ipv4.tcp_syncookies/d' /etc/sysctl.conf
   sed -i '/net.ipv4.tcp_tw_reuse/d' /etc/sysctl.conf
-  sed -i '/net.ipv4.tcp_tw_recycle/d' /etc/sysctl.conf
+  # sed -i '/net.ipv4.tcp_tw_recycle/d' /etc/sysctl.conf
   sed -i '/net.ipv4.tcp_fin_timeout/d' /etc/sysctl.conf
   sed -i '/net.ipv4.tcp_keepalive_time/d' /etc/sysctl.conf
   sed -i '/net.ipv4.ip_local_port_range/d' /etc/sysctl.conf
