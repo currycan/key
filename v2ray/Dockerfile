@@ -1,15 +1,16 @@
-FROM currycan/acme.sh:1.0.2
+FROM currycan/acme.sh:1.0.3
 
 LABEL maintainer="andrew <ansandy@foxmail.com>"
 
 RUN set -ex; \
-  runtime_pkgs="bash-completion gettext supervisor tzdata vim nginx openrc geoip geoip-dev"; \
+  runtime_pkgs="bash-completion gettext supervisor tzdata vim nginx openrc ca-certificates"; \
   apk add -U --no-cache ${runtime_pkgs}; \
+  update-ca-certificates; \
   ln -sf /usr/share/zoneinfo/Asia/Hong_Kong /etc/localtime; \
   rm -rf /tmp/*; \
   rm -rf /var/cache/apk/*
 
-ARG v2ray_version="v5.4.1"
+ARG v2ray_version="v5.12.1"
 RUN set -ex; \
   build_pkgs="unzip"; \
   apk add -U --no-cache ${build_pkgs}; \
@@ -38,13 +39,21 @@ RUN set -ex; \
   rc-update add nginx default
 
 ENV TZ="Asia/Hong_Kong"
-ENV DOMAIN="baidu.com"
+ENV DOMAIN="abc.com"
 ENV LISTENING_PORT="443"
-# ENV V2RAY_PORT="34567"
-# ENV VMESS_ID="c87153c0-ff7a-4039-a69f-89aa4a46c9a9"
+
+# v2ray
 ENV ALTERID="99"
 ENV NETWORK="ws"
-# ENV URL_PATH="/2ba84920/"
+
+# Letsencrypt.org 0
+# BuyPass.com 1
+# ZeroSSL.com 2
+# Google Public CA 3
+ENV SSLRegisterEmail="ansandy@foxmail.com"
+ENV SSL_PROVIDER = 0
+ENV GoogleEABId=''
+ENV GoogleEABKey=''
 ENV CERT_PATH="/pki/v2ray.crt"
 ENV KEY_PATH="/pki/v2ray.key"
 
