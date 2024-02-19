@@ -52,15 +52,29 @@ function getHTTPSCertificateWithAcme() {
 function createConfig() {
     export DOLLAR='$'
     export V2RAY_PORT=$((RANDOM + 10000))
-    export VMESS_ID=$(cat /proc/sys/kernel/random/uuid)
+    export XRAY_PORT=$((RANDOM + 10001))
+    export UUID=$(cat /proc/sys/kernel/random/uuid)
     export URL_PATH=/$(head /dev/urandom | tr -dc a-z0-9 | head -c 20)/
+    export PRIVATE_KEY=$(xray x25519 | head -1 | cut -d' ' -f3)
+    export PUBLIC_KEY=$(xray x25519 | tail -1 | cut -d' ' -f3)
+    export SHORTID=$(openssl rand -hex 8)
     export GEOIP_INFO=`curl http://www.ip111.cn/ -s | grep '这是您访问国内网站所使用的IP' -B 2 | head -n 1 | awk -F' ' '{print $2$3"|"$1}' | tr -d '</p>'`
+    if [ ! -f ~/.xray ];then
+        echo "export XRAY_PORT=$XRAY_PORT" >> ~/.xray
+        echo "export UUID=$UUID" >> ~/.xray
+        echo "export PUBLIC_KEY=$PUBLIC_KEY" >> ~/.xray
+        echo "export SHORTID=$SHORTID" >> ~/.xray
+        echo "export GEOIP_INFO='$GEOIP_INFO'" >> ~/.xray
+    fi
     if [ ! -f /etc/nginx/conf.d/nginx-v2ray.conf ];then
         envsubst </templates/nginx-v2ray.conf >/etc/nginx/conf.d/nginx-v2ray.conf
     fi
     if [ ! -f /etc/v2ray/v2ray-config.json ]; then
         envsubst </templates/v2ray-config.json >/etc/v2ray/v2ray-config.json
         envsubst </templates/vmess_qr.json >/etc/v2ray/vmess_qr.json
+    fi
+    if [ ! -f /etc/xray/xray-config.json ]; then
+        envsubst </templates/xray-config.json >/etc/xray/xray-config.json
     fi
 }
 

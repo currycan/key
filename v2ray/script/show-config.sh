@@ -19,4 +19,13 @@ vmess_qr_config_tls_ws() {
   echo -n "${vmess_link}" | qrencode -o - -t utf8
 }
 
+vless_qr_config_xtls() {
+    source ~/.xray
+    xray_link="vless://${UUID}@${DOMAIN}:${XRAY_PORT}?encryption=none&security=${SECURITY}&flow=${FLOW}&fp=chrome&utls=chrome&pbk=${PUBLIC_KEY}&sni=${DEST_HOST}&sid=${SHORTID}&type=${XRAY_NETWORK}&host=${DOMAIN}#${GEOIP_INFO}|${DOMAIN}|xray"
+    echo -e "${Red} xray 导入链接: ${xray_link} ${Font}"
+    echo -n "${xray_link}" | qrencode -o - -t utf8
+}
+
 vmess_qr_config_tls_ws
+
+vless_qr_config_xtls

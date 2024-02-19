@@ -1,3 +1,5 @@
+FROM enwaiax/x-ui:latest AS builder
+
 FROM currycan/acme.sh:1.0.3
 
 LABEL maintainer="andrew <ansandy@foxmail.com>"
@@ -26,6 +28,32 @@ RUN set -ex; \
   apk del ${build_pkgs}; \
   rm -rf /var/cache/apk/*
 
+# xray
+ARG xray_version="1.8.7"
+RUN set -ex; \
+  build_pkgs="unzip"; \
+  apk add -U --no-cache ${build_pkgs}; \
+  apk add -U --no-cache libqrencode libqrencode-dev; \
+  cd /tmp; \
+  wget -nc --no-check-certificate "https://github.com/XTLS/Xray-core/releases/download/v${xray_version}/Xray-linux-64.zip"; \
+  unzip -q Xray-linux-64.zip -d .; \
+  mv /tmp/xray /usr/local/bin/; \
+  wget -O /usr/local/bin/geosite.dat https://github.com/v2fly/domain-list-community/releases/latest/download/dlc.dat; \
+  wget -O /usr/local/bin/geoip.dat https://github.com/v2fly/geoip/releases/latest/download/geoip.dat; \
+  rm -rf /tmp/*; \
+  apk del ${build_pkgs}; \
+  rm -rf /var/cache/apk/*
+
+# x-ui
+# ARG xui_version="0.3.2"
+# RUN set -ex; \
+#   cd /tmp; \
+#   wget -nc --no-check-certificate "https://github.com/vaxilu/x-ui/releases/download/${xui_version}/x-ui-linux-amd64.tar.gz"; \
+#   tar zxf x-ui-linux-amd64.tar.gz; \
+#   mv /tmp/x-ui/x-ui /usr/local/bin/; \
+#   rm -rf /tmp/*
+COPY --from=builder  /usr/local/bin/x-ui /usr/local/bin/
+
 COPY config/supervisord.conf /v2ray/config/supervisord.conf
 COPY config/nginx.conf /etc/nginx/nginx.conf
 COPY 3DCEList /home/wwwroot/3DCEList
@@ -43,8 +71,15 @@ ENV DOMAIN="abc.com"
 ENV LISTENING_PORT="443"
 
 # v2ray
-ENV ALTERID="99"
+ENV ALTERID="0"
 ENV NETWORK="ws"
+
+# xray
+ENV XRAY_NETWORK="tcp"
+ENV SECURITY="reality"
+ENV FLOW="xtls-rprx-vision"
+ENV DEST_HOST="www.microsoft.com"
+ENV DEST_PORT="443"
 
 # Letsencrypt.org 0
 # BuyPass.com 1
@@ -61,7 +96,7 @@ WORKDIR /v2ray/config
 
 EXPOSE 80 443
 
-VOLUME ["/pki", "/acme.sh", "/var/log/v2ray", "/var/log/nginx"]
+VOLUME ["/pki", "/acme.sh", "/var/log/v2ray", "/var/log/xray", "/var/log/nginx"]
 
 STOPSIGNAL SIGTERM
 

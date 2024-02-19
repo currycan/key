@@ -1,9 +1,9 @@
 {
     "v": "2",
-    "ps": "${GEOIP_INFO}|${DOMAIN}",
+    "ps": "${GEOIP_INFO}|${DOMAIN}|v2ray",
     "add": "${DOMAIN}",
     "port": "${LISTENING_PORT}",
-    "id": "${VMESS_ID}",
+    "id": "${UUID}",
     "aid": "${ALTERID}",
     "net": "${NETWORK}",
     "type": "none",

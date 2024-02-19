@@ -1,7 +1,7 @@
 version: "3"
 services:
   v2ray:
-    image: currycan/v2ray-web:1.0.3
+    image: currycan/v2ray-web:2.0.0
     container_name: v2ray
     environment:
       - DOMAIN=$domain
@@ -11,8 +11,10 @@ services:
       - ./pki:/pki
       - ./acme:/acme.sh
       - ./config/v2ray:/etc/v2ray
+      - ./config/xray:/etc/xray
       - ./config/nginx:/etc/nginx/conf.d
       - ./logs/v2ray:/var/log/v2ray
+      - ./logs/xray:/var/log/xray
       - ./logs/nginx:/var/log/nginx
     # working_dir: /etc/nginx
     restart: always
