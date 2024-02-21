@@ -1,4 +1,4 @@
-FROM enwaiax/x-ui:latest AS builder
+FROM ghcr.io/mhsanaei/3x-ui:latest AS builder
 
 FROM currycan/acme.sh:1.0.3
 
@@ -45,14 +45,23 @@ RUN set -ex; \
   rm -rf /var/cache/apk/*
 
 # x-ui
-# ARG xui_version="0.3.2"
-# RUN set -ex; \
-#   cd /tmp; \
-#   wget -nc --no-check-certificate "https://github.com/vaxilu/x-ui/releases/download/${xui_version}/x-ui-linux-amd64.tar.gz"; \
-#   tar zxf x-ui-linux-amd64.tar.gz; \
-#   mv /tmp/x-ui/x-ui /usr/local/bin/; \
-#   rm -rf /tmp/*
-COPY --from=builder  /usr/local/bin/x-ui /usr/local/bin/
+ARG xui_version="2.1.3"
+RUN set -ex; \
+  apk add -U --no-cache fail2ban; \
+  rm -f /etc/fail2ban/jail.d/alpine-ssh.conf; \
+  cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local; \
+  sed -i "s/^\[ssh\]$/&\nenabled = false/" /etc/fail2ban/jail.local; \
+  sed -i "s/^\[sshd\]$/&\nenabled = false/" /etc/fail2ban/jail.local; \
+  sed -i "s/#allowipv6 = auto/allowipv6 = auto/g" /etc/fail2ban/fail2ban.conf; \
+  cd /tmp; \
+  wget -nc --no-check-certificate "https://github.com/MHSanaei/3x-ui/releases/download/v${xui_version}/x-ui-linux-amd64.tar.gz"; \
+  tar zxf x-ui-linux-amd64.tar.gz; \
+  rm -f /tmp/x-ui/bin/{LICENSE,README.md}; \
+  cp -a /tmp/x-ui/bin/*_*.dat /usr/local/bin/; \
+  mv /tmp/x-ui/bin /usr/local/bin/; \
+  rm -rf /var/cache/apk/*; \
+  rm -rf /tmp/*
+COPY --from=builder  /app/x-ui /usr/local/bin/
 
 COPY config/supervisord.conf /v2ray/config/supervisord.conf
 COPY config/nginx.conf /etc/nginx/nginx.conf
@@ -78,8 +87,14 @@ ENV NETWORK="ws"
 ENV XRAY_NETWORK="tcp"
 ENV SECURITY="reality"
 ENV FLOW="xtls-rprx-vision"
+ENV XVER=0
 ENV DEST_HOST="www.microsoft.com"
 ENV DEST_PORT="443"
+
+# x-ui
+ENV XUI_ACCOUNT="admin"
+ENV XUI_PASSWORD=""
+ENV XUI_PORT="4333"
 
 # Letsencrypt.org 0
 # BuyPass.com 1

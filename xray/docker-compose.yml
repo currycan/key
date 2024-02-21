@@ -6,7 +6,8 @@ services:
     environment:
       - DOMAIN=$domain
     volumes:
-      - ./config/xray:/etc/xray
+      - ./config/:/etc/xray
+      - ./.xray:/xray/config/.env/xray
       - ./logs/xray:/var/log/xray
     restart: always
     network_mode: "host"

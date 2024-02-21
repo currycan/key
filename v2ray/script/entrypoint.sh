@@ -51,21 +51,29 @@ function getHTTPSCertificateWithAcme() {
 
 function createConfig() {
     export DOLLAR='$'
-    export V2RAY_PORT=$((RANDOM + 10000))
-    export XRAY_PORT=$((RANDOM + 10001))
-    export UUID=$(cat /proc/sys/kernel/random/uuid)
-    export URL_PATH=/$(head /dev/urandom | tr -dc a-z0-9 | head -c 20)/
-    export PRIVATE_KEY=$(xray x25519 | head -1 | cut -d' ' -f3)
-    export PUBLIC_KEY=$(xray x25519 | tail -1 | cut -d' ' -f3)
-    export SHORTID=$(openssl rand -hex 8)
-    export GEOIP_INFO=`curl http://www.ip111.cn/ -s | grep '这是您访问国内网站所使用的IP' -B 2 | head -n 1 | awk -F' ' '{print $2$3"|"$1}' | tr -d '</p>'`
-    if [ ! -f ~/.xray ];then
-        echo "export XRAY_PORT=$XRAY_PORT" >> ~/.xray
-        echo "export UUID=$UUID" >> ~/.xray
-        echo "export PUBLIC_KEY=$PUBLIC_KEY" >> ~/.xray
-        echo "export SHORTID=$SHORTID" >> ~/.xray
-        echo "export GEOIP_INFO='$GEOIP_INFO'" >> ~/.xray
+    if [ ! -f /v2ray/config/.env/v2ray ];then
+        V2RAY_PORT=$((RANDOM + 10000))
+        XRAY_PORT=$((RANDOM + 10001))
+        XUI_LOCAL_PORT=$((RANDOM + 10001))
+        UUID=$(cat /proc/sys/kernel/random/uuid)
+        URL_PATH=/$(head /dev/urandom | tr -dc a-z0-9 | head -c 20)/
+        PRIVATE_KEY=$(xray x25519 | head -1 | cut -d' ' -f3)
+        PUBLIC_KEY=$(xray x25519 | tail -1 | cut -d' ' -f3)
+        SHORTID=$(openssl rand -hex 8)
+        XUI_PASSWORD=$(head /dev/urandom | tr -dc 'A-Za-z0-9!@#$%^&*()_+{}|:<>?=' | head -c 12)
+        GEOIP_INFO=`curl http://www.ip111.cn/ -s | grep '这是您访问国内网站所使用的IP' -B 2 | head -n 1 | awk -F' ' '{print $2$3"|"$1}' | tr -d '</p>'`
+        echo "export V2RAY_PORT=$V2RAY_PORT" >> /v2ray/config/.env/v2ray
+        echo "export XRAY_PORT=$XRAY_PORT" >> /v2ray/config/.env/v2ray
+        echo "export XUI_LOCAL_PORT=$XUI_LOCAL_PORT" >> /v2ray/config/.env/v2ray
+        echo "export UUID=$UUID" >> /v2ray/config/.env/v2ray
+        echo "export URL_PATH=$URL_PATH" >> /v2ray/config/.env/v2ray
+        echo "export PRIVATE_KEY=$PRIVATE_KEY" >> /v2ray/config/.env/v2ray
+        echo "export PUBLIC_KEY=$PUBLIC_KEY" >> /v2ray/config/.env/v2ray
+        echo "export SHORTID=$SHORTID" >> /v2ray/config/.env/v2ray
+        echo "export XUI_PASSWORD=$XUI_PASSWORD" >> /v2ray/config/.env/v2ray
+        echo "export GEOIP_INFO='$GEOIP_INFO'" >> /v2ray/config/.env/v2ray
     fi
+    source /v2ray/config/.env/v2ray
     if [ ! -f /etc/nginx/conf.d/nginx-v2ray.conf ];then
         envsubst </templates/nginx-v2ray.conf >/etc/nginx/conf.d/nginx-v2ray.conf
     fi
@@ -75,12 +83,20 @@ function createConfig() {
     fi
     if [ ! -f /etc/xray/xray-config.json ]; then
         envsubst </templates/xray-config.json >/etc/xray/xray-config.json
+        mkdir -p /usr/local/bin/bin/
+        cp /etc/xray/xray-config.json /usr/local/bin/bin/config.json
+    fi
+    if [ ! -f /usr/local/bin/bin/config.json ]; then
+        mkdir -p /usr/local/bin/bin/
+        cp /etc/xray/xray-config.json /usr/local/bin/bin/config.json
     fi
 }
 
 if [ "${1#-}" = 'supervisord' -a "$(id -u)" = '0' ]; then
     createConfig
     getHTTPSCertificateWithAcme
+    fail2ban-client -x start
+    x-ui setting -username ${XUI_ACCOUNT} -password ${XUI_PASSWORD} -port ${XUI_LOCAL_PORT}
     set "$@" -c "/v2ray/config/supervisord.conf"
 fi
 exec "$@"

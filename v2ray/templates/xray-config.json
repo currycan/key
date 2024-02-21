@@ -2,14 +2,13 @@
   "log": {
     "access": "/var/log/xray/access.log",
     "error": "/var/log/xray/error.log",
-    "loglevel": "info"
+    "loglevel": "warning"
   },
   "inbounds": [
     {
       "port": "${XRAY_PORT}",
       "listen": "0.0.0.0",
       "protocol": "vless",
-      "tag": "Vless-TCP-XTLS",
       "settings": {
         "clients": [
           {
@@ -26,56 +25,17 @@
         "realitySettings": {
           "show": false,
           "dest": "${DEST_HOST}:${DEST_PORT}",
-          "xver": 1,
+          "xver": ${XVER},
           "serverNames": [
             "${DEST_HOST}",
-            "icloud.com",
-            "www.icloud.com",
-            "apple.com",
-            "www.apple.com",
-            "mozilla.org",
-            "addons.mozilla.org",
-            "ebay.com",
-            "www.ebay.com",
-            "walmart.com",
-            "www.walmart.com",
-            "etsy.com",
-            "www.etsy.com",
-            "shopify.com",
-            "www.shopify.com",
-            "samsung.com",
-            "www.samsung.com",
-            "airbnb.com",
-            "www.airbnb.com",
-            "asml.com",
-            "www.asml.com",
-            "tsmc.com",
-            "www.tsmc.com",
-            "pfizer.com",
-            "www.pfizer.com",
-            "microsoft.com",
-            "www.microsoft.com",
-            "support.microsoft.com",
-            "office.com",
-            "www.office.com",
-            "signup.live.com",
-            "www.live.com",
-            "outlook.live.com",
-            "lovelive-anime.jp",
-            "s0.awsstatic.com",
-            "d1.awsstatic.com",
-            "amazon.com",
-            "m.media-amazon.com"
+            "www.${DEST_HOST}"
           ],
           "privateKey": "${PRIVATE_KEY}",
-          "maxTimeDiff": 70000,
+          "minClientVer": "1.8.0",
+          "maxTimeDiff": 0,
           "shortIds": [
             "${SHORTID}"
-          ],
-          "sockopt": {
-            "tcpFastOpen": true,
-            "tcpNoDelay": true
-          }
+          ]
         }
       },
       "sniffing": {
@@ -87,72 +47,34 @@
         ],
         "routeOnly": true
       }
+    },
+    {
+      "listen": "127.0.0.1",
+      "port": 10085,
+      "protocol": "dokodemo-door",
+      "settings": {
+        "address": "127.0.0.1"
+      },
+      "tag": "api"
     }
   ],
   "outbounds": [
     {
-      "tag": "IPv4_out",
       "protocol": "freedom",
-      "settings": {
-        "domainStrategy": "UseIP"
-      }
+      "tag": "direct"
     },
     {
-      "tag": "blocked_out",
       "protocol": "blackhole",
-      "settings": {
-        "response": {
-          "type": "http"
-        }
-      }
-    },
-    {
-      "tag": "IPv6_out",
-      "protocol": "freedom",
-      "settings": {
-        "domainStrategy": "UseIPv6"
-      }
-    },
-    {
-      "tag": "WARP_out",
-      "protocol": "socks",
-      "settings": {
-        "servers": [
-          {
-            "address": "127.0.0.1",
-            "port": 40000
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "tcp"
-      }
+      "tag": "block"
     }
   ],
   "dns": {
     "servers": [
-      {
-        "address": "8.8.8.8",
-        "port": 53,
-        "domains": [
-          "geosite:netflix",
-          "geosite:youtube",
-          "geosite:bahamut",
-          "geosite:hulu",
-          "geosite:hbo",
-          "geosite:disney",
-          "geosite:bbc",
-          "geosite:4chan",
-          "geosite:fox",
-          "geosite:abema",
-          "geosite:dmm",
-          "geosite:niconico",
-          "geosite:pixiv",
-          "geosite:bilibili",
-          "geosite:viu",
-          "geosite:pornhub"
-        ]
-      },
+      "https+local://cloudflare-dns.com/dns-query",
+      "1.1.1.1",
+      "1.0.0.1",
+      "8.8.8.8",
+      "8.8.4.4",
       "localhost"
     ]
   },
@@ -161,90 +83,10 @@
     "rules": [
       {
         "type": "field",
-        "ip": [
-          "geoip:cn"
-        ],
-        "outboundTag": "block"
-      },
-      {
-        "type": "field",
-        "outboundTag": "IPv6_out",
-        "domain": [
-          "geosite:google",
-          "geosite:openai",
-          "geosite:twitter",
-          "geosite:netflix",
-          "geosite:disney",
-          "geosite:youtube",
-          "geosite:spotify",
-          "geosite:pornhub",
-          "geosite:hulu",
-          "geosite:hbo",
-          "geosite:bbc",
-          "geosite:4chan",
-          "geosite:fox",
-          "geosite:abema",
-          "geosite:dmm",
-          "geosite:niconico",
-          "geosite:pixiv",
-          "geosite:viu"
-        ]
-      },
-      {
-        "type": "field",
-        "outboundTag": "WARP_out",
-        "domain": [
-          "test.com"
-        ]
-      },
-      {
-        "type": "field",
-        "outboundTag": "V2Ray_out",
-        "domain": [
-          "test.com"
-        ]
-      },
-      {
-        "type": "field",
-        "domain": [
-          "geosite:cn"
-        ],
-        "outboundTag": "blocked_out"
-      },
-      {
-        "type": "field",
-        "ip": [
-          "geoip:cn"
-        ],
-        "outboundTag": "blocked_out"
-      },
-      {
-        "type": "field",
-        "outboundTag": "IPv4_out",
-        "network": "udp,tcp"
-      },
-      {
-        "type": "field",
-        "ip": [
-          "0.0.0.0/8",
-          "10.0.0.0/8",
-          "100.64.0.0/10",
-          "169.254.0.0/16",
-          "172.16.0.0/12",
-          "192.0.0.0/24",
-          "192.0.2.0/24",
-          "192.168.0.0/16",
-          "198.18.0.0/15",
-          "198.51.100.0/24"
-        ],
-        "outboundTag": "blocked"
-      },
-      {
         "inboundTag": [
           "api"
         ],
-        "outboundTag": "api",
-        "type": "field"
+        "outboundTag": "api"
       },
       {
         "type": "field",
@@ -275,9 +117,7 @@
     "levels": {
       "0": {
         "statsUserUplink": true,
-        "handshake": 2,
-        "statsUserDownlink": true,
-        "connIdle": 120
+        "statsUserDownlink": true
       }
     },
     "system": {

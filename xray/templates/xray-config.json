@@ -26,7 +26,7 @@
         "realitySettings": {
           "show": false,
           "dest": "${DEST_HOST}:${DEST_PORT}",
-          "xver": 1,
+          "xver": ${XVER},
           "serverNames": [
             "${DEST_HOST}",
             "icloud.com",

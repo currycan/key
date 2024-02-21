@@ -5,19 +5,26 @@ services:
     container_name: v2ray
     environment:
       - DOMAIN=$domain
+      - XUI_ACCOUNT=$domain
       - ALTERID=0
       - LISTENING_PORT=443
+      # - DEST_HOST=www.google-analytics.com
+      - DEST_HOST=yahoo.com
+      - XRAY_VMESS_AEAD_FORCED="false"
     volumes:
       - ./pki:/pki
       - ./acme:/acme.sh
+      - ./.v2ray:/v2ray/config/.env
       - ./config/v2ray:/etc/v2ray
       - ./config/xray:/etc/xray
       - ./config/nginx:/etc/nginx/conf.d
+      - ./x-ui:/etc/x-ui/
       - ./logs/v2ray:/var/log/v2ray
       - ./logs/xray:/var/log/xray
       - ./logs/nginx:/var/log/nginx
     # working_dir: /etc/nginx
     restart: always
+    tty: true
     network_mode: "host"
     ulimits:
       nproc: 65535

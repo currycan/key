@@ -53,6 +53,7 @@ ENV DOMAIN="abc.com"
 ENV XRAY_NETWORK="tcp"
 ENV SECURITY="reality"
 ENV FLOW="xtls-rprx-vision"
+ENV XVER=0
 ENV DEST_HOST="www.microsoft.com"
 ENV DEST_PORT="443"
 
