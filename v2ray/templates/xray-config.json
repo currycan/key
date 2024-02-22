@@ -31,6 +31,7 @@
             "www.${DEST_HOST}"
           ],
           "privateKey": "${PRIVATE_KEY}",
+          "publicKey": "${PUBLIC_KEY}",
           "minClientVer": "1.8.0",
           "maxTimeDiff": 0,
           "shortIds": [

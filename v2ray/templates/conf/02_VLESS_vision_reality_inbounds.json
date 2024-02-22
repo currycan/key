@@ -1,0 +1,45 @@
+{
+  "inbounds": [
+    {
+      "port": 4433,
+      "protocol": "vless",
+      "tag": "VLESSReality",
+      "settings": {
+        "clients": [
+          {
+            "id": "${UUID}",
+            "flow": "xtls-rprx-vision",
+            "email": ""
+          }
+        ],
+        "decryption": "none",
+        "fallbacks": [
+          {
+            "dest": "${XRAY_PORT}",
+            "xver": 1
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "reality",
+        "realitySettings": {
+          "show": false,
+          "dest": "${DOMAIN}:4433",
+          "xver": 0,
+          "serverNames": [
+            "${DOMAIN}"
+          ],
+          "privateKey": "${PRIVATE_KEY}",
+          "publicKey": "${PUBLIC_KEY}",
+          "minClientVer": "1.8.0",
+          "maxTimeDiff": 70000,
+          "shortIds": [
+            "",
+            "${SHORTID}"
+          ]
+        }
+      }
+    }
+  ]
+}

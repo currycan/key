@@ -1,4 +1,5 @@
-FROM alpine:3.18
+# FROM alpine:3.18
+FROM nginx:1.25-alpine
 
 LABEL maintainer="andrew <ansandy@foxmail.com>"
 

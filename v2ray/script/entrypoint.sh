@@ -52,25 +52,26 @@ function getHTTPSCertificateWithAcme() {
 function createConfig() {
     export DOLLAR='$'
     if [ ! -f /v2ray/config/.env/v2ray ];then
-        V2RAY_PORT=$((RANDOM + 10000))
-        XRAY_PORT=$((RANDOM + 10001))
-        XUI_LOCAL_PORT=$((RANDOM + 10001))
+        XUI_LOCAL_PORT=$(shuf -i 35000-40000 -n 1)
+        V2RAY_PORT=$((XUI_LOCAL_PORT + 1))
+        XRAY_PORT=$((XUI_LOCAL_PORT + 2))
         UUID=$(cat /proc/sys/kernel/random/uuid)
         URL_PATH=/$(head /dev/urandom | tr -dc a-z0-9 | head -c 20)/
-        PRIVATE_KEY=$(xray x25519 | head -1 | cut -d' ' -f3)
-        PUBLIC_KEY=$(xray x25519 | tail -1 | cut -d' ' -f3)
+        x25519=$(xray x25519)
+        PRIVATE_KEY=$(echo "${x25519}" | head -1 | awk '{print $3}')
+        PUBLIC_KEY=$(echo "${x25519}" | tail -n 1 | awk '{print $3}')
         SHORTID=$(openssl rand -hex 8)
-        XUI_PASSWORD=$(head /dev/urandom | tr -dc 'A-Za-z0-9!@#$%^&*()_+{}|:<>?=' | head -c 12)
+        XUI_PASSWORD=$(head /dev/urandom | tr -dc 'A-Za-z0-9!@#%^&*()_+{}|:<>?=' | head -c 12)
         GEOIP_INFO=`curl http://www.ip111.cn/ -s | grep '这是您访问国内网站所使用的IP' -B 2 | head -n 1 | awk -F' ' '{print $2$3"|"$1}' | tr -d '</p>'`
+        echo "export XUI_LOCAL_PORT=$XUI_LOCAL_PORT" >> /v2ray/config/.env/v2ray
         echo "export V2RAY_PORT=$V2RAY_PORT" >> /v2ray/config/.env/v2ray
         echo "export XRAY_PORT=$XRAY_PORT" >> /v2ray/config/.env/v2ray
-        echo "export XUI_LOCAL_PORT=$XUI_LOCAL_PORT" >> /v2ray/config/.env/v2ray
         echo "export UUID=$UUID" >> /v2ray/config/.env/v2ray
         echo "export URL_PATH=$URL_PATH" >> /v2ray/config/.env/v2ray
         echo "export PRIVATE_KEY=$PRIVATE_KEY" >> /v2ray/config/.env/v2ray
         echo "export PUBLIC_KEY=$PUBLIC_KEY" >> /v2ray/config/.env/v2ray
         echo "export SHORTID=$SHORTID" >> /v2ray/config/.env/v2ray
-        echo "export XUI_PASSWORD=$XUI_PASSWORD" >> /v2ray/config/.env/v2ray
+        echo "export XUI_PASSWORD=\"$XUI_PASSWORD\"" >> /v2ray/config/.env/v2ray
         echo "export GEOIP_INFO='$GEOIP_INFO'" >> /v2ray/config/.env/v2ray
     fi
     source /v2ray/config/.env/v2ray
@@ -81,14 +82,19 @@ function createConfig() {
         envsubst </templates/v2ray-config.json >/etc/v2ray/v2ray-config.json
         envsubst </templates/vmess_qr.json >/etc/v2ray/vmess_qr.json
     fi
+    if [ ! -d /etc/xray/conf ]; then
+        mkdir -p /etc/xray/conf
+        envsubst </templates/conf/01_VLESS_TCP_inbounds.json >/etc/xray/conf/01_VLESS_TCP_inbounds.json
+        envsubst </templates/conf/02_VLESS_vision_reality_inbounds.json >/etc/xray/conf/02_VLESS_vision_reality_inbounds.json
+        envsubst </templates/conf/03_VLESS_vision_gRPC_inbounds.json >/etc/xray/conf/03_VLESS_vision_gRPC_inbounds.json
+        cp /templates/conf/00_log.json /etc/xray/conf/00_log.json
+        cp /templates/conf/04_routing.json /etc/xray/conf/04_routing.json
+        cp /templates/conf/05_dns.json /etc/xray/conf/05_dns.json
+        cp /templates/conf/06_policy.json /etc/xray/conf/06_policy.json
+        cp /templates/conf/z_direct_outbound.json /etc/xray/conf/z_direct_outbound.json
+    fi
     if [ ! -f /etc/xray/xray-config.json ]; then
         envsubst </templates/xray-config.json >/etc/xray/xray-config.json
-        mkdir -p /usr/local/bin/bin/
-        cp /etc/xray/xray-config.json /usr/local/bin/bin/config.json
-    fi
-    if [ ! -f /usr/local/bin/bin/config.json ]; then
-        mkdir -p /usr/local/bin/bin/
-        cp /etc/xray/xray-config.json /usr/local/bin/bin/config.json
     fi
 }
 

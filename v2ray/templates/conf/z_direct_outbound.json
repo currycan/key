@@ -1,0 +1,11 @@
+{
+  "outbounds": [
+    {
+      "protocol": "freedom",
+      "settings": {
+        "domainStrategy": "UseIP"
+      },
+      "tag": "z_direct_outbound"
+    }
+  ]
+}
