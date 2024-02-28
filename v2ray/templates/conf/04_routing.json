@@ -7,7 +7,28 @@
           "domain:gstatic.com",
           "domain:googleapis.com"
         ],
-        "outboundTag": "z_direct_outbound"
+        "outboundTag": "direct"
+      },
+      {
+        "type": "field",
+        "domain": [
+          "geosite:cn"
+        ],
+        "outboundTag": "force-ipv6"
+      },
+      {
+        "type": "field",
+        "ip": [
+          "geoip:cn"
+        ],
+        "outboundTag": "force-ipv6"
+      },
+      {
+        "type": "field",
+        "ip": [
+          "geoip:private"
+        ],
+        "outboundTag": "block"
       }
     ]
   }
