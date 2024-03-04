@@ -48,7 +48,8 @@ set fillchars=vert:\ ,stl:\ ,stlnc:\
 """""""""""""""""""""""""""""""""
 "自动开启语法高亮"
 syntax enable
-"colorscheme solarized
+colorscheme desert
+" colorscheme solarized
 
 " 创建一个新的 MyTabSpace 组,并设置它的颜色
 highlight MyTabSpace ctermfg=darkgrey
@@ -85,7 +86,6 @@ set guifont=Courier_New:h10:cANSI
 
 "高亮显示当前行"
 set cursorline
-set cursorlineopt=number
 hi cursorline guibg=#00ff00
 hi CursorColumn guibg=#00ff00
 
@@ -223,6 +223,7 @@ set incsearch
 "搜索时不区分大小写"
 "还可以使用简写（“:set ic”和“:set noic”）"
 set ignorecase
+set smartcase
 
 "用浅色高亮显示当前行"
 autocmd InsertLeave * se nocul
@@ -298,13 +299,15 @@ set autowrite
 
 "显示中文帮助"
 if version >= 603
-        set helplang=cn
-            set encoding=utf-8
+    set helplang=cn
+    set encoding=utf-8
 endif
 
 "设置高亮相关项"
 highlight Search ctermbg=black ctermfg=white guifg=white guibg=black
 
+"保存文件时自动删除行尾空格"
+autocmd BufWritePre * %s/\s\+$//e
 
 """"""""""""""""""""""""""""""""
 """=>在shell脚本开头自动增加解释器以及作者等版权信息<="""
