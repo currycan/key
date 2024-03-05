@@ -1,7 +1,6 @@
 # /bin/env bash
 
-# docker build -t currycan/acme.sh:1.0.2 .
-docker build -t currycan/acme.sh:1.0.3 .
+docker build -t currycan/acme.sh:1.0.4 .
 
 # 运行服务
 docker run --rm -itd --name=acme.sh \
@@ -24,6 +23,8 @@ docker exec acme.sh --issue -d "${domain}" --standalone -k ec-256 --force --test
 rm -rf /root/acme_out/${domain}_ecc
 docker exec acme.sh --issue -d "${domain}" --standalone -k ec-256 --force
 docker exec acme.sh --installcert -d ${domain} --fullchainpath ${CERT_PATH} --keypath /${KEY_PATH} --ecc --force
+
+acme.sh --installcert -d ${domain} --fullchainpath ${CERT_PATH} --keypath "/etc/v2ray-agent/tls/${tlsDomain}.key" --ecc >/dev/null
 
 # 查看证书信息
 openssl x509 -in /root/acme_out/${domain}_ecc/${domain}.cer -noout -text

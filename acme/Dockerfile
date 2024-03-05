@@ -1,5 +1,4 @@
-# FROM alpine:3.18
-FROM nginx:1.25-alpine
+FROM alpine:3.18
 
 LABEL maintainer="andrew <ansandy@foxmail.com>"
 
@@ -82,6 +81,8 @@ fi\n" >/entry.sh && chmod +x /entry.sh; \
   echo 'export PS1="\u@\h:\w\$ "' > ~/.bashrc
 
 VOLUME /acme.sh
+
+WORKDIR /acme.sh
 
 ENTRYPOINT ["/entry.sh"]
 CMD ["--help"]

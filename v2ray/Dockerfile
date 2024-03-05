@@ -1,6 +1,4 @@
-FROM ghcr.io/mhsanaei/3x-ui:latest AS builder
-
-FROM currycan/acme.sh:1.0.3
+FROM currycan/acme.sh:1.0.4
 
 LABEL maintainer="andrew <ansandy@foxmail.com>"
 
@@ -12,7 +10,7 @@ RUN set -ex; \
   rm -rf /tmp/*; \
   rm -rf /var/cache/apk/*
 
-ARG v2ray_version="v5.12.1"
+ARG v2ray_version="v5.14.1"
 RUN set -ex; \
   build_pkgs="unzip"; \
   apk add -U --no-cache ${build_pkgs}; \
@@ -29,7 +27,7 @@ RUN set -ex; \
   rm -rf /var/cache/apk/*
 
 # xray
-ARG xray_version="1.8.7"
+ARG xray_version="1.8.8"
 RUN set -ex; \
   build_pkgs="unzip"; \
   apk add -U --no-cache ${build_pkgs}; \
@@ -44,8 +42,25 @@ RUN set -ex; \
   apk del ${build_pkgs}; \
   rm -rf /var/cache/apk/*
 
+# # glibc
+ARG glibc_version=2.35-r1
+RUN set -ex; \
+  apk add --update --no-cache libstdc++; \
+  wget -q -O /etc/apk/keys/sgerrand.rsa.pub https://alpine-pkgs.sgerrand.com/sgerrand.rsa.pub; \
+  for pkg in glibc-${glibc_version} glibc-bin-${glibc_version} glibc-i18n-${glibc_version}; \
+  do \
+    curl -sSL https://github.com/sgerrand/alpine-pkg-glibc/releases/download/${glibc_version}/${pkg}.apk -o /tmp/${pkg}.apk; \
+  done; \
+  apk add /tmp/*.apk; \
+  ( /usr/glibc-compat/bin/localedef --force --inputfile POSIX --charmap UTF-8 C.UTF-8 || true ); \
+  echo "export LANG=C.UTF-8" > /etc/profile.d/locale.sh; \
+  /usr/glibc-compat/sbin/ldconfig /lib /usr/glibc-compat/lib; \
+  /usr/glibc-compat/bin/localedef -i en_US -f UTF-8 en_US.UTF-8; \
+  apk del --no-network glibc-i18n; \
+  rm -rf /tmp/* /var/cache/apk/*
+
 # x-ui
-ARG xui_version="2.1.3"
+ARG xui_version="2.2.1"
 RUN set -ex; \
   apk add -U --no-cache fail2ban; \
   rm -f /etc/fail2ban/jail.d/alpine-ssh.conf; \
@@ -58,10 +73,12 @@ RUN set -ex; \
   tar zxf x-ui-linux-amd64.tar.gz; \
   rm -f /tmp/x-ui/bin/{LICENSE,README.md}; \
   cp -a /tmp/x-ui/bin/*_*.dat /usr/local/bin/; \
+  cp -a /tmp/x-ui/x-ui /usr/local/bin/; \
   mv /tmp/x-ui/bin /usr/local/bin/; \
   rm -rf /var/cache/apk/*; \
   rm -rf /tmp/*
-COPY --from=builder  /app/x-ui /usr/local/bin/
+
+RUN apk add -U --no-cache gcompat || echo 0 && rm -rf /tmp/* /var/cache/apk/*
 
 COPY config/supervisord.conf /v2ray/config/supervisord.conf
 COPY config/nginx.conf /etc/nginx/nginx.conf

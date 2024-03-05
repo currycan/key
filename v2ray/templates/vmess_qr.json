@@ -1,6 +1,6 @@
 {
     "v": "2",
-    "ps": "${GEOIP_INFO}|${DOMAIN}|v2ray",
+    "ps": "${GEOIP_INFO}|${DOMAIN}",
     "add": "${DOMAIN}",
     "port": "${LISTENING_PORT}",
     "id": "${UUID}",
