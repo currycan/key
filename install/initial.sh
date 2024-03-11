@@ -121,23 +121,24 @@ apt_init() {
     apt upgrade -y
     apt install -y python3-pip vim ca-certificates curl
 
-    if [[ "${release}" == "ubuntu" ]]; then
-        sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
-        # Add the repository to Apt sources:
-        echo \
-            "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
-            $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
-            sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-    elif [[ "${release}" == "debian" ]]; then
-        sudo curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
-        # Add the repository to Apt sources:
-        echo \
-            "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian \
-            $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
-            sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-    fi
-    sudo apt-get update
-    sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+    # if [[ "${release}" == "ubuntu" ]]; then
+    #     sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+    #     # Add the repository to Apt sources:
+    #     echo \
+    #         "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+    #         $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+    #         sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+    # elif [[ "${release}" == "debian" ]]; then
+    #     sudo curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
+    #     # Add the repository to Apt sources:
+    #     echo \
+    #         "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian \
+    #         $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+    #         sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+    # fi
+    # sudo apt-get update
+    # sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+    curl -fsSL https://get.docker.com | bash -s docker
     if [ -f /usr/lib/python3.11/EXTERNALLY-MANAGED ];then
         sudo mv /usr/lib/python3.11/EXTERNALLY-MANAGED /usr/lib/python3.11/EXTERNALLY-MANAGED.old
     fi
