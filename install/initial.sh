@@ -120,31 +120,28 @@ apt_init() {
     apt update
     apt upgrade -y
     apt install -y python3-pip vim ca-certificates curl
+    sudo install -m 0755 -d /etc/apt/keyrings
 
     if [[ "${release}" == "ubuntu" ]]; then
+        # Add Docker's official GPG key:
         sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
-        # Add the repository to Apt sources:
-        echo \
-            "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
-            $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
-            sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-    elif [[ "${release}" == "debian" ]]; then
-        sudo curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
-        # Add the repository to Apt sources:
-        echo \
-            # Add Docker's official GPG key:
-            sudo apt-get update
-            sudo apt-get install ca-certificates curl
-            sudo install -m 0755 -d /etc/apt/keyrings
-            sudo curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
-            sudo chmod a+r /etc/apt/keyrings/docker.asc
 
-            # Add the repository to Apt sources:
-            echo \
-            "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian \
-            $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
-            sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+        # Add the repository to Apt sources:
+        echo \
+        "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+        $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+        sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+    elif [[ "${release}" == "debian" ]]; then
+        # Add Docker's official GPG key:
+        sudo curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
+
+        # Add the repository to Apt sources:
+        echo \
+        "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian \
+        $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+        sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
     fi
+    sudo chmod a+r /etc/apt/keyrings/docker.asc
     sudo apt-get update
     sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
     # curl -fsSL https://get.docker.com | bash -s docker
