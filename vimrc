@@ -13,7 +13,7 @@ filetype on
 "载入文件类型插件"
 filetype plugin on
 "为特定文件类型载入相关缩进文件"
-filetype indent on
+"filetype indent on
 
 "当文件在外部被修改时，自动更新该文件"
 set autoread
@@ -194,7 +194,7 @@ set lz
 set backspace=eol,start,indent
 
 "允许空格键和光标键跨越行边界"
-set whichwrap+=<,>,h,l
+"set whichwrap+=<,>,h,l
 
 "设置魔术"
 set magic
