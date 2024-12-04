@@ -22,9 +22,9 @@ domain=hk.ansandy.com
 docker exec acme.sh --issue -d "${domain}" --standalone -k ec-256 --force --test
 rm -rf /root/acme_out/${domain}_ecc
 docker exec acme.sh --issue -d "${domain}" --standalone -k ec-256 --force
-docker exec acme.sh --installcert -d ${domain} --fullchainpath ${CERT_PATH} --keypath /${KEY_PATH} --ecc --force
+docker exec acme.sh --installcert -d ${domain} --fullchainpath ${SSL_PATH}/${DOMAIN}.crt --keypath /${SSL_PATH}/${DOMAIN}.key --ecc --force
 
-acme.sh --installcert -d ${domain} --fullchainpath ${CERT_PATH} --keypath "/etc/v2ray-agent/tls/${tlsDomain}.key" --ecc >/dev/null
+acme.sh --installcert -d ${domain} --fullchainpath ${SSL_PATH}/${DOMAIN}.crt --keypath "/etc/v2ray-agent/tls/${tlsDomain}.key" --ecc >/dev/null
 
 # 查看证书信息
 openssl x509 -in /root/acme_out/${domain}_ecc/${domain}.cer -noout -text
