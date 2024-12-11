@@ -15,7 +15,7 @@
         "decryption": "none",
         "fallbacks": [
           {
-            "dest": "${XRAY_PORT}",
+            "dest": "${XRAY_REALITY_PORT}",
             "xver": 1
           }
         ]

@@ -23,11 +23,14 @@ vless_qr_config_xtls(){
     # xray_link="vless://${UUID}@${DOMAIN}:4433?encryption=none&security=${SECURITY}&type=${XRAY_NETWORK}&sni=${DOMAIN}&fp=chrome&pbk=${PUBLIC_KEY}&sid=${SHORTID}&flow=xtls-rprx-vision#${GEOIP_INFO}|${DOMAIN}|xray"
     xray_link_tcp="vless://${UUID}@${DOMAIN}:4433?encryption=none&security=reality&type=tcp&sni=${DOMAIN}&fp=chrome&pbk=${PUBLIC_KEY}&sid=${SHORTID}&flow=xtls-rprx-vision#${GEOIP_INFO}|${DOMAIN}|tcp"
     xray_link_grpc="vless://${UUID}@${DOMAIN}:4433?encryption=none&security=reality&type=grpc&sni=${DOMAIN}&fp=chrome&pbk=${PUBLIC_KEY}&sid=${SHORTID}&path=grpc&serviceName=grpc#${GEOIP_INFO}|${DOMAIN}|grpc"
+    xray_link_xhttp="vless://${UUID}@${DOMAIN}:443?encryption=none&security=tls&type=xhttp&host=${DOMAIN}&path=%2F${UUID}#${GEOIP_INFO}|${DOMAIN}|xhttp"
 
     echo -e "${Red} xray tcp 导入链接: ${xray_link_tcp} ${Font}"
     echo -n "${xray_link_tcp}" | qrencode -o - -t utf8
     echo -e "${Red} xray grpc 导入链接: ${xray_link_grpc} ${Font}"
     echo -n "${xray_link_grpc}" | qrencode -o - -t utf8
+    echo -e "${Red} xray xhttp 导入链接: ${xray_link_xhttp} ${Font}"
+    echo -n "${xray_link_xhttp}" | qrencode -o - -t utf8
 }
 
 xui_info(){

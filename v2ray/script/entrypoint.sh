@@ -54,8 +54,9 @@ function createConfig() {
     if [ ! -f /v2ray/config/.env/v2ray ];then
         XUI_LOCAL_PORT=$(shuf -i 35000-40000 -n 1)
         V2RAY_PORT=$((XUI_LOCAL_PORT + 1))
-        XRAY_PORT=$((XUI_LOCAL_PORT + 2))
-        DUFS_PORT=$((XUI_LOCAL_PORT + 3))
+        XRAY_REALITY_PORT=$((XUI_LOCAL_PORT + 2))
+        XRAY_XHTTP_PORT=$((XUI_LOCAL_PORT + 3))
+        DUFS_PORT=$((XUI_LOCAL_PORT + 4))
         UUID=$(cat /proc/sys/kernel/random/uuid)
         URL_PATH=/$(head /dev/urandom | tr -dc a-z0-9 | head -c 20)/
         x25519=$(xray x25519)
@@ -66,7 +67,8 @@ function createConfig() {
         GEOIP_INFO=`curl http://www.ip111.cn/ -s | grep '这是您访问国内网站所使用的IP' -B 2 | head -n 1 | awk -F' ' '{print $2$3"|"$1}' | tr -d '</p>'`
         echo "export XUI_LOCAL_PORT=$XUI_LOCAL_PORT" >> /v2ray/config/.env/v2ray
         echo "export V2RAY_PORT=$V2RAY_PORT" >> /v2ray/config/.env/v2ray
-        echo "export XRAY_PORT=$XRAY_PORT" >> /v2ray/config/.env/v2ray
+        echo "export XRAY_REALITY_PORT=$XRAY_REALITY_PORT" >> /v2ray/config/.env/v2ray
+        echo "export XRAY_XHTTP_PORT=$XRAY_XHTTP_PORT" >> /v2ray/config/.env/v2ray
         echo "export DUFS_PORT=$DUFS_PORT" >> /v2ray/config/.env/v2ray
         echo "export UUID=$UUID" >> /v2ray/config/.env/v2ray
         echo "export URL_PATH=$URL_PATH" >> /v2ray/config/.env/v2ray
@@ -86,14 +88,10 @@ function createConfig() {
     fi
     if [ ! -d /etc/xray/conf ]; then
         mkdir -p /etc/xray/conf
-        envsubst </templates/xray/01_VLESS_TCP_inbounds.json >/etc/xray/conf/01_VLESS_TCP_inbounds.json
-        envsubst </templates/xray/02_VLESS_vision_reality_inbounds.json >/etc/xray/conf/02_VLESS_vision_reality_inbounds.json
-        envsubst </templates/xray/03_VLESS_vision_gRPC_inbounds.json >/etc/xray/conf/03_VLESS_vision_gRPC_inbounds.json
-        cp /templates/xray/00_log.json /etc/xray/conf/00_log.json
-        cp /templates/xray/04_routing.json /etc/xray/conf/04_routing.json
-        cp /templates/xray/05_dns.json /etc/xray/conf/05_dns.json
-        cp /templates/xray/06_policy.json /etc/xray/conf/06_policy.json
-        cp /templates/xray/z_direct_outbound.json /etc/xray/conf/z_direct_outbound.json
+        for xray_conf_file in /templates/xray/*.json; do
+            file_name=$(basename ${xray_conf_file})
+            envsubst < ${xray_conf_file} > /etc/xray/conf/${file_name}
+        done
     fi
     if [ ! -f /etc/dufs/conf.yml ]; then
         mkdir -p /etc/dufs

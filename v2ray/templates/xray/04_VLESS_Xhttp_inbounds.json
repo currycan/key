@@ -1,0 +1,33 @@
+{
+  "inbounds": [
+    {
+      "port": ${XRAY_XHTTP_PORT},
+      "listen": "127.0.0.1",
+      "protocol": "vless",
+      "tag": "VLESSXhttp",
+      "settings": {
+        "clients": [
+          {
+            "id": "${UUID}",
+            "email": ""
+          }
+        ],
+        "decryption": "none"
+      },
+      "streamSettings": {
+        "network": "xhttp",
+        "xhttpSettings": {
+          "path": "/${UUID}"
+        }
+      },
+      "sniffing": {
+        "enabled": true,
+        "destOverride": [
+          "http",
+          "tls",
+          "quic"
+        ]
+      }
+    }
+  ]
+}
