@@ -1,0 +1,29 @@
+{
+  "inbounds": [
+    {
+      "port": "${XRAY_PORT}",
+      "listen": "127.0.0.1",
+      "protocol": "vless",
+      "tag": "VLESSRealityGRPC",
+      "settings": {
+        "clients": [
+          {
+            "id": "${UUID}",
+            "flow": ""
+          }
+        ],
+        "decryption": "none"
+      },
+      "streamSettings": {
+        "network": "grpc",
+        "grpcSettings": {
+          "serviceName": "grpc",
+          "multiMode": true
+        },
+        "sockopt": {
+          "acceptProxyProtocol": true
+        }
+      }
+    }
+  ]
+}

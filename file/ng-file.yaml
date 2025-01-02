@@ -1,0 +1,106 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ng-file
+  namespace: ifvben-fls
+spec:
+  selector:
+    app: ng-file
+  type: ClusterIP
+  ports:
+  - name: ng-file
+    protocol: TCP
+    port: 80
+    targetPort: ng-file
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name:  ng-file
+  namespace: ifvben-fls
+  labels:
+    app:  ng-file
+spec:
+  selector:
+    matchLabels:
+      app: ng-file
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: ng-file
+    spec:
+      containers:
+      - name:  ng-file
+        image:  ng-file:latest
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+          limits:
+            cpu: 1
+            memory: 10Gi
+        livenessProbe:
+          tcpSocket:
+            port: 8000
+          initialDelaySeconds: 5
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 3
+          periodSeconds: 10
+        readinessProbe:
+          tcpSocket:
+            port: 8000
+          initialDelaySeconds: 5
+          timeoutSeconds: 2
+          successThreshold: 1
+          failureThreshold: 3
+          periodSeconds: 10
+        ports:
+        - containerPort: 8000
+          name: ng-file
+        volumeMounts:
+        - name: localtime
+          mountPath: /etc/localtime
+      volumes:
+        - name: localtime
+          hostPath:
+            path: /usr/share/zoneinfo/Asia/Shanghai
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: ng-file
+  namespace: default
+data:
+  file.conf: |
+    server {
+        listen       8000;
+        index index.html default.html;
+        root  /var/www/file;
+        autoindex on;
+        autoindex_exact_size on;
+        autoindex_localtime on;
+        fancyindex on;
+        fancyindex_name_length 500;
+
+        charset utf-8;
+        location ~ (repos) {
+            deny all;
+        }
+
+        location ~ .*\.(gif|jpg|jpeg|png|bmp|swf)$ {
+            expires      30d;
+        }
+
+        location ~ .*\.(js|css)?$ {
+            expires      12h;
+        }
+        access_log  /dev/stdout;
+    }
