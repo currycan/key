@@ -1,7 +1,7 @@
 {
   "inbounds": [
     {
-      "port": "${XRAY_PORT}",
+      "port": "${XRAY_REALITY_PORT}",
       "listen": "127.0.0.1",
       "protocol": "vless",
       "tag": "VLESSRealityGRPC",

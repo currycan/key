@@ -30,8 +30,8 @@
           "minVersion": "1.2",
           "certificates": [
             {
-              "certificateFile": "${CERT_PATH}",
-              "keyFile": "${KEY_PATH}",
+              "certificateFile": "${SSL_PATH}/${DOMAIN}.crt",
+              "keyFile": "${SSL_PATH}/${DOMAIN}.key",
               "ocspStapling": 3600
             }
           ]

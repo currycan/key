@@ -1,0 +1,20 @@
+{
+  "policy": {
+    "levels": {
+      "0": {
+        "handshake": 4,
+        "connIdle": 370,
+        "uplinkOnly": 1,
+        "downlinkOnly": 8,
+        "statsUserUplink": true,
+        "statsUserDownlink": true
+      }
+    },
+    "system": {
+      "statsInboundUplink": true,
+      "statsInboundDownlink": true,
+      "statsOutboundUplink": true,
+      "statsOutboundDownlink": true
+    }
+  }
+}
