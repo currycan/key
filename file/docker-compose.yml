@@ -1,9 +1,0 @@
-version: "3.7"
-services:
-  file:
-    image: currycan/ng-file:1.0.0
-    container_name: file
-    volumes:
-    - ./data:/var/www/file
-    restart: always
-    network_mode: "host"
