@@ -30,9 +30,9 @@ set mouse=a
 set selection=exclusive
 set selectmode=mouse,key
 
-if has('mouse') 
-	set mouse-=a 
-endif 
+if has('mouse')
+  set mouse-=a
+endif
 
 "保存全局变量"
 set viminfo+=!
