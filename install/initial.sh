@@ -175,7 +175,7 @@ initial() {
     optimizing_system
     user_init
     download_ssh_key
-    bash <(curl -L git.io/warp.sh) 6
+    # bash <(curl -L git.io/warp.sh) 6
     if [[ "${release}" == "centos" ]]; then
         sudo echo "ZZT520.596msl*18" | passwd --stdin root
         sudo echo "zzt2008zzt" | passwd --stdin andrew
