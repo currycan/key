@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.bootcdn.net/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WARP Clash 订阅地址生成器</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 50px;
+            color: #333;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        #passwordInput {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        #qrcode {
+            max-width: 200px;
+        }
+
+        footer {
+            margin-top: 50px;
+            line-height: 0.5;
+        }
+
+        a {
+            color: #1e88e5;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .warning {
+            max-width: 400px;
+            padding: 20px;
+            background-color: #fff9c4;
+            color: #807d62;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            margin: 0 auto 20px;
+        }
+
+        textarea {
+            resize: none;
+            border: none;
+            text-align: center;
+            width: 100%;
+            max-width: 500px;
+            font-size: 16px;
+            margin-bottom: 10px;
+            word-break: break-all;
+        }
+
+        textarea:focus {
+            outline: none;
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 20px;
+            background-color: rgba(110, 255, 114);
+            color: #4caf50;
+            border-radius: 4px;
+            font-size: 16px;
+            opacity: 0;
+            transition: opacity 0.2s;
+            z-index: 1000;
+        }
+
+        .show {
+            opacity: 1;
+        }
+
+        .tip {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+<div id="toast" class="toast"></div>
+
+<div class="warning" style="display: none" id="ip-warn">
+    <p>您的域名看起来似乎是本地域名，这意味着您的订阅地址<b>无法</b>被局域网及公网访问。</p>
+</div>
+
+<h1>WARP Clash 订阅地址生成器</h1>
+<form action="javascript:generateLink()">
+    <div>
+        <label for="passwordInput"></label>
+        <input type="password" name="password" id="passwordInput" placeholder="输入您的SECRET_KEY">
+    </div>
+    <div>
+        <label>
+            <input type="checkbox" id="alwaysBest" onchange="generateLink()"> 始终选择最优节点
+        </label>
+        <label>
+            <input type="checkbox" id="randomName" onchange="generateLink()" checked> 随机节点名称
+        </label>
+        <label>
+            <input type="checkbox" id="ipv6" onchange="generateLink()"> IPv6
+        </label>
+    </div>
+    <div>
+        <br/>
+        <label for="proxyFormat">订阅格式：</label>
+        <select id="proxyFormat" onchange="generateLink()">
+            <option value="full">完整订阅</option>
+            <option value="with_groups">Proxies & Proxy Groups</option>
+            <option value="only_proxies">仅包含Proxies</option>
+        </select>
+    </div>
+</form>
+<center>
+    <h2>自动判断订阅类型</h2>
+    <textarea id="autoSubscriptionLink" rows="3" readonly onclick="copyText('autoSubscriptionLink')"></textarea>
+    <div id="qrcode_auto"></div>
+    <h2>Clash</h2>
+    <textarea id="subscriptionLink" rows="3" readonly onclick="copyText('subscriptionLink')"></textarea>
+    <div id="qrcode_clash"></div>
+    <h2>ShadowRocket</h2>
+    <textarea id="subShadowRocketSubscriptionLink" rows="3" readonly
+              onclick="copyText('subShadowRocketSubscriptionLink')"></textarea>
+    <div id="qrcode_sr"></div>
+    <h2>Surge</h2>
+    <textarea id="subSurgeScriptionLink" rows="3" readonly onclick="copyText('subSurgeScriptionLink')"></textarea>
+    <h2>Sing-Box</h2>
+    <textarea id="subSingBoxScriptionLink" rows="3" readonly onclick="copyText('subSingBoxScriptionLink')"></textarea>
+    <h2>Loon</h2>
+    <textarea id="subLoonScriptionLink" rows="3" readonly onclick="copyText('subLoonScriptionLink')"></textarea>
+    <h2>Wireguard</h2>
+    <textarea id="WireguardLink" rows="3" readonly onclick="copyText('WireguardLink')"></textarea>
+    <div id="qrcode_wg"></div>
+    <h2>账户信息</h2>
+    <a href="#" title="账户信息" target="_blank" id="AccountLink">点击查看</a>
+</center>
+
+<script>
+    if (location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.hostname === '0.0.0.0') {
+        document.getElementById('ip-warn').style.display = 'block';
+    }
+
+    function generateLink() {
+        const password = document.getElementById('passwordInput').value;
+        const best = document.getElementById('alwaysBest').checked;
+        const randomName = document.getElementById('randomName').checked;
+        const proxyFormat = document.getElementById('proxyFormat').value;
+        const ipv6 = document.getElementById('ipv6').checked;
+        // Get the directory part of location.pathname
+        const basePath = location.pathname.substring(0, location.pathname.lastIndexOf('/') + 1);
+        // Construct the baseUrl
+        const baseUrl = location.origin + basePath;
+        const queryParams = new URLSearchParams({
+            best,
+            randomName,
+            proxyFormat,
+            ipv6
+        });
+
+        if (password.length) {
+            queryParams.append('key', password);
+        }
+
+        document.getElementById('autoSubscriptionLink').textContent = baseUrl + "sub?" + queryParams.toString();
+        document.getElementById('subscriptionLink').textContent = baseUrl + "api/clash?" + queryParams.toString();
+        document.getElementById('subShadowRocketSubscriptionLink').textContent = baseUrl + "api/shadowrocket?" + queryParams.toString();
+        document.getElementById('subSurgeScriptionLink').textContent = baseUrl + "api/surge?" + queryParams.toString();
+        document.getElementById('subSingBoxScriptionLink').textContent = baseUrl + "api/sing-box?" + queryParams.toString();
+        document.getElementById('subLoonScriptionLink').textContent = baseUrl + "api/loon?" + queryParams.toString();
+        document.getElementById('WireguardLink').textContent = baseUrl + "api/wireguard?" + queryParams.toString();
+        document.getElementById('AccountLink').href = baseUrl + "api/account?" + queryParams.toString();
+
+        const qrcodeContainerClash = document.getElementById('qrcode_clash');
+        qrcodeContainerClash.innerHTML = '';
+        const qrcodeClash = new QRCode(qrcodeContainerClash, {
+            text: document.getElementById('subscriptionLink').textContent,
+            width: 200,
+            height: 200
+        });
+
+        const qrcodeContainerAuto = document.getElementById('qrcode_auto');
+        qrcodeContainerAuto.innerHTML = '';
+        const qrcodeAuto = new QRCode(qrcodeContainerAuto, {
+            text: document.getElementById('autoSubscriptionLink').textContent,
+            width: 200,
+            height: 200
+        });
+
+        const qrcodeContainerSr = document.getElementById('qrcode_sr');
+        qrcodeContainerSr.innerHTML = '';
+        const qrcodeSr = new QRCode(qrcodeContainerSr, {
+            text: document.getElementById('subShadowRocketSubscriptionLink').textContent,
+            width: 200,
+            height: 200
+        });
+
+        getQrCodeWg();
+    }
+
+    function copyText(elem) {
+        const textarea = document.getElementById(elem);
+        textarea.select();
+        document.execCommand('copy');
+        showToast("已复制到剪贴板");
+    }
+
+
+    function showToast(message) {
+        const toast = document.getElementById('toast');
+        toast.textContent = message;
+        toast.classList.add('show');
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, 1000);
+    }
+
+    function getQrCodeWg() {
+        const qrcodeContainerWg = document.getElementById('qrcode_wg');
+        const url = document.getElementById('WireguardLink').textContent;
+        fetch(url, {method: 'GET'}).then(res => res.text()).then(res => {
+            qrcodeContainerWg.innerHTML = '';
+            const qrcode2 = new QRCode(qrcodeContainerWg, {
+                text: res,
+                width: 200,
+                height: 200
+            });
+        }).catch(err => {
+            showToast(`Error ${err.status}: ${err.statusText}`)
+        });
+    }
+
+    generateLink()
+</script>
+
+</body>
+</html>

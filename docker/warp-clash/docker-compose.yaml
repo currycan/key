@@ -1,0 +1,12 @@
+services:
+  warp-clash:
+    image: currycan/warp-clash:25.2.12
+    container_name: warp-clash
+    ports:
+      - "21001:3000"
+    env_file:
+      - .env.local
+    volumes:
+      - ./config:/app/config
+      - ./account:/app/account
+      - ./logs:/app/logs
