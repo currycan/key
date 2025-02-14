@@ -222,9 +222,10 @@ initial() {
     curl -L https://raw.githubusercontent.com/docker/compose/1.28.x/contrib/completion/bash/docker-compose -o /etc/bash_completion.d/docker-compose
     systemctl enable --now docker
 
-    mkdir -p ~/v2ray
-    echo domain=$(hostname) >~/v2ray/.env
-    curl -o ~/v2ray/docker-compose.yml https://raw.githubusercontent.com/currycan/key/master/v2ray/docker-compose.yml
+    mkdir -p ~/xray
+    echo domain=$(hostname) >~/xray/.env
+    echo code="Mthgh@001" >~/xray/.env
+    curl -o ~/xray/docker-compose.yml https://raw.githubusercontent.com/currycan/key/master/docker/xray/docker-compose.yml
 
     mkdir -p /root/file/data
     curl -o /root/file/docker-compose.yml https://raw.githubusercontent.com/currycan/key/master/file/docker-compose.yml
@@ -235,9 +236,9 @@ initial() {
     curl -o /usr/local/bin/superspeed https://raw.githubusercontent.com/ernisn/superspeed/master/superspeed.sh
     chmod 700 /usr/local/bin/*
 
-    [[ $(grep 'docker exec -it v2ray show' ~/.bashrc | wc -l) == 0 ]] && echo 'alias show="docker exec -it v2ray show"' >>~/.bashrc
-    [[ $(grep 'docker logs -f v2ray' ~/.bashrc | wc -l) == 0 ]] && echo 'alias logs="docker logs -f v2ray"' >>~/.bashrc
-    [[ $(grep 'docker restart v2ray' ~/.bashrc | wc -l) == 0 ]] && echo 'alias restart="docker restart v2ray"' >>~/.bashrc
+    [[ $(grep 'docker exec -it xray show' ~/.bashrc | wc -l) == 0 ]] && echo 'alias show="docker exec -it xray show"' >>~/.bashrc
+    [[ $(grep 'docker logs -f xray' ~/.bashrc | wc -l) == 0 ]] && echo 'alias logs="docker logs -f xray"' >>~/.bashrc
+    [[ $(grep 'docker restart xray' ~/.bashrc | wc -l) == 0 ]] && echo 'alias restart="docker restart xray"' >>~/.bashrc
     service sshd restart
     sudo sysctl -p
 }
