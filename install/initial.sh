@@ -224,7 +224,7 @@ initial() {
 
     mkdir -p ~/xray
     echo domain=$(hostname) >~/xray/.env
-    echo code="Mthgh@001" >~/xray/.env
+    echo code="Mthgh@001" >>~/xray/.env
     curl -o ~/xray/docker-compose.yml https://raw.githubusercontent.com/currycan/key/master/docker/xray/docker-compose.yml
 
     mkdir -p /root/file/data
