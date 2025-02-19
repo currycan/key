@@ -321,7 +321,7 @@ autocmd BufNewFile *.py,*.cc,*.sh,*.java exec ":call SetTitle()"
 "定义函数SetTitle，自动插入文件头"
 func SetTitle()
     if expand ("%:e") == 'sh'
-        call setline(1, "#!/bin/bash")
+        call setline(1, "#!/usr/bin/env bash")
         call setline(2, "#Andrew")
         call setline(3, "#test")
         call setline(4, "#Time:".strftime("%F %T"))
