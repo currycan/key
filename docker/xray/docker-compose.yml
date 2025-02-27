@@ -1,0 +1,39 @@
+services:
+  xray:
+    image: docker.io/currycan/xray:0.0.1
+    container_name: xray
+    environment:
+      - DOMAIN=$domain
+      - XUI_ACCOUNT=$domain
+      - DECODE=$code
+      # buypass/zerossl/google/letsencrypt
+      - ACMESH_SERVER_NAME=letsencrypt
+      - DEST_HOST=yahoo.com
+      - LISTENING_PORT=443
+      - DUFS_PATH_PREFIX=/myfiles
+      - XUI_WEBBASEPATH=3xadmin
+    volumes:
+      - ./data:/data
+      - ./pki:/pki
+      - ./acmecerts:/acmecerts
+      - ./.xray:/xray/config/.env
+      - ./xray:/etc/xray
+      - ./dufs:/etc/dufs
+      - ./nginx/http:/etc/nginx/conf.d
+      - ./nginx/tcp:/etc/nginx/stream.d
+      - ./nginx/dhparam:/etc/nginx/dhparam
+      - ./x-ui:/etc/x-ui/
+      - ./logs/xray:/var/log/xray
+      - ./logs/x-ui:/var/log/x-ui
+      - ./logs/dufs:/var/log/dufs
+      - ./logs/supervisor:/var/log/supervisor
+      - ./logs/nginx:/var/log/nginx
+    # working_dir: /etc/nginx
+    restart: always
+    tty: true
+    network_mode: "host"
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 65536
+        hard: 65536

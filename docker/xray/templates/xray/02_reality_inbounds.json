@@ -1,0 +1,60 @@
+{
+    "inbounds": [
+        {
+            "listen": "0.0.0.0",
+            "port": "${LISTENING_PORT}",
+            "protocol": "vless",
+            "tag": "VISION+REALITY",
+            "settings": {
+                "clients": [
+                    {
+                        "id": "${XRAY_REALITY_UUID}",
+                        "level": 0,
+                        "email": "vless@xtls.reality",
+                        "flow": "xtls-rprx-vision"
+                    }
+                ],
+                "decryption": "none",
+                "fallbacks": [
+                    {
+                        "dest": "/dev/shm/udsxhttp.sock",
+                        "xver": 0
+                    }
+                ]
+            },
+            "streamSettings": {
+                "network": "raw",
+                "security": "reality",
+                "realitySettings": {
+                    "show": false,
+                    "target": "/dev/shm/nginx.sock",
+                    "xver": 0,
+                    "serverNames": [
+                        "drive.${DOMAIN}",
+                        "pan.${DOMAIN}"
+                    ],
+                    "privateKey": "${XRAY_REALITY_PRIVATE_KEY}",
+                    "shortIds": [
+                        "${XRAY_REALITY_SHORTID}"
+                    ]
+                },
+                "sockopt": {
+                    "tcpFastOpen": true,
+                    "tcpcongestion": "bbr",
+                    "tcpMptcp": true,
+                    "tcpNoDelay": true
+                }
+            },
+            "sniffing": {
+                "enabled": true,
+                "destOverride": [
+                    "http",
+                    "tls",
+                    "quic"
+                ],
+                "metadataOnly": false,
+                "routeOnly": true
+            }
+        }
+    ]
+}

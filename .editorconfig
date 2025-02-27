@@ -12,5 +12,5 @@ insert_final_newline = true
 [*.md]
 trim_trailing_whitespace = false
 
-[*.{sh,py,go,mod,sum,conf}]
+[*.{sh,py,go,mod,sum,conf,json}]
 indent_size = 4
