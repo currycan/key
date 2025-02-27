@@ -4,6 +4,7 @@ services:
     container_name: xray
     environment:
       - DOMAIN=$domain
+      - CDNDOMAIN=$cdndomain
       - XUI_ACCOUNT=$domain
       - DECODE=$code
       # buypass/zerossl/google/letsencrypt

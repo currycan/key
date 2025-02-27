@@ -30,8 +30,7 @@
                     "target": "/dev/shm/nginx.sock",
                     "xver": 0,
                     "serverNames": [
-                        "drive.${DOMAIN}",
-                        "pan.${DOMAIN}"
+                        "${DOMAIN}"
                     ],
                     "privateKey": "${XRAY_REALITY_PRIVATE_KEY}",
                     "shortIds": [

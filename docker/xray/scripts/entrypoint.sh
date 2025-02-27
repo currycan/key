@@ -202,7 +202,8 @@ if [ "${1#-}" = 'supervisord' ] && [ "$(id -u)" = '0' ]; then
     log INFO "Obtaining SSL certificate..."
     check_required_env ACMESH_REGISTER_EMAIL
     source "/scripts/updatessl.sh"
-    getHTTPSCertificateWithAcme
+    normalHTTPSCertificateWithAcme
+    cdnHTTPSCertificateWithAcme
 
     log INFO "Initializing X-UI..."
     x-ui setting -username "${XUI_ACCOUNT}" -password "${PASSWORD}" -port "${XUI_LOCAL_PORT}" -webBasePath "${XUI_WEBBASEPATH}"

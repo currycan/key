@@ -99,16 +99,35 @@ function setDnsApi() {
     esac
 }
 
-function getHTTPSCertificateWithAcme() {
+function normalHTTPSCertificateWithAcme() {
     if [ -f ${SSL_PATH}/${DOMAIN}.crt ] && [ -f ${SSL_PATH}/${DOMAIN}.key ]; then
         echo "证书文件已存在"
     else
         registerEmail
+        export DNS_API=ali
         setDnsApi
         acme.sh --issue --dns ${DnsProvider} -d ${DOMAIN} -d *.${DOMAIN}
         acme.sh --install-cert -d ${DOMAIN} -d *.${DOMAIN} \
             --key-file "${SSL_PATH}/${DOMAIN}.key" \
-            --fullchain-file "${SSL_PATH}/${DOMAIN}.crt"
+            --fullchain-file "${SSL_PATH}/${DOMAIN}.crt" \
+            --ca-file "${SSL_PATH}/${DOMAIN}-ca.crt"
+            # --reloadcmd "nginx -t && nginx -s stop"
+        # nginx -t && nginx -s reload
+    fi
+}
+
+function cdnHTTPSCertificateWithAcme() {
+    if [ -f ${SSL_PATH}/${CDNDOMAIN}.crt ] && [ -f ${SSL_PATH}/${CDNDOMAIN}.key ]; then
+        echo "证书文件已存在"
+    else
+        registerEmail
+        export DNS_API=cf
+        setDnsApi
+        acme.sh --issue --dns ${DnsProvider} -d ${CDNDOMAIN} -d *.${CDNDOMAIN}
+        acme.sh --install-cert -d ${CDNDOMAIN} -d *.${CDNDOMAIN} \
+            --key-file "${SSL_PATH}/${CDNDOMAIN}.key" \
+            --fullchain-file "${SSL_PATH}/${CDNDOMAIN}.crt" \
+            --ca-file "${SSL_PATH}/${CDNDOMAIN}-ca.crt"
             # --reloadcmd "nginx -t && nginx -s stop"
         # nginx -t && nginx -s reload
     fi

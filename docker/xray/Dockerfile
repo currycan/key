@@ -69,6 +69,7 @@ ENV TZ="Asia/Hong_Kong"
 # acme.sh
 ENV PATH=/acme.sh/:$PATH
 ENV DOMAIN=""
+ENV CDNDOMAIN=""
 ENV LISTENING_PORT="433"
 ENV ACMESH_REGISTER_EMAIL=""
 # buypass/zerossl/google/letsencrypt
@@ -82,7 +83,7 @@ ENV ALI_SECRET=""
 ENV CF_KEY=""
 ENV CF_EMAIL=""
 # ali/cf
-ENV DNS_API="ali"
+ENV DNS_API=""
 ENV SSL_PATH="/pki"
 
 # xray
