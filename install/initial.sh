@@ -223,7 +223,9 @@ initial() {
     systemctl enable --now docker
 
     mkdir -p ~/xray
+    DOMAIN=$(hostname)
     echo domain=$(hostname) >~/xray/.env
+    echo domain=${DOMAIN%%.*}.ansandy.site >>~/xray/.env
     echo code="Mthgh@001" >>~/xray/.env
     curl -o ~/xray/docker-compose.yml https://raw.githubusercontent.com/currycan/key/master/docker/xray/docker-compose.yml
 
