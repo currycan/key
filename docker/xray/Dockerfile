@@ -1,4 +1,4 @@
-FROM docker.io/alpine:3
+FROM docker.io/library/alpine:3
 
 # 系统级配置（时区/镜像源）
 RUN set -ex; \
