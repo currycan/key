@@ -38,9 +38,11 @@ function registerEmail() {
         # 请先按照如下链接申请 google Public CA  https://hostloc.com/thread-993780-1-1.html
         # 具体可参考 https://github.com/acmesh-official/acme.sh/wiki/Google-Trust-Services-CA
         # https://console.cloud.google.com/?cloudshell=true&hl=zh-cn
+        # EAB 有效期只有 7天
         google )
             # Google Trust Services 需要 EAB 认证
             checkGoogleEAB
+            email=${GOOGLE_EMAIL}
             acme.sh --register-account -m "${email}" \
                 --eab-kid "${GOOGLE_EAB_ID}" \
                 --eab-hmac-key "${GOOGLE_EAB_KEY}"
