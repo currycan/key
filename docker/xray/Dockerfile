@@ -66,28 +66,27 @@ ADD https://raw.githubusercontent.com/currycan/key/master/vimrc /root/.vimrc
 # time zone
 ENV TZ="Asia/Hong_Kong"
 
-# acme.sh
+# xray
+ENV DEST_HOST="www.microsoft.com"
 ENV PATH=/acme.sh/:$PATH
 ENV DOMAIN=""
 ENV CDNDOMAIN=""
 ENV LISTENING_PORT="433"
+
+# acme.sh
 ENV ACMESH_REGISTER_EMAIL=""
-# buypass/zerossl/google/letsencrypt
+# buypass/zerossl/letsencrypt
 ENV ACMESH_SERVER_NAME="buypass"
-ENV ZEROSSL_EAB_ID=""
-ENV ZEROSSL_EAB_KEY=""
-ENV GOOGLE_EAB_ID=""
-ENV GOOGLE_EAB_KEY=""
+# ali/cf
+# for cf
+ENV CF_TOKEN=""
+ENV CF_ZONE_ID=""
+ENV CF_ACCOUNT_ID=""
+# for ali
 ENV ALI_KEY=""
 ENV ALI_SECRET=""
-ENV CF_KEY=""
-ENV CF_EMAIL=""
-# ali/cf
-ENV DNS_API=""
+# certs path
 ENV SSL_PATH="/pki"
-
-# xray
-ENV DEST_HOST="www.microsoft.com"
 
 # x-ui
 ENV XUI_LOG_LEVEL="info"

@@ -1,13 +1,13 @@
 services:
   xray:
-    image: docker.io/currycan/xray:25.3.3
+    image: docker.io/currycan/xray:25.3.4
     container_name: xray
     environment:
       - DOMAIN=$domain
       - CDNDOMAIN=$cdndomain
       - XUI_ACCOUNT=$domain
       - DECODE=$code
-      # buypass/zerossl/google/letsencrypt
+      # buypass/zerossl/letsencrypt
       - ACMESH_SERVER_NAME=buypass
       - DEST_HOST=harvard.edu
       - LISTENING_PORT=443

@@ -14,7 +14,7 @@ else
 fi
 
 # 日志记录函数
-log() {
+function log() {
     local level=$1
     shift
     local msg=$*
@@ -33,7 +33,7 @@ log() {
 }
 
 # 检查必要环境变量
-check_required_env() {
+function checkRequiredEnv() {
     local missing_vars=()
 
     # 遍历所有传入的参数作为变量名
@@ -49,24 +49,8 @@ check_required_env() {
     fi
 }
 
-# 生成DH参数
-setup_dhparam() {
-    local dhparam_path="/etc/nginx/dhparam/dhparam.pem"
-
-    if [ ! -f "$dhparam_path" ]; then
-        log INFO "Generating DH parameters..."
-        mkdir -p "$(dirname "$dhparam_path")"
-
-        if ! openssl dhparam -dsaparam -out "$dhparam_path" 4096; then
-            log ERROR "Failed to generate DH parameters"
-            exit 1
-        fi
-        log INFO "DH parameters generated successfully"
-    fi
-}
-
 # 生成随机字符串
-generate_random() {
+function generateRandomStr() {
     local type=$1
     local length=${2:-12}
     local charset
@@ -86,7 +70,7 @@ generate_random() {
 }
 
 # 生成环境变量
-generate_env() {
+function generateEnv() {
     local env_file="/xray/config/.env/xray"
 
     if [ ! -f "$env_file" ]; then
@@ -110,17 +94,17 @@ generate_env() {
 
         # 生成随机参数
         declare -A config=(
-            ["XUI_LOCAL_PORT"]=$(generate_random port)
-            ["DUFS_PORT"]=$(generate_random port)
-            ["PASSWORD"]=$(generate_random password 16)
-            ["XRAY_REALITY_UUID"]=$(generate_random uuid)
+            ["XUI_LOCAL_PORT"]=$(generateRandomStr port)
+            ["DUFS_PORT"]=$(generateRandomStr port)
+            ["PASSWORD"]=$(generateRandomStr password 16)
+            ["XRAY_REALITY_UUID"]=$(generateRandomStr uuid)
             ["XRAY_REALITY_PRIVATE_KEY"]=${reality_private_key}
             ["XRAY_REALITY_PUBLIC_KEY"]=${reality_public_key}
             ["XRAY_REALITY_SHORTID"]=$(openssl rand -hex 8)
-            ["XRAY_XHTTP_UUID"]=$(generate_random uuid)
-            ["XRAY_XHTTP_URL_PATH"]=$(generate_random path 20)
-            # ["XRAY_REALITY_XHTTP_UUID"]=$(generate_random uuid)
-            # ["XRAY_REALITY_XHTTP_URL_PATH"]=$(generate_random path 20)
+            ["XRAY_XHTTP_UUID"]=$(generateRandomStr uuid)
+            ["XRAY_XHTTP_URL_PATH"]=$(generateRandomStr path 20)
+            # ["XRAY_REALITY_XHTTP_UUID"]=$(generateRandomStr uuid)
+            # ["XRAY_REALITY_XHTTP_URL_PATH"]=$(generateRandomStr path 20)
             # ["XRAY_REALITY_XHTTP_PRIVATE_KEY"]=${reality_xhttp_private_key}
             # ["XRAY_REALITY_XHTTP_PUBLIC_KEY"]=${reality_xhttp_public_key}
             # ["XRAY_REALITY_XHTTP_SHORTID"]=$(openssl rand -hex 8)
@@ -139,7 +123,7 @@ generate_env() {
     # 解密密钥文件
     local secret_file="/xray/config/.env/secret"
     if [ ! -f "$secret_file" ]; then
-        check_required_env DECODE
+        checkRequiredEnv DECODE
         log INFO "Downloading encrypted secrets..."
 
         if ! curl -fsSLo /tmp/tmp.bin "https://raw.githubusercontent.com/currycan/key/master/tmp.bin"; then
@@ -157,7 +141,7 @@ generate_env() {
 }
 
 # 生成配置文件
-create_config() {
+function createConfig() {
     log INFO "Creating configurations..."
     source "/xray/config/.env/xray"
     source "/xray/config/.env/secret"
@@ -193,20 +177,122 @@ create_config() {
     fi
 }
 
+# 配置 nginx dhparam 证书
+function setupDhParam() {
+    local dhparam_path="/etc/nginx/dhparam/dhparam.pem"
+
+    if [ ! -f "$dhparam_path" ]; then
+        log INFO "Generating DH parameters..."
+        mkdir -p "$(dirname "$dhparam_path")"
+
+        if ! openssl dhparam -dsaparam -out "$dhparam_path" 4096; then
+            log ERROR "Failed to generate DH parameters"
+            exit 1
+        fi
+        log INFO "DH parameters generated successfully"
+    fi
+}
+
+# 证书类型映射表 (类型: [域名变量名,DNS服务商])
+declare -A CERT_TYPE_MAP=(
+    ["normal"]="DOMAIN ali"
+    ["cdn"]="CDNDOMAIN cf"
+)
+
+# https://github.com/acmesh-official/acme.sh/wiki/ZeroSSL.com-CA
+function registerAccount() {
+    checkRequiredEnv "ACMESH_SERVER_NAME" "ACMESH_REGISTER_EMAIL"
+    log INFO "Set default server: ${ACMESH_SERVER_NAME}"
+    acme.sh --set-default-ca --server "${ACMESH_SERVER_NAME}"
+    log INFO "Registering account: ${ACMESH_REGISTER_EMAIL}"
+    acme.sh --register-account -m "${ACMESH_REGISTER_EMAIL}"
+}
+
+# DNS服务商配置
+function setDnsApi() {
+    local dns_api="${DNS_API,,}"
+
+    case "${dns_api}" in
+        ali)
+            checkRequiredEnv "ALI_KEY" "ALI_SECRET"
+            export Ali_Key="${ALI_KEY}" Ali_Secret="${ALI_SECRET}"
+            DNS_PROVIDER="dns_ali"
+            ;;
+        cf)
+            checkRequiredEnv "CF_TOKEN" "CF_ZONE_ID" "CF_ACCOUNT_ID"
+            export CF_Token="${CF_TOKEN}" CF_Zone_ID="${CF_ZONE_ID}" CF_Account_ID="${CF_ACCOUNT_ID}"
+            DNS_PROVIDER="dns_cf"
+            ;;
+        *)
+            log ERROR "错误：不支持的DNS服务商 '${dns_api}'" >&2
+            exit 1
+            ;;
+    esac
+}
+
+# https://github.com/acmesh-official/acme.sh/wiki/dnsapi#dns_cf
+function issueCertificate() {
+    local cert_type=$1
+    [[ -z "${CERT_TYPE_MAP[${cert_type}]}" ]] && {
+        log ERROR "错误：无效证书类型 '${cert_type}'" >&2
+        exit 1
+    }
+
+    # 解析域名和DNS配置
+    IFS=' ' read -r domain_var dns_provider <<< "${CERT_TYPE_MAP[${cert_type}]}"
+    local domain="${!domain_var}"
+    local cert_file="${SSL_PATH}/${domain}.crt"
+
+    # 跳过已存在的证书
+    [[ -f "$cert_file" && -f "${SSL_PATH}/${domain}.key" ]] && {
+        log INFO "证书已存在: ${domain}"
+        return 0
+    }
+
+    registerAccount
+    export DNS_API="${dns_provider}"
+    setDnsApi
+
+    # 动态构建域名参数（buypass不支持通配符）
+    local domains=("-d" "${domain}")
+    if [[ "${ACMESH_SERVER_NAME}" == "letsencrypt" ]]; then
+        domains+=("-d" "*.${domain}")
+    fi
+
+    # 申请并安装证书
+    set +e
+    acme_output=$(acme.sh --issue --dns "${DNS_PROVIDER}" "${domains[@]}" 2>&1)
+    exit_code=$?
+    set -e
+    # 根据退出码和输出内容判断是否为正常跳过
+    if [[ $exit_code -ne 0 ]]; then
+        if echo "$acme_output" | grep -e "Skipping. Next renewal"; then
+            log INFO "证书未到期，跳过续期。"
+        else
+            log ERROR "证书申请失败: ${domain}" >&2
+            exit 1
+        fi
+    fi
+
+    acme.sh --install-cert -d "${domain}" \
+        --key-file "${SSL_PATH}/${domain}.key" \
+        --fullchain-file "${cert_file}" \
+        --ca-file "${SSL_PATH}/${domain}-ca.crt"
+}
+
 # 主执行流程
 if [ "${1#-}" = 'supervisord' ] && [ "$(id -u)" = '0' ]; then
-    generate_env
-    create_config
-    setup_dhparam
+    generateEnv
+    createConfig
+
+    setupDhParam
 
     log INFO "Obtaining SSL certificate..."
-    check_required_env ACMESH_REGISTER_EMAIL
-    source "/scripts/updatessl.sh"
+    checkRequiredEnv ACMESH_REGISTER_EMAIL
     # 生成证书
     issueCertificate "normal"
     sleep 5
     issueCertificate "cdn"
-
 
     log INFO "Initializing X-UI..."
     x-ui setting -username "${XUI_ACCOUNT}" -password "${PASSWORD}" -port "${XUI_LOCAL_PORT}" -webBasePath "${XUI_WEBBASEPATH}"
