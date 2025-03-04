@@ -40,7 +40,7 @@ COPY --chmod=755 bin/x-ui  /usr/local/bin/x-ui
 COPY --chmod=755 bin/xui-xray  /usr/local/bin/bin
 
 # xray
-ARG XRAY_VERSION="25.2.21"
+ARG XRAY_VERSION="25.3.3"
 RUN set -ex; \
   build_pkgs="unzip"; \
   apk add -U --no-cache --virtual .build-deps ${build_pkgs}; \
