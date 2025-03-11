@@ -11,7 +11,10 @@ https://github.com/XTLS/Xray-core/discussions/4118
 ## 镜像制作
 
 ```bash
-docker build -t currycan/xray:0.0.1 .
+docker build \
+  --build-arg DUFS_VERSION="0.43.0" \
+  --build-arg XRAY_VERSION="25.3.6"\
+  -t currycan/xray:25.3.11 .
 ```
 
 ### CDN 域名报错：您重定向的次数过多
