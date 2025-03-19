@@ -18,7 +18,6 @@ RUN set -ex; \
     # 库依赖
     libatomic_ops-dev \
     zlib-dev \
-    luajit-dev \
     pcre2-dev \
     linux-headers \
     yajl-dev \
@@ -27,7 +26,6 @@ RUN set -ex; \
     curl-dev \
     lmdb-dev \
     libfuzzy2-dev \
-    lua5.1-dev \
     zstd-dev \
     # 地理和数据库相关
     geoip-dev \
@@ -99,21 +97,6 @@ ARG DEVEL_KIT_VERSION=v0.3.4
 RUN set -ex; \
   echo "Cloning and configuring ngx_devel_kit ${DEVEL_KIT_VERSION} ..."; \
   git clone --recursive --depth 1 --single-branch -b ${DEVEL_KIT_VERSION} https://github.com/vision5/ngx_devel_kit /src/ngx_devel_kit;
-
-ARG LUA_VERSION=v0.10.28
-RUN set -ex; \
-  echo "Cloning and configuring lua-nginx-module ${LUA_VERSION} ..."; \
-  git clone --recursive --depth 1 --single-branch -b ${LUA_VERSION} https://github.com/openresty/lua-nginx-module /src/lua-nginx-module;
-
-ARG LUA_RESTY_CORE_VERSION=v0.1.31
-RUN set -ex; \
-  echo "Cloning and configuring lua-resty-core ${LUA_RESTY_CORE_VERSION} ..."; \
-  git clone --recursive --depth 1 --single-branch -b ${LUA_RESTY_CORE_VERSION} https://github.com/openresty/lua-resty-core /src/lua-resty-core;
-
-ARG LUA_RESTY_LRUCACHE_VERSION=v0.15
-RUN set -ex; \
-  echo "Cloning and configuring lua-resty-lrucache ${LUA_RESTY_LRUCACHE_VERSION} ..."; \
-  git clone --recursive --depth 1 --single-branch -b ${LUA_RESTY_LRUCACHE_VERSION} https://github.com/openresty/lua-resty-lrucache /src/lua-resty-lrucache;
 
 # https://github.com/tokers/zstd-nginx-module/releases
 ARG ZSTD_VERSION=0.1.1
@@ -198,7 +181,6 @@ ARG CONFIG="\
   --with-http_auth_request_module \
   --add-module=/src/ngx_brotli \
   --add-module=/src/ngx_devel_kit \
-  --add-module=/src/lua-nginx-module \
   --add-module=/src/ModSecurity-nginx \
   --add-module=/src/headers-more-nginx-module \
   --add-module=/src/ngx_http_zstd_module \
@@ -208,9 +190,6 @@ ARG CONFIG="\
   --add-dynamic-module=/src/nginx-ntlm-module \
   --add-dynamic-module=/src/nginx-module-vts \
   "
-
-ARG LUAJIT_INC=/usr/include/luajit-2.1
-ARG LUAJIT_LIB=/usr/lib
 
 ARG CC_OPT=""
 ARG LD_OPT=""
@@ -222,17 +201,7 @@ RUN set -ex; \
   ./auto/configure $CONFIG --with-cc-opt="${CC_OPT}" --with-ld-opt="${LD_OPT}"; \
   # make -j "$(nproc)" install && make install && make clean && strip /usr/sbin/nginx
   make -j "$(nproc)" install; \
-  ln -s /etc/nginx/sbin/nginx /usr/local/bin/nginx
-
-RUN set -ex; \
-  echo "Building lua-resty-core ..."; \
-  cd /src/lua-resty-core; \
-  make -j "$(nproc)" install PREFIX=/etc/nginx;
-
-RUN set -ex; \
-  echo "Building lua-resty-lrucache ..."; \
-  cd /src/lua-resty-lrucache; \
-  make -j "$(nproc)" install PREFIX=/etc/nginx
+  ln -s /etc/nginx/sbin/nginx /usr/sbin/nginx
 
 # openappsec attachment
 ARG ATTACHMENT_VERSION=main
@@ -302,21 +271,29 @@ RUN set -ex; \
 
 FROM alpine:3
 
-SHELL ["/bin/ash", "-eo", "pipefail", "-c"]
-
-COPY --from=builder /etc/nginx/sbin/nginx                                                /usr/sbin/nginx
-COPY --from=builder /etc/nginx                                                           /etc/nginx
-COPY --from=builder /var/log/nginx/                                                      /var/log/nginx/
-COPY --from=builder /var/run/nginx/                                                      /var/run/nginx/
-
-COPY --from=builder /src/oqs-provider/lib/oqsprovider.so                                 /usr/lib/ossl-modules/oqsprovider.so
-COPY --from=builder /src/ModSecurity/src/.libs/libmodsecurity.so.3                       /usr/local/lib/libmodsecurity.so.3
-COPY --from=builder /src/ModSecurity/unicode.mapping                                     /etc/nginx/conf/conf.d/include/unicode.mapping
-COPY --from=builder /src/ModSecurity/modsecurity.conf-recommended                        /etc/nginx/conf/conf.d/include/modsecurity.conf.example
-COPY --from=builder /src/opentelemetry-cpp/libopentelemetry_proto.so                     /usr/local/lib/libopentelemetry_proto.so
-COPY --from=builder /src/attachment/core/shmem_ipc/libosrc_shmem_ipc.so                  /usr/local/lib/libosrc_shmem_ipc.so
-COPY --from=builder /src/attachment/core/compression/libosrc_compression_utils.so        /usr/local/lib/libosrc_compression_utils.so
-COPY --from=builder /src/attachment/attachments/nginx/nginx_attachment_util/libosrc_nginx_attachment_util.so /usr/local/lib/libosrc_nginx_attachment_util.so
+RUN set -ex; \
+  apk upgrade --no-cache -a && \
+  apk add --no-cache \
+  # 基础运行时库
+  libstdc++ zlib pcre2 \
+  # 安全与证书
+  ca-certificates openssl \
+  # 时区管理
+  tzdata \
+  # 进程管理
+  tini \
+  # 网络与协议
+  libcurl libprotobuf \
+  # XML/XSLT处理
+  libxml2 libxslt yajl \
+  # 数据库与存储
+  lmdb \
+  # 地理定位
+  geoip libmaxminddb-libs \
+  # 数据处理
+  libfuzzy2; \
+  sed -i "s|default = default_sect|default = default_sect\noqsprovider = oqsprovider_sect|g" /etc/ssl/openssl.cnf; \
+  sed -i "s|\[default_sect\]|\[default_sect\]\nactivate = 1\n\[oqsprovider_sect\]\nactivate = 1\n|g" /etc/ssl/openssl.cnf
 
 ARG NGINX_USER_UID=100
 ARG NGINX_GROUP_GID=101
@@ -325,11 +302,19 @@ RUN set -ex; \
   addgroup --gid $NGINX_GROUP_GID -S nginx; \
   adduser --uid $NGINX_USER_UID -D -S -h /var/cache/nginx -s /sbin/nologin -G nginx nginx
 
-RUN set -ex; \
-    apk upgrade --no-cache -a; \
-    apk add --no-cache ca-certificates tzdata tini zlib luajit pcre2 libstdc++ yajl libxml2 libxslt libcurl lmdb libfuzzy2 lua5.1-libs geoip libmaxminddb-libs libprotobuf openssl; \
-    sed -i "s|default = default_sect|default = default_sect\noqsprovider = oqsprovider_sect|g" /etc/ssl/openssl.cnf; \
-    sed -i "s|\[default_sect\]|\[default_sect\]\nactivate = 1\n\[oqsprovider_sect\]\nactivate = 1\n|g" /etc/ssl/openssl.cnf
+COPY --from=builder --chown=${NGINX_USER_UID}:${NGINX_GROUP_GID} /usr/sbin/nginx                                          /usr/sbin/nginx
+COPY --from=builder --chown=${NGINX_USER_UID}:${NGINX_GROUP_GID} /etc/nginx                                                    /etc/nginx
+COPY --from=builder --chown=${NGINX_USER_UID}:${NGINX_GROUP_GID} /var/log/nginx/                                               /var/log/nginx/
+COPY --from=builder --chown=${NGINX_USER_UID}:${NGINX_GROUP_GID} /var/run/nginx/                                               /var/run/nginx/
+
+COPY --from=builder --chown=${NGINX_USER_UID}:${NGINX_GROUP_GID} /src/oqs-provider/lib/oqsprovider.so                          /usr/lib/ossl-modules/oqsprovider.so
+COPY --from=builder --chown=${NGINX_USER_UID}:${NGINX_GROUP_GID} /src/ModSecurity/src/.libs/libmodsecurity.so.3                /usr/local/lib/libmodsecurity.so.3
+COPY --from=builder --chown=${NGINX_USER_UID}:${NGINX_GROUP_GID} /src/ModSecurity/unicode.mapping                              /etc/nginx/conf/conf.d/include/unicode.mapping
+COPY --from=builder --chown=${NGINX_USER_UID}:${NGINX_GROUP_GID} /src/ModSecurity/modsecurity.conf-recommended                 /etc/nginx/conf/conf.d/include/modsecurity.conf.example
+COPY --from=builder --chown=${NGINX_USER_UID}:${NGINX_GROUP_GID} /src/opentelemetry-cpp/libopentelemetry_proto.so              /usr/local/lib/libopentelemetry_proto.so
+COPY --from=builder --chown=${NGINX_USER_UID}:${NGINX_GROUP_GID} /src/attachment/core/shmem_ipc/libosrc_shmem_ipc.so           /usr/local/lib/libosrc_shmem_ipc.so
+COPY --from=builder --chown=${NGINX_USER_UID}:${NGINX_GROUP_GID} /src/attachment/core/compression/libosrc_compression_utils.so /usr/local/lib/libosrc_compression_utils.so
+COPY --from=builder --chown=${NGINX_USER_UID}:${NGINX_GROUP_GID} /src/attachment/attachments/nginx/nginx_attachment_util/libosrc_nginx_attachment_util.so /usr/local/lib/libosrc_nginx_attachment_util.so
 
 WORKDIR /etc/nginx
 
