@@ -302,7 +302,7 @@ RUN set -ex; \
   addgroup --gid $NGINX_GROUP_GID -S nginx; \
   adduser --uid $NGINX_USER_UID -D -S -h /var/cache/nginx -s /sbin/nologin -G nginx nginx
 
-COPY --from=builder --chown=${NGINX_USER_UID}:${NGINX_GROUP_GID} /usr/sbin/nginx                                          /usr/sbin/nginx
+COPY --from=builder --chown=${NGINX_USER_UID}:${NGINX_GROUP_GID} /usr/sbin/nginx                                               /usr/sbin/nginx
 COPY --from=builder --chown=${NGINX_USER_UID}:${NGINX_GROUP_GID} /etc/nginx                                                    /etc/nginx
 COPY --from=builder --chown=${NGINX_USER_UID}:${NGINX_GROUP_GID} /var/log/nginx/                                               /var/log/nginx/
 COPY --from=builder --chown=${NGINX_USER_UID}:${NGINX_GROUP_GID} /var/run/nginx/                                               /var/run/nginx/
