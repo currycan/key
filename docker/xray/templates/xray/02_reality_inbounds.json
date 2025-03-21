@@ -1,8 +1,7 @@
 {
     "inbounds": [
         {
-            "listen": "0.0.0.0",
-            "port": "${LISTENING_PORT}",
+            "listen": "/dev/shm/udsreality.sock,0666",
             "protocol": "vless",
             "tag": "VISION+REALITY",
             "settings": {
@@ -28,7 +27,7 @@
                 "realitySettings": {
                     "show": false,
                     "target": "/dev/shm/nginx.sock",
-                    "xver": 0,
+                    "xver": 1,
                     "serverNames": [
                         "${DOMAIN}"
                     ],
@@ -42,6 +41,9 @@
                     "tcpcongestion": "bbr",
                     "tcpMptcp": true,
                     "tcpNoDelay": true
+                },
+                "rawSettings": {
+                    "acceptProxyProtocol": true
                 }
             },
             "sniffing": {

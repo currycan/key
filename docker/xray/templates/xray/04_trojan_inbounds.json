@@ -1,0 +1,49 @@
+{
+    "inbounds": [
+        {
+            "listen": "/dev/shm/udstrojan.sock,0666",
+            "protocol": "trojan",
+            "settings": {
+                "clients": [
+                    {
+                        "password": "${PASSWORD}",
+                        "email": "vless-trojan@gmail.com"
+                    }
+                ],
+                "fallbacks": [
+                    {
+                        "dest": "/dev/shm/fallback.trojan.sock",
+                        "xver": 1
+                    }
+                ]
+            },
+            "streamSettings": {
+                "network": "raw",
+                "security": "tls",
+                "tlsSettings": {
+                    "certificates": [
+                        {
+                            "ocspStapling": 3600,
+                            "certificateFile": "${SSL_PATH}/${DOMAIN}.crt",
+                            "keyFile": "${SSL_PATH}/${DOMAIN}.key"
+                        }
+                    ],
+                    "minVersion": "1.2",
+                    "maxVersion": "1.2",
+                    "cipherSuites": "TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256:TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256"
+                },
+                "rawSettings": {
+                    "acceptProxyProtocol": true
+                }
+            },
+            "sniffing": {
+                "enabled": true,
+                "destOverride": [
+                    "http",
+                    "tls",
+                    "quic"
+                ]
+            }
+        }
+    ]
+}

@@ -85,8 +85,6 @@ function generateEnv() {
 
         local reality_private_key reality_public_key
         read -r reality_private_key reality_public_key <<<$(gen_x25519_key)
-        local reality_xhttp_private_key reality_xhttp_public_key
-        read -r reality_private_key reality_public_key <<<$(gen_x25519_key)
 
         # # 获取地理位置信息
         log DEBUG "Generating geographical location information"
@@ -103,11 +101,11 @@ function generateEnv() {
             ["XRAY_REALITY_SHORTID"]=$(openssl rand -hex 8)
             ["XRAY_XHTTP_UUID"]=$(generateRandomStr uuid)
             ["XRAY_XHTTP_URL_PATH"]=$(generateRandomStr path 20)
-            # ["XRAY_REALITY_XHTTP_UUID"]=$(generateRandomStr uuid)
-            # ["XRAY_REALITY_XHTTP_URL_PATH"]=$(generateRandomStr path 20)
-            # ["XRAY_REALITY_XHTTP_PRIVATE_KEY"]=${reality_xhttp_private_key}
-            # ["XRAY_REALITY_XHTTP_PUBLIC_KEY"]=${reality_xhttp_public_key}
-            # ["XRAY_REALITY_XHTTP_SHORTID"]=$(openssl rand -hex 8)
+            ["XRAY_VMESS_UUID"]=$(generateRandomStr uuid)
+            ["XRAY_VMESS_URL_PATH"]=$(generateRandomStr path 20)
+            ["XRAY_KCP_PORT"]=$(generateRandomStr port)
+            ["XRAY_KCP_UUID"]=$(generateRandomStr uuid)
+            ["XRAY_KCP_SEED"]=$(openssl rand -base64 9 | tr -dc 'a-zA-Z0-9' | head -c12)
             ["GEOIP_INFO"]=${geo_output}
         )
 

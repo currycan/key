@@ -1,4 +1,6 @@
-FROM docker.io/library/alpine:3
+# https://github.com/macbre/docker-nginx-http3/blob/master/Dockerfile
+# FROM docker.io/library/alpine:3
+FROM docker.io/currycan/nginx:1.27.4
 
 # 系统级配置（时区/镜像源）
 RUN set -ex; \
@@ -8,7 +10,7 @@ RUN set -ex; \
 
 # 安装基础组件
 RUN set -ex; \
-  runtime_pkgs="curl bash iproute2 net-tools tzdata bash-completion ca-certificates python3 nginx nginx-mod-stream openssl gettext libc6-compat gcompat vim libqrencode-tools supervisor socat logrotate"; \
+  runtime_pkgs="curl bash iproute2 net-tools tzdata bash-completion ca-certificates python3 gettext libc6-compat gcompat vim libqrencode-tools supervisor socat logrotate"; \
   apk add -U --no-cache --virtual .runtime-deps ${runtime_pkgs}; \
   rm -rf /tmp/*; \
   rm -rf /var/cache/apk/*
@@ -40,7 +42,7 @@ COPY --chmod=755 bin/x-ui  /usr/local/bin/x-ui
 COPY --chmod=755 bin/xui-xray  /usr/local/bin/bin
 
 # xray
-ARG XRAY_VERSION="25.3.3"
+ARG XRAY_VERSION="25.3.6"
 RUN set -ex; \
   build_pkgs="unzip"; \
   apk add -U --no-cache --virtual .build-deps ${build_pkgs}; \
@@ -76,7 +78,7 @@ ENV LISTENING_PORT="433"
 # acme.sh
 ENV ACMESH_REGISTER_EMAIL=""
 # buypass/zerossl/letsencrypt
-ENV ACMESH_SERVER_NAME="buypass"
+ENV ACMESH_SERVER_NAME="letsencrypt"
 # ali/cf
 # for cf
 ENV CF_TOKEN=""
