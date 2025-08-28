@@ -1,4 +1,4 @@
-FROM docker.io/library/alpine:3 AS builder
+FROM alpine:3 AS builder
 
 # Requirements
 RUN set -ex; \
@@ -37,7 +37,6 @@ RUN set -ex; \
     protobuf-dev;
 
 WORKDIR /src
-COPY attachment.patch /src/attachment.patch
 
 # ModSecurity
 # https://github.com/owasp-modsecurity/ModSecurity
@@ -54,14 +53,14 @@ RUN set -ex; \
 
 # Nginx
 # https://github.com/nginx/nginx
-ARG NGINX_VERSION=release-1.27.4
-ARG DTR_VER=1.27.4
+ARG NGINX_VERSION=release-1.29.1
+ARG DTR_VER=1.27.5
 ARG RCP_VER=1.27.1
 RUN set -ex; \
   git clone https://github.com/nginx/nginx --branch "$NGINX_VERSION" /src/nginx; \
   cd /src/nginx; \
-  wget -q https://raw.githubusercontent.com/nginx-modules/ngx_http_tls_dyn_size/master/nginx__dynamic_tls_records_"$DTR_VER"%2B.patch -O /src/nginx/1.patch; \
-  wget -q https://raw.githubusercontent.com/openresty/openresty/master/patches/nginx-"$RCP_VER"-resolver_conf_parsing.patch -O /src/nginx/2.patch; \
+  wget -q https://raw.githubusercontent.com/nginx-modules/ngx_http_tls_dyn_size/refs/heads/master/nginx__dynamic_tls_records_"$DTR_VER"%2B.patch -O /src/nginx/1.patch; \
+  wget -q https://raw.githubusercontent.com/openresty/openresty/refs/heads/master/patches/nginx/"$RCP_VER"/nginx-"$RCP_VER"-resolver_conf_parsing.patch -O /src/nginx/2.patch; \
   sed -i "s|nginx/|NPMplus/|g" /src/nginx/src/core/nginx.h; \
   sed -i "s|Server: nginx|Server: NPMplus|g" /src/nginx/src/http/ngx_http_header_filter_module.c; \
   sed -i "/<hr><center>/d" /src/nginx/src/http/ngx_http_special_response.c; \
@@ -83,15 +82,28 @@ RUN set -ex; \
   echo "Cloning ngx-fancyindex $FANCYINDEX_VERSION ..."; \
   git clone --recursive --depth 1 --single-branch -b ${FANCYINDEX_VERSION} https://github.com/aperezdc/ngx-fancyindex /src/ngx-fancyindex;
 
-ARG HEADERS_MORE_VERSION=v0.38
+ARG HEADERS_MORE_VERSION=v0.39
 RUN set -ex; \
   echo "Cloning headers-more-nginx-module ${HEADERS_MORE_VERSION} ..."; \
   git clone --recursive --depth 1 --branch ${HEADERS_MORE_VERSION} https://github.com/openresty/headers-more-nginx-module /src/headers-more-nginx-module
 
-ARG NJS_VERSION=0.8.9
+ARG QUICKJS_VERSION=master
+RUN set -ex; \
+  echo "Cloning and configuring quickjs ..."; \
+  git clone --recursive --depth 1 --single-branch -b ${QUICKJS_VERSION} https://github.com/bellard/quickjs  /src/quickjs; \
+  cd /src/quickjs; \
+  make -j$(nproc) libquickjs.a; \
+  echo "quickjs $(cat VERSION)"
+
+ARG NJS_VERSION=0.9.1
 RUN set -ex; \
   echo "Cloning and configuring njs ${NJS_VERSION} ..."; \
-  git clone --recursive --depth 1 --single-branch -b ${NJS_VERSION} https://github.com/nginx/njs /src/njs;
+  git clone --recursive --depth 1 --single-branch -b ${NJS_VERSION} https://github.com/nginx/njs /src/njs; \
+  cd /src/njs; \
+  ./configure  --cc-opt='-I /src/quickjs' --ld-opt="-L /src/quickjs"; \
+  make njs; \
+  mv /src/njs/build/njs /usr/sbin/njs; \
+  echo "njs v$(njs -v)"
 
 ARG DEVEL_KIT_VERSION=v0.3.4
 RUN set -ex; \
@@ -121,21 +133,11 @@ RUN set -ex; \
   git clone --recursive --depth 1 --branch ${VTS_VERSION} https://github.com/vozlt/nginx-module-vts /src/nginx-module-vts
 
 # patch ModSecurity-nginx
-ARG MODSECNGX_VERSION=v1.0.3
+ARG MODSECNGX_VERSION=v1.0.4
 RUN set -ex; \
   echo "Cloning ModSecurity-nginx ${MODSECNGX_VERSION} ..."; \
   git clone --recursive --depth 1 --branch ${MODSECNGX_VERSION} https://github.com/SpiderLabs/ModSecurity-nginx /src/ModSecurity-nginx; \
-  cd /src/ModSecurity-nginx; \
-  wget -q https://patch-diff.githubusercontent.com/raw/owasp-modsecurity/ModSecurity-nginx/pull/320.patch -O /src/ModSecurity-nginx/1.patch; \
-  git apply /src/ModSecurity-nginx/1.patch; \
-  rm -v /src/ModSecurity-nginx/*.patch
-
-# RUN set -ex; \
-#   echo "Cloning and configuring quickjs ..."; \
-#   git clone --recursive --depth 1 https://github.com/bellard/quickjs /src/quickjs; \
-#   cd /src/quickjs; \
-#   make -j$(nproc) libquickjs.a; \
-#   echo "quickjs $(cat VERSION)"
+  cd /src/ModSecurity-nginx;
 
 ARG CONFIG="\
   --build=nginx \
@@ -191,33 +193,30 @@ ARG CONFIG="\
   --add-dynamic-module=/src/nginx-module-vts \
   "
 
-ARG CC_OPT=""
-ARG LD_OPT=""
+ARG CC_OPT='-g -O2 -flto=auto -ffat-lto-objects -flto=auto -ffat-lto-objects'
+ARG LD_OPT='-Wl,-Bsymbolic-functions -flto=auto -ffat-lto-objects -flto=auto'
 
 RUN set -ex; \
   echo "Building nginx ..."; \
   mkdir -p /var/run/nginx/ /var/cache/nginx; \
   cd /src/nginx; \
   ./auto/configure $CONFIG --with-cc-opt="${CC_OPT}" --with-ld-opt="${LD_OPT}"; \
-  # make -j "$(nproc)" install && make install && make clean && strip /usr/sbin/nginx
   make -j "$(nproc)" install; \
   ln -s /etc/nginx/sbin/nginx /usr/sbin/nginx
 
-# openappsec attachment
-ARG ATTACHMENT_VERSION=main
+ARG LUA_CORE_VERSIOM=v0.1.31
+ARG LUA_LRCACHE_VERSION=v0.15
 RUN set -ex; \
-  echo "Cloning attachment ${ATTACHMENT_VERSION} ..."; \
-  git clone --recursive --depth 1 --branch ${ATTACHMENT_VERSION} https://github.com/openappsec/attachment /src/attachment; \
-  echo "Building attachment ..."; \
-  cd /src/attachment; \
-  git apply /src/attachment.patch; \
-  rm -v /src/attachment.patch; \
-  cmake /src/attachment -G Ninja; \
-  ninja; \
-  mv -v /src/attachment/attachments/nginx/ngx_module/libngx_module.so /etc/nginx/modules/libngx_module.so
+  echo "Building nginx lua..."; \
+  git clone --recursive --depth 1 --branch ${LUA_CORE_VERSIOM} https://github.com/openresty/lua-resty-core /src/lua-resty-core; \
+  cd /src/lua-resty-core; \
+  make -j "$(nproc)" install PREFIX=/etc/nginx/; \
+  git clone --recursive --depth 1 --branch ${LUA_LRCACHE_VERSION} https://github.com/openresty/lua-resty-lrucache /src/lua-resty-lrucache; \
+  cd /src/lua-resty-lrucache; \
+  make -j "$(nproc)" install PREFIX=/etc/nginx/
 
 # liboqs
-ARG LIBOQS_VERSION=0.12.0
+ARG LIBOQS_VERSION=0.14.0
 RUN set -ex; \
   echo "Cloning liboqs ${LIBOQS_VERSION} ..."; \
   git clone --recursive --depth 1 --branch ${LIBOQS_VERSION} https://github.com/open-quantum-safe/liboqs /src/liboqs; \
@@ -227,7 +226,7 @@ RUN set -ex; \
   ninja install
 
 # oqs-provider
-ARG OQSPROVIDER_VERSION=0.8.0
+ARG OQSPROVIDER_VERSION=0.10.0
 RUN set -ex; \
   echo "Cloning oqs-provider ${OQSPROVIDER_VERSION} ..."; \
   git clone --recursive --depth 1 --branch ${OQSPROVIDER_VERSION} https://github.com/open-quantum-safe/oqs-provider /src/oqs-provider; \
@@ -260,43 +259,67 @@ RUN set -ex; \
 
 # strip files
 RUN set -ex; \
-  strip -s /etc/nginx/sbin/nginx; \
+	cd /src/nginx; \
+	make install; \
+	mkdir /etc/nginx/conf.d/; \
+	mkdir /etc/nginx/stream.d/; \
+	strip /usr/sbin/nginx*; \
   find /etc/nginx/modules -name "*.so" -exec strip -s {} \;; \
   strip -s /src/oqs-provider/lib/oqsprovider.so; \
   strip -s /src/ModSecurity/src/.libs/libmodsecurity.so.3; \
   strip -s /src/opentelemetry-cpp/libopentelemetry_proto.so; \
-  strip -s /src/attachment/core/shmem_ipc/libosrc_shmem_ipc.so; \
-  strip -s /src/attachment/core/compression/libosrc_compression_utils.so; \
-  strip -s /src/attachment/attachments/nginx/nginx_attachment_util/libosrc_nginx_attachment_util.so
+	\
+	# https://tools.ietf.org/html/rfc7919
+	# https://github.com/mozilla/ssl-config-generator/blob/master/docs/ffdhe2048.txt
+  mkdir -p /etc/nginx/ssl; \
+	wget -q https://ssl-config.mozilla.org/ffdhe2048.txt -O /etc/nginx/ssl/dhparam.pem; \
+	\
+	# Bring in gettext so we can get `envsubst`, then throw
+	# the rest away. To do this, we need to install `gettext`
+	# then move `envsubst` out of the way so `gettext` can
+	# be deleted completely, then move `envsubst` back.
+	apk add --no-cache --virtual .gettext gettext; \
+	\
+	scanelf --needed --nobanner /usr/sbin/nginx /usr/sbin/njs /etc/nginx/modules/*.so /usr/bin/envsubst \
+			| awk '{ gsub(/,/, "\nso:", $2); print "so:" $2 }' \
+			| sort -u \
+			| xargs -r apk info --installed \
+			| sort -u > /tmp/runDeps.txt
 
-FROM alpine:3
+# FROM --platform=$TARGETPLATFORM alpine:3
+FROM docker.io/library/alpine:3
+
+COPY --from=builder /tmp/runDeps.txt /tmp/runDeps.txt
 
 RUN set -ex; \
-  apk upgrade --no-cache -a && \
-  apk add --no-cache \
-  # 基础运行时库
-  libstdc++ zlib pcre2 \
-  # 安全与证书
-  ca-certificates openssl \
-  # 时区管理
-  tzdata \
-  # 进程管理
-  tini \
-  # 网络与协议
-  libcurl libprotobuf \
-  # XML/XSLT处理
-  libxml2 libxslt yajl \
-  # 数据库与存储
-  lmdb \
-  # 地理定位
-  geoip libmaxminddb-libs \
-  # 数据处理
-  libfuzzy2; \
+  apk upgrade --no-cache -a; \
+  apk add --no-cache --virtual .base-rundeps \
+    bash \
+    # 基础运行时库
+    libstdc++ zlib pcre2 \
+    # 安全与证书
+    ca-certificates openssl \
+    # 时区管理
+    tzdata \
+    # 进程管理
+    tini \
+    # 网络与协议
+    libcurl libprotobuf \
+    # XML/XSLT处理
+    libxml2 libxslt yajl \
+    # 数据库与存储
+    lmdb \
+    # 地理定位
+    geoip libmaxminddb-libs \
+    # 数据处理
+    libfuzzy2; \
+  apk add --no-cache --virtual .nginx-rundeps $(cat /tmp/runDeps.txt); \
+  rm -f /tmp/runDeps.txt; \
   sed -i "s|default = default_sect|default = default_sect\noqsprovider = oqsprovider_sect|g" /etc/ssl/openssl.cnf; \
   sed -i "s|\[default_sect\]|\[default_sect\]\nactivate = 1\n\[oqsprovider_sect\]\nactivate = 1\n|g" /etc/ssl/openssl.cnf
 
-ARG NGINX_USER_UID=100
-ARG NGINX_GROUP_GID=101
+ARG NGINX_USER_UID=200
+ARG NGINX_GROUP_GID=201
 # add user
 RUN set -ex; \
   addgroup --gid $NGINX_GROUP_GID -S nginx; \
@@ -312,9 +335,9 @@ COPY --from=builder --chown=${NGINX_USER_UID}:${NGINX_GROUP_GID} /src/ModSecurit
 COPY --from=builder --chown=${NGINX_USER_UID}:${NGINX_GROUP_GID} /src/ModSecurity/unicode.mapping                              /etc/nginx/conf/conf.d/include/unicode.mapping
 COPY --from=builder --chown=${NGINX_USER_UID}:${NGINX_GROUP_GID} /src/ModSecurity/modsecurity.conf-recommended                 /etc/nginx/conf/conf.d/include/modsecurity.conf.example
 COPY --from=builder --chown=${NGINX_USER_UID}:${NGINX_GROUP_GID} /src/opentelemetry-cpp/libopentelemetry_proto.so              /usr/local/lib/libopentelemetry_proto.so
-COPY --from=builder --chown=${NGINX_USER_UID}:${NGINX_GROUP_GID} /src/attachment/core/shmem_ipc/libosrc_shmem_ipc.so           /usr/local/lib/libosrc_shmem_ipc.so
-COPY --from=builder --chown=${NGINX_USER_UID}:${NGINX_GROUP_GID} /src/attachment/core/compression/libosrc_compression_utils.so /usr/local/lib/libosrc_compression_utils.so
-COPY --from=builder --chown=${NGINX_USER_UID}:${NGINX_GROUP_GID} /src/attachment/attachments/nginx/nginx_attachment_util/libosrc_nginx_attachment_util.so /usr/local/lib/libosrc_nginx_attachment_util.so
+
+COPY --from=builder --chown=${NGINX_USER_UID}:${NGINX_GROUP_GID} /etc/nginx/ssl /etc/nginx/ssl
+COPY --from=builder --chown=${NGINX_USER_UID}:${NGINX_GROUP_GID} /usr/sbin/njs /usr/sbin/njs
 
 WORKDIR /etc/nginx
 

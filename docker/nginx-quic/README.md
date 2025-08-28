@@ -1,13 +1,25 @@
 # nginx-quic
 
+follow the below approach:
+
 [ZoeyVid/nginx-quic: Docker image for Nginx + HTTP/3](https://github.com/ZoeyVid/nginx-quic)
+[macbre/docker-nginx-http3 ](https://github.com/macbre/docker-nginx-http3)
 
-Docker image for nginx with HTTP/3-module - used as base image for NPMplus, it also contains libmodsec, some patches and some modules (including lua), you can find the all links in the Dockerfile. The python-version/python-latest build also contains python and certbot.
+## Multi platform building
 
-Requires: `zlib luajit pcre2 libstdc++ yajl libxml2 libxslt libcurl lmdb libfuzzy2 lua5.1-libs geoip libmaxminddb-libs openssl` and libmodsecurity <br>
-Please add: `lua_package_path "/usr/local/nginx/lib/lua/?.lua;;";` to the http part of your nginx.conf.
-If you use the tar files, please move the `libmodsecurity.so.3` file to `/usr/local/lib/libmodsecurity.so.3`
+[Multi-platform | Docker Docs](https://docs.docker.com/build/building/multi-platform/)
+[containerd image store | Docker Docs](https://docs.docker.com/desktop/features/containerd/)
 
 ```bash
-docker buildx build --platform linux/amd64 -t currycan/nginx:1.27.4 .
+
+docker run --privileged --rm tonistiigi/binfmt --install all
+
+docker buildx create --use --name=mybuilder-cn --driver docker-container --driver-opt image=dockerpracticesig/buildkit:master
+
+docker buildx build --platform linux/amd64,linux/arm64 -t currycan/nginx:1.29.1 --output ./bin .
+
+docker build \
+  --platform linux/amd64,linux/arm64 \
+  --tag currycan/nginx:1.29.1 \
+  --push .
 ```
