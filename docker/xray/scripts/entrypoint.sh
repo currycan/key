@@ -101,11 +101,6 @@ function generateEnv() {
             ["XRAY_REALITY_SHORTID"]=$(openssl rand -hex 8)
             ["XRAY_XHTTP_UUID"]=$(generateRandomStr uuid)
             ["XRAY_XHTTP_URL_PATH"]=$(generateRandomStr path 20)
-            ["XRAY_VMESS_UUID"]=$(generateRandomStr uuid)
-            ["XRAY_VMESS_URL_PATH"]=$(generateRandomStr path 20)
-            ["XRAY_KCP_PORT"]=$(generateRandomStr port)
-            ["XRAY_KCP_UUID"]=$(generateRandomStr uuid)
-            ["XRAY_KCP_SEED"]=$(openssl rand -base64 9 | tr -dc 'a-zA-Z0-9' | head -c12)
             ["GEOIP_INFO"]=${geo_output}
         )
 
@@ -158,7 +153,7 @@ function createConfig() {
     fi
 
     # 生成Xray配置
-    if [ ! -d "/etc/xray/conf" ]; then
+    if [ ! -f "/etc/xray/conf/*.json" ]; then
         mkdir -p "/etc/xray/conf"
         for template in /templates/xray/*.json; do
             local output="/etc/xray/conf/$(basename "$template")"

@@ -1,6 +1,6 @@
 services:
   xray:
-    image: docker.io/currycan/xray:25.3.21
+    image: docker.io/currycan/xray:25.8.1
     container_name: xray
     environment:
       - DOMAIN=$domain
@@ -12,12 +12,15 @@ services:
       - LISTENING_PORT=443
       - DUFS_PATH_PREFIX=/myfiles
       - XUI_WEBBASEPATH=3xadmin
+    ports:
+      - '443:443/tcp'
+      - '443:443/udp' # use UDP for usage of HTTP/3
     volumes:
       - ./data:/data
       - ./pki:/pki
       - ./acmecerts:/acmecerts
       - ./.xray:/xray/config/.env
-      - ./xray:/etc/xray
+      - ./xray:/etc/xray/conf
       - ./dufs:/etc/dufs
       - ./nginx/http:/etc/nginx/conf.d
       - ./nginx/tcp:/etc/nginx/stream.d
@@ -31,7 +34,7 @@ services:
     # working_dir: /etc/nginx
     restart: always
     tty: true
-    network_mode: "host"
+    network_mode: host
     ulimits:
       nproc: 65535
       nofile:

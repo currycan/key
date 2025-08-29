@@ -1,6 +1,36 @@
-# https://github.com/macbre/docker-nginx-http3/blob/master/Dockerfile
-# FROM docker.io/library/alpine:3
-FROM docker.io/currycan/nginx:1.27.4
+FROM golang:1.25-alpine AS builder
+
+WORKDIR /app
+
+RUN apk --no-cache --update add \
+  build-base \
+  curl \
+  git \
+  gcc \
+  wget \
+  unzip
+
+ENV CGO_ENABLED=1
+ENV CGO_CFLAGS="-D_LARGEFILE64_SOURCE"
+
+ARG XUI_VERSION=v2.6.6
+ARG XRAY_VERSION="25.8.3"
+ARG V2RAY_VERSION="5.38.0"
+
+COPY --chmod=755 install.sh /usr/local/bin/
+RUN set -ex; \
+  git clone --recursive --depth 1 --shallow-submodules --branch ${XUI_VERSION} https://github.com/MHSanaei/3x-ui /app/xui; \
+  cd /app/xui && go build -ldflags "-w -s" -o build/x-ui main.go; \
+  git clone --filter=blob:none --no-checkout https://github.com/currycan/key.git /app/key; \
+  cd /app/key && git checkout HEAD -- docker/crypctl; \
+  cd /app/key/docker/crypctl; \
+  go build -ldflags "-w -s" -o crypctl main.go; \
+  install.sh
+
+FROM docker.io/currycan/nginx:1.29.1
+
+# Create a non-root user and group
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 
 # 系统级配置（时区/镜像源）
 RUN set -ex; \
@@ -21,14 +51,7 @@ ENV LE_WORKING_DIR=/acme.sh
 ENV LE_CONFIG_HOME=/acmecerts
 RUN set -ex && wget -O- https://get.acme.sh | sh
 
-# dufs
-ARG DUFS_VERSION="0.43.0"
-RUN set -ex; \
-  curl -fsSL "https://github.com/sigoden/dufs/releases/download/v${DUFS_VERSION}/dufs-v${DUFS_VERSION}-x86_64-unknown-linux-musl.tar.gz" | tar -xzC /tmp/; \
-  mv /tmp/dufs /usr/local/bin/; \
-  rm -rf /tmp/*
-
-# x-ui
+# x-ui dependences
 RUN set -ex; \
   apk add -U --no-cache fail2ban; \
   rm -f /etc/fail2ban/jail.d/alpine-ssh.conf; \
@@ -38,24 +61,11 @@ RUN set -ex; \
   sed -i "s/#allowipv6 = auto/allowipv6 = auto/g" /etc/fail2ban/fail2ban.conf; \
   rm -rf /var/cache/apk/*; \
   rm -rf /tmp/*
-COPY --chmod=755 bin/x-ui  /usr/local/bin/x-ui
-COPY --chmod=755 bin/xui-xray  /usr/local/bin/bin
 
-# xray
-ARG XRAY_VERSION="25.3.6"
-RUN set -ex; \
-  build_pkgs="unzip"; \
-  apk add -U --no-cache --virtual .build-deps ${build_pkgs}; \
-  curl -fsSLo /tmp/xray.zip "https://github.com/XTLS/Xray-core/releases/download/v${XRAY_VERSION}/Xray-linux-64.zip"; \
-  unzip -q /tmp/xray.zip -d /tmp; \
-  mv /tmp/xray /usr/local/bin/; \
-  wget -O /usr/local/bin/geosite.dat https://github.com/v2fly/domain-list-community/releases/latest/download/dlc.dat; \
-  wget -O /usr/local/bin/geoip.dat https://github.com/v2fly/geoip/releases/latest/download/geoip.dat; \
-  apk del --purge .build-deps; \
-  rm -rf /tmp/*; \
-  rm -rf /var/cache/apk/*
-
-COPY --chmod=755 bin/crypctl  /usr/local/bin/crypctl
+COPY --from=builder --chmod=755 /app/xui/build/ /usr/local/bin/
+COPY --from=builder --chmod=755 /app/key/docker/crypctl/crypctl /usr/local/bin/
+COPY --from=builder --chmod=755 /app/v2ray/v2ray /usr/local/bin/
+COPY --from=builder --chmod=755 /usr/local/bin/dufs /usr/local/bin/
 COPY nginx/network_internal.conf /etc/nginx/
 COPY 3DCEList /home/wwwroot/3DCEList
 COPY configs/nginx.conf /etc/nginx/nginx.conf
@@ -64,6 +74,11 @@ COPY configs/logrotate.conf /etc/logrotate.conf
 COPY --chmod=755 scripts /scripts
 COPY templates/ /templates/
 ADD https://raw.githubusercontent.com/currycan/key/master/vimrc /root/.vimrc
+
+# xray
+RUN set -ex; \
+  ln -sf /usr/local/bin/bin/xray* /usr/local/bin/xray; \
+  cp -a /usr/local/bin/bin/*.dat /usr/local/bin/
 
 # time zone
 ENV TZ="Asia/Hong_Kong"
@@ -117,6 +132,10 @@ ENV DUFS_LOG_FORMAT=""
 ENV DUFS_COMPRESS="low"
 
 WORKDIR /xray/
+
+HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
+    CMD supervisorctl status all | grep -q 'RUNNING' || exit 1
+
 
 EXPOSE 80 443
 
