@@ -30,14 +30,16 @@ show_qrcode() {
     local remark="$2"
 
     qr_params="-s 8 -m 4 -l H -v 10 -d 300 -k 2"
-    qrencode $qr_params -o "/xray/config/qr_${remark}.png" "$content"
+    qrencode $qr_params -o "/tmp/qr_${remark}.png" "$content"
     echo -e "${GREEN}== ${remark} QR Code ==${RESET}"
     echo "$content" | qrencode -o - -t utf8 $qr_params --foreground=000000 --background=FFFFFF
 }
 
 # 主配置生成函数
-vless_link() {
+all_links() {
     name="${DOMAIN%%.*}"
+
+    vmess_link="vmess://$(base64 -w 0 /etc/v2ray/vmess_qr.json)"
 
     reality="vless://${XRAY_REALITY_UUID}@${DOMAIN}:${LISTENING_PORT}?encryption=none&flow=xtls-rprx-vision&security=reality&sni=${DOMAIN}&fp=chrome&pbk=${XRAY_REALITY_PUBLIC_KEY}&sid=${XRAY_REALITY_SHORTID}&spx=%2F&type=tcp&headerType=none#${GEOIP_INFO}|${name}|TR"
 
@@ -50,8 +52,8 @@ vless_link() {
     full_cdn="vless://${XRAY_XHTTP_UUID}@${DOMAIN}:${LISTENING_PORT}?encryption=none&security=tls&sni=${CDNDOMAIN}&alpn=h2&fp=chrome&pbk=${XRAY_REALITY_PUBLIC_KEY}&sid=${XRAY_REALITY_SHORTID}&type=xhttp&host=${CDNDOMAIN}&path=%2F${XRAY_XHTTP_URL_PATH}&mode=auto#${GEOIP_INFO}|${name}|XTC上下行不分离"
 
     # 显示配置信息
-    echo -e "${GREEN}=== VLESS 链接信息 ===${RESET}"
-    echo ""
+    echo -e "${GREEN}=== 链接信息 ===${RESET}\n"
+    print_colored ${CYAN} "${vmess_link}"
     print_colored ${RED} "${reality}"
     print_colored ${GREEN} "${xhttp_reality}"
     print_colored ${YELLOW} "${up_cdn}"
@@ -59,8 +61,10 @@ vless_link() {
     print_colored ${MAGENTA} "${full_cdn}"
 }
 
-vless_qr() {
+all_qrs() {
     # 显示二维码
+    # echo -n "${vmess_link}" | qrencode -o - -t utf8
+    show_qrcode "$vmess_link" "Vmess"
     show_qrcode "$reality" "XTLS+Reality"
     show_qrcode "$xhttp_reality" "xhttp+Reality上下行不分离"
     show_qrcode "$up_cdn" "上行xhttp+TLS+CDN-下行xhttp+Reality"
@@ -75,17 +79,6 @@ xui_info() {
 }
 
 main() {
-    # 加载环境变量
-    ENV_FILE="/xray/config/.env/xray"
-    [ -f "$ENV_FILE" ] || error_exit "环境文件不存在: $ENV_FILE"
-    source "$ENV_FILE"
-
-    xui_info
-    vless_link
-    vless_qr
-}
-
-main() {
     local show_qr=false
 
     # 添加参数判断逻辑
@@ -94,16 +87,17 @@ main() {
     fi
 
     # 加载环境变量
-    ENV_FILE="/xray/config/.env/xray"
+    ENV_FILE="/.env/xray"
     [ -f "$ENV_FILE" ] || error_exit "环境文件不存在: $ENV_FILE"
     source "$ENV_FILE"
 
-    vless_link  # 默认显示链接
+    all_links  # 默认显示链接
     xui_info
+    print_colored ${CYAN} "${PASSWORD}"
 
     # 根据参数决定是否显示二维码
     if $show_qr; then
-        vless_qr
+        all_qrs
     fi
 }
 

@@ -16,7 +16,7 @@ docker build \
   --build-arg XUI_VERSION="v2.6.6" \
   --build-arg XRAY_VERSION="25.8.3" \
   --build-arg V2RAY_VERSION="5.38.0" \
-  --tag currycan/xray:25.8.29 \
+  --tag currycan/xray:25.9.1 \
   --push .
 ```
 

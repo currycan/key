@@ -71,7 +71,7 @@ function generateRandomStr() {
 
 # 生成环境变量
 function generateEnv() {
-    local env_file="/xray/config/.env/xray"
+    local env_file="/.env/xray"
 
     if [ ! -f "$env_file" ]; then
         log INFO "Generating environment variables..."
@@ -101,6 +101,9 @@ function generateEnv() {
             ["XRAY_REALITY_SHORTID"]=$(openssl rand -hex 8)
             ["XRAY_XHTTP_UUID"]=$(generateRandomStr uuid)
             ["XRAY_XHTTP_URL_PATH"]=$(generateRandomStr path 20)
+            ["V2RAY_LOCAL_PORT"]=$(generateRandomStr port)
+            ["V2RAY_UUID"]=$(generateRandomStr uuid)
+            ["V2RAY_URL_PATH"]=$(generateRandomStr path 20)
             ["GEOIP_INFO"]=${geo_output}
         )
 
@@ -114,7 +117,7 @@ function generateEnv() {
     fi
 
     # 解密密钥文件
-    local secret_file="/xray/config/.env/secret"
+    local secret_file="/.env/secret"
     if [ ! -f "$secret_file" ]; then
         checkRequiredEnv DECODE
         log INFO "Downloading encrypted secrets..."
@@ -136,11 +139,19 @@ function generateEnv() {
 # 生成配置文件
 function createConfig() {
     log INFO "Creating configurations..."
-    source "/xray/config/.env/xray"
-    source "/xray/config/.env/secret"
+    source "/.env/xray"
+    source "/.env/secret"
+
+    export DOLLAR='$'
+
+    # 生成Supervisord配置
+    if [ ! -f /etc/supervisord/all.conf ]; then
+        mkdir -p /etc/supervisord/
+        log DEBUG "Generating supervisord /etc/supervisord/all.conf"
+        envsubst </templates/supervisord/supervisord.conf >/etc/supervisord/all.conf
+    fi
 
     # 生成Nginx配置
-    export DOLLAR='$'
     if [ ! -f /etc/nginx/conf.d/http.conf ]; then
         mkdir -p /etc/nginx/conf.d/
         log DEBUG "Generating Nginx http.conf"
@@ -160,6 +171,13 @@ function createConfig() {
             log DEBUG "Generating $output"
             envsubst <"$template" >"$output"
         done
+    fi
+
+    # 生成V2ray配置
+    if [ ! -f "/etc/v2ray/*.json" ]; then
+        mkdir -p "/etc/v2ray/"
+        envsubst </templates/v2ray/config.json >/etc/v2ray/config.json
+        envsubst </templates/v2ray/vmess_qr.json >/etc/v2ray/vmess_qr.json
     fi
 
     # 生成Dufs配置
@@ -295,7 +313,7 @@ if [ "${1#-}" = 'supervisord' ] && [ "$(id -u)" = '0' ]; then
 
     [[ ! -f "/usr/local/bin/show" ]] && ln -sf "/scripts/show-config.sh" "/usr/local/bin/show"
 
-    set -- "$@" -n -c "/xray/config/supervisord.conf"
+    set -- "$@" -n -c "/etc/supervisord/all.conf"
 fi
 
 exec "$@"

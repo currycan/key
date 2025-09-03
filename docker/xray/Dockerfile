@@ -40,8 +40,10 @@ RUN set -ex; \
 
 # 安装基础组件
 RUN set -ex; \
-  runtime_pkgs="curl bash iproute2 net-tools tzdata bash-completion ca-certificates python3 gettext libc6-compat gcompat vim libqrencode-tools supervisor socat logrotate"; \
+  runtime_pkgs="curl bash iproute2 net-tools tzdata bash-completion ca-certificates python3 py3-pip gettext libc6-compat gcompat vim libqrencode-tools socat logrotate"; \
   apk add -U --no-cache --virtual .runtime-deps ${runtime_pkgs}; \
+  echo -e "[global]\nbreak-system-packages = true" > /etc/pip.conf; \
+  pip install --no-cache-dir -U pip supervisor; \
   rm -rf /tmp/*; \
   rm -rf /var/cache/apk/*
 
@@ -66,11 +68,8 @@ COPY --from=builder --chmod=755 /app/xui/build/ /usr/local/bin/
 COPY --from=builder --chmod=755 /app/key/docker/crypctl/crypctl /usr/local/bin/
 COPY --from=builder --chmod=755 /app/v2ray/v2ray /usr/local/bin/
 COPY --from=builder --chmod=755 /usr/local/bin/dufs /usr/local/bin/
-COPY nginx/network_internal.conf /etc/nginx/
+COPY nginx/ /etc/nginx/
 COPY 3DCEList /home/wwwroot/3DCEList
-COPY configs/nginx.conf /etc/nginx/nginx.conf
-COPY configs/supervisord.conf /xray/config/supervisord.conf
-COPY configs/logrotate.conf /etc/logrotate.conf
 COPY --chmod=755 scripts /scripts
 COPY templates/ /templates/
 ADD https://raw.githubusercontent.com/currycan/key/master/vimrc /root/.vimrc
@@ -89,6 +88,10 @@ ENV PATH=/acme.sh/:$PATH
 ENV DOMAIN=""
 ENV CDNDOMAIN=""
 ENV LISTENING_PORT="433"
+
+# v2ray
+ENV ALTERID="0"
+ENV NETWORK="ws"
 
 # acme.sh
 ENV ACMESH_REGISTER_EMAIL=""
@@ -131,15 +134,14 @@ ENV DUFS_RENDER_SPA="true"
 ENV DUFS_LOG_FORMAT=""
 ENV DUFS_COMPRESS="low"
 
-WORKDIR /xray/
+# WORKDIR /xray/
 
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
-    CMD supervisorctl status all | grep -q 'RUNNING' || exit 1
-
+    CMD supervisorctl -c /etc/supervisord/all.conf status xray | grep -q 'RUNNING' || exit 1
 
 EXPOSE 80 443
 
-VOLUME ["/data", "/acmecerts", "/pki", "/etc/nginx/conf.d", "/etc/nginx/stream.d", "/etc/nginx/dhparam", "/var/log/xray", "/var/log/dufs", "/var/log/nginx", "/var/log/supervisor"]
+VOLUME ["/data", "/pki", "/acmecerts", "/etc/supervisord", "/etc/xray/conf", "/etc/v2ray", "/etc/dufs", "/etc/x-ui/","/etc/nginx/conf.d", "/etc/nginx/stream.d", "/etc/nginx/dhparam", "/var/log/xray", "/var/log/v2ray","/var/log/x-ui", "/var/log/dufs", "/var/log/nginx", "/var/log/supervisor"]
 
 STOPSIGNAL SIGTERM
 
