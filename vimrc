@@ -182,7 +182,7 @@ set ruler
 set cmdheight=1
 
 "显示行数"
-set number
+"set number"
 
 "不要图形按钮"
 set go=
@@ -194,7 +194,7 @@ set lz
 set backspace=eol,start,indent
 
 "允许空格键和光标键跨越行边界"
-set whichwrap+=<,>,h,l
+"set whichwrap+=<,>,h,l"
 
 "设置魔术"
 set magic
