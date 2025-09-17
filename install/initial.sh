@@ -233,6 +233,9 @@ initial() {
     curl -o /root/file/docker-compose.yml https://raw.githubusercontent.com/currycan/key/master/file/docker-compose.yml
     cd /root/file/data; dd if=/dev/zero of=`hostname` bs=1M count=1k conv=fdatasync;cd -
 
+    bash <(curl -fsSL https://tcp.hy2.sh/)
+    dkms status
+
     curl -o /usr/local/bin/tcp.sh https://raw.githubusercontent.com/ylx2016/Linux-NetSpeed/master/tcp.sh
     curl -Lso /usr/local/bin/kernel.sh https://git.io/kernel.sh
     curl -o /usr/local/bin/superspeed https://raw.githubusercontent.com/ernisn/superspeed/master/superspeed.sh
