@@ -150,7 +150,8 @@ apt_init() {
     fi
     # pip config set global.index-url https://mirrors.aliyun.com/pypi/simple/
     # pip config set global.trusted-host mirrors.aliyun.com
-    pip3 install -U speedtest-cli
+    # pip3 install -U speedtest-cli
+    apt install speedtest-cli -y
 }
 
 ssh_init() {
