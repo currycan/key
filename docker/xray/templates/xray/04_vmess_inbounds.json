@@ -1,0 +1,36 @@
+{
+    "inbounds": [
+        {
+            "listen": "/dev/shm/udsvmess.sock,0666",
+            "protocol": "vmess",
+            "tag": "VMESS_IN",
+            "settings": {
+                "clients": [
+                    {
+                        "id": "${V2RAY_UUID}",
+                        "alterId": 0,
+                        "email": "vmess@vless"
+                    }
+                ]
+            },
+            "streamSettings": {
+                "network": "ws",
+                "security": "none",
+                "wsSettings": {
+                    "acceptProxyProtocol": true,
+                    "path": "${V2RAY_URL_PATH}-vless"
+                }
+            },
+            "sniffing": {
+                "enabled": true,
+                "destOverride": [
+                    "http",
+                    "tls",
+                    "quic"
+                ],
+                "metadataOnly": false,
+                "routeOnly": true
+            }
+        }
+    ]
+}

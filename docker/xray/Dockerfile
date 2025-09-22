@@ -1,9 +1,11 @@
 FROM golang:1.25-alpine AS builder
 
-WORKDIR /app
+ARG TARGETARCH
+ARG TARGETVARIANT
 
 RUN apk --no-cache --update add \
   build-base \
+  upx \
   curl \
   git \
   gcc \
@@ -13,19 +15,93 @@ RUN apk --no-cache --update add \
 ENV CGO_ENABLED=1
 ENV CGO_CFLAGS="-D_LARGEFILE64_SOURCE"
 
-ARG XUI_VERSION=v2.6.6
-ARG XRAY_VERSION="25.8.3"
-ARG V2RAY_VERSION="5.38.0"
+WORKDIR /app
 
-COPY --chmod=755 install.sh /usr/local/bin/
+# ===== 安装 crypctl =====
 RUN set -ex; \
-  git clone --recursive --depth 1 --shallow-submodules --branch ${XUI_VERSION} https://github.com/MHSanaei/3x-ui /app/xui; \
-  cd /app/xui && go build -ldflags "-w -s" -o build/x-ui main.go; \
   git clone --filter=blob:none --no-checkout https://github.com/currycan/key.git /app/key; \
   cd /app/key && git checkout HEAD -- docker/crypctl; \
-  cd /app/key/docker/crypctl; \
-  go build -ldflags "-w -s" -o crypctl main.go; \
-  install.sh
+  cd docker/crypctl && go build -ldflags="-s -w" -trimpath -o crypctl main.go; \
+  upx --lzma --best crypctl; \
+  mv crypctl /usr/local/bin/
+
+# ===== 安装 Dufs =====
+RUN set -ex; \
+    DUFS_VERSION=$(curl -sSf https://github.com/sigoden/dufs/tags \
+      | grep "releases/tag/" | grep -Ev "rc|alpha|beta" \
+      | grep -o "[0-9]\+\.[0-9]\+\.[0-9]\+" | head -n 1); \
+    case "${TARGETARCH}" in \
+      amd64)   BINARY_FILE="dufs-v${DUFS_VERSION}-x86_64-unknown-linux-musl.tar.gz";; \
+      arm64)   BINARY_FILE="dufs-v${DUFS_VERSION}-arm-unknown-linux-musleabihf.tar.gz";; \
+      *)       echo "Unsupported architecture: ${TARGETARCH}"; exit 1 ;; \
+    esac; \
+    curl -fsSL "https://github.com/sigoden/dufs/releases/download/v${DUFS_VERSION}/${BINARY_FILE}" | tar -xzC /tmp/; \
+    upx --lzma --best /tmp/dufs; \
+    mv /tmp/dufs /usr/local/bin/
+
+# ===== 安装 V2Ray =====
+ARG V2RAY_VERSION="5.39.0"
+RUN set -ex; \
+    if [ -z "$V2RAY_VERSION" ]; then \
+        V2RAY_VERSION=$(curl -sSf https://github.com/v2fly/v2ray-core/tags \
+            | grep "releases/tag/" | grep -Ev "rc|alpha|beta" \
+            | grep -o "[0-9]\+\.[0-9]\+\.[0-9]\+" | head -n 1); \
+    fi; \
+    case "${TARGETARCH}" in \
+      amd64)   BINARY_FILE="v2ray-linux-64.zip";; \
+      arm64)   BINARY_FILE="v2ray-linux-arm64-v8a.zip";; \
+      *)       echo "Unsupported architecture: ${TARGETARCH}"; exit 1 ;; \
+    esac; \
+    mkdir -p /tmp/v2ray; \
+    cd /tmp/v2ray; \
+    wget -q "https://github.com/v2fly/v2ray-core/releases/download/v${V2RAY_VERSION}/${BINARY_FILE}"; \
+    unzip "${BINARY_FILE}"; \
+    upx --lzma --best v2ray; \
+    mv v2ray /usr/local/bin/
+
+# ===== 安装 x-ui =====
+ARG XUI_VERSION="2.8.0"
+RUN set -ex; \
+    if [ -z "$XUI_VERSION" ]; then \
+        V2RAY_VERSION=$(curl -sSf https://github.com/MHSanaei/3x-ui/tags \
+            | grep "releases/tag/" | grep -Ev "rc|alpha|beta" \
+            | grep -o "[0-9]\+\.[0-9]\+\.[0-9]\+" | head -n 1); \
+    fi; \
+  git clone --recursive --depth 1 --shallow-submodules --branch v${XUI_VERSION} https://github.com/MHSanaei/3x-ui /app/xui; \
+  cd /app/xui && go build -ldflags="-s -w" -trimpath -o x-ui main.go; \
+  upx --lzma --best x-ui; \
+  mv x-ui /usr/local/bin/
+
+# ===== 安装 Xray =====
+ARG XRAY_VERSION="25.9.11"
+RUN set -ex; \
+    if [ -z "$XRAY_VERSION" ]; then \
+        XRAY_VERSION=$(curl -sSf https://github.com/XTLS/Xray-core/tags \
+            | grep "releases/tag/" | grep -Ev "rc|alpha|beta" \
+            | grep -o "[0-9]\+\.[0-9]\+\.[0-9]\+" | head -n 1); \
+    fi; \
+    case "${TARGETARCH}" in \
+      amd64)   BINARY_FILE="Xray-linux-64.zip";; \
+      arm64)   BINARY_FILE="Xray-linux-arm64-v8a.zip";; \
+      *)       echo "Unsupported architecture: ${TARGETARCH}"; exit 1 ;; \
+    esac; \
+    mkdir -p /tmp/xray; \
+    cd /tmp/xray; \
+    wget -q "https://github.com/XTLS/Xray-core/releases/download/v${XRAY_VERSION}/${BINARY_FILE}"; \
+    unzip "${BINARY_FILE}"; \
+    rm -f "${BINARY_FILE}" geoip.dat geosite.dat; \
+    upx --lzma --best xray; \
+    wget -q https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geoip.dat; \
+    wget -q https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geosite.dat; \
+    wget -q -O geoip_IR.dat https://github.com/chocolate4u/Iran-v2ray-rules/releases/latest/download/geoip.dat; \
+    wget -q -O geosite_IR.dat https://github.com/chocolate4u/Iran-v2ray-rules/releases/latest/download/geosite.dat; \
+    wget -q -O geoip_RU.dat https://github.com/runetfreedom/russia-v2ray-rules-dat/releases/latest/download/geoip.dat; \
+    wget -q -O geosite_RU.dat https://github.com/runetfreedom/russia-v2ray-rules-dat/releases/latest/download/geosite.dat; \
+    mkdir -p /usr/local/bin/bin; \
+    mv xray /usr/local/bin/bin/xray-linux-${TARGETARCH}; \
+    mv *.dat /usr/local/bin/bin; \
+    ln -sf /usr/local/bin/bin/xray* /usr/local/bin/xray; \
+    ln -sf /usr/local/bin/bin/*.dat /usr/local/bin/
 
 FROM docker.io/currycan/nginx:1.29.1
 
@@ -64,20 +140,12 @@ RUN set -ex; \
   rm -rf /var/cache/apk/*; \
   rm -rf /tmp/*
 
-COPY --from=builder --chmod=755 /app/xui/build/ /usr/local/bin/
-COPY --from=builder --chmod=755 /app/key/docker/crypctl/crypctl /usr/local/bin/
-COPY --from=builder --chmod=755 /app/v2ray/v2ray /usr/local/bin/
-COPY --from=builder --chmod=755 /usr/local/bin/dufs /usr/local/bin/
+COPY --from=builder --chmod=755 /usr/local/bin/ /usr/local/bin/
 COPY nginx/ /etc/nginx/
 COPY 3DCEList /home/wwwroot/3DCEList
 COPY --chmod=755 scripts /scripts
 COPY templates/ /templates/
 ADD https://raw.githubusercontent.com/currycan/key/master/vimrc /root/.vimrc
-
-# xray
-RUN set -ex; \
-  ln -sf /usr/local/bin/bin/xray* /usr/local/bin/xray; \
-  cp -a /usr/local/bin/bin/*.dat /usr/local/bin/
 
 # time zone
 ENV TZ="Asia/Hong_Kong"
@@ -97,14 +165,6 @@ ENV NETWORK="ws"
 ENV ACMESH_REGISTER_EMAIL=""
 # buypass/zerossl/letsencrypt
 ENV ACMESH_SERVER_NAME="letsencrypt"
-# ali/cf
-# for cf
-ENV CF_TOKEN=""
-ENV CF_ZONE_ID=""
-ENV CF_ACCOUNT_ID=""
-# for ali
-ENV ALI_KEY=""
-ENV ALI_SECRET=""
 # certs path
 ENV SSL_PATH="/pki"
 

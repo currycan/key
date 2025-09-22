@@ -59,7 +59,8 @@ function generateRandomStr() {
         "port") shuf -i 32000-38000 -n 1 ;;
         "uuid") xray uuid ;;
         "password")
-            charset='A-Za-z0-9!@#%^&*()_+{}|:<>?='
+            # charset='A-Za-z0-9!@#%^&*()_+{}|:<>?='
+            charset='A-Za-z0-9'
             LC_ALL=C tr -dc "$charset" </dev/urandom | head -c "$length"
             ;;
         "path")
@@ -80,7 +81,7 @@ function generateEnv() {
         gen_x25519_key() {
             log DEBUG "Generating Xray x25519 key"
             local x25519_reality_xhttp_secret=$(xray x25519)
-            echo "$(echo "${x25519_reality_xhttp_secret}" | head -1 | awk '{print $3}') $(echo "${x25519_reality_xhttp_secret}" | tail -n 1 | awk '{print $3}')"
+            echo "$(echo "${x25519_reality_xhttp_secret}" | head -1 | awk '{print $2}') $(echo "${x25519_reality_xhttp_secret}" | tail -n 1 | awk '{print $2}')"
         }
 
         local reality_private_key reality_public_key
@@ -142,7 +143,8 @@ function createConfig() {
     source "/.env/xray"
     source "/.env/secret"
 
-    export DOLLAR='$'
+    # 提取所有环境变量名，生成用于envsubst的变量列表
+    ENV_LIST=$(env | grep -v '^_' | cut -d= -f1 | sed 's/^/${/;s/$/}/' | xargs)
 
     # 生成Supervisord配置
     if [ ! -f /etc/supervisord/all.conf ]; then
@@ -155,12 +157,12 @@ function createConfig() {
     if [ ! -f /etc/nginx/conf.d/http.conf ]; then
         mkdir -p /etc/nginx/conf.d/
         log DEBUG "Generating Nginx http.conf"
-        envsubst </templates/nginx/http.conf >/etc/nginx/conf.d/http.conf
+        envsubst "${ENV_LIST}" </templates/nginx/http.conf >/etc/nginx/conf.d/http.conf
     fi
     if [ ! -f /etc/nginx/stream.d/tcp.conf ]; then
         mkdir -p /etc/nginx/stream.d/
         log DEBUG "Generating Nginx tcp.conf"
-        envsubst </templates/nginx/tcp.conf >/etc/nginx/stream.d/tcp.conf
+        envsubst "${ENV_LIST}" </templates/nginx/tcp.conf >/etc/nginx/stream.d/tcp.conf
     fi
 
     # 生成Xray配置
@@ -177,7 +179,6 @@ function createConfig() {
     if [ ! -f "/etc/v2ray/*.json" ]; then
         mkdir -p "/etc/v2ray/"
         envsubst </templates/v2ray/config.json >/etc/v2ray/config.json
-        envsubst </templates/v2ray/vmess_qr.json >/etc/v2ray/vmess_qr.json
     fi
 
     # 生成Dufs配置

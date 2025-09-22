@@ -1,5 +1,7 @@
 # 参考
 
+https://github.com/lxhao61/integrated-examples
+
 https://github.com/Vauth/warp
 
 https://blog.xmgspace.me/archives/nginx-sni-dispatcher.html
@@ -13,10 +15,10 @@ https://github.com/XTLS/Xray-core/discussions/4118
 ```bash
 docker build \
   --platform linux/amd64,linux/arm64 \
-  --build-arg XUI_VERSION="v2.6.6" \
-  --build-arg XRAY_VERSION="25.8.3" \
-  --build-arg V2RAY_VERSION="5.38.0" \
-  --tag currycan/xray:25.9.1 \
+  --build-arg XUI_VERSION="2.8.3" \
+  --build-arg XRAY_VERSION="25.9.11" \
+  --build-arg V2RAY_VERSION="5.39.0" \
+  --tag currycan/xray:25.9.17 \
   --push .
 ```
 
