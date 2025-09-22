@@ -1,6 +1,6 @@
 services:
   xray:
-    image: docker.io/currycan/xray:25.9.17
+    image: docker.io/currycan/xray:25.8.3
     container_name: xray
     environment:
       - DOMAIN=$domain

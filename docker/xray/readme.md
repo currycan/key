@@ -13,12 +13,15 @@ https://github.com/XTLS/Xray-core/discussions/4118
 ## 镜像制作
 
 ```bash
-docker build \
+docker buildx build \
   --platform linux/amd64,linux/arm64 \
+  --build-arg HTTP_PROXY=http://host.docker.internal:7890 \
+  --build-arg HTTPS_PROXY=http://host.docker.internal:7890 \
+  --build-arg NO_PROXY=localhost,127.0.0.1,github.com \
   --build-arg XUI_VERSION="2.8.3" \
-  --build-arg XRAY_VERSION="25.9.11" \
+  --build-arg XRAY_VERSION="25.8.3" \
   --build-arg V2RAY_VERSION="5.39.0" \
-  --tag currycan/xray:25.9.17 \
+  --tag currycan/xray:25.8.3 \
   --push .
 ```
 

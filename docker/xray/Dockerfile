@@ -3,14 +3,23 @@ FROM golang:1.25-alpine AS builder
 ARG TARGETARCH
 ARG TARGETVARIANT
 
+ARG HTTP_PROXY
+ARG HTTPS_PROXY
+ARG NO_PROXY
+ENV http_proxy=$HTTP_PROXY
+ENV https_proxy=$HTTPS_PROXY
+ENV no_proxy=$NO_PROXY
+
 RUN apk --no-cache --update add \
+  ca-certificates \
   build-base \
   upx \
   curl \
   git \
   gcc \
   wget \
-  unzip
+  unzip; \
+  update-ca-certificates
 
 ENV CGO_ENABLED=1
 ENV CGO_CFLAGS="-D_LARGEFILE64_SOURCE"
