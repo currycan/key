@@ -132,7 +132,6 @@ vless://${SB_UUID}@${DOMAIN}:${PORT_XTLS_REALITY}?encryption=none&security=reali
     ----------------------------
 hysteria2://${SB_UUID}@${NODE_IP}:${PORT_HYSTERIA2}/?alpn=h3&insecure=1#${GEOIP_INFO}|${NODE_NAME}|hysteria2
 "
-hysteria2://20f7fca4-86e5-4ddf-9eed-24142073d197@192.243.112.113:8802?alpn=h3&insecure=1#sing-box%20hysteria2
 
     [ "${TUIC}" = 'true' ] && V2RAYN_SUBSCRIBE+="
     ----------------------------
@@ -218,9 +217,6 @@ vless://${SB_UUID}@${DOMAIN}:${PORT_H2_REALITY}?encryption=none&security=reality
 ----------------------------
 vless://${SB_UUID}@${DOMAIN}:${PORT_GRPC_REALITY}?encryption=none&security=reality&sni=addons.mozilla.org&fp=chrome&pbk=${SB_REALITY_PUBLIC_KEY}&type=grpc&serviceName=grpc&mode=gun#${GEOIP_INFO}|${NODE_NAME}|grpc-reality
 "
-vless://${UUID}@${SERVER_IP_1}:${PORT_GRPC_REALITY}?encryption=none&security=reality&sni=addons.mozilla.org&fp=chrome&pbk=${REALITY_PUBLIC}&type=grpc&serviceName=grpc&mode=gun#${NODE_NAME// /%20}%20grpc-reality"
-vless://20f7fca4-86e5-4ddf-9eed-24142073d197@192.243.112.113:8810?encryption=none&security=reality&sni=addons.mozilla.org&fp=chrome&pbk=wP8U7zR-VBXqGCfZv3F0zV4EXSi0Di-hDwaIq_1pCEs&type=grpc&authority=&serviceName=grpc&mode=gun#sing-box%20grpc-reality
-
 
     [ "${ANYTLS}" = 'true' ] && V2RAYN_SUBSCRIBE+="
 ----------------------------
