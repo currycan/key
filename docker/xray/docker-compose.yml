@@ -20,6 +20,7 @@ services:
       - ./acmecerts:/acmecerts
       - ./.envs:/.env
       - ./xray:/xray
+      - ./logs:/xray/logs
       - ./nginx/http:/etc/nginx/conf.d
       - ./nginx/tcp:/etc/nginx/stream.d
       - ./nginx/dhparam:/etc/nginx/dhparam

@@ -39,9 +39,7 @@ show_qrcode() {
 all_links() {
     name="${DOMAIN%%.*}"
 
-    vmess_link="vmess://$(echo -n "{\"add\":\"${DOMAIN}\",\"aid\":\"${ALTERID}\",\"host\":\"${DOMAIN}\",\"id\":\"${V2RAY_UUID}\",\"net\":\"${NETWORK}\",\"path\":\"/${V2RAY_URL_PATH}\",\"port\":\"${LISTENING_PORT}\",\"ps\":\"${GEOIP_INFO}|${DOMAIN}-VMESS\",\"tls\":\"tls\",\"type\":\"\",\"v\":\"2\"}" | base64 -w0)"
-
-    x_vmess_link="vmess://$(echo -n "{\"add\":\"${DOMAIN}\",\"aid\":\"${ALTERID}\",\"host\":\"${DOMAIN}\",\"id\":\"${V2RAY_UUID}\",\"net\":\"${NETWORK}\",\"path\":\"/${V2RAY_URL_PATH}-vless\",\"port\":\"${LISTENING_PORT}\",\"ps\":\"${GEOIP_INFO}|${DOMAIN}-VLESS\",\"tls\":\"tls\",\"type\":\"\",\"v\":\"2\"}" | base64 -w0)"
+    vmess_link="vmess://$(echo -n "{\"add\":\"${DOMAIN}\",\"aid\":\"${ALTERID}\",\"host\":\"${DOMAIN}\",\"id\":\"${V2RAY_UUID}\",\"net\":\"${NETWORK}\",\"path\":\"/${V2RAY_URL_PATH}\",\"port\":\"${LISTENING_PORT}\",\"ps\":\"${GEOIP_INFO}|${DOMAIN}-VMESS\",\"tls\":\"tls\",\"type\":\"\",\"v\":\"2\"}" | jq | base64 -w0)"
 
     reality="vless://${XRAY_REALITY_UUID}@${DOMAIN}:${LISTENING_PORT}?encryption=none&flow=xtls-rprx-vision&security=reality&sni=${DOMAIN}&fp=chrome&pbk=${XRAY_REALITY_PUBLIC_KEY}&sid=${XRAY_REALITY_SHORTID}&spx=%2F&type=tcp&headerType=none#${GEOIP_INFO}|${name}|XTLS(Vision)+Reality直连"
 
@@ -56,7 +54,6 @@ all_links() {
     # 显示配置信息
     echo -e "${GREEN}=== 链接信息 ===${RESET}\n"
     print_colored ${CYAN} "${vmess_link}"
-    print_colored ${BLUE} "${x_vmess_link}"
     print_colored ${RED} "${reality}"
     print_colored ${GREEN} "${xhttp_reality}"
     print_colored ${YELLOW} "${up_cdn}"
@@ -68,7 +65,6 @@ all_qrs() {
     # 显示二维码
     # echo -n "${vmess_link}" | qrencode -o - -t utf8
     show_qrcode "$vmess_link" "Vmess"
-    show_qrcode "$x_vmess_link" "VLESS-Vmess"
     show_qrcode "$reality" "XTLS+Reality"
     show_qrcode "$xhttp_reality" "xhttp+Reality上下行不分离"
     show_qrcode "$up_cdn" "上行xhttp+TLS+CDN-下行xhttp+Reality"

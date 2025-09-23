@@ -303,12 +303,12 @@ function issueCertificate() {
 
 # 主执行流程
 if [ "${1#-}" = 'supervisord' ] && [ "$(id -u)" = '0' ]; then
+    mkdir -p ${LOGDIR}/{supervisor,xray,v2ray,dufs,nginx,x-ui}
+
     generateEnv
     createConfig
 
     setupDhParam
-
-    mkdir -p ${LOGDIR}/{supervisor,xray,sing-box,v2ray,dufs,nginx,x-ui}
 
     log INFO "Obtaining SSL certificate..."
     checkRequiredEnv ACMESH_REGISTER_EMAIL

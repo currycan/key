@@ -21,7 +21,7 @@
             "streamSettings": {
                 "network": "${NETWORK}",
                 "wsSettings": {
-                    "path": "${V2RAY_URL_PATH}"
+                    "path": "/${V2RAY_URL_PATH}"
                 }
             }
         }
