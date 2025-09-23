@@ -282,10 +282,10 @@ function createConfig() {
     fi
 
     # 生成Sing-box配置
-    if [ ! -f "${WORKDIR}/sing-box//*.json" ]; then
+    if [ ! -f "${WORKDIR}/sing-box/*.json" ]; then
         mkdir -p "${WORKDIR}/sing-box/"
         for template in /templates/sing-box/*.json; do
-            local output="${WORKDIR}/sing-box//$(basename "$template")"
+            local output="${WORKDIR}/sing-box/$(basename "$template")"
             log DEBUG "Generating $output"
             envsubst <"$template" >"$output"
         done

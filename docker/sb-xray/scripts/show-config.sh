@@ -102,4 +102,5 @@ main() {
     fi
 }
 
-main "$@"
+main
+bash /scripts/sing-box.sh

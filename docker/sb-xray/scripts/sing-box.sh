@@ -21,14 +21,11 @@ GRPC_REALITY=true
 show_clash_subscribe() {
     # 生成各订阅文件
     # 生成 Clash proxy providers 订阅文件
-    CLASH_SUBSCRIBE="proxies:"
+    CLASH_SUBSCRIBE="proxies:
+"
     # xtls-reality
     [ "${XTLS_REALITY}" = 'true' ] && local CLASH_XTLS_REALITY="- {name: \"${GEOIP_INFO}|${NODE_NAME}|xtls-reality\", type: vless, server: ${DOMAIN}, port: ${PORT_XTLS_REALITY}, uuid: ${SB_UUID}, network: tcp, udp: true, tls: true, servername: addons.mozilla.org, client-fingerprint: chrome, reality-opts: {public-key: ${SB_REALITY_PUBLIC_KEY}, short-id: \"\"}, smux: { enabled: true, protocol: 'h2mux', padding: true, max-connections: '8', min-streams: '16', statistic: true, only-tcp: false }, brutal-opts: { enabled: ${IS_BRUTAL}, up: '2500 Mbps', down: '2500 Mbps' } }"
-    CLASH_SUBSCRIBE+="  $CLASH_SHADOWSOCKS
-"
-
-    [ "${XTLS_REALITY}" = 'true' ] && local CLASH_XTLS_REALITY="- {name: \"${NODE_NAME} xtls-reality\", type: vless, server: ${SERVER_IP}, port: ${PORT_XTLS_REALITY}, uuid: ${UUID}, network: tcp, udp: true, tls: true, servername: addons.mozilla.org, client-fingerprint: chrome, reality-opts: {public-key: ${REALITY_PUBLIC}, short-id: \"\"}, smux: { enabled: true, protocol: 'h2mux', padding: true, max-connections: '8', min-streams: '16', statistic: true, only-tcp: false }, brutal-opts: { enabled: ${IS_BRUTAL}, up: '1000 Mbps', down: '1000 Mbps' } }" &&
-    local CLASH_SUBSCRIBE+="  $CLASH_XTLS_REALITY
+    CLASH_SUBSCRIBE+="  $CLASH_XTLS_REALITY
 "
     # hysteria2
     [ "${HYSTERIA2}" = 'true' ] && local CLASH_HYSTERIA2="- {name: \"${GEOIP_INFO}|${NODE_NAME}|hysteria2\", type: hysteria2, server: ${DOMAIN}, port: ${PORT_HYSTERIA2}, up: \"2000 Mbps\", down: \"2500 Mbps\", password: ${SB_UUID}, skip-cert-verify: true}"
@@ -73,7 +70,7 @@ show_clash_subscribe() {
 
     # 生成 clash 订阅配置文件
     # 模板: 使用 proxy providers
-    cat /templates/client_template/clash | sed "s#NODE_NAME#${NODE_NAME}#g; s#PROXY_PROVIDERS_URL#https://${DOMAIN}/all-sing-box/proxies#" > ${WORKDIR}/subscribe/clash
+    cat /templates/client_template/clash | sed "s#NODE_NAME#${NODE_NAME}#g; s#PROXY_PROVIDERS_URL#https://${DOMAIN}/sb-xray/proxies#" > ${WORKDIR}/subscribe/clash
 }
 
 show_shadowrocket_link() {
@@ -318,7 +315,7 @@ vless://${SB_UUID}@${DOMAIN}:${PORT_GRPC_REALITY}?security=reality&sni=addons.mo
 show_singbox_link() {
     # 生成 Sing-box 订阅文件
     [ "${XTLS_REALITY}" = 'true' ] &&
-    INBOUND_REPLACE+=" { \"type\": \"vless\", \"tag\": \"${GEOIP_INFO}|${NODE_NAME}|xtls-reality\", \"server\":\"${DOMAIN}\", \"server_port\":${PORT_XTLS_REALITY}, \"uuid\":\"${SB_UUID}\", \"flow\":\"\", \"tls\":{ \"enabled\":true, \"server_name\":\"addons.mozilla.org\", \"utls\":{ \"enabled\":true, \"fingerprint\":\"chrome\" }, \"reality\":{ \"enabled\":true, \"public_key\":\"${SB_REALITY_PUBLIC_KEY}\", \"short_id\":\"\" } }, \"multiplex\": { \"enabled\": true, \"protocol\": \"h2mux\", \"max_connections\": 8, \"min_streams\": 16, \"padding\": true, \"brutal\":{ \"enabled\":true, \"up_mbps\":2500, \"down_mbps\":2500 } } }," &&
+    INBOUND_REPLACE+=" { \"type\": \"vless\", \"tag\": \"${GEOIP_INFO}|${NODE_NAME}|xtls-reality\", \"server\":\"${DOMAIN}\", \"server_port\":${PORT_XTLS_REALITY}, \"uuid\":\"${SB_UUID}\", \"flow\":\"\", \"tls\":{ \"enabled\":true, \"server_name\":\"addons.mozilla.org\", \"utls\":{ \"enabled\":true, \"fingerprint\":\"chrome\" }, \"reality\":{ \"enabled\":true, \"public_key\":\"${SB_REALITY_PUBLIC_KEY}\", \"short_id\":\"\" } }, \"multiplex\": { \"enabled\": true, \"protocol\": \"h2mux\", \"max_connections\": 8, \"min_streams\": 16, \"padding\": true, \"brutal\":{ \"enabled\":true, \"up_mbps\":2500, \"down_mbps\":2500 } } },"
     local NODE_REPLACE+="\"${GEOIP_INFO}|${NODE_NAME}|xtls-reality\","
 
     if [ "${HYSTERIA2}" = 'true' ]; then
@@ -329,38 +326,38 @@ show_singbox_link() {
     fi
 
     [ "${TUIC}" = 'true' ] &&
-    INBOUND_REPLACE+=" { \"type\": \"tuic\", \"tag\": \"${GEOIP_INFO}|${NODE_NAME}|tuic\", \"server\": \"${DOMAIN}\", \"server_port\": ${PORT_TUIC}, \"uuid\": \"${SB_UUID}\", \"password\": \"${SB_UUID}\", \"congestion_control\": \"bbr\", \"udp_relay_mode\": \"native\", \"zero_rtt_handshake\": false, \"heartbeat\": \"10s\", \"tls\": { \"enabled\": true, \"insecure\": true, \"server_name\": \"\", \"alpn\": [ \"h3\" ] } }," &&
+    INBOUND_REPLACE+=" { \"type\": \"tuic\", \"tag\": \"${GEOIP_INFO}|${NODE_NAME}|tuic\", \"server\": \"${DOMAIN}\", \"server_port\": ${PORT_TUIC}, \"uuid\": \"${SB_UUID}\", \"password\": \"${SB_UUID}\", \"congestion_control\": \"bbr\", \"udp_relay_mode\": \"native\", \"zero_rtt_handshake\": false, \"heartbeat\": \"10s\", \"tls\": { \"enabled\": true, \"insecure\": true, \"server_name\": \"\", \"alpn\": [ \"h3\" ] } },"
     local NODE_REPLACE+="\"${GEOIP_INFO}|${NODE_NAME}|tuic\","
 
     [ "${SHADOWTLS}" = 'true' ] &&
-    INBOUND_REPLACE+=" { \"type\": \"shadowsocks\", \"tag\": \"${GEOIP_INFO}|${NODE_NAME}|ShadowTLS\", \"method\": \"2022-blake3-aes-128-gcm\", \"password\": \"${SHADOWTLS_PASSWORD}\", \"detour\": \"shadowtls-out\", \"udp_over_tcp\": false, \"multiplex\": { \"enabled\": true, \"protocol\": \"h2mux\", \"max_connections\": 8, \"min_streams\": 16, \"padding\": true, \"brutal\":{ \"enabled\":true, \"up_mbps\":2500, \"down_mbps\":2500 } } }, { \"type\": \"shadowtls\", \"tag\": \"shadowtls-out\", \"server\": \"${DOMAIN}\", \"server_port\": ${PORT_SHADOWTLS}, \"version\": 3, \"password\": \"${SB_UUID}\", \"tls\": { \"enabled\": true, \"server_name\": \"addons.mozilla.org\", \"utls\": { \"enabled\": true, \"fingerprint\": \"chrome\" } } }," &&
+    INBOUND_REPLACE+=" { \"type\": \"shadowsocks\", \"tag\": \"${GEOIP_INFO}|${NODE_NAME}|ShadowTLS\", \"method\": \"2022-blake3-aes-128-gcm\", \"password\": \"${SHADOWTLS_PASSWORD}\", \"detour\": \"shadowtls-out\", \"udp_over_tcp\": false, \"multiplex\": { \"enabled\": true, \"protocol\": \"h2mux\", \"max_connections\": 8, \"min_streams\": 16, \"padding\": true, \"brutal\":{ \"enabled\":true, \"up_mbps\":2500, \"down_mbps\":2500 } } }, { \"type\": \"shadowtls\", \"tag\": \"shadowtls-out\", \"server\": \"${DOMAIN}\", \"server_port\": ${PORT_SHADOWTLS}, \"version\": 3, \"password\": \"${SB_UUID}\", \"tls\": { \"enabled\": true, \"server_name\": \"addons.mozilla.org\", \"utls\": { \"enabled\": true, \"fingerprint\": \"chrome\" } } },"
     local NODE_REPLACE+="\"${GEOIP_INFO}|${NODE_NAME}|ShadowTLS\","
 
     [ "${SHADOWSOCKS}" = 'true' ] &&
-    INBOUND_REPLACE+=" { \"type\": \"shadowsocks\", \"tag\": \"${GEOIP_INFO}|${NODE_NAME}|shadowsocks\", \"server\": \"${DOMAIN}\", \"server_port\": $PORT_SHADOWSOCKS, \"method\": \"aes-128-gcm\", \"password\": \"${SB_UUID}\", \"multiplex\": { \"enabled\": true, \"protocol\": \"h2mux\", \"max_connections\": 8, \"min_streams\": 16, \"padding\": true, \"brutal\":{ \"enabled\":true, \"up_mbps\":2500, \"down_mbps\":2500 } } }," &&
+    INBOUND_REPLACE+=" { \"type\": \"shadowsocks\", \"tag\": \"${GEOIP_INFO}|${NODE_NAME}|shadowsocks\", \"server\": \"${DOMAIN}\", \"server_port\": $PORT_SHADOWSOCKS, \"method\": \"aes-128-gcm\", \"password\": \"${SB_UUID}\", \"multiplex\": { \"enabled\": true, \"protocol\": \"h2mux\", \"max_connections\": 8, \"min_streams\": 16, \"padding\": true, \"brutal\":{ \"enabled\":true, \"up_mbps\":2500, \"down_mbps\":2500 } } },"
     local NODE_REPLACE+="\"${GEOIP_INFO}|${NODE_NAME}|shadowsocks\","
 
     [ "${TROJAN}" = 'true' ] &&
-    INBOUND_REPLACE+=" { \"type\": \"trojan\", \"tag\": \"${GEOIP_INFO}|${NODE_NAME}|trojan\", \"server\": \"${DOMAIN}\", \"server_port\": $PORT_TROJAN, \"password\": \"${SB_UUID}\", \"tls\": { \"enabled\":true, \"insecure\": true, \"server_name\":\"\", \"utls\": { \"enabled\":true, \"fingerprint\":\"chrome\" } }, \"multiplex\": { \"enabled\":true, \"protocol\":\"h2mux\", \"max_connections\": 8, \"min_streams\": 16, \"padding\": true, \"brutal\":{ \"enabled\":true, \"up_mbps\":2500, \"down_mbps\":2500 } } }," &&
+    INBOUND_REPLACE+=" { \"type\": \"trojan\", \"tag\": \"${GEOIP_INFO}|${NODE_NAME}|trojan\", \"server\": \"${DOMAIN}\", \"server_port\": $PORT_TROJAN, \"password\": \"${SB_UUID}\", \"tls\": { \"enabled\":true, \"insecure\": true, \"server_name\":\"\", \"utls\": { \"enabled\":true, \"fingerprint\":\"chrome\" } }, \"multiplex\": { \"enabled\":true, \"protocol\":\"h2mux\", \"max_connections\": 8, \"min_streams\": 16, \"padding\": true, \"brutal\":{ \"enabled\":true, \"up_mbps\":2500, \"down_mbps\":2500 } } },"
     local NODE_REPLACE+="\"${GEOIP_INFO}|${NODE_NAME}|trojan\","
 
     [ "${VMESS_WS}" = 'true' ] &&
     INBOUND_REPLACE+=" { \"type\": \"vmess\", \"tag\": \"${GEOIP_INFO}|${NODE_NAME}|vmess-ws-tls\", \"server\":\"${DOMAIN}\", \"server_port\":443, \"uuid\": \"${SB_UUID}\", \"security\": \"auto\", \"transport\": { \"type\":\"ws\", \"path\":\"/${SB_UUID}-vmess\", \"headers\": { \"Host\": \"${DOMAIN}\" } }, \"multiplex\": { \"enabled\":true, \"protocol\":\"h2mux\", \"max_streams\":16, \"padding\": true, \"brutal\":{ \"enabled\":true, \"up_mbps\":2500, \"down_mbps\":2500 } } }," && local NODE_REPLACE+="\"${GEOIP_INFO}|${NODE_NAME}|vmess-ws-tls\","
 
     [ "${VLESS_WS}" = 'true' ] &&
-    INBOUND_REPLACE+=" { \"type\": \"vless\", \"tag\": \"${GEOIP_INFO}|${NODE_NAME}|vless-ws-tls\", \"server\":\"${DOMAIN}\", \"server_port\":443, \"uuid\": \"${SB_UUID}\", \"tls\": { \"enabled\":true, \"server_name\":\"${DOMAIN}\", \"utls\": { \"enabled\":true, \"fingerprint\":\"chrome\" } }, \"transport\": { \"type\":\"ws\", \"path\":\"/${SB_UUID}-vless\", \"headers\": { \"Host\": \"${DOMAIN}\" }, \"max_early_data\":2048, \"early_data_header_name\":\"Sec-WebSocket-Protocol\" }, \"multiplex\": { \"enabled\":true, \"protocol\":\"h2mux\", \"max_streams\":16, \"padding\": true, \"brutal\":{ \"enabled\":true, \"up_mbps\":2500, \"down_mbps\":2500 } } }," &&
+    INBOUND_REPLACE+=" { \"type\": \"vless\", \"tag\": \"${GEOIP_INFO}|${NODE_NAME}|vless-ws-tls\", \"server\":\"${DOMAIN}\", \"server_port\":443, \"uuid\": \"${SB_UUID}\", \"tls\": { \"enabled\":true, \"server_name\":\"${DOMAIN}\", \"utls\": { \"enabled\":true, \"fingerprint\":\"chrome\" } }, \"transport\": { \"type\":\"ws\", \"path\":\"/${SB_UUID}-vless\", \"headers\": { \"Host\": \"${DOMAIN}\" }, \"max_early_data\":2048, \"early_data_header_name\":\"Sec-WebSocket-Protocol\" }, \"multiplex\": { \"enabled\":true, \"protocol\":\"h2mux\", \"max_streams\":16, \"padding\": true, \"brutal\":{ \"enabled\":true, \"up_mbps\":2500, \"down_mbps\":2500 } } },"
     local NODE_REPLACE+="\"${GEOIP_INFO}|${NODE_NAME}|vless-ws-tls\","
 
     [ "${H2_REALITY}" = 'true' ] &&
-    INBOUND_REPLACE+=" { \"type\": \"vless\", \"tag\": \"${GEOIP_INFO}|${NODE_NAME}|h2-reality\", \"server\": \"${DOMAIN}\", \"server_port\": ${PORT_H2_REALITY}, \"uuid\":\"${SB_UUID}\", \"tls\": { \"enabled\":true, \"server_name\":\"addons.mozilla.org\", \"utls\": { \"enabled\":true, \"fingerprint\":\"chrome\" }, \"reality\":{ \"enabled\":true, \"public_key\":\"${SB_REALITY_PUBLIC_KEY}\", \"short_id\":\"\" } }, \"transport\": { \"type\": \"http\" } }," &&
+    INBOUND_REPLACE+=" { \"type\": \"vless\", \"tag\": \"${GEOIP_INFO}|${NODE_NAME}|h2-reality\", \"server\": \"${DOMAIN}\", \"server_port\": ${PORT_H2_REALITY}, \"uuid\":\"${SB_UUID}\", \"tls\": { \"enabled\":true, \"server_name\":\"addons.mozilla.org\", \"utls\": { \"enabled\":true, \"fingerprint\":\"chrome\" }, \"reality\":{ \"enabled\":true, \"public_key\":\"${SB_REALITY_PUBLIC_KEY}\", \"short_id\":\"\" } }, \"transport\": { \"type\": \"http\" } },"
     local NODE_REPLACE+="\"${GEOIP_INFO}|${NODE_NAME}|h2-reality\","
 
     [ "${GRPC_REALITY}" = 'true' ] &&
-    INBOUND_REPLACE+=" { \"type\": \"vless\", \"tag\": \"${GEOIP_INFO}|${NODE_NAME}|grpc-reality\", \"server\": \"${DOMAIN}\", \"server_port\": ${PORT_GRPC_REALITY}, \"uuid\":\"${SB_UUID}\", \"tls\": { \"enabled\":true, \"server_name\":\"addons.mozilla.org\", \"utls\": { \"enabled\":true, \"fingerprint\":\"chrome\" }, \"reality\":{ \"enabled\":true, \"public_key\":\"${SB_REALITY_PUBLIC_KEY}\", \"short_id\":\"\" } }, \"transport\": { \"type\": \"grpc\", \"service_name\": \"grpc\" } }," &&
+    INBOUND_REPLACE+=" { \"type\": \"vless\", \"tag\": \"${GEOIP_INFO}|${NODE_NAME}|grpc-reality\", \"server\": \"${DOMAIN}\", \"server_port\": ${PORT_GRPC_REALITY}, \"uuid\":\"${SB_UUID}\", \"tls\": { \"enabled\":true, \"server_name\":\"addons.mozilla.org\", \"utls\": { \"enabled\":true, \"fingerprint\":\"chrome\" }, \"reality\":{ \"enabled\":true, \"public_key\":\"${SB_REALITY_PUBLIC_KEY}\", \"short_id\":\"\" } }, \"transport\": { \"type\": \"grpc\", \"service_name\": \"grpc\" } },"
     local NODE_REPLACE+="\"${GEOIP_INFO}|${NODE_NAME}|grpc-reality\","
 
     [ "${ANYTLS}" = 'true' ] &&
-    INBOUND_REPLACE+=" { \"type\": \"anytls\", \"tag\": \"${GEOIP_INFO}|${NODE_NAME}|anytls\", \"server\": \"${DOMAIN}\", \"server_port\": ${PORT_ANYTLS}, \"password\": \"${SB_UUID}\", \"idle_session_check_interval\": \"30s\", \"idle_session_timeout\": \"30s\", \"min_idle_session\": 5, \"tls\": { \"enabled\": true, \"insecure\": true, \"server_name\": \"\" } }," &&
+    INBOUND_REPLACE+=" { \"type\": \"anytls\", \"tag\": \"${GEOIP_INFO}|${NODE_NAME}|anytls\", \"server\": \"${DOMAIN}\", \"server_port\": ${PORT_ANYTLS}, \"password\": \"${SB_UUID}\", \"idle_session_check_interval\": \"30s\", \"idle_session_timeout\": \"30s\", \"min_idle_session\": 5, \"tls\": { \"enabled\": true, \"insecure\": true, \"server_name\": \"\" } },"
     local NODE_REPLACE+="\"${GEOIP_INFO}|${NODE_NAME}|anytls\","
 
 
@@ -424,43 +421,34 @@ $(info "$(echo "{ \"outbounds\":[ ${INBOUND_REPLACE%,} ] }" | jq)
 *******************************************
 
 $(hint "Index:
-https://${DOMAIN}/all-sing-box/
+https://${DOMAIN}/sb-xray/
 
 QR code:
-https://${DOMAIN}/all-sing-box/qr
+https://${DOMAIN}/sb-xray/qr
 
 V2rayN 订阅:
-https://${DOMAIN}/all-sing-box/v2rayn")
+https://${DOMAIN}/sb-xray/v2rayn")
 
 $(hint "NekoBox 订阅:
-https://${DOMAIN}/all-sing-box/neko")
+https://${DOMAIN}/sb-xray/neko")
 
 $(hint "Clash 订阅:
-https://${DOMAIN}/all-sing-box/clash
+https://${DOMAIN}/sb-xray/clash
 
 sing-box for pc 订阅:
-https://${DOMAIN}/all-sing-box/sing-box-pc
+https://${DOMAIN}/sb-xray/sing-box-pc
 
 sing-box for cellphone 订阅:
-https://${DOMAIN}/all-sing-box/sing-box-phone
+https://${DOMAIN}/sb-xray/sing-box-phone
 
 ShadowRocket 订阅:
-https://${DOMAIN}/all-sing-box/shadowrocket")
+https://${DOMAIN}/sb-xray/shadowrocket")
 
 *******************************************
 
 $(info " 自适应 Clash / V2rayN / NekoBox / ShadowRocket / SFI / SFA / SFM 客户端:
-模版:
-https://${DOMAIN}/all-sing-box/auto
-
-订阅 QRcode:
-模版:
-https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://${DOMAIN}/all-sing-box/auto")
-
-$(hint "模版:")
-$(qrencode https://${DOMAIN}/all-sing-box/auto)
+https://${DOMAIN}/all-sing-box/auto")
 "
-
     # 生成并显示节点信息
     echo "$EXPORT_LIST_FILE" > ${WORKDIR}/list
     cat ${WORKDIR}/list
@@ -481,5 +469,3 @@ info() { echo -e "\033[32m\033[01m$*\033[0m"; }   # 绿色
 hint() { echo -e "\033[33m\033[01m$*\033[0m"; }   # 黄色
 mkdir -p ${WORKDIR}/subscribe
 main
-
-vless://99637539-72cc-4e92-b474-4d44df946542@dc99-3.ansandy.com:32102?encryption=none&security=reality&sni=addons.mozilla.org&fp=chrome&pbk=Xa2FtAAwyfvqRzMeWSF9DrqztAOTRxgFXAbZeFkFFh0&type=tcp&headerType=none&host=dc99-3.ansandy.com#%E7%BE%8E%E5%9B%BD%E6%B4%9B%E6%9D%89%E7%9F%B6%7C192.243.112.113%7Cdc99-3%7Cxtls-reality
