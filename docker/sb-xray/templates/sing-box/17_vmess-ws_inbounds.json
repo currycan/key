@@ -1,0 +1,34 @@
+//  "CDN": "www.csgo.com"
+{
+    "inbounds": [
+        {
+            "type": "vmess",
+            "tag": "sing-box vmess-ws-tls",
+            "listen": "127.0.0.1",
+            "listen_port": ${PORT_VMESS_WS},
+            "tcp_fast_open": false,
+            "proxy_protocol": false,
+            "users": [
+                {
+                    "uuid": "${SB_UUID}",
+                    "alterId": 0
+                }
+            ],
+            "transport": {
+                "type": "ws",
+                "path": "/${SB_UUID}-vmess",
+                "max_early_data": 2048,
+                "early_data_header_name": "Sec-WebSocket-Protocol"
+            },
+            "multiplex": {
+                "enabled": true,
+                "padding": true,
+                "brutal": {
+                    "enabled": ${IS_BRUTAL},
+                    "up_mbps": 2500,
+                    "down_mbps": 2500
+                }
+            }
+        }
+    ]
+}

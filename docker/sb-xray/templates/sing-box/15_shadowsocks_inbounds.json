@@ -1,0 +1,21 @@
+{
+    "inbounds": [
+        {
+            "type": "shadowsocks",
+            "tag": "sing-box shadowsocks",
+            "listen": "::",
+            "listen_port": ${PORT_SHADOWSOCKS},
+            "method": "aes-128-gcm",
+            "password": "${SB_UUID}",
+            "multiplex": {
+                "enabled": true,
+                "padding": true,
+                "brutal": {
+                    "enabled": ${IS_BRUTAL},
+                    "up_mbps": 2500,
+                    "down_mbps": 2500
+                }
+            }
+        }
+    ]
+}

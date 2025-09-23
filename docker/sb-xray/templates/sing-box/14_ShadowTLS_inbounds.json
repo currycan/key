@@ -1,0 +1,39 @@
+{
+    "inbounds": [
+        {
+            "type": "shadowtls",
+            "tag": "sing-box ShadowTLS",
+            "listen": "::",
+            "listen_port": ${PORT_SHADOWTLS},
+            "detour": "shadowtls-in",
+            "version": 3,
+            "users": [
+                {
+                    "password": "${SB_UUID}"
+                }
+            ],
+            "handshake": {
+                "server": "addons.mozilla.org",
+                "server_port": 443
+            },
+            "strict_mode": true
+        },
+        {
+            "type": "shadowsocks",
+            "tag": "shadowtls-in",
+            "listen": "127.0.0.1",
+            "network": "tcp",
+            "method": "2022-blake3-aes-128-gcm",
+            "password": "${SHADOWTLS_PASSWORD}",
+            "multiplex": {
+                "enabled": true,
+                "padding": true,
+                "brutal": {
+                    "enabled": ${IS_BRUTAL},
+                    "up_mbps": 2500,
+                    "down_mbps": 2500
+                }
+            }
+        }
+    ]
+}

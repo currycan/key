@@ -1,0 +1,9 @@
+
+{
+    "log":{
+        "disabled":false,
+        "level":"error",
+        "output":"${LOGDIR}/sing-box/sing-box.log",
+        "timestamp":true
+    }
+}

@@ -1,0 +1,14 @@
+{
+    "api": {
+        "tag": "api",
+        "services": [
+            "HandlerService",
+            "LoggerService",
+            "StatsService"
+        ]
+    },
+    "version": {
+        "min": "25.8.3",
+        "max": ""
+    }
+}

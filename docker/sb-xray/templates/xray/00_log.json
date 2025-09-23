@@ -1,0 +1,7 @@
+{
+    "log": {
+        "access": "${LOGDIR}/xray/access.log",
+        "error": "${LOGDIR}/xray/error.log",
+        "loglevel": "warning"
+    }
+}

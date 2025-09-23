@@ -1,0 +1,21 @@
+{
+    "inbounds": [
+        {
+            "type": "anytls",
+            "tag": "sing-box anytls",
+            "listen": "::",
+            "listen_port": ${PORT_ANYTLS},
+            "users": [
+                {
+                    "password": "${SB_UUID}"
+                }
+            ],
+            "padding_scheme": [],
+            "tls": {
+                "enabled": true,
+                "certificate_path": "${SSL_PATH}/${DOMAIN}.crt",
+                "key_path": "${SSL_PATH}/${DOMAIN}.key"
+            }
+        }
+    ]
+}

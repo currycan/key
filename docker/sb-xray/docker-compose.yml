@@ -1,0 +1,36 @@
+services:
+  sb-xray:
+    image: docker.io/currycan/sb-xray:25.9.11
+    container_name: sb-xray
+    environment:
+      - DOMAIN=$domain
+      - CDNDOMAIN=$cdndomain
+      - XUI_ACCOUNT=$domain
+      - DECODE=$code
+      - ACMESH_DEBUG=2
+      - ACMESH_SERVER_NAME=letsencrypt
+      - DEST_HOST=harvard.edu
+      - LISTENING_PORT=443
+      - DUFS_PATH_PREFIX=/myfiles
+      - XUI_WEBBASEPATH=3xadmin
+    ports:
+      - '443:443/tcp'
+      - '443:443/udp' # use UDP for usage of HTTP/3
+    volumes:
+      - ./pki:/pki
+      - ./acmecerts:/acmecerts
+      - ./.envs:/.env
+      - ./sb-xray:/sb-xray
+      - ./logs:/sb-xray/logs
+      - ./nginx/http:/etc/nginx/conf.d
+      - ./nginx/tcp:/etc/nginx/stream.d
+      - ./nginx/dhparam:/etc/nginx/dhparam
+      - ./data:/data
+    restart: always
+    tty: true
+    network_mode: host
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 65536
+        hard: 65536

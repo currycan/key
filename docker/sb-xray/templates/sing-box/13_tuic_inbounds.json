@@ -1,0 +1,26 @@
+{
+    "inbounds": [
+        {
+            "type": "tuic",
+            "tag": "sing-box tuic",
+            "listen": "::",
+            "listen_port": ${PORT_TUIC},
+            "users": [
+                {
+                    "uuid": "${SB_UUID}",
+                    "password": "${SB_UUID}"
+                }
+            ],
+            "congestion_control": "bbr",
+            "zero_rtt_handshake": false,
+            "tls": {
+                "enabled": true,
+                "alpn": [
+                    "h3"
+                ],
+                "certificate_path": "${SSL_PATH}/${DOMAIN}.crt",
+                "key_path": "${SSL_PATH}/${DOMAIN}.key"
+            }
+        }
+    ]
+}

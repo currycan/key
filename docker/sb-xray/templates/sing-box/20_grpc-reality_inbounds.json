@@ -1,0 +1,46 @@
+//  "public_key": "${SB_REALITY_PUBLIC_KEY}"
+{
+    "inbounds": [
+        {
+            "type": "vless",
+            "sniff": true,
+            "sniff_override_destination": true,
+            "tag": "sing-box grpc-reality",
+            "listen": "::",
+            "listen_port": ${PORT_GRPC_REALITY},
+            "users": [
+                {
+                    "uuid": "${SB_UUID}"
+                }
+            ],
+            "tls": {
+                "enabled": true,
+                "server_name": "addons.mozilla.org",
+                "reality": {
+                    "enabled": true,
+                    "handshake": {
+                        "server": "addons.mozilla.org",
+                        "server_port": 443
+                    },
+                    "private_key": "${SB_REALITY_PRIVATE_KEY}",
+                    "short_id": [
+                        ""
+                    ]
+                }
+            },
+            "transport": {
+                "type": "grpc",
+                "service_name": "grpc"
+            },
+            "multiplex": {
+                "enabled": true,
+                "padding": true,
+                "brutal": {
+                    "enabled": ${IS_BRUTAL},
+                    "up_mbps": 2500,
+                    "down_mbps": 2500
+                }
+            }
+        }
+    ]
+}

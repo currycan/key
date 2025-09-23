@@ -1,0 +1,40 @@
+{
+    "route": {
+        "rule_set": [
+            {
+                "tag": "geosite-openai",
+                "type": "remote",
+                "format": "binary",
+                "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-openai.srs"
+            }
+        ],
+        "rules": [
+            {
+                "action": "sniff"
+            },
+            {
+                "action": "resolve",
+                "domain": [
+                    "api.openai.com"
+                ],
+                "strategy": "prefer_ipv4"
+            },
+            {
+                "action": "resolve",
+                "rule_set": [
+                    "geosite-openai"
+                ],
+                "strategy": "prefer_ipv6"
+            },
+            {
+                "domain": [
+                    "api.openai.com"
+                ],
+                "rule_set": [
+                    "geosite-openai"
+                ],
+                "outbound": "${CHATGPT_OUT}"
+            }
+        ]
+    }
+}

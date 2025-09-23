@@ -1,0 +1,29 @@
+{
+    "inbounds": [
+        {
+            "type": "trojan",
+            "tag": "sing-box trojan",
+            "listen": "::",
+            "listen_port": ${PORT_TROJAN},
+            "users": [
+                {
+                    "password": "${SB_UUID}"
+                }
+            ],
+            "tls": {
+                "enabled": true,
+                "certificate_path": "${SSL_PATH}/${DOMAIN}.crt",
+                "key_path": "${SSL_PATH}/${DOMAIN}.key"
+            },
+            "multiplex": {
+                "enabled": true,
+                "padding": true,
+                "brutal": {
+                    "enabled": ${IS_BRUTAL},
+                    "up_mbps": 2500,
+                    "down_mbps": 2500
+                }
+            }
+        }
+    ]
+}
