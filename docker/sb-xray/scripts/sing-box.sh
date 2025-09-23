@@ -6,6 +6,7 @@ ENV_FILE="/.env/xray"
 source "$ENV_FILE"
 
 NODE_NAME="${DOMAIN%%.*}"
+NODE_IP=${GEOIP_INFO#*|}
 
 XTLS_REALITY=true
 HYSTERIA2=true
@@ -28,11 +29,11 @@ show_clash_subscribe() {
     CLASH_SUBSCRIBE+="  $CLASH_XTLS_REALITY
 "
     # hysteria2
-    [ "${HYSTERIA2}" = 'true' ] && local CLASH_HYSTERIA2="- {name: \"${GEOIP_INFO}|${NODE_NAME}|hysteria2\", type: hysteria2, server: ${DOMAIN}, port: ${PORT_HYSTERIA2}, up: \"2000 Mbps\", down: \"2500 Mbps\", password: ${SB_UUID}, skip-cert-verify: true}"
+    [ "${HYSTERIA2}" = 'true' ] && local CLASH_HYSTERIA2="- {name: \"${GEOIP_INFO}|${NODE_NAME}|hysteria2\", type: hysteria2, server: ${NODE_IP}, port: ${PORT_HYSTERIA2}, up: \"2000 Mbps\", down: \"2500 Mbps\", password: ${SB_UUID}, skip-cert-verify: true}"
     CLASH_SUBSCRIBE+="  $CLASH_HYSTERIA2
 "
     # tuic
-    [ "${TUIC}" = 'true' ] && local CLASH_TUIC="- {name: \"${GEOIP_INFO}|${NODE_NAME}|tuic\", type: tuic, server: ${DOMAIN}, port: ${PORT_TUIC}, uuid: ${SB_UUID}, password: ${SB_UUID}, alpn: [h3], disable-sni: true, reduce-rtt: true, request-timeout: 8000, udp-relay-mode: native, congestion-controller: bbr, skip-cert-verify: true}"
+    [ "${TUIC}" = 'true' ] && local CLASH_TUIC="- {name: \"${GEOIP_INFO}|${NODE_NAME}|tuic\", type: tuic, server: ${NODE_IP}, port: ${PORT_TUIC}, uuid: ${SB_UUID}, password: ${SB_UUID}, alpn: [h3], disable-sni: true, reduce-rtt: true, request-timeout: 8000, udp-relay-mode: native, congestion-controller: bbr, skip-cert-verify: true}"
     CLASH_SUBSCRIBE+="  $CLASH_TUIC
 "
     # ShadowTLS
@@ -81,11 +82,11 @@ vless://$(echo -n "auto:${SB_UUID}@${DOMAIN}:${PORT_XTLS_REALITY}" | base64 -w0)
 "
     [ "${HYSTERIA2}" = 'true' ] && SHADOWROCKET_SUBSCRIBE+="
     ----------------------------
-hysteria2://${SB_UUID}@${DOMAIN}:${PORT_HYSTERIA2}?insecure=1&obfs=none#${GEOIP_INFO}|${NODE_NAME}|hysteria2
+hysteria2://${SB_UUID}@${NODE_IP}:${PORT_HYSTERIA2}?insecure=1&obfs=none#${GEOIP_INFO}|${NODE_NAME}|hysteria2
 "
     [ "${TUIC}" = 'true' ] && SHADOWROCKET_SUBSCRIBE+="
     ----------------------------
-tuic://${SB_UUID}:${SB_UUID}@${DOMAIN}:${PORT_TUIC}?congestion_control=bbr&udp_relay_mode=native&alpn=h3&allow_insecure=1#${GEOIP_INFO}|${NODE_NAME}|tuic
+tuic://${SB_UUID}:${SB_UUID}@${NODE_IP}:${PORT_TUIC}?congestion_control=bbr&udp_relay_mode=native&alpn=h3&allow_insecure=1#${GEOIP_INFO}|${NODE_NAME}|tuic
 "
     [ "${SHADOWTLS}" = 'true' ] && SHADOWROCKET_SUBSCRIBE+="
     ----------------------------
@@ -129,13 +130,14 @@ vless://${SB_UUID}@${DOMAIN}:${PORT_XTLS_REALITY}?encryption=none&security=reali
 
     [ "${HYSTERIA2}" = 'true' ] && V2RAYN_SUBSCRIBE+="
     ----------------------------
-hysteria2://${SB_UUID}@${DOMAIN}:${PORT_HYSTERIA2}/?alpn=h3&insecure=1#${GEOIP_INFO}|${NODE_NAME}|hysteria2
+hysteria2://${SB_UUID}@${NODE_IP}:${PORT_HYSTERIA2}/?alpn=h3&insecure=1#${GEOIP_INFO}|${NODE_NAME}|hysteria2
 "
+hysteria2://20f7fca4-86e5-4ddf-9eed-24142073d197@192.243.112.113:8802?alpn=h3&insecure=1#sing-box%20hysteria2
 
     [ "${TUIC}" = 'true' ] && V2RAYN_SUBSCRIBE+="
     ----------------------------
-tuic://${SB_UUID}:${SB_UUID}@${DOMAIN}:${PORT_TUIC}?alpn=h3&congestion_control=bbr#${GEOIP_INFO}|${NODE_NAME}|tuic
-"
+tuic://${SB_UUID}:${SB_UUID}@${NODE_IP}:${PORT_TUIC}?alpn=h3&congestion_control=bbr#${GEOIP_INFO}|${NODE_NAME}|tuic
+# $(info "请把 tls 里的 inSecure 设置为 true")"
 
     info "ShadowTLS 配置文件内容，需要更新 sing_box 内核"
     [ "${SHADOWTLS}" = 'true' ] && V2RAYN_SUBSCRIBE+="
@@ -216,6 +218,9 @@ vless://${SB_UUID}@${DOMAIN}:${PORT_H2_REALITY}?encryption=none&security=reality
 ----------------------------
 vless://${SB_UUID}@${DOMAIN}:${PORT_GRPC_REALITY}?encryption=none&security=reality&sni=addons.mozilla.org&fp=chrome&pbk=${SB_REALITY_PUBLIC_KEY}&type=grpc&serviceName=grpc&mode=gun#${GEOIP_INFO}|${NODE_NAME}|grpc-reality
 "
+vless://${UUID}@${SERVER_IP_1}:${PORT_GRPC_REALITY}?encryption=none&security=reality&sni=addons.mozilla.org&fp=chrome&pbk=${REALITY_PUBLIC}&type=grpc&serviceName=grpc&mode=gun#${NODE_NAME// /%20}%20grpc-reality"
+vless://20f7fca4-86e5-4ddf-9eed-24142073d197@192.243.112.113:8810?encryption=none&security=reality&sni=addons.mozilla.org&fp=chrome&pbk=wP8U7zR-VBXqGCfZv3F0zV4EXSi0Di-hDwaIq_1pCEs&type=grpc&authority=&serviceName=grpc&mode=gun#sing-box%20grpc-reality
+
 
     [ "${ANYTLS}" = 'true' ] && V2RAYN_SUBSCRIBE+="
 ----------------------------
@@ -264,12 +269,12 @@ vless://${SB_UUID}@${DOMAIN}:${PORT_XTLS_REALITY}?security=reality&sni=addons.mo
 
     [ "${HYSTERIA2}" = 'true' ] && NEKOBOX_SUBSCRIBE+="
 ----------------------------
-hy2://${SB_UUID}@${DOMAIN}:${PORT_HYSTERIA2}?insecure=1#${GEOIP_INFO}|${NODE_NAME}|hysteria2
+hy2://${SB_UUID}@${NODE_IP}:${PORT_HYSTERIA2}?insecure=1#${GEOIP_INFO}|${NODE_NAME}|hysteria2
 "
 
     [ "${TUIC}" = 'true' ] && NEKOBOX_SUBSCRIBE+="
 ----------------------------
-tuic://${SB_UUID}:${SB_UUID}@${DOMAIN}:${PORT_TUIC}?congestion_control=bbr&alpn=h3&udp_relay_mode=native&allow_insecure=1&disable_sni=1#${GEOIP_INFO}|${NODE_NAME}|tuic
+tuic://${SB_UUID}:${SB_UUID}@${NODE_IP}:${PORT_TUIC}?congestion_control=bbr&alpn=h3&udp_relay_mode=native&allow_insecure=1&disable_sni=1#${GEOIP_INFO}|${NODE_NAME}|tuic
 "
 
     [ "${SHADOWTLS}" = 'true' ] && NEKOBOX_SUBSCRIBE+="
@@ -319,14 +324,14 @@ show_singbox_link() {
     local NODE_REPLACE+="\"${GEOIP_INFO}|${NODE_NAME}|xtls-reality\","
 
     if [ "${HYSTERIA2}" = 'true' ]; then
-        INBOUND_REPLACE+=" { \"type\": \"hysteria2\", \"tag\": \"${GEOIP_INFO}|${NODE_NAME}|hysteria2\", \"server\": \"${DOMAIN}\", \"server_port\": ${PORT_HYSTERIA2},"
+        INBOUND_REPLACE+=" { \"type\": \"hysteria2\", \"tag\": \"${GEOIP_INFO}|${NODE_NAME}|hysteria2\", \"server\": \"${NODE_IP}\", \"server_port\": ${PORT_HYSTERIA2},"
         [[ -n "${PORT_HOPPING_START}" && -n "${PORT_HOPPING_END}" ]] && INBOUND_REPLACE+=" \"server_ports\": [ \"${PORT_HOPPING_START}:${PORT_HOPPING_END}\" ],"
         INBOUND_REPLACE+=" \"up_mbps\": 2000, \"down_mbps\": 2500, \"password\": \"${SB_UUID}\", \"tls\": { \"enabled\": true, \"insecure\": true, \"server_name\": \"\", \"alpn\": [ \"h3\" ] } },"
         local NODE_REPLACE+="\"${GEOIP_INFO}|${NODE_NAME}|hysteria2\","
     fi
 
     [ "${TUIC}" = 'true' ] &&
-    INBOUND_REPLACE+=" { \"type\": \"tuic\", \"tag\": \"${GEOIP_INFO}|${NODE_NAME}|tuic\", \"server\": \"${DOMAIN}\", \"server_port\": ${PORT_TUIC}, \"uuid\": \"${SB_UUID}\", \"password\": \"${SB_UUID}\", \"congestion_control\": \"bbr\", \"udp_relay_mode\": \"native\", \"zero_rtt_handshake\": false, \"heartbeat\": \"10s\", \"tls\": { \"enabled\": true, \"insecure\": true, \"server_name\": \"\", \"alpn\": [ \"h3\" ] } },"
+    INBOUND_REPLACE+=" { \"type\": \"tuic\", \"tag\": \"${GEOIP_INFO}|${NODE_NAME}|tuic\", \"server\": \"${NODE_IP}\", \"server_port\": ${PORT_TUIC}, \"uuid\": \"${SB_UUID}\", \"password\": \"${SB_UUID}\", \"congestion_control\": \"bbr\", \"udp_relay_mode\": \"native\", \"zero_rtt_handshake\": false, \"heartbeat\": \"10s\", \"tls\": { \"enabled\": true, \"insecure\": true, \"server_name\": \"\", \"alpn\": [ \"h3\" ] } },"
     local NODE_REPLACE+="\"${GEOIP_INFO}|${NODE_NAME}|tuic\","
 
     [ "${SHADOWTLS}" = 'true' ] &&
