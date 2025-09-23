@@ -53,7 +53,10 @@ go build -o crypctl
 sudo mv crypctl /usr/local/bin/
 
 # Docker方式
-docker build -t currycan/crypctl:1.0.0 .
+docker buildx build \
+  --platform linux/amd64,linux/arm64 \
+  --tag currycan/crypctl:1.0.0 \
+  --push .
 ```
 
 ## 使用指南

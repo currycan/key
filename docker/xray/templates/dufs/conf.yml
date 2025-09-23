@@ -1,4 +1,4 @@
-serve-path: '/data'
+serve-path: ${DUFS_SERVE_PATH}
 bind: 127.0.0.1
 port: ${DUFS_PORT}
 path-prefix: ${DUFS_PATH_PREFIX}
@@ -18,5 +18,5 @@ render-try-index: true
 render-spa: true
 # assets: ./assets/
 log-format: '$remote_addr "$request" $status $http_user_agent'
-log-file: /var/log/dufs/dufs.log
+log-file: ${LOGDIR}/dufs/dufs.log
 compress: low

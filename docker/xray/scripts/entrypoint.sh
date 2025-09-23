@@ -81,7 +81,7 @@ function generateEnv() {
         gen_x25519_key() {
             log DEBUG "Generating Xray x25519 key"
             local x25519_reality_xhttp_secret=$(xray x25519)
-            echo "$(echo "${x25519_reality_xhttp_secret}" | head -1 | awk '{print $2}') $(echo "${x25519_reality_xhttp_secret}" | tail -n 1 | awk '{print $2}')"
+            echo "$(echo "${x25519_reality_xhttp_secret}" | sed -n '1p' | awk -F': ' '{print $2}') $(echo "${x25519_reality_xhttp_secret}" | sed -n '2p' | awk -F': ' '{print $2}')"
         }
 
         local reality_private_key reality_public_key
@@ -147,13 +147,20 @@ function createConfig() {
     ENV_LIST=$(env | grep -v '^_' | cut -d= -f1 | sed 's/^/${/;s/$/}/' | xargs)
 
     # 生成Supervisord配置
-    if [ ! -f /etc/supervisord/all.conf ]; then
-        mkdir -p /etc/supervisord/
-        log DEBUG "Generating supervisord /etc/supervisord/all.conf"
-        envsubst </templates/supervisord/supervisord.conf >/etc/supervisord/all.conf
+    if [ ! -f /etc/supervisord.conf ]; then
+        log DEBUG "Generating supervisord /etc/supervisord.conf"
+        envsubst </templates/supervisord/supervisord.conf >/etc/supervisord.conf
+    fi
+    if [ ! -f /etc/supervisor.d/daemon.ini ]; then
+        mkdir -p /etc/supervisor.d/
+        log DEBUG "Generating supervisord /etc/supervisor.d/daemon.ini"
+        envsubst </templates/supervisord/daemon.ini >/etc/supervisor.d/daemon.ini
     fi
 
     # 生成Nginx配置
+    log DEBUG "Generating Nginx nginx.conf"
+    envsubst "${ENV_LIST}" </templates/nginx/nginx.conf >/etc/nginx/nginx.conf
+    cp -f /templates/nginx/network_internal.conf /etc/nginx/network_internal.conf
     if [ ! -f /etc/nginx/conf.d/http.conf ]; then
         mkdir -p /etc/nginx/conf.d/
         log DEBUG "Generating Nginx http.conf"
@@ -166,26 +173,26 @@ function createConfig() {
     fi
 
     # 生成Xray配置
-    if [ ! -f "/etc/xray/conf/*.json" ]; then
-        mkdir -p "/etc/xray/conf"
+    if [ ! -f "${WORKDIR}/xray/*.json" ]; then
+        mkdir -p "${WORKDIR}/xray/"
         for template in /templates/xray/*.json; do
-            local output="/etc/xray/conf/$(basename "$template")"
+            local output="${WORKDIR}/xray/$(basename "$template")"
             log DEBUG "Generating $output"
             envsubst <"$template" >"$output"
         done
     fi
 
     # 生成V2ray配置
-    if [ ! -f "/etc/v2ray/*.json" ]; then
-        mkdir -p "/etc/v2ray/"
-        envsubst </templates/v2ray/config.json >/etc/v2ray/config.json
+    if [ ! -f "${WORKDIR}/v2ray/*.json" ]; then
+        mkdir -p "${WORKDIR}/v2ray/"
+        envsubst </templates/v2ray/config.json >${WORKDIR}/v2ray/config.json
     fi
 
     # 生成Dufs配置
-    if [ ! -f "/etc/dufs/conf.yml" ]; then
-        mkdir -p "/etc/dufs"
+    if [ ! -f "${WORKDIR}/dufs/conf.yml" ]; then
+        mkdir -p "${WORKDIR}/dufs"
         log DEBUG "Generating Dufs config"
-        envsubst <"/templates/dufs/conf.yml" >"/etc/dufs/conf.yml"
+        envsubst <"/templates/dufs/conf.yml" >"${WORKDIR}/dufs/conf.yml"
     fi
 }
 
@@ -244,6 +251,7 @@ function setDnsApi() {
 
 # https://github.com/acmesh-official/acme.sh/wiki/dnsapi#dns_cf
 function issueCertificate() {
+    export DEBUG=${ACMESH_DEBUG}
     local cert_type=$1
     [[ -z "${CERT_TYPE_MAP[${cert_type}]}" ]] && {
         log ERROR "错误：无效证书类型 '${cert_type}'" >&2
@@ -289,7 +297,8 @@ function issueCertificate() {
     acme.sh --install-cert -d "${domain}" \
         --key-file "${SSL_PATH}/${domain}.key" \
         --fullchain-file "${cert_file}" \
-        --ca-file "${SSL_PATH}/${domain}-ca.crt"
+        --ca-file "${SSL_PATH}/${domain}-ca.crt" \
+        --reloadcmd "nginx -s reload"
 }
 
 # 主执行流程
@@ -298,6 +307,8 @@ if [ "${1#-}" = 'supervisord' ] && [ "$(id -u)" = '0' ]; then
     createConfig
 
     setupDhParam
+
+    mkdir -p ${LOGDIR}/{supervisor,xray,sing-box,v2ray,dufs,nginx,x-ui}
 
     log INFO "Obtaining SSL certificate..."
     checkRequiredEnv ACMESH_REGISTER_EMAIL
@@ -314,7 +325,7 @@ if [ "${1#-}" = 'supervisord' ] && [ "$(id -u)" = '0' ]; then
 
     [[ ! -f "/usr/local/bin/show" ]] && ln -sf "/scripts/show-config.sh" "/usr/local/bin/show"
 
-    set -- "$@" -n -c "/etc/supervisord/all.conf"
+    set -- "$@" -n -c /etc/supervisord.conf
 fi
 
 exec "$@"

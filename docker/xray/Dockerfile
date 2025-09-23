@@ -125,7 +125,7 @@ RUN set -ex; \
 
 # 安装基础组件
 RUN set -ex; \
-  runtime_pkgs="curl bash iproute2 net-tools tzdata bash-completion ca-certificates python3 py3-pip gettext libc6-compat gcompat vim libqrencode-tools socat logrotate"; \
+  runtime_pkgs="curl bash iproute2 net-tools tzdata bash-completion ca-certificates python3 py3-pip gettext libc6-compat gcompat vim libqrencode-tools socat logrotate nftables jq"; \
   apk add -U --no-cache --virtual .runtime-deps ${runtime_pkgs}; \
   echo -e "[global]\nbreak-system-packages = true" > /etc/pip.conf; \
   pip install --no-cache-dir -U pip supervisor; \
@@ -136,6 +136,7 @@ RUN set -ex; \
 ENV AUTO_UPGRADE=1
 ENV LE_WORKING_DIR=/acme.sh
 ENV LE_CONFIG_HOME=/acmecerts
+ENV ACMESH_DEBUG=1
 RUN set -ex && wget -O- https://get.acme.sh | sh
 
 # x-ui dependences
@@ -150,11 +151,15 @@ RUN set -ex; \
   rm -rf /tmp/*
 
 COPY --from=builder --chmod=755 /usr/local/bin/ /usr/local/bin/
-COPY nginx/ /etc/nginx/
 COPY 3DCEList /home/wwwroot/3DCEList
 COPY --chmod=755 scripts /scripts
 COPY templates/ /templates/
 ADD https://raw.githubusercontent.com/currycan/key/master/vimrc /root/.vimrc
+
+ENV WORKDIR=/xray
+ENV LOGDIR=${WORKDIR}/logs
+
+WORKDIR ${WORKDIR}
 
 # time zone
 ENV TZ="Asia/Hong_Kong"
@@ -175,12 +180,12 @@ ENV ACMESH_REGISTER_EMAIL=""
 # buypass/zerossl/letsencrypt
 ENV ACMESH_SERVER_NAME="letsencrypt"
 # certs path
-ENV SSL_PATH="/pki"
+ENV SSL_PATH=/pki
 
 # x-ui
 ENV XUI_LOG_LEVEL="info"
 ENV XUI_DEBUG="false"
-ENV XUI_LOG_FOLDER="/var/log/x-ui"
+ENV XUI_LOG_FOLDER=${LOGDIR}/x-ui
 ENV XUI_WEBBASEPATH="x-ui"
 ENV XUI_ACCOUNT="admin"
 ENV XUI_PORT="8888"
@@ -203,14 +208,12 @@ ENV DUFS_RENDER_SPA="true"
 ENV DUFS_LOG_FORMAT=""
 ENV DUFS_COMPRESS="low"
 
-# WORKDIR /xray/
-
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
-    CMD supervisorctl -c /etc/supervisord/all.conf status xray | grep -q 'RUNNING' || exit 1
+    CMD supervisorctl status xray | grep -q 'RUNNING' || exit 1
 
 EXPOSE 80 443
 
-VOLUME ["/data", "/pki", "/acmecerts", "/etc/supervisord", "/etc/xray/conf", "/etc/v2ray", "/etc/dufs", "/etc/x-ui/","/etc/nginx/conf.d", "/etc/nginx/stream.d", "/etc/nginx/dhparam", "/var/log/xray", "/var/log/v2ray","/var/log/x-ui", "/var/log/dufs", "/var/log/nginx", "/var/log/supervisor"]
+VOLUME ${DUFS_SERVE_PATH} ${WORKDIR} ${LOGDIR} /etc/nginx/conf.d /etc/nginx/stream.d /etc/nginx/dhparam
 
 STOPSIGNAL SIGTERM
 

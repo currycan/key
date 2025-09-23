@@ -1,6 +1,6 @@
 services:
   xray:
-    image: docker.io/currycan/xray:25.8.3
+    image: docker.io/currycan/xray:25.9.11
     container_name: xray
     environment:
       - DOMAIN=$domain
@@ -16,25 +16,14 @@ services:
       - '443:443/tcp'
       - '443:443/udp' # use UDP for usage of HTTP/3
     volumes:
-      - ./data:/data
       - ./pki:/pki
       - ./acmecerts:/acmecerts
-      - ./supervisord/:/etc/supervisord/
-      - ./.xray:/.env
-      - ./xray:/etc/xray/conf
-      - ./v2ray:/etc/v2ray/
+      - ./.envs:/.env
+      - ./xray:/xray
       - ./nginx/http:/etc/nginx/conf.d
       - ./nginx/tcp:/etc/nginx/stream.d
       - ./nginx/dhparam:/etc/nginx/dhparam
-      - ./x-ui:/etc/x-ui/
-      - ./dufs:/etc/dufs
-      - ./logs/xray:/var/log/xray
-      - ./logs/v2ray:/var/log/v2ray
-      - ./logs/x-ui:/var/log/x-ui
-      - ./logs/dufs:/var/log/dufs
-      - ./logs/supervisor:/var/log/supervisor
-      - ./logs/nginx:/var/log/nginx
-    # working_dir: /etc/nginx
+      - ./data:/data
     restart: always
     tty: true
     network_mode: host
