@@ -162,7 +162,8 @@ ENV AUTO_UPGRADE=1
 ENV LE_WORKING_DIR=/acme.sh
 ENV LE_CONFIG_HOME=/acmecerts
 ENV ACMESH_DEBUG=1
-RUN set -ex && wget -O- https://get.acme.sh | sh
+ENV PATH=/acme.sh/:$PATH
+RUN set -ex && curl -L https://get.acme.sh | sh
 
 # x-ui dependences
 RUN set -ex; \
@@ -191,7 +192,6 @@ ENV TZ="Asia/Hong_Kong"
 
 # xray
 ENV DEST_HOST="www.microsoft.com"
-ENV PATH=/acme.sh/:$PATH
 ENV DOMAIN=""
 ENV CDNDOMAIN=""
 ENV LISTENING_PORT="433"
