@@ -92,7 +92,7 @@ main() {
     [ -f "$ENV_FILE" ] || error_exit "环境文件不存在: $ENV_FILE"
     source "$ENV_FILE"
 
-    all_links  # 默认显示链接
+    # all_links  # 默认显示链接
     xui_info
     print_colored ${CYAN} "${PASSWORD}"
 
