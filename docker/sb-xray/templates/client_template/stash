@@ -1,0 +1,225 @@
+proxies:
+- name: ${GEOIP_INFO}|${NODE_NAME}|xtls-reality
+  type: vless
+  server: ${DOMAIN}
+  port: ${PORT_XTLS_REALITY}
+  uuid: ${SB_UUID}
+  network: tcp
+  udp: true
+  tls: true
+  servername: addons.mozilla.org
+  client-fingerprint: chrome
+  reality-opts:
+    public-key: ${SB_REALITY_PUBLIC_KEY}
+    short-id: ""
+  tfo: false
+  skip-cert-verify: false
+
+- name: ${GEOIP_INFO}|${NODE_NAME}|hysteria2
+  type: hysteria2
+  server: ${NODE_IP}
+  port: ${PORT_HYSTERIA2}
+  password: ${SB_UUID}
+  skip-cert-verify: true
+
+- name: ${GEOIP_INFO}|${NODE_NAME}|tuic
+  type: tuic
+  server: ${NODE_IP}
+  port: ${PORT_TUIC}
+  uuid: ${SB_UUID}
+  password: ${SB_UUID}
+  alpn:
+    - h3
+  disable-sni: true
+  reduce-rtt: true
+  request-timeout: 8000
+  udp-relay-mode: native
+  congestion-controller: bbr
+  skip-cert-verify: true
+
+- name: ${GEOIP_INFO}|${NODE_NAME}|ShadowTLS
+  type: ss
+  server: ${DOMAIN}
+  port: ${PORT_SHADOWTLS}
+  cipher: 2022-blake3-aes-128-gcm
+  password: ${SHADOWTLS_PASSWORD}
+  plugin: shadow-tls
+  client-fingerprint: chrome
+  plugin-opts:
+    host: addons.mozilla.org
+    password: ${SB_UUID}
+    version: 3
+
+- name: ${GEOIP_INFO}|${NODE_NAME}|shadowsocks
+  type: ss
+  server: ${DOMAIN}
+  port: ${PORT_SHADOWSOCKS}
+  cipher: aes-128-gcm
+  password: ${SB_UUID}
+
+- name: ${GEOIP_INFO}|${NODE_NAME}|trojan
+  type: trojan
+  server: ${DOMAIN}
+  port: ${PORT_TROJAN}
+  password: ${SB_UUID}
+  client-fingerprint: random
+  skip-cert-verify: true
+
+- name: ${GEOIP_INFO}|${NODE_NAME}|vmess-ws-tls
+  type: vmess
+  server: ${DOMAIN}
+  port: ${LISTENING_PORT}
+  uuid: ${SB_UUID}
+  udp: true
+  tls: true
+  alterId: 0
+  cipher: auto
+  skip-cert-verify: true
+  network: ws
+  ws-opts:
+    path: /${SB_UUID}-vmess
+    headers:
+      Host: ${DOMAIN}
+
+- name: ${GEOIP_INFO}|${NODE_NAME}|vless-ws-tls
+  type: vless
+  server: ${DOMAIN}
+  port: ${LISTENING_PORT}
+  uuid: ${SB_UUID}
+  udp: true
+  tls: true
+  servername: ${DOMAIN}
+  network: ws
+  skip-cert-verify: true
+  ws-opts:
+    path: /${SB_UUID}-vless
+    headers:
+      Host: ${DOMAIN}
+    max-early-data: 2048
+    early-data-header-name: Sec-WebSocket-Protocol
+
+- name: ${GEOIP_INFO}|${NODE_NAME}|grpc-reality
+  type: vless
+  server: ${DOMAIN}
+  port: ${PORT_GRPC_REALITY}
+  uuid: ${SB_UUID}
+  network: grpc
+  tls: true
+  udp: true
+  client-fingerprint: chrome
+  servername: addons.mozilla.org
+  grpc-opts:
+    grpc-service-name: grpc
+  reality-opts:
+    public-key: ${SB_REALITY_PUBLIC_KEY}
+    short-id: ""
+
+- name: ${GEOIP_INFO}|${NODE_NAME}|anytls
+  type: anytls
+  server: ${NODE_IP}
+  port: ${PORT_ANYTLS}
+  password: ${SB_UUID}
+  client-fingerprint: chrome
+  udp: true
+  idle-session-check-interval: 30
+  idle-session-timeout: 30
+  skip-cert-verify: true
+
+- name: ${GEOIP_INFO}|${NODE_NAME}|VMESS
+  type: vmess
+  server: ${DOMAIN}
+  port: ${LISTENING_PORT}
+  cipher: auto
+  uuid: ${V2RAY_UUID}
+  alterId: ${ALTERID}
+  tls: true
+  network: ${NETWORK}
+  ws-opts:
+    path: /${V2RAY_URL_PATH}
+    headers:
+      Host: ${DOMAIN}
+  servername: ${DOMAIN}
+
+- name: ${REGION_INFO}|${NODE_NAME}|XTLS(Vision)+Reality直连
+  type: vless
+  server: ${DOMAIN}
+  port: ${LISTENING_PORT}
+  uuid: ${XRAY_REALITY_UUID}
+  tls: true
+  flow: xtls-rprx-vision
+  client-fingerprint: chrome
+  skip-cert-verify: false
+  reality-opts:
+    public-key: ${XRAY_REALITY_PUBLIC_KEY}
+    short-id: ${XRAY_REALITY_SHORTID}
+    _spider-x: /
+  network: tcp
+  servername: ${DOMAIN}
+
+- name: ${REGION_INFO}|${NODE_NAME}|Xhttp+Reality直连
+  type: vless
+  server: ${DOMAIN}
+  port: ${LISTENING_PORT}
+  uuid: ${XRAY_XHTTP_UUID}
+  tls: true
+  client-fingerprint: chrome
+  skip-cert-verify: false
+  reality-opts:
+    public-key: ${XRAY_REALITY_PUBLIC_KEY}
+    short-id: ${XRAY_REALITY_SHORTID}
+  network: xhttp
+  xhttp-opts:
+    path: /${XRAY_XHTTP_URL_PATH}
+  servername: ${DOMAIN}
+
+- name: ${REGION_INFO}|${NODE_NAME}|上行Xhttp+TLS+CDN|下行Xhttp+Reality
+  type: vless
+  server: ${DOMAIN}
+  port: ${LISTENING_PORT}
+  uuid: ${XRAY_XHTTP_UUID}
+  tls: true
+  client-fingerprint: chrome
+  alpn:
+    - h2
+  skip-cert-verify: false
+  network: xhttp
+  xhttp-opts:
+    headers:
+      Host: ${CDNDOMAIN}
+    path: /${XRAY_XHTTP_URL_PATH}
+  servername: ${CDNDOMAIN}
+
+- name: ${REGION_INFO}|${NODE_NAME}|上行Xhttp+Reality|下行Xhttp+TLS+CDN
+  type: vless
+  server: ${DOMAIN}
+  port: ${LISTENING_PORT}
+  uuid: ${XRAY_XHTTP_UUID}
+  tls: true
+  client-fingerprint: chrome
+  alpn:
+    - h2
+  skip-cert-verify: false
+  reality-opts:
+    public-key: ${XRAY_REALITY_PUBLIC_KEY}
+    short-id: ${XRAY_REALITY_SHORTID}
+  network: xhttp
+  xhttp-opts:
+    path: /${XRAY_XHTTP_URL_PATH}
+  servername: ${DOMAIN}
+
+- name: ${REGION_INFO}|${NODE_NAME}|Xhttp+TLS+CDN上下行不分离
+  type: vless
+  server: ${DOMAIN}
+  port: ${LISTENING_PORT}
+  uuid: ${XRAY_XHTTP_UUID}
+  tls: true
+  client-fingerprint: chrome
+  alpn:
+    - h2
+  skip-cert-verify: false
+  network: xhttp
+  xhttp-opts:
+    headers:
+      Host: ${CDNDOMAIN}
+    path: /${XRAY_XHTTP_URL_PATH}
+  servername: ${CDNDOMAIN}

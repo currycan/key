@@ -431,7 +431,9 @@ if [ "${1#-}" = 'supervisord' ] && [ "$(id -u)" = '0' ]; then
     log INFO "Starting fail2ban..."
     fail2ban-client -x start
 
+    # 显示访问信息
     [[ ! -f "/usr/local/bin/show" ]] && ln -sf "/scripts/show-config.sh" "/usr/local/bin/show"
+    /usr/local/bin/show
 
     set -- "$@" -n -c /etc/supervisord.conf
 fi
