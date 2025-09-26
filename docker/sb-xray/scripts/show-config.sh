@@ -235,6 +235,9 @@ main() {
     show_all_link
     envsubst </templates/client_template/proxies >${WORKDIR}/subscribe/proxies
     envsubst </templates/client_template/stash >${WORKDIR}/subscribe/stash
+    sed '/# TAG_INCOMPATIBILITY_BEGIN/,/# TAG_INCOMPATIBILITY_END/d' \
+        "${WORKDIR}/subscribe/stash" \
+        > "${WORKDIR}/subscribe/stash-simple"
     envsubst </templates/client_template/stash.yaml >${WORKDIR}/subscribe/stash.yaml
 }
 

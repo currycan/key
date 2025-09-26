@@ -22,6 +22,7 @@ proxies:
   password: ${SB_UUID}
   skip-cert-verify: true
 
+# TAG_INCOMPATIBILITY_BEGIN
 - name: ${GEOIP_INFO}|${NODE_NAME}|tuic
   type: tuic
   server: ${NODE_IP}
@@ -36,6 +37,7 @@ proxies:
   udp-relay-mode: native
   congestion-controller: bbr
   skip-cert-verify: true
+# TAG_INCOMPATIBILITY_END
 
 - name: ${GEOIP_INFO}|${NODE_NAME}|ShadowTLS
   type: ss
@@ -98,6 +100,7 @@ proxies:
     max-early-data: 2048
     early-data-header-name: Sec-WebSocket-Protocol
 
+# TAG_INCOMPATIBILITY_BEGIN
 - name: ${GEOIP_INFO}|${NODE_NAME}|grpc-reality
   type: vless
   server: ${DOMAIN}
@@ -113,7 +116,9 @@ proxies:
   reality-opts:
     public-key: ${SB_REALITY_PUBLIC_KEY}
     short-id: ""
+# TAG_INCOMPATIBILITY_END
 
+# TAG_INCOMPATIBILITY_BEGIN
 - name: ${GEOIP_INFO}|${NODE_NAME}|anytls
   type: anytls
   server: ${NODE_IP}
@@ -124,6 +129,7 @@ proxies:
   idle-session-check-interval: 30
   idle-session-timeout: 30
   skip-cert-verify: true
+# TAG_INCOMPATIBILITY_END
 
 - name: ${GEOIP_INFO}|${NODE_NAME}|VMESS
   type: vmess
@@ -156,6 +162,7 @@ proxies:
   network: tcp
   servername: ${DOMAIN}
 
+# TAG_INCOMPATIBILITY_BEGIN
 - name: ${REGION_INFO}|${NODE_NAME}|Xhttp+Reality直连
   type: vless
   server: ${DOMAIN}
@@ -171,7 +178,9 @@ proxies:
   xhttp-opts:
     path: /${XRAY_XHTTP_URL_PATH}
   servername: ${DOMAIN}
+# TAG_INCOMPATIBILITY_END
 
+# TAG_INCOMPATIBILITY_BEGIN
 - name: ${REGION_INFO}|${NODE_NAME}|上行Xhttp+TLS+CDN|下行Xhttp+Reality
   type: vless
   server: ${DOMAIN}
@@ -188,7 +197,9 @@ proxies:
       Host: ${CDNDOMAIN}
     path: /${XRAY_XHTTP_URL_PATH}
   servername: ${CDNDOMAIN}
+# TAG_INCOMPATIBILITY_END
 
+# TAG_INCOMPATIBILITY_BEGIN
 - name: ${REGION_INFO}|${NODE_NAME}|上行Xhttp+Reality|下行Xhttp+TLS+CDN
   type: vless
   server: ${DOMAIN}
@@ -206,7 +217,9 @@ proxies:
   xhttp-opts:
     path: /${XRAY_XHTTP_URL_PATH}
   servername: ${DOMAIN}
+# TAG_INCOMPATIBILITY_END
 
+# TAG_INCOMPATIBILITY_BEGIN
 - name: ${REGION_INFO}|${NODE_NAME}|Xhttp+TLS+CDN上下行不分离
   type: vless
   server: ${DOMAIN}
@@ -223,3 +236,4 @@ proxies:
       Host: ${CDNDOMAIN}
     path: /${XRAY_XHTTP_URL_PATH}
   servername: ${CDNDOMAIN}
+# TAG_INCOMPATIBILITY_END
