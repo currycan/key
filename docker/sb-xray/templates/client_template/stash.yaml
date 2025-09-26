@@ -95,15 +95,14 @@ proxy-groups:
       - 🇸🇬 SG 新加坡
       - 🇯🇵 JP 日本
       - 🇺🇲 US 美国
-      - DIRECT
+      - 🎯 全球直连
 
   - name: 📦 默认
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Final.png
     type: select
     proxies:
       - ♻️ 自动选择
-      - DIRECT
-
+      - 🎯 全球直连
   - name: 📺 Netflix
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Netflix.png
     type: select
@@ -129,54 +128,53 @@ proxy-groups:
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/CN.png
     type: select
     proxies:
-      - DIRECT
+      - 🎯 全球直连
       - 🚀 节点选择
       - ♻️ 自动选择
   - name: 🍎 苹果服务
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Apple.png
     type: select
     proxies:
-      - DIRECT
+      - 🎯 全球直连
       - 🚀 节点选择
       - ♻️ 自动选择
   - name: 🎮 游戏平台
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Game.png
     type: select
     proxies:
-      - DIRECT
+      - 🎯 全球直连
       - 🚀 节点选择
       - ♻️ 自动选择
   - name: 🎶 网易音乐
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Netease_Music.png
     type: select
     proxies:
-      - DIRECT
+      - 🎯 全球直连
       - 🚀 节点选择
   - name: 🎯 全球直连
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Direct.png
     type: select
     proxies:
       - DIRECT
-      - 🚀 节点选择
   - name: 🛑 广告拦截
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/AdBlack.png
     type: select
     proxies:
       - REJECT
-      - DIRECT
+      - 🎯 全球直连
   - name: 🍃 应用净化
     icon: https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/1f343.png
     type: select
     proxies:
       - REJECT
-      - DIRECT
+      - 🎯 全球直连
   - name: 🐟 漏网之鱼
     icon: https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/1f41f.png
     type: select
     proxies:
-      - 🚀 节点选择
       - ♻️ 自动选择
-      - DIRECT
+      - 🚀 节点选择
+      - 🎯 全球直连
 
   # 基于地区分组
   - name: 🇭🇰 HK 香港
