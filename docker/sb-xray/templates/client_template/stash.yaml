@@ -78,21 +78,21 @@ dns:
       # - https://dns.cloudflare.com/dns-query
       # - https://dns.google/dns-query
 proxies:
-- name: ${GEOIP_INFO}|${NODE_NAME}|xtls-reality
-  type: vless
-  server: ${DOMAIN}
-  port: ${PORT_XTLS_REALITY}
-  uuid: ${SB_UUID}
-  network: tcp
-  udp: true
-  tls: true
-  servername: addons.mozilla.org
-  client-fingerprint: chrome
-  reality-opts:
-    public-key: ${SB_REALITY_PUBLIC_KEY}
-    short-id: ""
-  tfo: false
-  skip-cert-verify: false
+# - name: ${GEOIP_INFO}|${NODE_NAME}|xtls-reality
+#   type: vless
+#   server: ${DOMAIN}
+#   port: ${PORT_XTLS_REALITY}
+#   uuid: ${SB_UUID}
+#   network: tcp
+#   udp: true
+#   tls: true
+#   servername: addons.mozilla.org
+#   client-fingerprint: chrome
+#   reality-opts:
+#     public-key: ${SB_REALITY_PUBLIC_KEY}
+#     short-id: ""
+#   tfo: false
+#   skip-cert-verify: false
 
 - name: ${GEOIP_INFO}|${NODE_NAME}|hysteria2
   type: hysteria2
@@ -101,20 +101,20 @@ proxies:
   password: ${SB_UUID}
   skip-cert-verify: true
 
-- name: ${GEOIP_INFO}|${NODE_NAME}|tuic
-  type: tuic
-  server: ${NODE_IP}
-  port: ${PORT_TUIC}
-  uuid: ${SB_UUID}
-  password: ${SB_UUID}
-  alpn:
-    - h3
-  disable-sni: true
-  reduce-rtt: true
-  request-timeout: 8000
-  udp-relay-mode: native
-  congestion-controller: bbr
-  skip-cert-verify: true
+# - name: ${GEOIP_INFO}|${NODE_NAME}|tuic
+#   type: tuic
+#   server: ${NODE_IP}
+#   port: ${PORT_TUIC}
+#   uuid: ${SB_UUID}
+#   password: ${SB_UUID}
+#   alpn:
+#     - h3
+#   disable-sni: true
+#   reduce-rtt: true
+#   request-timeout: 8000
+#   udp-relay-mode: native
+#   congestion-controller: bbr
+#   skip-cert-verify: true
 
 - name: ${GEOIP_INFO}|${NODE_NAME}|ShadowTLS
   type: ss
@@ -177,32 +177,32 @@ proxies:
     max-early-data: 2048
     early-data-header-name: Sec-WebSocket-Protocol
 
-- name: ${GEOIP_INFO}|${NODE_NAME}|grpc-reality
-  type: vless
-  server: ${DOMAIN}
-  port: ${PORT_GRPC_REALITY}
-  uuid: ${SB_UUID}
-  network: grpc
-  tls: true
-  udp: true
-  client-fingerprint: chrome
-  servername: addons.mozilla.org
-  grpc-opts:
-    grpc-service-name: grpc
-  reality-opts:
-    public-key: ${SB_REALITY_PUBLIC_KEY}
-    short-id: ""
+# - name: ${GEOIP_INFO}|${NODE_NAME}|grpc-reality
+#   type: vless
+#   server: ${DOMAIN}
+#   port: ${PORT_GRPC_REALITY}
+#   uuid: ${SB_UUID}
+#   network: grpc
+#   tls: true
+#   udp: true
+#   client-fingerprint: chrome
+#   servername: addons.mozilla.org
+#   grpc-opts:
+#     grpc-service-name: grpc
+#   reality-opts:
+#     public-key: ${SB_REALITY_PUBLIC_KEY}
+#     short-id: ""
 
-- name: ${GEOIP_INFO}|${NODE_NAME}|anytls
-  type: anytls
-  server: ${NODE_IP}
-  port: ${PORT_ANYTLS}
-  password: ${SB_UUID}
-  client-fingerprint: chrome
-  udp: true
-  idle-session-check-interval: 30
-  idle-session-timeout: 30
-  skip-cert-verify: true
+# - name: ${GEOIP_INFO}|${NODE_NAME}|anytls
+#   type: anytls
+#   server: ${NODE_IP}
+#   port: ${PORT_ANYTLS}
+#   password: ${SB_UUID}
+#   client-fingerprint: chrome
+#   udp: true
+#   idle-session-check-interval: 30
+#   idle-session-timeout: 30
+#   skip-cert-verify: true
 
 - name: ${GEOIP_INFO}|${NODE_NAME}|VMESS
   type: vmess
@@ -235,77 +235,77 @@ proxies:
   network: tcp
   servername: ${DOMAIN}
 
-- name: ${REGION_INFO}|${NODE_NAME}|Xhttp+Reality直连
-  type: vless
-  server: ${DOMAIN}
-  port: ${LISTENING_PORT}
-  uuid: ${XRAY_XHTTP_UUID}
-  tls: true
-  client-fingerprint: chrome
-  skip-cert-verify: false
-  reality-opts:
-    public-key: ${XRAY_REALITY_PUBLIC_KEY}
-    short-id: ${XRAY_REALITY_SHORTID}
-  network: xhttp
-  xhttp-opts:
-    path: /${XRAY_XHTTP_URL_PATH}
-  servername: ${DOMAIN}
+# - name: ${REGION_INFO}|${NODE_NAME}|Xhttp+Reality直连
+#   type: vless
+#   server: ${DOMAIN}
+#   port: ${LISTENING_PORT}
+#   uuid: ${XRAY_XHTTP_UUID}
+#   tls: true
+#   client-fingerprint: chrome
+#   skip-cert-verify: false
+#   reality-opts:
+#     public-key: ${XRAY_REALITY_PUBLIC_KEY}
+#     short-id: ${XRAY_REALITY_SHORTID}
+#   network: xhttp
+#   xhttp-opts:
+#     path: /${XRAY_XHTTP_URL_PATH}
+#   servername: ${DOMAIN}
 
-- name: ${REGION_INFO}|${NODE_NAME}|上行Xhttp+TLS+CDN|下行Xhttp+Reality
-  type: vless
-  server: ${DOMAIN}
-  port: ${LISTENING_PORT}
-  uuid: ${XRAY_XHTTP_UUID}
-  tls: true
-  client-fingerprint: chrome
-  alpn:
-    - h2
-  skip-cert-verify: false
-  network: xhttp
-  xhttp-opts:
-    headers:
-      Host: ${CDNDOMAIN}
-    path: /${XRAY_XHTTP_URL_PATH}
-  servername: ${CDNDOMAIN}
+# - name: ${REGION_INFO}|${NODE_NAME}|上行Xhttp+TLS+CDN|下行Xhttp+Reality
+#   type: vless
+#   server: ${DOMAIN}
+#   port: ${LISTENING_PORT}
+#   uuid: ${XRAY_XHTTP_UUID}
+#   tls: true
+#   client-fingerprint: chrome
+#   alpn:
+#     - h2
+#   skip-cert-verify: false
+#   network: xhttp
+#   xhttp-opts:
+#     headers:
+#       Host: ${CDNDOMAIN}
+#     path: /${XRAY_XHTTP_URL_PATH}
+#   servername: ${CDNDOMAIN}
 
-- name: ${REGION_INFO}|${NODE_NAME}|上行Xhttp+Reality|下行Xhttp+TLS+CDN
-  type: vless
-  server: ${DOMAIN}
-  port: ${LISTENING_PORT}
-  uuid: ${XRAY_XHTTP_UUID}
-  tls: true
-  client-fingerprint: chrome
-  alpn:
-    - h2
-  skip-cert-verify: false
-  reality-opts:
-    public-key: ${XRAY_REALITY_PUBLIC_KEY}
-    short-id: ${XRAY_REALITY_SHORTID}
-  network: xhttp
-  xhttp-opts:
-    path: /${XRAY_XHTTP_URL_PATH}
-  servername: ${DOMAIN}
+# - name: ${REGION_INFO}|${NODE_NAME}|上行Xhttp+Reality|下行Xhttp+TLS+CDN
+#   type: vless
+#   server: ${DOMAIN}
+#   port: ${LISTENING_PORT}
+#   uuid: ${XRAY_XHTTP_UUID}
+#   tls: true
+#   client-fingerprint: chrome
+#   alpn:
+#     - h2
+#   skip-cert-verify: false
+#   reality-opts:
+#     public-key: ${XRAY_REALITY_PUBLIC_KEY}
+#     short-id: ${XRAY_REALITY_SHORTID}
+#   network: xhttp
+#   xhttp-opts:
+#     path: /${XRAY_XHTTP_URL_PATH}
+#   servername: ${DOMAIN}
 
-- name: ${REGION_INFO}|${NODE_NAME}|Xhttp+TLS+CDN上下行不分离
-  type: vless
-  server: ${DOMAIN}
-  port: ${LISTENING_PORT}
-  uuid: ${XRAY_XHTTP_UUID}
-  tls: true
-  client-fingerprint: chrome
-  alpn:
-    - h2
-  skip-cert-verify: false
-  network: xhttp
-  xhttp-opts:
-    headers:
-      Host: ${CDNDOMAIN}
-    path: /${XRAY_XHTTP_URL_PATH}
-  servername: ${CDNDOMAIN}
+# - name: ${REGION_INFO}|${NODE_NAME}|Xhttp+TLS+CDN上下行不分离
+#   type: vless
+#   server: ${DOMAIN}
+#   port: ${LISTENING_PORT}
+#   uuid: ${XRAY_XHTTP_UUID}
+#   tls: true
+#   client-fingerprint: chrome
+#   alpn:
+#     - h2
+#   skip-cert-verify: false
+#   network: xhttp
+#   xhttp-opts:
+#     headers:
+#       Host: ${CDNDOMAIN}
+#     path: /${XRAY_XHTTP_URL_PATH}
+#   servername: ${CDNDOMAIN}
 proxy-groups:
   # 功能分组
   - name: 选择代理
-    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/mini/Proxy.png
+    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Proxy.png
     type: select
     proxies: &proxies
       - ♻️ 自动选择
@@ -317,94 +317,81 @@ proxy-groups:
       - 🇺🇲 US 美国
       - DIRECT
 
+  - name: 📦 默认
+    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Final.png
+    type: select
+    proxies:
+      - ♻️ 自动选择
+      - DIRECT
+
   - name: 📺 Netflix
-    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/mini/Netflix.png
+    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Netflix.png
     type: select
     proxies: *proxies
-
-  - name: 💬 OpenAi
+  - name: 💡 OpenAi
+    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/ChatGPT.png
     type: select
     proxies: *proxies
-
-  - name: 📹 YouTube
-    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/mini/YouTube.png
+  - name: ▶️ YouTube
+    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/YouTube.png
     type: select
     proxies: *proxies
-
-  - name: 🎥 奈飞视频
+  - name: 🎬 哔哩哔哩
     type: select
-    proxies: *proxies
-
-  - name: 📺 哔哩哔哩
-    type: select
+    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/bilibili_3.png
     proxies:
       - 🎯 全球直连
   - name: 🌍 国外媒体
+    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Global.png
     type: select
     proxies: *proxies
-  - name: 🌏 国内媒体
-    type: select
-    proxies:
-      - DIRECT
-      - 🚀 节点选择
-      - ♻️ 自动选择
-  - name: 📢 谷歌FCM
-    type: select
-    proxies:
-      - DIRECT
-      - 🚀 节点选择
-      - ♻️ 自动选择
-  - name: Ⓜ️ 微软Bing
-    type: select
-    proxies:
-      - DIRECT
-      - 🚀 节点选择
-      - ♻️ 自动选择
-  - name: Ⓜ️ 微软云盘
-    type: select
-    proxies:
-      - DIRECT
-      - 🚀 节点选择
-      - ♻️ 自动选择
-  - name: Ⓜ️ 微软服务
+  - name: 📹 国内媒体
+    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/CN.png
     type: select
     proxies:
       - DIRECT
       - 🚀 节点选择
       - ♻️ 自动选择
   - name: 🍎 苹果服务
+    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Apple.png
     type: select
     proxies:
       - DIRECT
       - 🚀 节点选择
       - ♻️ 自动选择
   - name: 🎮 游戏平台
+    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Game.png
     type: select
     proxies:
       - DIRECT
       - 🚀 节点选择
       - ♻️ 自动选择
   - name: 🎶 网易音乐
+    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Netease_Music.png
     type: select
     proxies:
       - DIRECT
       - 🚀 节点选择
   - name: 🎯 全球直连
+    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Direct.png
     type: select
     proxies:
       - DIRECT
       - 🚀 节点选择
   - name: 🛑 广告拦截
+    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/AdBlack.png
     type: select
     proxies:
       - REJECT
       - DIRECT
   - name: 🍃 应用净化
+    icon: https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/1f343.png
     type: select
     proxies:
       - REJECT
       - DIRECT
   - name: 🐟 漏网之鱼
+    icon: https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/1f41f.png
     type: select
     proxies:
       - 🚀 节点选择
@@ -414,7 +401,7 @@ proxy-groups:
   # 基于地区分组
   - name: 🇭🇰 HK 香港
     filter: "港|🇭🇰|HK|(?i)Hong"
-    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/mini/Hong_Kong.png
+    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Hong_Kong.png
     interval: 120
     lazy: true
     tolerance: 50
@@ -423,7 +410,7 @@ proxy-groups:
 
   - name: 🇨🇳|🇹🇼 TW 台湾
     filter: "台|🇨🇳|🇹🇼|湾|TW|(?i)Taiwan"
-    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/mini/Taiwan.png
+    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Taiwan.png
     interval: 120
     lazy: true
     tolerance: 50
@@ -432,7 +419,7 @@ proxy-groups:
 
   - name: 🇸🇬 SG 新加坡
     filter: "新加坡|坡|狮城|🇸🇬|SG|(?i)Singapore"
-    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/mini/Singapore.png
+    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Singapore.png
     interval: 120
     lazy: true
     tolerance: 50
@@ -441,7 +428,7 @@ proxy-groups:
 
   - name: 🇯🇵 JP 日本
     filter: "日|🇯🇵|东京|JP|(?i)Japan"
-    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/mini/Japan.png
+    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Japan.png
     interval: 120
     lazy: true
     tolerance: 50
@@ -450,7 +437,7 @@ proxy-groups:
 
   - name: 🇺🇲 US 美国
     filter: "美|🇺🇲|US|(?i)States|American"
-    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/mini/United_States.png
+    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/United_States.png
     interval: 120
     lazy: true
     tolerance: 50
@@ -458,7 +445,7 @@ proxy-groups:
     include-all: true
 
   - name: ♻️ 自动选择
-    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/mini/Auto.png
+    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Auto.png
     interval: 120
     lazy: true
     tolerance: 50
@@ -466,19 +453,12 @@ proxy-groups:
     include-all: true
 
   - name: 🚀 节点选择
-    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/mini/Static.png
+    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Static.png
     interval: 120
     lazy: true
     type: select
     include-all: true
 
-  - name: 默认
-    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/mini/Final.png
-    type: select
-    proxies:
-      - ♻️ 自动选择
-      - 🚀 节点选择
-      - DIRECT
 rules:
   - DOMAIN-SUFFIX,acl4.ssr,🎯 全球直连
   - DOMAIN-SUFFIX,ip6-localhost,🎯 全球直连

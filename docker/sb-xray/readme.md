@@ -12,17 +12,28 @@ https://github.com/XTLS/Xray-core/discussions/4118
 
 https://github.com/fscarmen/sing-box
 
-
 https://bianyuan.xyz/
 
 ## 镜像制作
 
+
+docker buildx 等 BuildKit 功能构建镜像，在 ~/.docker/config.json 或 buildkit 配置里指定代理：
+
+```json
+{
+  "proxies": {
+    "default": {
+      "httpProxy": "http://xxxxx:7890",
+      "httpsProxy": "http://xxxxx:7890",
+      "noProxy": "localhost,127.0.0.1,github.com"
+    }
+  }
+}
+```
+
 ```bash
 docker buildx build \
   --platform linux/amd64,linux/arm64 \
-  --build-arg HTTP_PROXY=http://host.docker.internal:7890 \
-  --build-arg HTTPS_PROXY=http://host.docker.internal:7890 \
-  --build-arg NO_PROXY=localhost,127.0.0.1,github.com \
   --build-arg XUI_VERSION="2.8.3" \
   --build-arg XRAY_VERSION="25.9.11" \
   --build-arg V2RAY_VERSION="5.39.0" \
