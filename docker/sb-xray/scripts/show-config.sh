@@ -13,8 +13,11 @@ RESET="\033[0m"
 
 # 加载环境变量
 ENV_FILE="/.env/xray"
+# SEC_FILE="/.env/secret"
 [ -f "$ENV_FILE" ] || error_exit "环境文件不存在: $ENV_FILE"
+# [ -f "$SEC_FILE" ] || error_exit "环境文件不存在: $SEC_FILE"
 source "$ENV_FILE"
+# source "$SEC_FILE"
 
 export NODE_NAME="${DOMAIN%%.*}"
 export NODE_IP=${GEOIP_INFO#*|}
@@ -238,7 +241,9 @@ main() {
     sed '/# TAG_INCOMPATIBILITY_BEGIN/,/# TAG_INCOMPATIBILITY_END/d' \
         "${WORKDIR}/subscribe/stash" \
         > "${WORKDIR}/subscribe/stash-simple"
-    envsubst </templates/client_template/stash.yaml >${WORKDIR}/subscribe/stash.yaml
+    envsubst </templates/client_template/stash.yaml >${WORKDIR}/subscribe/stash-${NODE_NAME}.yaml
+    envsubst </templates/client_template/surge >${WORKDIR}/subscribe/surge
+    envsubst </templates/client_template/surge.conf >${WORKDIR}/subscribe/surge-${NODE_NAME}.conf
 }
 
 main | tee >(sed 's/\x1b\[[0-9;]*m//g' > ${WORKDIR}/subscribe/show-config)

@@ -84,7 +84,7 @@ proxy-providers:
 
 proxy-groups:
   # 功能分组
-  - name: 选择代理
+  - name: 📡 选择代理
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Proxy.png
     type: select
     proxies: &proxies
