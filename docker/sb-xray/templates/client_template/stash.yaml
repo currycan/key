@@ -84,12 +84,14 @@ proxy-providers:
 
 proxy-groups:
   # 功能分组
-  - name: 📡 选择代理
-    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Proxy.png
+  - name: 🚀 节点选择
+    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Static.png
+    interval: 120
+    lazy: true
     type: select
+    include-all: true
     proxies: &proxies
       - ♻️ 自动选择
-      - 🚀 节点选择
       - 🇭🇰 HK 香港
       - 🇨🇳|🇹🇼 TW 台湾
       - 🇸🇬 SG 新加坡
@@ -97,12 +99,22 @@ proxy-groups:
       - 🇺🇲 US 美国
       - 🎯 全球直连
 
+  - name: ♻️ 自动选择
+    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Auto.png
+    interval: 120
+    lazy: true
+    tolerance: 50
+    type: url-test
+    include-all: true
+
   - name: 📦 默认
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Final.png
     type: select
     proxies:
       - ♻️ 自动选择
+      - 🚀 节点选择
       - 🎯 全球直连
+
   - name: 📺 Netflix
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Netflix.png
     type: select
@@ -168,13 +180,6 @@ proxy-groups:
     proxies:
       - REJECT
       - 🎯 全球直连
-  - name: 🐟 漏网之鱼
-    icon: https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/1f41f.png
-    type: select
-    proxies:
-      - ♻️ 自动选择
-      - 🚀 节点选择
-      - 🎯 全球直连
 
   # 基于地区分组
   - name: 🇭🇰 HK 香港
@@ -220,21 +225,6 @@ proxy-groups:
     lazy: true
     tolerance: 50
     type: url-test
-    include-all: true
-
-  - name: ♻️ 自动选择
-    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Auto.png
-    interval: 120
-    lazy: true
-    tolerance: 50
-    type: url-test
-    include-all: true
-
-  - name: 🚀 节点选择
-    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Static.png
-    interval: 120
-    lazy: true
-    type: select
     include-all: true
 
 rules:
@@ -9796,4 +9786,4 @@ rules:
   - PROCESS-NAME,Weiyun.exe,🎯 全球直连
   - PROCESS-NAME,baidunetdisk.exe,🎯 全球直连
   - GEOIP,CN,🎯 全球直连
-  - MATCH,🐟 漏网之鱼
+  - MATCH,📦 默认

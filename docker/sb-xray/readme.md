@@ -41,6 +41,20 @@ docker buildx build \
   --push .
 ```
 
+### 订阅转换
+
+https://kb.nssurge.com/surge-knowledge-base/zh/guidelines/detached-profile
+
+自建订阅转换不会有隐私泄露等风险，但需要一定技术基础。
+
+以下教程源自网络收集，与本文无关，仅作为示例：
+
+前端：https://github.com/CareyWang/sub-web
+
+后端：https://github.com/tindy2013/subconverter
+
+相关教程：https://ednovas.xyz/2021/06/06/subs/
+
 ### CDN 域名报错：您重定向的次数过多
 
 如果使用Cloudflare等CDN，检查CDN/代理设置（如Cloudflare）

@@ -212,7 +212,10 @@ https://${DOMAIN}/sb-xray/neko"
 https://${DOMAIN}/sb-xray/proxies"
 
     print_colored ${MAGENTA} "stash 订阅:
-https://${DOMAIN}/sb-xray/stash.yaml"
+https://${DOMAIN}/sb-xray/stash-${NODE_NAME}.yaml"
+
+print_colored ${YELLOW} "surge 订阅:
+https://${DOMAIN}/sb-xray/surge-${NODE_NAME}.conf"
 
     print_colored ${GREEN} "自适应 Clash / V2rayN / NekoBox / ShadowRocket / SFI / SFA / SFM 客户端:
 https://${DOMAIN}/sb-xray/auto
