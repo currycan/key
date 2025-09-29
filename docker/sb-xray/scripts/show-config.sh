@@ -50,37 +50,37 @@ show_qrcode() {
 show_shadowrocket_link() {
     # 生成 ShadowRocket 订阅配置文件
     SHADOWROCKET_SUBSCRIBE+="
-vless://$(echo -n "auto:${SB_UUID}@${DOMAIN}:${PORT_XTLS_REALITY}" | base64 -w0)?remarks=${GEOIP_INFO}|${NODE_NAME}|xtls-reality&obfs=none&tls=1&peer=addons.mozilla.org&mux=1&pbk=${SB_REALITY_PUBLIC_KEY}
+vless://$(echo -n "auto:${SB_UUID}@${DOMAIN}:${PORT_XTLS_REALITY}" | base64 -w0)?remarks=${REGION_INFO}|${NODE_NAME}|xtls-reality&obfs=none&tls=1&peer=addons.mozilla.org&mux=1&pbk=${SB_REALITY_PUBLIC_KEY}
 "
     SHADOWROCKET_SUBSCRIBE+="
-hysteria2://${SB_UUID}@${NODE_IP}:${PORT_HYSTERIA2}?insecure=1&obfs=none#${GEOIP_INFO}|${NODE_NAME}|hysteria2
+hysteria2://${SB_UUID}@${NODE_IP}:${PORT_HYSTERIA2}?insecure=1&obfs=none#${REGION_INFO}|${NODE_NAME}|hysteria2
 "
     SHADOWROCKET_SUBSCRIBE+="
-tuic://${SB_UUID}:${SB_UUID}@${NODE_IP}:${PORT_TUIC}?congestion_control=bbr&udp_relay_mode=native&alpn=h3&allow_insecure=1#${GEOIP_INFO}|${NODE_NAME}|tuic
+tuic://${SB_UUID}:${SB_UUID}@${NODE_IP}:${PORT_TUIC}?congestion_control=bbr&udp_relay_mode=native&alpn=h3&allow_insecure=1#${REGION_INFO}|${NODE_NAME}|tuic
 "
     SHADOWROCKET_SUBSCRIBE+="
-ss://$(echo -n "2022-blake3-aes-128-gcm:${SHADOWTLS_PASSWORD}@${DOMAIN}:${PORT_SHADOWTLS}" | base64 -w0)?shadow-tls=$(echo -n "{\"version\":\"3\",\"host\":\"addons.mozilla.org\",\"password\":\"${SB_UUID}\"}" | base64 -w0)#${GEOIP_INFO}|${NODE_NAME}|ShadowTLS
+ss://$(echo -n "2022-blake3-aes-128-gcm:${SHADOWTLS_PASSWORD}@${DOMAIN}:${PORT_SHADOWTLS}" | base64 -w0)?shadow-tls=$(echo -n "{\"version\":\"3\",\"host\":\"addons.mozilla.org\",\"password\":\"${SB_UUID}\"}" | base64 -w0)#${REGION_INFO}|${NODE_NAME}|ShadowTLS
 "
     SHADOWROCKET_SUBSCRIBE+="
-ss://$(echo -n "aes-128-gcm:${SB_UUID}@${DOMAIN}:${PORT_SHADOWSOCKS}" | base64 -w0)#${GEOIP_INFO}|${NODE_NAME}|shadowsocks
+ss://$(echo -n "aes-128-gcm:${SB_UUID}@${DOMAIN}:${PORT_SHADOWSOCKS}" | base64 -w0)#${REGION_INFO}|${NODE_NAME}|shadowsocks
 "
     SHADOWROCKET_SUBSCRIBE+="
-trojan://${SB_UUID}@${DOMAIN}:${PORT_TROJAN}?allowInsecure=1#${GEOIP_INFO}|${NODE_NAME}|trojan
+trojan://${SB_UUID}@${DOMAIN}:${PORT_TROJAN}?allowInsecure=1#${REGION_INFO}|${NODE_NAME}|trojan
 "
     SHADOWROCKET_SUBSCRIBE+="
-vmess://$(echo -n "auto:${SB_UUID}@${DOMAIN}:${LISTENING_PORT}" | base64 -w0)?remarks=${GEOIP_INFO}|${NODE_NAME}|vmess-ws-tls&obfsParam=${DOMAIN}&path=/${SB_UUID}-vmess&obfs=websocket&alterId=0&tls=1&peer=${DOMAIN}&allowInsecure=1
+vmess://$(echo -n "auto:${SB_UUID}@${DOMAIN}:${LISTENING_PORT}" | base64 -w0)?remarks=${REGION_INFO}|${NODE_NAME}|vmess-ws-tls&obfsParam=${DOMAIN}&path=/${SB_UUID}-vmess&obfs=websocket&alterId=0&tls=1&peer=${DOMAIN}&allowInsecure=1
 "
     SHADOWROCKET_SUBSCRIBE+="
-vless://$(echo -n "auto:${SB_UUID}@${DOMAIN}:${LISTENING_PORT}" | base64 -w0)?remarks=${GEOIP_INFO}|${NODE_NAME}|vless-ws-tls&obfsParam=${DOMAIN}&path=/${SB_UUID}-vless?ed=2048&obfs=websocket&tls=1&peer=${DOMAIN}&allowInsecure=1
+vless://$(echo -n "auto:${SB_UUID}@${DOMAIN}:${LISTENING_PORT}" | base64 -w0)?remarks=${REGION_INFO}|${NODE_NAME}|vless-ws-tls&obfsParam=${DOMAIN}&path=/${SB_UUID}-vless?ed=2048&obfs=websocket&tls=1&peer=${DOMAIN}&allowInsecure=1
 "
     SHADOWROCKET_SUBSCRIBE+="
-vless://$(echo -n auto:${SB_UUID}@${DOMAIN}:${PORT_H2_REALITY} | base64 -w0)?remarks=${GEOIP_INFO}|${NODE_NAME}|h2-reality&path=/&obfs=h2&tls=1&peer=addons.mozilla.org&alpn=h2&mux=1&pbk=${SB_REALITY_PUBLIC_KEY}
+vless://$(echo -n auto:${SB_UUID}@${DOMAIN}:${PORT_H2_REALITY} | base64 -w0)?remarks=${REGION_INFO}|${NODE_NAME}|h2-reality&path=/&obfs=h2&tls=1&peer=addons.mozilla.org&alpn=h2&mux=1&pbk=${SB_REALITY_PUBLIC_KEY}
 "
     SHADOWROCKET_SUBSCRIBE+="
-vless://$(echo -n "auto:${SB_UUID}@${DOMAIN}:${PORT_GRPC_REALITY}" | base64 -w0)?remarks=${GEOIP_INFO}|${NODE_NAME}|grpc-reality&path=grpc&obfs=grpc&tls=1&peer=addons.mozilla.org&pbk=${SB_REALITY_PUBLIC_KEY}
+vless://$(echo -n "auto:${SB_UUID}@${DOMAIN}:${PORT_GRPC_REALITY}" | base64 -w0)?remarks=${REGION_INFO}|${NODE_NAME}|grpc-reality&path=grpc&obfs=grpc&tls=1&peer=addons.mozilla.org&pbk=${SB_REALITY_PUBLIC_KEY}
 "
     SHADOWROCKET_SUBSCRIBE+="
-anytls://${SB_UUID}@${NODE_IP}:${PORT_ANYTLS}?insecure=1&udp=1#${GEOIP_INFO}|${NODE_NAME}|&anytls
+anytls://${SB_UUID}@${NODE_IP}:${PORT_ANYTLS}?insecure=1&udp=1#${REGION_INFO}|${NODE_NAME}|&anytls
 "
     print_colored ${GREEN} "ShadowRocket 订阅链接内容如下:
 ${SHADOWROCKET_SUBSCRIBE}"
@@ -90,37 +90,37 @@ ${SHADOWROCKET_SUBSCRIBE}"
 show_v2rayn_link() {
     # 生成 V2rayN 订阅文件
     V2RAYN_SUBSCRIBE+="
-vless://${SB_UUID}@${DOMAIN}:${PORT_XTLS_REALITY}?encryption=none&security=reality&sni=addons.mozilla.org&fp=chrome&pbk=${SB_REALITY_PUBLIC_KEY}&type=tcp&headerType=none&host=${DOMAIN}#${GEOIP_INFO}|${NODE_NAME}|xtls-reality
+vless://${SB_UUID}@${DOMAIN}:${PORT_XTLS_REALITY}?encryption=none&security=reality&sni=addons.mozilla.org&fp=chrome&pbk=${SB_REALITY_PUBLIC_KEY}&type=tcp&headerType=none&host=${DOMAIN}#${REGION_INFO}|${NODE_NAME}|xtls-reality
 "
     V2RAYN_SUBSCRIBE+="
-hysteria2://${SB_UUID}@${NODE_IP}:${PORT_HYSTERIA2}/?alpn=h3&insecure=1#${GEOIP_INFO}|${NODE_NAME}|hysteria2
-"
-    V2RAYN_SUBSCRIBE+="
-# 需把 tls 里的 inSecure 设置为 true
-tuic://${SB_UUID}:${SB_UUID}@${NODE_IP}:${PORT_TUIC}?alpn=h3&congestion_control=bbr#${GEOIP_INFO}|${NODE_NAME}|tuic
-"
-    V2RAYN_SUBSCRIBE+="
-ss://$(echo -n "aes-128-gcm:${SB_UUID}@${DOMAIN}:${PORT_SHADOWSOCKS}" | base64 -w0)#${GEOIP_INFO}|${NODE_NAME}|shadowsocks
-"
-    V2RAYN_SUBSCRIBE+="
-trojan://${SB_UUID}@${DOMAIN}:${PORT_TROJAN}?security=tls&type=tcp&headerType=none#${GEOIP_INFO}|${NODE_NAME}|trojan
-"
-    V2RAYN_SUBSCRIBE+="
-vmess://$(echo -n "{ \"v\": \"2\", \"ps\": \"${GEOIP_INFO}|${NODE_NAME}|vmess-ws-tls\", \"add\": \"${DOMAIN}\", \"port\": \"${LISTENING_PORT}\", \"id\": \"${SB_UUID}\", \"aid\": \"0\", \"scy\": \"auto\", \"net\": \"ws\", \"type\": \"none\", \"host\": \"${DOMAIN}\", \"path\": \"/${SB_UUID}-vmess\", \"tls\": \"tls\", \"sni\": \"\", \"alpn\": \"\" }" | base64 -w0)
-"
-    V2RAYN_SUBSCRIBE+="
-vless://${SB_UUID}@${DOMAIN}:${LISTENING_PORT}?encryption=none&security=tls&sni=${DOMAIN}&type=ws&host=${DOMAIN}&path=%2F${SB_UUID}-vless%3Fed%3D2048#${GEOIP_INFO}|${NODE_NAME}|vless-ws-tls
-"
-    V2RAYN_SUBSCRIBE+="
-vless://${SB_UUID}@${DOMAIN}:${PORT_GRPC_REALITY}?encryption=none&security=reality&sni=addons.mozilla.org&fp=chrome&pbk=${SB_REALITY_PUBLIC_KEY}&type=grpc&serviceName=grpc&mode=gun#${GEOIP_INFO}|${NODE_NAME}|grpc-reality
+hysteria2://${SB_UUID}@${NODE_IP}:${PORT_HYSTERIA2}/?alpn=h3&insecure=1#${REGION_INFO}|${NODE_NAME}|hysteria2
 "
     V2RAYN_SUBSCRIBE+="
 # 需把 tls 里的 inSecure 设置为 true
-anytls://${SB_UUID}@${NODE_IP}:${PORT_ANYTLS}?security=tls&type=tcp#${GEOIP_INFO}|${NODE_NAME}|&anytls
+tuic://${SB_UUID}:${SB_UUID}@${NODE_IP}:${PORT_TUIC}?alpn=h3&congestion_control=bbr#${REGION_INFO}|${NODE_NAME}|tuic
+"
+    V2RAYN_SUBSCRIBE+="
+ss://$(echo -n "aes-128-gcm:${SB_UUID}@${DOMAIN}:${PORT_SHADOWSOCKS}" | base64 -w0)#${REGION_INFO}|${NODE_NAME}|shadowsocks
+"
+    V2RAYN_SUBSCRIBE+="
+trojan://${SB_UUID}@${DOMAIN}:${PORT_TROJAN}?security=tls&type=tcp&headerType=none#${REGION_INFO}|${NODE_NAME}|trojan
+"
+    V2RAYN_SUBSCRIBE+="
+vmess://$(echo -n "{ \"v\": \"2\", \"ps\": \"${REGION_INFO}|${NODE_NAME}|vmess-ws-tls\", \"add\": \"${DOMAIN}\", \"port\": \"${LISTENING_PORT}\", \"id\": \"${SB_UUID}\", \"aid\": \"0\", \"scy\": \"auto\", \"net\": \"ws\", \"type\": \"none\", \"host\": \"${DOMAIN}\", \"path\": \"/${SB_UUID}-vmess\", \"tls\": \"tls\", \"sni\": \"\", \"alpn\": \"\" }" | base64 -w0)
+"
+    V2RAYN_SUBSCRIBE+="
+vless://${SB_UUID}@${DOMAIN}:${LISTENING_PORT}?encryption=none&security=tls&sni=${DOMAIN}&type=ws&host=${DOMAIN}&path=%2F${SB_UUID}-vless%3Fed%3D2048#${REGION_INFO}|${NODE_NAME}|vless-ws-tls
+"
+    V2RAYN_SUBSCRIBE+="
+vless://${SB_UUID}@${DOMAIN}:${PORT_GRPC_REALITY}?encryption=none&security=reality&sni=addons.mozilla.org&fp=chrome&pbk=${SB_REALITY_PUBLIC_KEY}&type=grpc&serviceName=grpc&mode=gun#${REGION_INFO}|${NODE_NAME}|grpc-reality
+"
+    V2RAYN_SUBSCRIBE+="
+# 需把 tls 里的 inSecure 设置为 true
+anytls://${SB_UUID}@${NODE_IP}:${PORT_ANYTLS}?security=tls&type=tcp#${REGION_INFO}|${NODE_NAME}|&anytls
 "
     # vmess ws tls
     V2RAYN_SUBSCRIBE+="
-vmess://$(echo -n "{\"add\":\"${DOMAIN}\",\"aid\":\"${ALTERID}\",\"host\":\"${DOMAIN}\",\"id\":\"${V2RAY_UUID}\",\"net\":\"${NETWORK}\",\"path\":\"/${V2RAY_URL_PATH}\",\"port\":\"${LISTENING_PORT}\",\"ps\":\"${GEOIP_INFO}|${DOMAIN}-VMESS\",\"tls\":\"tls\",\"type\":\"\",\"v\":\"2\"}" | base64 -w0)
+vmess://$(echo -n "{\"add\":\"${DOMAIN}\",\"aid\":\"${ALTERID}\",\"host\":\"${DOMAIN}\",\"id\":\"${V2RAY_UUID}\",\"net\":\"${NETWORK}\",\"path\":\"/${V2RAY_URL_PATH}\",\"port\":\"${LISTENING_PORT}\",\"ps\":\"${REGION_INFO}|${DOMAIN}-VMESS\",\"tls\":\"tls\",\"type\":\"\",\"v\":\"2\"}" | base64 -w0)
 "
     # XTLS(Vision)+Reality直连
     V2RAYN_SUBSCRIBE+="
@@ -150,36 +150,36 @@ ${V2RAYN_SUBSCRIBE}"
 show_netbox_link() {
     # 生成 NekoBox 订阅文件
     NEKOBOX_SUBSCRIBE+="
-vless://${SB_UUID}@${DOMAIN}:${PORT_XTLS_REALITY}?security=reality&sni=addons.mozilla.org&fp=chrome&pbk=${SB_REALITY_PUBLIC_KEY}&type=tcp&encryption=none#${GEOIP_INFO}|${NODE_NAME}|xtls-reality
+vless://${SB_UUID}@${DOMAIN}:${PORT_XTLS_REALITY}?security=reality&sni=addons.mozilla.org&fp=chrome&pbk=${SB_REALITY_PUBLIC_KEY}&type=tcp&encryption=none#${REGION_INFO}|${NODE_NAME}|xtls-reality
 "
     NEKOBOX_SUBSCRIBE+="
-hy2://${SB_UUID}@${NODE_IP}:${PORT_HYSTERIA2}?insecure=1#${GEOIP_INFO}|${NODE_NAME}|hysteria2
+hy2://${SB_UUID}@${NODE_IP}:${PORT_HYSTERIA2}?insecure=1#${REGION_INFO}|${NODE_NAME}|hysteria2
 "
     NEKOBOX_SUBSCRIBE+="
-tuic://${SB_UUID}:${SB_UUID}@${NODE_IP}:${PORT_TUIC}?congestion_control=bbr&alpn=h3&udp_relay_mode=native&allow_insecure=1&disable_sni=1#${GEOIP_INFO}|${NODE_NAME}|tuic
+tuic://${SB_UUID}:${SB_UUID}@${NODE_IP}:${PORT_TUIC}?congestion_control=bbr&alpn=h3&udp_relay_mode=native&allow_insecure=1&disable_sni=1#${REGION_INFO}|${NODE_NAME}|tuic
 "
     NEKOBOX_SUBSCRIBE+="
-nekoray://custom#$(echo -n "{\"_v\":0,\"addr\":\"127.0.0.1\",\"cmd\":[\"\"],\"core\":\"internal\",\"cs\":\"{\n    \\\"password\\\": \\\"${SB_UUID}\\\",\n    \\\"server\\\": \\\"${DOMAIN}\\\",\n    \\\"server_port\\\": ${PORT_SHADOWTLS},\n    \\\"tag\\\": \\\"shadowtls-out\\\",\n    \\\"tls\\\": {\n        \\\"enabled\\\": true,\n        \\\"server_name\\\": \\\"addons.mozilla.org\\\"\n    },\n    \\\"type\\\": \\\"shadowtls\\\",\n    \\\"version\\\": 3\n}\n\",\"mapping_port\":0,\"name\":\"${GEOIP_INFO}|${NODE_NAME}|ss-custom\",\"port\":1080,\"socks_port\":0}" | base64 -w0)
+nekoray://custom#$(echo -n "{\"_v\":0,\"addr\":\"127.0.0.1\",\"cmd\":[\"\"],\"core\":\"internal\",\"cs\":\"{\n    \\\"password\\\": \\\"${SB_UUID}\\\",\n    \\\"server\\\": \\\"${DOMAIN}\\\",\n    \\\"server_port\\\": ${PORT_SHADOWTLS},\n    \\\"tag\\\": \\\"shadowtls-out\\\",\n    \\\"tls\\\": {\n        \\\"enabled\\\": true,\n        \\\"server_name\\\": \\\"addons.mozilla.org\\\"\n    },\n    \\\"type\\\": \\\"shadowtls\\\",\n    \\\"version\\\": 3\n}\n\",\"mapping_port\":0,\"name\":\"${REGION_INFO}|${NODE_NAME}|ss-custom\",\"port\":1080,\"socks_port\":0}" | base64 -w0)
 
-nekoray://shadowsocks#$(echo -n "{\"_v\":0,\"method\":\"2022-blake3-aes-128-gcm\",\"name\":\"${GEOIP_INFO}|${NODE_NAME}|ss-tls\",\"pass\":\"${SHADOWTLS_PASSWORD}\",\"port\":0,\"stream\":{\"ed_len\":0,\"insecure\":false,\"mux_s\":0,\"net\":\"tcp\"},\"uot\":0}" | base64 -w0)
+nekoray://shadowsocks#$(echo -n "{\"_v\":0,\"method\":\"2022-blake3-aes-128-gcm\",\"name\":\"${REGION_INFO}|${NODE_NAME}|ss-tls\",\"pass\":\"${SHADOWTLS_PASSWORD}\",\"port\":0,\"stream\":{\"ed_len\":0,\"insecure\":false,\"mux_s\":0,\"net\":\"tcp\"},\"uot\":0}" | base64 -w0)
 "
     NEKOBOX_SUBSCRIBE+="
-ss://$(echo -n "aes-128-gcm:${SB_UUID}" | base64 -w0)@${DOMAIN}:${PORT_SHADOWSOCKS}#${GEOIP_INFO}|${NODE_NAME}|shadowsocks
+ss://$(echo -n "aes-128-gcm:${SB_UUID}" | base64 -w0)@${DOMAIN}:${PORT_SHADOWSOCKS}#${REGION_INFO}|${NODE_NAME}|shadowsocks
 "
     NEKOBOX_SUBSCRIBE+="
-trojan://${SB_UUID}@${DOMAIN}:${PORT_TROJAN}?security=tls&allowInsecure=1&fp=random&type=tcp#${GEOIP_INFO}|${NODE_NAME}|trojan
+trojan://${SB_UUID}@${DOMAIN}:${PORT_TROJAN}?security=tls&allowInsecure=1&fp=random&type=tcp#${REGION_INFO}|${NODE_NAME}|trojan
 "
     NEKOBOX_SUBSCRIBE+="
-vmess://$(echo -n "{\"add\":\"${DOMAIN}\",\"aid\":\"0\",\"host\":\"${DOMAIN}\",\"id\":\"${SB_UUID}\",\"net\":\"ws\",\"path\":\"/${SB_UUID}-vmess\",\"port\":\"${LISTENING_PORT}\",\"ps\":\"${GEOIP_INFO}|${NODE_NAME}|vmess-ws-tls\",\"scy\":\"auto\",\"sni\":\"\",\"tls\":\"tls\",\"type\":\"\",\"v\":\"2\"}" | base64 -w0)
+vmess://$(echo -n "{\"add\":\"${DOMAIN}\",\"aid\":\"0\",\"host\":\"${DOMAIN}\",\"id\":\"${SB_UUID}\",\"net\":\"ws\",\"path\":\"/${SB_UUID}-vmess\",\"port\":\"${LISTENING_PORT}\",\"ps\":\"${REGION_INFO}|${NODE_NAME}|vmess-ws-tls\",\"scy\":\"auto\",\"sni\":\"\",\"tls\":\"tls\",\"type\":\"\",\"v\":\"2\"}" | base64 -w0)
 "
     NEKOBOX_SUBSCRIBE+="
-vless://${SB_UUID}@${DOMAIN}:${LISTENING_PORT}?security=tls&sni=${DOMAIN}&type=ws&path=/${SB_UUID}-vless?ed%3D2048&host=${DOMAIN}#${GEOIP_INFO}|${NODE_NAME}|vless-ws-tls
+vless://${SB_UUID}@${DOMAIN}:${LISTENING_PORT}?security=tls&sni=${DOMAIN}&type=ws&path=/${SB_UUID}-vless?ed%3D2048&host=${DOMAIN}#${REGION_INFO}|${NODE_NAME}|vless-ws-tls
 "
     NEKOBOX_SUBSCRIBE+="
-vless://${SB_UUID}@${DOMAIN}:${PORT_H2_REALITY}?security=reality&sni=addons.mozilla.org&alpn=h2&fp=chrome&pbk=${SB_REALITY_PUBLIC_KEY}&type=http&encryption=none#${GEOIP_INFO}|${NODE_NAME}|h2-reality
+vless://${SB_UUID}@${DOMAIN}:${PORT_H2_REALITY}?security=reality&sni=addons.mozilla.org&alpn=h2&fp=chrome&pbk=${SB_REALITY_PUBLIC_KEY}&type=http&encryption=none#${REGION_INFO}|${NODE_NAME}|h2-reality
 "
     NEKOBOX_SUBSCRIBE+="
-vless://${SB_UUID}@${DOMAIN}:${PORT_GRPC_REALITY}?security=reality&sni=addons.mozilla.org&fp=chrome&pbk=${SB_REALITY_PUBLIC_KEY}&type=grpc&serviceName=grpc&encryption=none#${GEOIP_INFO}|${NODE_NAME}|grpc-reality
+vless://${SB_UUID}@${DOMAIN}:${PORT_GRPC_REALITY}?security=reality&sni=addons.mozilla.org&fp=chrome&pbk=${SB_REALITY_PUBLIC_KEY}&type=grpc&serviceName=grpc&encryption=none#${REGION_INFO}|${NODE_NAME}|grpc-reality
 "
     print_colored ${YELLOW} "NEKOBOX 订阅链接内容如下:
 $NEKOBOX_SUBSCRIBE"

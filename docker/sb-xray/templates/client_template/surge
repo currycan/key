@@ -1,14 +1,14 @@
 # Hysteria2
-${GEOIP_INFO}|${NODE_NAME}|hysteria2=hysteria2,${NODE_IP},${PORT_HYSTERIA2},password="${SB_UUID}",skip-cert-verify=true,download-bandwidth=2500
+${REGION_INFO}|${NODE_NAME}|hysteria2=hysteria2,${NODE_IP},${PORT_HYSTERIA2},password="${SB_UUID}",skip-cert-verify=true,download-bandwidth=2500
 # TUICv5
-${GEOIP_INFO}|${NODE_NAME}|tuic=tuic-v5,${NODE_IP},${PORT_TUIC},uuid=${SB_UUID},password="${SB_UUID}",alpn=h3,sni=off,skip-cert-verify=true
+${REGION_INFO}|${NODE_NAME}|tuic=tuic-v5,${NODE_IP},${PORT_TUIC},uuid=${SB_UUID},password="${SB_UUID}",alpn=h3,sni=off,skip-cert-verify=true
 # ShadowTLS+Shadowsocks2022
-${GEOIP_INFO}|${NODE_NAME}|ShadowTLS=ss,${DOMAIN},${PORT_SHADOWTLS},encrypt-method=2022-blake3-aes-128-gcm,password="${SHADOWTLS_PASSWORD}",shadow-tls-password=${SB_UUID},shadow-tls-sni=addons.mozilla.org,shadow-tls-version=3
+${REGION_INFO}|${NODE_NAME}|ShadowTLS=ss,${DOMAIN},${PORT_SHADOWTLS},encrypt-method=2022-blake3-aes-128-gcm,password="${SHADOWTLS_PASSWORD}",shadow-tls-password=${SB_UUID},shadow-tls-sni=addons.mozilla.org,shadow-tls-version=3
 # 普通ShadowsocksAEAD
-${GEOIP_INFO}|${NODE_NAME}|shadowsocks=ss,${DOMAIN},${PORT_SHADOWSOCKS},encrypt-method=aes-128-gcm,password="${SB_UUID}"
+${REGION_INFO}|${NODE_NAME}|shadowsocks=ss,${DOMAIN},${PORT_SHADOWSOCKS},encrypt-method=aes-128-gcm,password="${SB_UUID}"
 # Trojan
-${GEOIP_INFO}|${NODE_NAME}|trojan=trojan,${DOMAIN},${PORT_TROJAN},password="${SB_UUID}",tls=true,sni=${DOMAIN},skip-cert-verify=true
+${REGION_INFO}|${NODE_NAME}|trojan=trojan,${DOMAIN},${PORT_TROJAN},password="${SB_UUID}",tls=true,sni=${DOMAIN},skip-cert-verify=true
 # VMessWS+TLS(AEAD)
-${GEOIP_INFO}|${NODE_NAME}|vmess-ws-tls=vmess,${DOMAIN},${LISTENING_PORT},username=${SB_UUID},ws=true,ws-path=/${SB_UUID}-vmess,ws-headers=Host:"${DOMAIN}",vmess-aead=true,tls=true,sni=${DOMAIN},skip-cert-verify=true,udp-relay=true
+${REGION_INFO}|${NODE_NAME}|vmess-ws-tls=vmess,${DOMAIN},${LISTENING_PORT},username=${SB_UUID},ws=true,ws-path=/${SB_UUID}-vmess,ws-headers=Host:"${DOMAIN}",vmess-aead=true,tls=true,sni=${DOMAIN},skip-cert-verify=true,udp-relay=true
 # VMess普通WS+TLS
-${GEOIP_INFO}|${NODE_NAME}|VMESS=vmess,${DOMAIN},${LISTENING_PORT},username=${V2RAY_UUID},ws=true,ws-path=/${V2RAY_URL_PATH},ws-headers=Host:"${DOMAIN}",vmess-aead=true,tls=true,sni=${DOMAIN}
+${REGION_INFO}|${NODE_NAME}|VMESS=vmess,${DOMAIN},${LISTENING_PORT},username=${V2RAY_UUID},ws=true,ws-path=/${V2RAY_URL_PATH},ws-headers=Host:"${DOMAIN}",vmess-aead=true,tls=true,sni=${DOMAIN}

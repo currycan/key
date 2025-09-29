@@ -93,7 +93,7 @@ proxy-groups:
     proxies: &proxies
       - ♻️ 自动选择
       - 🇭🇰 HK 香港
-      - 🇨🇳|🇹🇼 TW 台湾
+      - 🇹🇼 TW 台湾
       - 🇸🇬 SG 新加坡
       - 🇯🇵 JP 日本
       - 🇺🇲 US 美国
@@ -191,8 +191,8 @@ proxy-groups:
     type: url-test
     include-all: true
 
-  - name: 🇨🇳|🇹🇼 TW 台湾
-    filter: "台|🇨🇳|🇹🇼|湾|TW|(?i)Taiwan"
+  - name: 🇹🇼 TW 台湾
+    filter: "台|🇹🇼|湾|TW|(?i)Taiwan"
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Taiwan.png
     interval: 120
     lazy: true

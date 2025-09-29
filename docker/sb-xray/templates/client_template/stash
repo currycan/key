@@ -1,5 +1,5 @@
 proxies:
-- name: ${GEOIP_INFO}|${NODE_NAME}|xtls-reality
+- name: ${REGION_INFO}|${NODE_NAME}|xtls-reality
   type: vless
   server: ${DOMAIN}
   port: ${PORT_XTLS_REALITY}
@@ -15,7 +15,7 @@ proxies:
   tfo: false
   skip-cert-verify: false
 
-- name: ${GEOIP_INFO}|${NODE_NAME}|hysteria2
+- name: ${REGION_INFO}|${NODE_NAME}|hysteria2
   type: hysteria2
   server: ${NODE_IP}
   port: ${PORT_HYSTERIA2}
@@ -23,7 +23,7 @@ proxies:
   skip-cert-verify: true
 
 # TAG_INCOMPATIBILITY_BEGIN
-- name: ${GEOIP_INFO}|${NODE_NAME}|tuic
+- name: ${REGION_INFO}|${NODE_NAME}|tuic
   type: tuic
   server: ${NODE_IP}
   port: ${PORT_TUIC}
@@ -39,7 +39,7 @@ proxies:
   skip-cert-verify: true
 # TAG_INCOMPATIBILITY_END
 
-- name: ${GEOIP_INFO}|${NODE_NAME}|ShadowTLS
+- name: ${REGION_INFO}|${NODE_NAME}|ShadowTLS
   type: ss
   server: ${DOMAIN}
   port: ${PORT_SHADOWTLS}
@@ -52,14 +52,14 @@ proxies:
     password: ${SB_UUID}
     version: 3
 
-- name: ${GEOIP_INFO}|${NODE_NAME}|shadowsocks
+- name: ${REGION_INFO}|${NODE_NAME}|shadowsocks
   type: ss
   server: ${DOMAIN}
   port: ${PORT_SHADOWSOCKS}
   cipher: aes-128-gcm
   password: ${SB_UUID}
 
-- name: ${GEOIP_INFO}|${NODE_NAME}|trojan
+- name: ${REGION_INFO}|${NODE_NAME}|trojan
   type: trojan
   server: ${DOMAIN}
   port: ${PORT_TROJAN}
@@ -67,7 +67,7 @@ proxies:
   client-fingerprint: random
   skip-cert-verify: true
 
-- name: ${GEOIP_INFO}|${NODE_NAME}|vmess-ws-tls
+- name: ${REGION_INFO}|${NODE_NAME}|vmess-ws-tls
   type: vmess
   server: ${DOMAIN}
   port: ${LISTENING_PORT}
@@ -83,7 +83,7 @@ proxies:
     headers:
       Host: ${DOMAIN}
 
-- name: ${GEOIP_INFO}|${NODE_NAME}|vless-ws-tls
+- name: ${REGION_INFO}|${NODE_NAME}|vless-ws-tls
   type: vless
   server: ${DOMAIN}
   port: ${LISTENING_PORT}
@@ -101,7 +101,7 @@ proxies:
     early-data-header-name: Sec-WebSocket-Protocol
 
 # TAG_INCOMPATIBILITY_BEGIN
-- name: ${GEOIP_INFO}|${NODE_NAME}|grpc-reality
+- name: ${REGION_INFO}|${NODE_NAME}|grpc-reality
   type: vless
   server: ${DOMAIN}
   port: ${PORT_GRPC_REALITY}
@@ -119,7 +119,7 @@ proxies:
 # TAG_INCOMPATIBILITY_END
 
 # TAG_INCOMPATIBILITY_BEGIN
-- name: ${GEOIP_INFO}|${NODE_NAME}|anytls
+- name: ${REGION_INFO}|${NODE_NAME}|anytls
   type: anytls
   server: ${NODE_IP}
   port: ${PORT_ANYTLS}
@@ -131,7 +131,7 @@ proxies:
   skip-cert-verify: true
 # TAG_INCOMPATIBILITY_END
 
-- name: ${GEOIP_INFO}|${NODE_NAME}|VMESS
+- name: ${REGION_INFO}|${NODE_NAME}|VMESS
   type: vmess
   server: ${DOMAIN}
   port: ${LISTENING_PORT}
