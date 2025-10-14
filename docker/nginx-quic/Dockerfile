@@ -23,6 +23,7 @@ RUN set -ex; \
     yajl-dev \
     libxml2-dev \
     libxslt-dev \
+    curl \
     curl-dev \
     lmdb-dev \
     libfuzzy2-dev \
@@ -53,14 +54,14 @@ RUN set -ex; \
 
 # Nginx
 # https://github.com/nginx/nginx
-ARG NGINX_VERSION=release-1.29.1
-ARG DTR_VER=1.27.5
+ARG NGINX_VERSION=release-1.29.2
+ARG DTR_VER=1.29.2
 ARG RCP_VER=1.27.1
 RUN set -ex; \
   git clone https://github.com/nginx/nginx --branch "$NGINX_VERSION" /src/nginx; \
   cd /src/nginx; \
-  wget -q https://raw.githubusercontent.com/nginx-modules/ngx_http_tls_dyn_size/refs/heads/master/nginx__dynamic_tls_records_"$DTR_VER"%2B.patch -O /src/nginx/1.patch; \
-  wget -q https://raw.githubusercontent.com/openresty/openresty/refs/heads/master/patches/nginx/"$RCP_VER"/nginx-"$RCP_VER"-resolver_conf_parsing.patch -O /src/nginx/2.patch; \
+  curl -fsSL https://raw.githubusercontent.com/nginx-modules/ngx_http_tls_dyn_size/refs/heads/master/nginx__dynamic_tls_records_"$DTR_VER"%2B.patch -o /src/nginx/1.patch; \
+  curl -fsSL https://raw.githubusercontent.com/openresty/openresty/refs/heads/master/patches/nginx/"$RCP_VER"/nginx-"$RCP_VER"-resolver_conf_parsing.patch -o /src/nginx/2.patch; \
   sed -i "s|nginx/|NPMplus/|g" /src/nginx/src/core/nginx.h; \
   sed -i "s|Server: nginx|Server: NPMplus|g" /src/nginx/src/http/ngx_http_header_filter_module.c; \
   sed -i "/<hr><center>/d" /src/nginx/src/http/ngx_http_special_response.c; \
@@ -95,7 +96,7 @@ RUN set -ex; \
   make -j$(nproc) libquickjs.a; \
   echo "quickjs $(cat VERSION)"
 
-ARG NJS_VERSION=0.9.1
+ARG NJS_VERSION=0.9.3
 RUN set -ex; \
   echo "Cloning and configuring njs ${NJS_VERSION} ..."; \
   git clone --recursive --depth 1 --single-branch -b ${NJS_VERSION} https://github.com/nginx/njs /src/njs; \
@@ -272,7 +273,7 @@ RUN set -ex; \
 	# https://tools.ietf.org/html/rfc7919
 	# https://github.com/mozilla/ssl-config-generator/blob/master/docs/ffdhe2048.txt
   mkdir -p /etc/nginx/ssl; \
-	wget -q https://ssl-config.mozilla.org/ffdhe2048.txt -O /etc/nginx/ssl/dhparam.pem; \
+	curl -fsSL https://ssl-config.mozilla.org/ffdhe2048.txt -o /etc/nginx/ssl/dhparam.pem; \
 	\
 	# Bring in gettext so we can get `envsubst`, then throw
 	# the rest away. To do this, we need to install `gettext`

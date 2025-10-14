@@ -20,6 +20,6 @@ docker buildx build --platform linux/amd64,linux/arm64 -t currycan/nginx:1.29.1 
 
 docker build \
   --platform linux/amd64,linux/arm64 \
-  --tag currycan/nginx:1.29.1 \
+  --tag currycan/nginx:1.29.2 \
   --push .
 ```
