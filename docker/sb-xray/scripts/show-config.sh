@@ -53,10 +53,10 @@ show_shadowrocket_link() {
 vless://$(echo -n "auto:${SB_UUID}@${DOMAIN}:${PORT_XTLS_REALITY}" | base64 -w0)?remarks=${REGION_INFO}|${NODE_NAME}|xtls-reality&obfs=none&tls=1&peer=addons.mozilla.org&mux=1&pbk=${SB_REALITY_PUBLIC_KEY}
 "
     SHADOWROCKET_SUBSCRIBE+="
-hysteria2://${SB_UUID}@${NODE_IP}:${PORT_HYSTERIA2}?insecure=1&obfs=none#${REGION_INFO}|${NODE_NAME}|hysteria2
+hysteria2://${SB_UUID}@${DOMAIN}:${PORT_HYSTERIA2}?insecure=1&obfs=none#${REGION_INFO}|${NODE_NAME}|hysteria2
 "
     SHADOWROCKET_SUBSCRIBE+="
-tuic://${SB_UUID}:${SB_UUID}@${NODE_IP}:${PORT_TUIC}?congestion_control=bbr&udp_relay_mode=native&alpn=h3&allow_insecure=1#${REGION_INFO}|${NODE_NAME}|tuic
+tuic://${SB_UUID}:${SB_UUID}@${DOMAIN}:${PORT_TUIC}?congestion_control=bbr&udp_relay_mode=native&alpn=h3&allow_insecure=1#${REGION_INFO}|${NODE_NAME}|tuic
 "
     SHADOWROCKET_SUBSCRIBE+="
 ss://$(echo -n "2022-blake3-aes-128-gcm:${SHADOWTLS_PASSWORD}@${DOMAIN}:${PORT_SHADOWTLS}" | base64 -w0)?shadow-tls=$(echo -n "{\"version\":\"3\",\"host\":\"addons.mozilla.org\",\"password\":\"${SB_UUID}\"}" | base64 -w0)#${REGION_INFO}|${NODE_NAME}|ShadowTLS
@@ -80,7 +80,7 @@ vless://$(echo -n auto:${SB_UUID}@${DOMAIN}:${PORT_H2_REALITY} | base64 -w0)?rem
 vless://$(echo -n "auto:${SB_UUID}@${DOMAIN}:${PORT_GRPC_REALITY}" | base64 -w0)?remarks=${REGION_INFO}|${NODE_NAME}|grpc-reality&path=grpc&obfs=grpc&tls=1&peer=addons.mozilla.org&pbk=${SB_REALITY_PUBLIC_KEY}
 "
     SHADOWROCKET_SUBSCRIBE+="
-anytls://${SB_UUID}@${NODE_IP}:${PORT_ANYTLS}?insecure=1&udp=1#${REGION_INFO}|${NODE_NAME}|&anytls
+anytls://${SB_UUID}@${DOMAIN}:${PORT_ANYTLS}?insecure=1&udp=1#${REGION_INFO}|${NODE_NAME}|anytls
 "
     print_colored ${GREEN} "ShadowRocket 订阅链接内容如下:
 ${SHADOWROCKET_SUBSCRIBE}"
@@ -93,11 +93,11 @@ show_v2rayn_link() {
 vless://${SB_UUID}@${DOMAIN}:${PORT_XTLS_REALITY}?encryption=none&security=reality&sni=addons.mozilla.org&fp=chrome&pbk=${SB_REALITY_PUBLIC_KEY}&type=tcp&headerType=none&host=${DOMAIN}#${REGION_INFO}|${NODE_NAME}|xtls-reality
 "
     V2RAYN_SUBSCRIBE+="
-hysteria2://${SB_UUID}@${NODE_IP}:${PORT_HYSTERIA2}/?alpn=h3&insecure=1#${REGION_INFO}|${NODE_NAME}|hysteria2
+hysteria2://${SB_UUID}@${DOMAIN}:${PORT_HYSTERIA2}/?alpn=h3&insecure=1#${REGION_INFO}|${NODE_NAME}|hysteria2
 "
     V2RAYN_SUBSCRIBE+="
 # 需把 tls 里的 inSecure 设置为 true
-tuic://${SB_UUID}:${SB_UUID}@${NODE_IP}:${PORT_TUIC}?alpn=h3&congestion_control=bbr#${REGION_INFO}|${NODE_NAME}|tuic
+tuic://${SB_UUID}:${SB_UUID}@${DOMAIN}:${PORT_TUIC}?alpn=h3&congestion_control=bbr#${REGION_INFO}|${NODE_NAME}|tuic
 "
     V2RAYN_SUBSCRIBE+="
 ss://$(echo -n "aes-128-gcm:${SB_UUID}@${DOMAIN}:${PORT_SHADOWSOCKS}" | base64 -w0)#${REGION_INFO}|${NODE_NAME}|shadowsocks
@@ -116,7 +116,7 @@ vless://${SB_UUID}@${DOMAIN}:${PORT_GRPC_REALITY}?encryption=none&security=reali
 "
     V2RAYN_SUBSCRIBE+="
 # 需把 tls 里的 inSecure 设置为 true
-anytls://${SB_UUID}@${NODE_IP}:${PORT_ANYTLS}?security=tls&type=tcp#${REGION_INFO}|${NODE_NAME}|&anytls
+anytls://${SB_UUID}@${DOMAIN}:${PORT_ANYTLS}?security=tls&type=tcp#${REGION_INFO}|${NODE_NAME}|anytls
 "
     # vmess ws tls
     V2RAYN_SUBSCRIBE+="
@@ -153,10 +153,10 @@ show_netbox_link() {
 vless://${SB_UUID}@${DOMAIN}:${PORT_XTLS_REALITY}?security=reality&sni=addons.mozilla.org&fp=chrome&pbk=${SB_REALITY_PUBLIC_KEY}&type=tcp&encryption=none#${REGION_INFO}|${NODE_NAME}|xtls-reality
 "
     NEKOBOX_SUBSCRIBE+="
-hy2://${SB_UUID}@${NODE_IP}:${PORT_HYSTERIA2}?insecure=1#${REGION_INFO}|${NODE_NAME}|hysteria2
+hy2://${SB_UUID}@${DOMAIN}:${PORT_HYSTERIA2}?insecure=1#${REGION_INFO}|${NODE_NAME}|hysteria2
 "
     NEKOBOX_SUBSCRIBE+="
-tuic://${SB_UUID}:${SB_UUID}@${NODE_IP}:${PORT_TUIC}?congestion_control=bbr&alpn=h3&udp_relay_mode=native&allow_insecure=1&disable_sni=1#${REGION_INFO}|${NODE_NAME}|tuic
+tuic://${SB_UUID}:${SB_UUID}@${DOMAIN}:${PORT_TUIC}?congestion_control=bbr&alpn=h3&udp_relay_mode=native&allow_insecure=1&disable_sni=1#${REGION_INFO}|${NODE_NAME}|tuic
 "
     NEKOBOX_SUBSCRIBE+="
 nekoray://custom#$(echo -n "{\"_v\":0,\"addr\":\"127.0.0.1\",\"cmd\":[\"\"],\"core\":\"internal\",\"cs\":\"{\n    \\\"password\\\": \\\"${SB_UUID}\\\",\n    \\\"server\\\": \\\"${DOMAIN}\\\",\n    \\\"server_port\\\": ${PORT_SHADOWTLS},\n    \\\"tag\\\": \\\"shadowtls-out\\\",\n    \\\"tls\\\": {\n        \\\"enabled\\\": true,\n        \\\"server_name\\\": \\\"addons.mozilla.org\\\"\n    },\n    \\\"type\\\": \\\"shadowtls\\\",\n    \\\"version\\\": 3\n}\n\",\"mapping_port\":0,\"name\":\"${REGION_INFO}|${NODE_NAME}|ss-custom\",\"port\":1080,\"socks_port\":0}" | base64 -w0)

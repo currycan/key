@@ -10,13 +10,25 @@ follow the below approach:
 [Multi-platform | Docker Docs](https://docs.docker.com/build/building/multi-platform/)
 [containerd image store | Docker Docs](https://docs.docker.com/desktop/features/containerd/)
 
+
+
 ```bash
+
+vim /etc/docker/daemon.json
+#添加配置
+{
+ "experimental": true
+}
+systemctl daemon-reload && systemctl restart docker
+docker info | grep Experimental # 此时特性将开启
 
 docker run --privileged --rm tonistiigi/binfmt --install all
 
-docker buildx create --use --name=mybuilder-cn --driver docker-container --driver-opt image=dockerpracticesig/buildkit:master
+docker buildx create --name mybuilder --driver docker-container --use
 
-docker buildx build --platform linux/amd64,linux/arm64 -t currycan/nginx:1.29.1 --output ./bin .
+docker buildx use xxx
+
+docker buildx build --platform linux/amd64,linux/arm64 -t currycan/nginx:1.29.2 --output ./bin .
 
 docker build \
   --platform linux/amd64,linux/arm64 \

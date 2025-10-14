@@ -17,7 +17,6 @@ RUN apk --no-cache --update add \
   curl \
   git \
   gcc \
-  wget \
   unzip; \
   update-ca-certificates
 
@@ -49,7 +48,7 @@ RUN set -ex; \
     mv /tmp/dufs /usr/local/bin/
 
 # ===== 安装 V2Ray =====
-ARG V2RAY_VERSION="5.39.0"
+ARG V2RAY_VERSION="5.40.0"
 RUN set -ex; \
     if [ -z "$V2RAY_VERSION" ]; then \
         V2RAY_VERSION=$(curl -sSf https://github.com/v2fly/v2ray-core/tags \
@@ -63,13 +62,13 @@ RUN set -ex; \
     esac; \
     mkdir -p /tmp/v2ray; \
     cd /tmp/v2ray; \
-    wget -q "https://github.com/v2fly/v2ray-core/releases/download/v${V2RAY_VERSION}/${BINARY_FILE}"; \
+    curl -fsSLO "https://github.com/v2fly/v2ray-core/releases/download/v${V2RAY_VERSION}/${BINARY_FILE}"; \
     unzip "${BINARY_FILE}"; \
     upx --lzma --best v2ray; \
     mv v2ray /usr/local/bin/
 
 # ===== 安装 Sing-box =====
-ARG SING_BOX_VERSION="1.12.8"
+ARG SING_BOX_VERSION="1.12.9"
 RUN set -ex; \
     if [ -z "$SING_BOX_VERSION" ]; then \
         V2RAY_VERSION=$(curl -sSf https://github.com/SagerNet/sing-box/tags \
@@ -94,7 +93,7 @@ RUN set -ex; \
     mv /tmp/cloudflared /usr/local/bin/
 
 # ===== 安装 x-ui =====
-ARG XUI_VERSION="2.8.3"
+ARG XUI_VERSION="2.8.4"
 RUN set -ex; \
     if [ -z "$XUI_VERSION" ]; then \
         V2RAY_VERSION=$(curl -sSf https://github.com/MHSanaei/3x-ui/tags \
@@ -121,23 +120,23 @@ RUN set -ex; \
     esac; \
     mkdir -p /tmp/xray; \
     cd /tmp/xray; \
-    wget -q "https://github.com/XTLS/Xray-core/releases/download/v${XRAY_VERSION}/${BINARY_FILE}"; \
+    curl -fsSLO "https://github.com/XTLS/Xray-core/releases/download/v${XRAY_VERSION}/${BINARY_FILE}"; \
     unzip "${BINARY_FILE}"; \
     rm -f "${BINARY_FILE}" geoip.dat geosite.dat; \
     upx --lzma --best xray; \
-    wget -q https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geoip.dat; \
-    wget -q https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geosite.dat; \
-    wget -q -O geoip_IR.dat https://github.com/chocolate4u/Iran-v2ray-rules/releases/latest/download/geoip.dat; \
-    wget -q -O geosite_IR.dat https://github.com/chocolate4u/Iran-v2ray-rules/releases/latest/download/geosite.dat; \
-    wget -q -O geoip_RU.dat https://github.com/runetfreedom/russia-v2ray-rules-dat/releases/latest/download/geoip.dat; \
-    wget -q -O geosite_RU.dat https://github.com/runetfreedom/russia-v2ray-rules-dat/releases/latest/download/geosite.dat; \
+    curl -fsSLO https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geoip.dat; \
+    curl -fsSLO https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geosite.dat; \
+    curl -fsSLo geoip_IR.dat https://github.com/chocolate4u/Iran-v2ray-rules/releases/latest/download/geoip.dat; \
+    curl -fsSLo geosite_IR.dat https://github.com/chocolate4u/Iran-v2ray-rules/releases/latest/download/geosite.dat; \
+    curl -fsSLo geoip_RU.dat https://github.com/runetfreedom/russia-v2ray-rules-dat/releases/latest/download/geoip.dat; \
+    curl -fsSLo geosite_RU.dat https://github.com/runetfreedom/russia-v2ray-rules-dat/releases/latest/download/geosite.dat; \
     mkdir -p /usr/local/bin/bin; \
     mv xray /usr/local/bin/bin/xray-linux-${TARGETARCH}; \
     mv *.dat /usr/local/bin/bin; \
     ln -sf /usr/local/bin/bin/xray* /usr/local/bin/xray; \
     ln -sf /usr/local/bin/bin/*.dat /usr/local/bin/
 
-FROM docker.io/currycan/nginx:1.29.1
+FROM docker.io/currycan/nginx:1.29.2
 
 # Create a non-root user and group
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
