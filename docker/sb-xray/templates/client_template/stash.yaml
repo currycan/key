@@ -79,7 +79,7 @@ dns:
       # - https://dns.google/dns-query
 proxy-providers:
   ${NODE_NAME}:
-    url: https://${DOMAIN}/sb-xray/stash-simple
+    url: https://${DOMAIN}/sb-xray/stash
     interval: 60
 
 proxy-groups:

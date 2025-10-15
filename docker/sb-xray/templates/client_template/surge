@@ -1,7 +1,7 @@
 # Hysteria2
-${REGION_INFO}|${NODE_NAME}|hysteria2=hysteria2,${NODE_IP},${PORT_HYSTERIA2},password="${SB_UUID}",skip-cert-verify=true,download-bandwidth=2500
+${REGION_INFO}|${NODE_NAME}|hysteria2=hysteria2,${DOMAIN},${PORT_HYSTERIA2},password="${SB_UUID}",skip-cert-verify=true,download-bandwidth=2500
 # TUICv5
-${REGION_INFO}|${NODE_NAME}|tuic=tuic-v5,${NODE_IP},${PORT_TUIC},uuid=${SB_UUID},password="${SB_UUID}",alpn=h3,sni=off,skip-cert-verify=true
+${REGION_INFO}|${NODE_NAME}|tuic=tuic-v5,${DOMAIN},${PORT_TUIC},uuid=${SB_UUID},password="${SB_UUID}",alpn=h3,sni=off,skip-cert-verify=true
 # ShadowTLS+Shadowsocks2022
 ${REGION_INFO}|${NODE_NAME}|ShadowTLS=ss,${DOMAIN},${PORT_SHADOWTLS},encrypt-method=2022-blake3-aes-128-gcm,password="${SHADOWTLS_PASSWORD}",shadow-tls-password=${SB_UUID},shadow-tls-sni=addons.mozilla.org,shadow-tls-version=3
 # 普通ShadowsocksAEAD

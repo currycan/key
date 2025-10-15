@@ -16,21 +16,6 @@ https://bianyuan.xyz/
 
 ## 镜像制作
 
-
-docker buildx 等 BuildKit 功能构建镜像，在 ~/.docker/config.json 或 buildkit 配置里指定代理：
-
-```json
-{
-  "proxies": {
-    "default": {
-      "httpProxy": "http://xxxxx:7890",
-      "httpsProxy": "http://xxxxx:7890",
-      "noProxy": "localhost,127.0.0.1,github.com"
-    }
-  }
-}
-```
-
 ```bash
 docker buildx build \
   --platform linux/amd64,linux/arm64 \

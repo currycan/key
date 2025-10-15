@@ -1,43 +1,10 @@
 proxies:
-- name: ${REGION_INFO}|${NODE_NAME}|xtls-reality
-  type: vless
-  server: ${DOMAIN}
-  port: ${PORT_XTLS_REALITY}
-  uuid: ${SB_UUID}
-  network: tcp
-  udp: true
-  tls: true
-  servername: addons.mozilla.org
-  client-fingerprint: chrome
-  reality-opts:
-    public-key: ${SB_REALITY_PUBLIC_KEY}
-    short-id: ""
-  tfo: false
-  skip-cert-verify: false
-
 - name: ${REGION_INFO}|${NODE_NAME}|hysteria2
   type: hysteria2
-  server: ${NODE_IP}
+  server: ${DOMAIN}
   port: ${PORT_HYSTERIA2}
   password: ${SB_UUID}
   skip-cert-verify: true
-
-# TAG_INCOMPATIBILITY_BEGIN
-- name: ${REGION_INFO}|${NODE_NAME}|tuic
-  type: tuic
-  server: ${NODE_IP}
-  port: ${PORT_TUIC}
-  uuid: ${SB_UUID}
-  password: ${SB_UUID}
-  alpn:
-    - h3
-  disable-sni: true
-  reduce-rtt: true
-  request-timeout: 8000
-  udp-relay-mode: native
-  congestion-controller: bbr
-  skip-cert-verify: true
-# TAG_INCOMPATIBILITY_END
 
 - name: ${REGION_INFO}|${NODE_NAME}|ShadowTLS
   type: ss
@@ -100,37 +67,6 @@ proxies:
     max-early-data: 2048
     early-data-header-name: Sec-WebSocket-Protocol
 
-# TAG_INCOMPATIBILITY_BEGIN
-- name: ${REGION_INFO}|${NODE_NAME}|grpc-reality
-  type: vless
-  server: ${DOMAIN}
-  port: ${PORT_GRPC_REALITY}
-  uuid: ${SB_UUID}
-  network: grpc
-  tls: true
-  udp: true
-  client-fingerprint: chrome
-  servername: addons.mozilla.org
-  grpc-opts:
-    grpc-service-name: grpc
-  reality-opts:
-    public-key: ${SB_REALITY_PUBLIC_KEY}
-    short-id: ""
-# TAG_INCOMPATIBILITY_END
-
-# TAG_INCOMPATIBILITY_BEGIN
-- name: ${REGION_INFO}|${NODE_NAME}|anytls
-  type: anytls
-  server: ${NODE_IP}
-  port: ${PORT_ANYTLS}
-  password: ${SB_UUID}
-  client-fingerprint: chrome
-  udp: true
-  idle-session-check-interval: 30
-  idle-session-timeout: 30
-  skip-cert-verify: true
-# TAG_INCOMPATIBILITY_END
-
 - name: ${REGION_INFO}|${NODE_NAME}|VMESS
   type: vmess
   server: ${DOMAIN}
@@ -161,79 +97,3 @@ proxies:
     _spider-x: /
   network: tcp
   servername: ${DOMAIN}
-
-# TAG_INCOMPATIBILITY_BEGIN
-- name: ${REGION_INFO}|${NODE_NAME}|Xhttp+Reality直连
-  type: vless
-  server: ${DOMAIN}
-  port: ${LISTENING_PORT}
-  uuid: ${XRAY_XHTTP_UUID}
-  tls: true
-  client-fingerprint: chrome
-  skip-cert-verify: false
-  reality-opts:
-    public-key: ${XRAY_REALITY_PUBLIC_KEY}
-    short-id: ${XRAY_REALITY_SHORTID}
-  network: xhttp
-  xhttp-opts:
-    path: /${XRAY_XHTTP_URL_PATH}
-  servername: ${DOMAIN}
-# TAG_INCOMPATIBILITY_END
-
-# TAG_INCOMPATIBILITY_BEGIN
-- name: ${REGION_INFO}|${NODE_NAME}|上行Xhttp+TLS+CDN|下行Xhttp+Reality
-  type: vless
-  server: ${DOMAIN}
-  port: ${LISTENING_PORT}
-  uuid: ${XRAY_XHTTP_UUID}
-  tls: true
-  client-fingerprint: chrome
-  alpn:
-    - h2
-  skip-cert-verify: false
-  network: xhttp
-  xhttp-opts:
-    headers:
-      Host: ${CDNDOMAIN}
-    path: /${XRAY_XHTTP_URL_PATH}
-  servername: ${CDNDOMAIN}
-# TAG_INCOMPATIBILITY_END
-
-# TAG_INCOMPATIBILITY_BEGIN
-- name: ${REGION_INFO}|${NODE_NAME}|上行Xhttp+Reality|下行Xhttp+TLS+CDN
-  type: vless
-  server: ${DOMAIN}
-  port: ${LISTENING_PORT}
-  uuid: ${XRAY_XHTTP_UUID}
-  tls: true
-  client-fingerprint: chrome
-  alpn:
-    - h2
-  skip-cert-verify: false
-  reality-opts:
-    public-key: ${XRAY_REALITY_PUBLIC_KEY}
-    short-id: ${XRAY_REALITY_SHORTID}
-  network: xhttp
-  xhttp-opts:
-    path: /${XRAY_XHTTP_URL_PATH}
-  servername: ${DOMAIN}
-# TAG_INCOMPATIBILITY_END
-
-# TAG_INCOMPATIBILITY_BEGIN
-- name: ${REGION_INFO}|${NODE_NAME}|Xhttp+TLS+CDN上下行不分离
-  type: vless
-  server: ${DOMAIN}
-  port: ${LISTENING_PORT}
-  uuid: ${XRAY_XHTTP_UUID}
-  tls: true
-  client-fingerprint: chrome
-  alpn:
-    - h2
-  skip-cert-verify: false
-  network: xhttp
-  xhttp-opts:
-    headers:
-      Host: ${CDNDOMAIN}
-    path: /${XRAY_XHTTP_URL_PATH}
-  servername: ${CDNDOMAIN}
-# TAG_INCOMPATIBILITY_END

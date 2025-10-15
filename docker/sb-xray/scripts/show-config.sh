@@ -227,8 +227,8 @@ xui_info() {
     echo -e "${GREEN}=== x-ui 用户信息 ===${RESET}"
     /usr/local/bin/x-ui setting --show
     echo ""
+    print_colored ${CYAN} ">>>>>>>>>>>>>>>>>>>>>>>>>>>>> ${DOMAIN} <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
     print_colored ${CYAN} ">>>>>>>>>>>>>>>>>>>>>>>>>>>>> ${PASSWORD} <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
-
 }
 
 mkdir -p ${WORKDIR}/subscribe
@@ -241,11 +241,9 @@ main() {
     show_all_link
     envsubst </templates/client_template/proxies >${WORKDIR}/subscribe/proxies
     envsubst </templates/client_template/stash >${WORKDIR}/subscribe/stash
-    sed '/# TAG_INCOMPATIBILITY_BEGIN/,/# TAG_INCOMPATIBILITY_END/d' \
-        "${WORKDIR}/subscribe/stash" \
-        > "${WORKDIR}/subscribe/stash-simple"
-    envsubst </templates/client_template/stash.yaml >${WORKDIR}/subscribe/stash-${NODE_NAME}.yaml
     envsubst </templates/client_template/surge >${WORKDIR}/subscribe/surge
+
+    envsubst </templates/client_template/stash.yaml >${WORKDIR}/subscribe/stash-${NODE_NAME}.yaml
     envsubst </templates/client_template/surge.conf >${WORKDIR}/subscribe/surge-${NODE_NAME}.conf
 }
 
