@@ -1,0 +1,32 @@
+# 代理配置
+proxies:
+# XTLS Reality 配置
+- {name: "${REGION_INFO}|${NODE_NAME}|xtls-reality", server: ${DOMAIN}, port: ${PORT_XTLS_REALITY}, type: vless, tls: true, packet-encoding: xudp, uuid: ${SB_UUID}, servername: addons.mozilla.org, skip-cert-verify: false, udp: true, tfo: false}
+# Hysteria2 配置
+- {name: "${REGION_INFO}|${NODE_NAME}|hysteria2", server: ${NODE_IP}, port: ${PORT_HYSTERIA2}, type: hysteria2, ports: ${PORT_HYSTERIA2}, password: ${SB_UUID}, skip-cert-verify: false, udp: true, tfo: false}
+# TUIC 配置
+- {name: "${REGION_INFO}|${NODE_NAME}|tuic", server: ${NODE_IP}, port: ${PORT_TUIC}, type: tuic, uuid: ${SB_UUID}, password: ${SB_UUID}, alpn: [h3], congestion-controller: bbr, skip-cert-verify: false, udp: true, tfo: false}
+# Shadowsocks 配置
+- {name: "${REGION_INFO}|${NODE_NAME}|shadowsocks", server: ${DOMAIN}, port: ${PORT_SHADOWSOCKS}, type: ss, cipher: aes-128-gcm, password: ${SB_UUID}, udp: true, tfo: false}
+# Trojan 配置
+- {name: "${REGION_INFO}|${NODE_NAME}|trojan", server: ${DOMAIN}, port: ${PORT_TROJAN}, type: trojan, password: ${SB_UUID}, skip-cert-verify: false, udp: true, tfo: false}
+# VMESS WS TLS 配置
+- {name: "${REGION_INFO}|${NODE_NAME}|vmess-ws-tls", server: ${DOMAIN}, port: ${LISTENING_PORT}, type: vmess, uuid: ${SB_UUID}, alterId: ${ALTERID}, cipher: auto, tls: true, skip-cert-verify: false, network: ${NETWORK}, ws-opts: {path: /${SB_UUID}-vmess, headers: {Host: ${DOMAIN}}}, udp: true, tfo: false}
+# VLESS WS TLS 配置
+- {name: "${REGION_INFO}|${NODE_NAME}|vless-ws-tls", server: ${DOMAIN}, port: ${LISTENING_PORT}, type: vless, tls: true, packet-encoding: xudp, uuid: ${SB_UUID}, servername: ${DOMAIN}, skip-cert-verify: false, udp: true, tfo: false}
+# gRPC Reality 配置
+- {name: "${REGION_INFO}|${NODE_NAME}|grpc-reality", server: ${DOMAIN}, port: ${PORT_GRPC_REALITY}, type: vless, tls: true, packet-encoding: xudp, uuid: ${SB_UUID}, servername: addons.mozilla.org, skip-cert-verify: false, udp: true, tfo: false}
+# AnyTLS 配置
+- {name: "${REGION_INFO}|${NODE_NAME}|anytls", server: ${NODE_IP}, port: ${PORT_ANYTLS}, type: anytls, password: ${SB_UUID}, skip-cert-verify: false, udp: true, tfo: false}
+# 备用 VMESS 配置
+- {name: "${REGION_INFO}|${NODE_NAME}.${DOMAIN}-VMESS", server: ${DOMAIN}, port: ${LISTENING_PORT}, type: vmess, uuid: ${V2RAY_UUID}, alterId: ${ALTERID}, cipher: auto, tls: true, skip-cert-verify: false, network: ${NETWORK}, ws-opts: {path: /${V2RAY_URL_PATH}, headers: {Host: ${DOMAIN}}}, udp: true, tfo: false}
+# XTLS Vision Reality 直连配置
+- {name: "${REGION_INFO}|${NODE_NAME}|XTLS(Vision) Reality直连", server: ${DOMAIN}, port: ${LISTENING_PORT}, type: vless, tls: true, packet-encoding: xudp, uuid: ${XRAY_REALITY_UUID}, servername: ${DOMAIN}, flow: xtls-rprx-vision, reality-opts: {public-key: ${XRAY_REALITY_PUBLIC_KEY}, short-id: ${XRAY_REALITY_SHORTID}}, client-fingerprint: random, skip-cert-verify: false, udp: true, tfo: false}
+# Xhttp Reality 直连配置
+- {name: "${REGION_INFO}|${NODE_NAME}|Xhttp Reality直连", server: ${DOMAIN}, port: ${LISTENING_PORT}, type: vless, tls: true, packet-encoding: xudp, uuid: ${XRAY_XHTTP_UUID}, servername: ${DOMAIN}, reality-opts: {public-key: ${XRAY_REALITY_PUBLIC_KEY}, short-id: ${XRAY_REALITY_SHORTID}}, client-fingerprint: random, skip-cert-verify: false, udp: true, tfo: false}
+# 上行Xhttp TLS CDN | 下行Xhttp Reality 配置
+- {name: "${REGION_INFO}|${NODE_NAME}|上行Xhttp TLS CDN|下行Xhttp Reality", server: ${DOMAIN}, port: ${LISTENING_PORT}, type: vless, tls: true, packet-encoding: xudp, uuid: ${XRAY_XHTTP_UUID}, servername: ${CDNDOMAIN}, alpn: [h2], skip-cert-verify: false, udp: true, tfo: false}
+# 上行Xhttp Reality | 下行 Xhttp TLS CDN 配置
+- {name: "${REGION_INFO}|${NODE_NAME}|上行Xhttp Reality|下行 Xhttp TLS CDN", server: ${DOMAIN}, port: ${LISTENING_PORT}, type: vless, tls: true, packet-encoding: xudp, uuid: ${XRAY_XHTTP_UUID}, servername: ${DOMAIN}, alpn: [h2], reality-opts: {public-key: ${XRAY_REALITY_PUBLIC_KEY}, short-id: ${XRAY_REALITY_SHORTID}}, client-fingerprint: random, skip-cert-verify: false, udp: true, tfo: false}
+# Xhttp TLS CDN 上下行不分离配置
+- {name: "${REGION_INFO}|${NODE_NAME}|Xhttp TLS CDN上下行不分离", server: ${DOMAIN}, port: ${LISTENING_PORT}, type: vless, tls: true, packet-encoding: xudp, uuid: ${XRAY_XHTTP_UUID}, servername: ${CDNDOMAIN}, alpn: [h2], reality-opts: {public-key: ${XRAY_REALITY_PUBLIC_KEY}, short-id: ${XRAY_REALITY_SHORTID}}, client-fingerprint: random, skip-cert-verify: false, udp: true, tfo: false}
