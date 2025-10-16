@@ -230,6 +230,8 @@ initial() {
     echo code="Mthgh@001" >>~/sb-xray/.env
     curl -o ~/sb-xray/docker-compose.yml https://raw.githubusercontent.com/currycan/key/refs/heads/master/docker/sb-xray/docker-compose.yml
 
+    mkdir -p /root/ssrpolipo && cd /root/ssrpolipo
+    curl -fsSLO  https://raw.githubusercontent.com/currycan/key/master/ssrpolipo/docker-compose.yml
     mkdir -p /root/file/data
     curl -o /root/file/docker-compose.yml https://raw.githubusercontent.com/currycan/key/master/file/docker-compose.yml
     cd /root/file/data; dd if=/dev/zero of=`hostname` bs=1M count=1k conv=fdatasync;cd -
