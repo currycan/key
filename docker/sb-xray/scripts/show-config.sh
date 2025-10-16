@@ -47,46 +47,6 @@ show_qrcode() {
     echo "$content" | qrencode -o - -t utf8 $qr_params --foreground=000000 --background=FFFFFF
 }
 
-show_shadowrocket_link() {
-    # 生成 ShadowRocket 订阅配置文件
-    SHADOWROCKET_SUBSCRIBE+="
-vless://$(echo -n "auto:${SB_UUID}@${DOMAIN}:${PORT_XTLS_REALITY}" | base64 -w0)?remarks=${REGION_INFO}|${NODE_NAME}|xtls-reality&obfs=none&tls=1&peer=addons.mozilla.org&mux=1&pbk=${SB_REALITY_PUBLIC_KEY}
-"
-    SHADOWROCKET_SUBSCRIBE+="
-hysteria2://${SB_UUID}@${DOMAIN}:${PORT_HYSTERIA2}?insecure=1&obfs=none#${REGION_INFO}|${NODE_NAME}|hysteria2
-"
-    SHADOWROCKET_SUBSCRIBE+="
-tuic://${SB_UUID}:${SB_UUID}@${DOMAIN}:${PORT_TUIC}?congestion_control=bbr&udp_relay_mode=native&alpn=h3&allow_insecure=1#${REGION_INFO}|${NODE_NAME}|tuic
-"
-    SHADOWROCKET_SUBSCRIBE+="
-ss://$(echo -n "2022-blake3-aes-128-gcm:${SHADOWTLS_PASSWORD}@${DOMAIN}:${PORT_SHADOWTLS}" | base64 -w0)?shadow-tls=$(echo -n "{\"version\":\"3\",\"host\":\"addons.mozilla.org\",\"password\":\"${SB_UUID}\"}" | base64 -w0)#${REGION_INFO}|${NODE_NAME}|ShadowTLS
-"
-    SHADOWROCKET_SUBSCRIBE+="
-ss://$(echo -n "aes-128-gcm:${SB_UUID}@${DOMAIN}:${PORT_SHADOWSOCKS}" | base64 -w0)#${REGION_INFO}|${NODE_NAME}|shadowsocks
-"
-    SHADOWROCKET_SUBSCRIBE+="
-trojan://${SB_UUID}@${DOMAIN}:${PORT_TROJAN}?allowInsecure=1#${REGION_INFO}|${NODE_NAME}|trojan
-"
-    SHADOWROCKET_SUBSCRIBE+="
-vmess://$(echo -n "auto:${SB_UUID}@${DOMAIN}:${LISTENING_PORT}" | base64 -w0)?remarks=${REGION_INFO}|${NODE_NAME}|vmess-ws-tls&obfsParam=${DOMAIN}&path=/${SB_UUID}-vmess&obfs=websocket&alterId=0&tls=1&peer=${DOMAIN}&allowInsecure=1
-"
-    SHADOWROCKET_SUBSCRIBE+="
-vless://$(echo -n "auto:${SB_UUID}@${DOMAIN}:${LISTENING_PORT}" | base64 -w0)?remarks=${REGION_INFO}|${NODE_NAME}|vless-ws-tls&obfsParam=${DOMAIN}&path=/${SB_UUID}-vless?ed=2048&obfs=websocket&tls=1&peer=${DOMAIN}&allowInsecure=1
-"
-    SHADOWROCKET_SUBSCRIBE+="
-vless://$(echo -n auto:${SB_UUID}@${DOMAIN}:${PORT_H2_REALITY} | base64 -w0)?remarks=${REGION_INFO}|${NODE_NAME}|h2-reality&path=/&obfs=h2&tls=1&peer=addons.mozilla.org&alpn=h2&mux=1&pbk=${SB_REALITY_PUBLIC_KEY}
-"
-    SHADOWROCKET_SUBSCRIBE+="
-vless://$(echo -n "auto:${SB_UUID}@${DOMAIN}:${PORT_GRPC_REALITY}" | base64 -w0)?remarks=${REGION_INFO}|${NODE_NAME}|grpc-reality&path=grpc&obfs=grpc&tls=1&peer=addons.mozilla.org&pbk=${SB_REALITY_PUBLIC_KEY}
-"
-    SHADOWROCKET_SUBSCRIBE+="
-anytls://${SB_UUID}@${DOMAIN}:${PORT_ANYTLS}?insecure=1&udp=1#${REGION_INFO}|${NODE_NAME}|anytls
-"
-    print_colored ${GREEN} "ShadowRocket 订阅链接内容如下:
-${SHADOWROCKET_SUBSCRIBE}"
-    echo -n "$SHADOWROCKET_SUBSCRIBE" | sed -E '/^[ ]*#|^--/d' | sed '/^$/d' | base64 -w0 > ${WORKDIR}/subscribe/shadowrocket
-}
-
 show_v2rayn_link() {
     # 生成 V2rayN 订阅文件
     V2RAYN_SUBSCRIBE+="
@@ -147,45 +107,6 @@ ${V2RAYN_SUBSCRIBE}"
     echo -n "$V2RAYN_SUBSCRIBE" | sed '/^# 需把 tls 里的 inSecure 设置为 true$/d' | base64 -w0 > ${WORKDIR}/subscribe/v2rayn
 }
 
-show_netbox_link() {
-    # 生成 NekoBox 订阅文件
-    NEKOBOX_SUBSCRIBE+="
-vless://${SB_UUID}@${DOMAIN}:${PORT_XTLS_REALITY}?security=reality&sni=addons.mozilla.org&fp=chrome&pbk=${SB_REALITY_PUBLIC_KEY}&type=tcp&encryption=none#${REGION_INFO}|${NODE_NAME}|xtls-reality
-"
-    NEKOBOX_SUBSCRIBE+="
-hy2://${SB_UUID}@${DOMAIN}:${PORT_HYSTERIA2}?insecure=1#${REGION_INFO}|${NODE_NAME}|hysteria2
-"
-    NEKOBOX_SUBSCRIBE+="
-tuic://${SB_UUID}:${SB_UUID}@${DOMAIN}:${PORT_TUIC}?congestion_control=bbr&alpn=h3&udp_relay_mode=native&allow_insecure=1&disable_sni=1#${REGION_INFO}|${NODE_NAME}|tuic
-"
-    NEKOBOX_SUBSCRIBE+="
-nekoray://custom#$(echo -n "{\"_v\":0,\"addr\":\"127.0.0.1\",\"cmd\":[\"\"],\"core\":\"internal\",\"cs\":\"{\n    \\\"password\\\": \\\"${SB_UUID}\\\",\n    \\\"server\\\": \\\"${DOMAIN}\\\",\n    \\\"server_port\\\": ${PORT_SHADOWTLS},\n    \\\"tag\\\": \\\"shadowtls-out\\\",\n    \\\"tls\\\": {\n        \\\"enabled\\\": true,\n        \\\"server_name\\\": \\\"addons.mozilla.org\\\"\n    },\n    \\\"type\\\": \\\"shadowtls\\\",\n    \\\"version\\\": 3\n}\n\",\"mapping_port\":0,\"name\":\"${REGION_INFO}|${NODE_NAME}|ss-custom\",\"port\":1080,\"socks_port\":0}" | base64 -w0)
-
-nekoray://shadowsocks#$(echo -n "{\"_v\":0,\"method\":\"2022-blake3-aes-128-gcm\",\"name\":\"${REGION_INFO}|${NODE_NAME}|ss-tls\",\"pass\":\"${SHADOWTLS_PASSWORD}\",\"port\":0,\"stream\":{\"ed_len\":0,\"insecure\":false,\"mux_s\":0,\"net\":\"tcp\"},\"uot\":0}" | base64 -w0)
-"
-    NEKOBOX_SUBSCRIBE+="
-ss://$(echo -n "aes-128-gcm:${SB_UUID}" | base64 -w0)@${DOMAIN}:${PORT_SHADOWSOCKS}#${REGION_INFO}|${NODE_NAME}|shadowsocks
-"
-    NEKOBOX_SUBSCRIBE+="
-trojan://${SB_UUID}@${DOMAIN}:${PORT_TROJAN}?security=tls&allowInsecure=1&fp=random&type=tcp#${REGION_INFO}|${NODE_NAME}|trojan
-"
-    NEKOBOX_SUBSCRIBE+="
-vmess://$(echo -n "{\"add\":\"${DOMAIN}\",\"aid\":\"0\",\"host\":\"${DOMAIN}\",\"id\":\"${SB_UUID}\",\"net\":\"ws\",\"path\":\"/${SB_UUID}-vmess\",\"port\":\"${LISTENING_PORT}\",\"ps\":\"${REGION_INFO}|${NODE_NAME}|vmess-ws-tls\",\"scy\":\"auto\",\"sni\":\"\",\"tls\":\"tls\",\"type\":\"\",\"v\":\"2\"}" | base64 -w0)
-"
-    NEKOBOX_SUBSCRIBE+="
-vless://${SB_UUID}@${DOMAIN}:${LISTENING_PORT}?security=tls&sni=${DOMAIN}&type=ws&path=/${SB_UUID}-vless?ed%3D2048&host=${DOMAIN}#${REGION_INFO}|${NODE_NAME}|vless-ws-tls
-"
-    NEKOBOX_SUBSCRIBE+="
-vless://${SB_UUID}@${DOMAIN}:${PORT_H2_REALITY}?security=reality&sni=addons.mozilla.org&alpn=h2&fp=chrome&pbk=${SB_REALITY_PUBLIC_KEY}&type=http&encryption=none#${REGION_INFO}|${NODE_NAME}|h2-reality
-"
-    NEKOBOX_SUBSCRIBE+="
-vless://${SB_UUID}@${DOMAIN}:${PORT_GRPC_REALITY}?security=reality&sni=addons.mozilla.org&fp=chrome&pbk=${SB_REALITY_PUBLIC_KEY}&type=grpc&serviceName=grpc&encryption=none#${REGION_INFO}|${NODE_NAME}|grpc-reality
-"
-    print_colored ${YELLOW} "NEKOBOX 订阅链接内容如下:
-$NEKOBOX_SUBSCRIBE"
-    echo -n "$NEKOBOX_SUBSCRIBE" | sed -E '/^[ ]*#|^--/d' | sed '/^$/d' | base64 -w0 > ${WORKDIR}/subscribe/neko
-}
-
 show_all_link() {
     # 生成配置文件
     print_colored ${GREEN} "
@@ -195,30 +116,24 @@ show_all_link() {
 各客户端配置文件路径: ${WORKDIR}/subscribe/\n 完整模板可参照:\n https://github.com/chika0801/sing-box-examples/tree/main/Tun
 "
 
-    print_colored ${CYAN} "Index:
+    print_colored ${RED} "Index:
 https://${DOMAIN}/sb-xray/
 "
-
-    print_colored ${RED} "V2rayN 订阅:
-https://${DOMAIN}/sb-xray/v2rayn"
-
-    print_colored ${YELLOW} "ShadowRocket 订阅:
-https://${DOMAIN}/sb-xray/shadowrocket"
-
-    print_colored ${BLUE} "NekoBox 订阅:
-https://${DOMAIN}/sb-xray/neko"
 
     print_colored ${MAGENTA} "通用链接:
 https://${DOMAIN}/sb-xray/proxies"
 
-    print_colored ${MAGENTA} "stash 订阅:
+    print_colored ${CYAN} "V2rayN 订阅:
+https://${DOMAIN}/sb-xray/v2rayn"
+
+    print_colored ${YELLOW} "clash 订阅:
+https://${DOMAIN}/sb-xray/clash-${NODE_NAME}.yaml"
+
+    print_colored ${BLUE} "stash 订阅:
 https://${DOMAIN}/sb-xray/stash-${NODE_NAME}.yaml"
 
-print_colored ${YELLOW} "surge 订阅:
-https://${DOMAIN}/sb-xray/surge-${NODE_NAME}.conf"
-
-    print_colored ${GREEN} "自适应 Clash / V2rayN / NekoBox / ShadowRocket / SFI / SFA / SFM 客户端:
-https://${DOMAIN}/sb-xray/auto
+print_colored ${GREEN} "surge 订阅:
+https://${DOMAIN}/sb-xray/surge-${NODE_NAME}.conf
 
 ******************************************************************"
 }
@@ -235,15 +150,18 @@ mkdir -p ${WORKDIR}/subscribe
 
 main() {
     xui_info
-    show_shadowrocket_link
     show_v2rayn_link
-    show_netbox_link
     show_all_link
     envsubst </templates/client_template/proxies >${WORKDIR}/subscribe/proxies
+    envsubst </templates/client_template/clash >${WORKDIR}/subscribe/clash
     envsubst </templates/client_template/stash >${WORKDIR}/subscribe/stash
     envsubst </templates/client_template/surge >${WORKDIR}/subscribe/surge
 
-    envsubst </templates/client_template/stash.yaml >${WORKDIR}/subscribe/stash-${NODE_NAME}.yaml
+    CLIENTS=("clash" "stash")
+    # 循环生成文件
+    for CLIENT in "${CLIENTS[@]}"; do
+        export CLIENT &&  envsubst </templates/client_template/clash.yaml >${WORKDIR}/subscribe/${CLIENT}-${NODE_NAME}.yaml
+    done
     envsubst </templates/client_template/surge.conf >${WORKDIR}/subscribe/surge-${NODE_NAME}.conf
 }
 

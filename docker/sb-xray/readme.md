@@ -19,10 +19,11 @@ https://bianyuan.xyz/
 ```bash
 docker buildx build \
   --platform linux/amd64,linux/arm64 \
-  --build-arg XUI_VERSION="2.8.3" \
-  --build-arg XRAY_VERSION="25.9.11" \
-  --build-arg V2RAY_VERSION="5.39.0" \
-  --tag currycan/sb-xray:25.9.11 \
+  --build-arg XUI_VERSION="2.8.5" \
+  --build-arg V2RAY_VERSION="5.41.0" \
+  --build-arg SING_BOX_VERSION="1.12.10" \
+  --build-arg XRAY_VERSION="25.10.15" \
+  --tag currycan/sb-xray:25.10.16 \
   --push .
 ```
 

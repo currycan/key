@@ -1,144 +1,27 @@
-redir-port: 23457
-allow-lan: true
-mode: rule
-log-level: error
-external-controller: :9990
-geodata-mode: true
-geo-auto-update: true
-geodata-loader: standard
-geo-update-interval: 24
-geox-url:
-  geoip: https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geoip.dat
-  geosite: >-
-    https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geosite.dat
-  mmdb: >-
-    https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/country.mmdb
-  asn: >-
-    https://github.com/xishang0128/geoip/releases/download/latest/GeoLite2-ASN.mmdb
-rule-providers:
-  geolocation-cn:
-    type: http
-    format: mrs
-    behavior: domain
-    url: >-
-      https://gh-proxy.com/https://github.com/MetaCubeX/meta-rules-dat/raw/refs/heads/meta/geo/geosite/geolocation-cn.mrs
-    path: ./ruleset/geolocation-cn.mrs
-    interval: 86400
-  cn:
-    type: http
-    format: mrs
-    behavior: ipcidr
-    url: >-
-      https://gh-proxy.com/https://github.com/MetaCubeX/meta-rules-dat/raw/refs/heads/meta/geo/geoip/cn.mrs
-    path: ./ruleset/cn.mrs
-    interval: 86400
-  geolocation-!cn:
-    type: http
-    format: mrs
-    behavior: domain
-    url: >-
-      https://gh-proxy.com/https://github.com/MetaCubeX/meta-rules-dat/raw/refs/heads/meta/geo/geosite/geolocation-!cn.mrs
-    path: ./ruleset/geolocation-!cn.mrs
-    interval: 86400
-  private:
-    type: http
-    format: mrs
-    behavior: ipcidr
-    url: >-
-      https://gh-proxy.com/https://github.com/MetaCubeX/meta-rules-dat/raw/refs/heads/meta/geo/geoip/private.mrs
-    path: ./ruleset/private.mrs
-    interval: 86400
-experimental:
-  ignore-resolve-fail: true
-external-ui: dashboard
-external-ui-name: zashboard
-external-ui-url: https://github.com/Zephyruso/zashboard/releases/latest/download/dist-cdn-fonts.zip
-secret: "clash"
-profile:
-  store-selected: true
-  store-fake-ip: true
-ipv6: false
-unified-delay: true
-hosts:
-  services.googleapis.cn: 74.125.193.94
-  time.android.com: 203.107.6.88
-
-routing-mark: 255
-
-dns:
-  enable: true
-  ipv6: false
-  listen: :23453
-  enhanced-mode: redir-host
-  respect-rules: true
-  proxy-server-nameserver:
-    - 119.29.29.29
-    - 223.5.5.5
-  nameserver-policy:
-    "+.steampowered.com": "223.5.5.5"
-    "geosite:cn,apple,bilibili":
-      - https://doh.pub/dns-query
-      - 223.5.5.5
-  nameserver:
-    - tls://jp01.dns4me.net
-    - https://dns.csaonline.de/dns-query
-    - tls://unfiltered.adguard-dns.com
-
-tproxy: true
-tproxy-port: 23458
-
-sniffer:
-  enable: true
-  force-dns-mapping: false
-  parse-pure-ip: true
-  override-destination: true
-  sniff:
-    TLS:
-      ports: [443, 8443]
-
-    HTTP:
-      ports: [80, 8080-8880]
-      override-destination: false
-  force-domain:
-    - '+.v2ex.com'
-
-  skip-domain:
-    - 'Mijia Cloud'
-    - 'dlg.io.mi.com'
-    - '+.apple.com'
-
-
 proxy-providers:
   ${NODE_NAME}:
-    url: https://${DOMAIN}/sb-xray/clash
+    url: https://${DOMAIN}/sb-xray/${CLIENT}
     interval: 10
 
 proxy-groups:
+  # 功能分组
   - name: 🚀 节点选择
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Static.png
     interval: 15
     lazy: true
     type: select
-    include-all: true
     proxies: &proxies
       - ♻️ 自动选择
+      - 🛫 手动切换
       - 🔯 故障转移
       - 🔮 负载均衡
       - 🇭🇰 HK 香港
       - 🇹🇼 TW 台湾
       - 🇸🇬 SG 新加坡
+      - 🇰🇷 KR 节点
       - 🇯🇵 JP 日本
       - 🇺🇲 US 美国
-      - 🇰🇷 KR 节点
-      - 🚀 手动切换
-      - DIRECT
-
-  - name: 🚀 手动切换
-    type: select
-    interval: 15
-    lazy: true
-    include-all: true
-    proxies: &proxies
+      - 🎯 全球直连
 
   - name: ♻️ 自动选择
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Auto.png
@@ -148,8 +31,16 @@ proxy-groups:
     type: url-test
     include-all: true
 
+  - name: 🛫 手动切换
+    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Airport.png
+    interval: 120
+    lazy: true
+    tolerance: 50
+    type: select
+    include-all: true
+
   - name: 🔯 故障转移
-    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Static.png
+    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Star.png
     interval: 120
     lazy: true
     tolerance: 50
@@ -165,23 +56,21 @@ proxy-groups:
     strategy: consistent-hashing
     include-all: true
 
-  - name: 📲 电报消息
+  - name: 📺 Netflix
+    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Netflix.png
     type: select
     proxies: *proxies
-  - name: 💬 OpenAi
+  - name: 💡 OpenAi
+    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/ChatGPT.png
     type: select
     proxies: *proxies
-  - name: 📹 油管视频
+  - name: ▶️ YouTube
+    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/YouTube.png
     type: select
     proxies: *proxies
-  - name: 🎥 奈飞视频
+  - name: 🎬 哔哩哔哩
     type: select
-    proxies: *proxies
-  - name: 📺 巴哈姆特
-    type: select
-    proxies: *proxies
-  - name: 📺 哔哩哔哩
-    type: select
+    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/bilibili_3.png
     proxies:
       - 🎯 全球直连
       - 🇭🇰 HK 香港
@@ -190,50 +79,13 @@ proxy-groups:
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Global.png
     type: select
     proxies: *proxies
-  - name: 🌏 国内媒体
+  - name: 📹 国内媒体
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/CN.png
     type: select
     proxies:
       - 🎯 全球直连
       - 🚀 节点选择
       - ♻️ 自动选择
-      - 🚀 手动切换
-  - name: 📢 谷歌FCM
-    type: select
-    proxies:
-      - 🚀 节点选择
-      - 🇭🇰 HK 香港
-      - 🇹🇼 TW 台湾
-      - 🇸🇬 SG 新加坡
-      - 🇯🇵 JP 日本
-      - 🇺🇲 US 美国
-      - 🇰🇷 KR 节点
-      - 🚀 手动切换
-      - DIRECT
-  - name: Ⓜ️ 微软云盘
-    type: select
-    proxies:
-      - 🚀 节点选择
-      - 🇭🇰 HK 香港
-      - 🇹🇼 TW 台湾
-      - 🇸🇬 SG 新加坡
-      - 🇯🇵 JP 日本
-      - 🇺🇲 US 美国
-      - 🇰🇷 KR 节点
-      - 🚀 手动切换
-      - DIRECT
-  - name: Ⓜ️ 微软服务
-    type: select
-    proxies:
-      - 🚀 节点选择
-      - 🇭🇰 HK 香港
-      - 🇹🇼 TW 台湾
-      - 🇸🇬 SG 新加坡
-      - 🇯🇵 JP 日本
-      - 🇺🇲 US 美国
-      - 🇰🇷 KR 节点
-      - 🚀 手动切换
-      - DIRECT
   - name: 🍎 苹果服务
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Apple.png
     type: select
@@ -241,13 +93,6 @@ proxy-groups:
       - 🎯 全球直连
       - 🚀 节点选择
       - ♻️ 自动选择
-      - 🇭🇰 HK 香港
-      - 🇹🇼 TW 台湾
-      - 🇸🇬 SG 新加坡
-      - 🇯🇵 JP 日本
-      - 🇺🇲 US 美国
-      - 🇰🇷 KR 节点
-      - 🚀 手动切换
   - name: 🎮 游戏平台
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Game.png
     type: select
@@ -255,20 +100,12 @@ proxy-groups:
       - 🎯 全球直连
       - 🚀 节点选择
       - ♻️ 自动选择
-      - 🇭🇰 HK 香港
-      - 🇹🇼 TW 台湾
-      - 🇸🇬 SG 新加坡
-      - 🇯🇵 JP 日本
-      - 🇺🇲 US 美国
-      - 🇰🇷 KR 节点
-      - 🚀 手动切换
   - name: 🎶 网易音乐
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Netease_Music.png
     type: select
     proxies:
       - 🎯 全球直连
       - 🚀 节点选择
-      - ♻️ 自动选择
   - name: 🎯 全球直连
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Direct.png
     type: select
@@ -279,26 +116,20 @@ proxy-groups:
     type: select
     proxies:
       - REJECT
-      - DIRECT
+      - 🎯 全球直连
   - name: 🍃 应用净化
     icon: https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/1f343.png
     type: select
     proxies:
       - REJECT
-      - DIRECT
+      - 🎯 全球直连
   - name: 🐟 漏网之鱼
+    icon: https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/1f41f.png
     type: select
     proxies:
-      - 🚀 节点选择
       - ♻️ 自动选择
-      - DIRECT
-      - 🇭🇰 HK 香港
-      - 🇹🇼 TW 台湾
-      - 🇸🇬 SG 新加坡
-      - 🇯🇵 JP 日本
-      - 🇺🇲 US 美国
-      - 🇰🇷 KR 节点
-      - 🚀 手动切换
+      - 🚀 节点选择
+      - 🎯 全球直连
 
   # 基于地区分组
   - name: 🇭🇰 HK 香港
@@ -328,6 +159,15 @@ proxy-groups:
     type: url-test
     include-all: true
 
+  - name: 🇰🇷 KR 节点
+    filter: "韩|🇰🇷|KR|(?i)Korea"
+    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Korea.png
+    interval: 120
+    lazy: true
+    tolerance: 50
+    type: url-test
+    include-all: true
+
   - name: 🇯🇵 JP 日本
     filter: "日|🇯🇵|东京|JP|(?i)Japan"
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Japan.png
@@ -340,15 +180,6 @@ proxy-groups:
   - name: 🇺🇲 US 美国
     filter: "美|🇺🇲|US|(?i)States|American"
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/United_States.png
-    interval: 120
-    lazy: true
-    tolerance: 50
-    type: url-test
-    include-all: true
-
-  - name: 🇰🇷 KR 节点
-    filter: "韩|🇰🇷|KR|(?i)Korea"
-    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Korea.png
     interval: 120
     lazy: true
     tolerance: 50
@@ -10522,3 +10353,114 @@ rules:
   - DOMAIN-KEYWORD,aria2,🎯 全球直连
   - GEOIP,CN,🎯 全球直连
   - MATCH,🐟 漏网之鱼
+
+redir-port: 23457
+allow-lan: true
+mode: rule
+log-level: error
+external-controller: :9990
+geodata-mode: true
+geo-auto-update: true
+geodata-loader: standard
+geo-update-interval: 24
+geox-url:
+  geoip: https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geoip.dat
+  geosite: >-
+    https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geosite.dat
+  mmdb: >-
+    https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/country.mmdb
+  asn: >-
+    https://github.com/xishang0128/geoip/releases/download/latest/GeoLite2-ASN.mmdb
+rule-providers:
+  geolocation-cn:
+    type: http
+    format: mrs
+    behavior: domain
+    url: >-
+      https://gh-proxy.com/https://github.com/MetaCubeX/meta-rules-dat/raw/refs/heads/meta/geo/geosite/geolocation-cn.mrs
+    path: ./ruleset/geolocation-cn.mrs
+    interval: 86400
+  cn:
+    type: http
+    format: mrs
+    behavior: ipcidr
+    url: >-
+      https://gh-proxy.com/https://github.com/MetaCubeX/meta-rules-dat/raw/refs/heads/meta/geo/geoip/cn.mrs
+    path: ./ruleset/cn.mrs
+    interval: 86400
+  geolocation-!cn:
+    type: http
+    format: mrs
+    behavior: domain
+    url: >-
+      https://gh-proxy.com/https://github.com/MetaCubeX/meta-rules-dat/raw/refs/heads/meta/geo/geosite/geolocation-!cn.mrs
+    path: ./ruleset/geolocation-!cn.mrs
+    interval: 86400
+  private:
+    type: http
+    format: mrs
+    behavior: ipcidr
+    url: >-
+      https://gh-proxy.com/https://github.com/MetaCubeX/meta-rules-dat/raw/refs/heads/meta/geo/geoip/private.mrs
+    path: ./ruleset/private.mrs
+    interval: 86400
+experimental:
+  ignore-resolve-fail: true
+external-ui: dashboard
+external-ui-name: zashboard
+external-ui-url: https://github.com/Zephyruso/zashboard/releases/latest/download/dist-cdn-fonts.zip
+secret: "clash"
+profile:
+  store-selected: true
+  store-fake-ip: true
+ipv6: false
+unified-delay: true
+hosts:
+  services.googleapis.cn: 74.125.193.94
+  time.android.com: 203.107.6.88
+
+routing-mark: 255
+
+dns:
+  enable: true
+  ipv6: false
+  listen: :23453
+  enhanced-mode: redir-host
+  respect-rules: true
+  proxy-server-nameserver:
+    - https://120.53.53.53/dns-query
+    - https://223.5.5.5/dns-query
+  nameserver-policy:
+    geosite:cn,private: https://120.53.53.53/dns-query
+    geosite:geolocation-!cn: https://dns.cloudflare.com/dns-query
+    "+.steampowered.com": "223.5.5.5"
+    "geosite:cn,apple,bilibili": https://doh.pub/dns-query
+  nameserver:
+    - tls://jp01.dns4me.net
+    - https://dns.csaonline.de/dns-query
+    - tls://unfiltered.adguard-dns.com
+    - https://120.53.53.53/dns-query
+    - https://223.5.5.5/dns-query
+
+tproxy: true
+tproxy-port: 23458
+
+sniffer:
+  enable: true
+  force-dns-mapping: false
+  parse-pure-ip: true
+  override-destination: true
+  sniff:
+    TLS:
+      ports: [443, 8443]
+
+    HTTP:
+      ports: [80, 8080-8880]
+      override-destination: false
+  force-domain:
+    - '+.v2ex.com'
+
+  skip-domain:
+    - 'Mijia Cloud'
+    - 'dlg.io.mi.com'
+    - '+.apple.com'

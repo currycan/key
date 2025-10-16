@@ -41,7 +41,7 @@ RUN set -ex; \
     mv /tmp/dufs /usr/local/bin/
 
 # ===== 安装 V2Ray =====
-ARG V2RAY_VERSION="5.40.0"
+ARG V2RAY_VERSION="5.41.0"
 RUN set -ex; \
     if [ -z "$V2RAY_VERSION" ]; then \
         V2RAY_VERSION=$(curl -sSf https://github.com/v2fly/v2ray-core/tags \
@@ -61,7 +61,7 @@ RUN set -ex; \
     mv v2ray /usr/local/bin/
 
 # ===== 安装 Sing-box =====
-ARG SING_BOX_VERSION="1.12.9"
+ARG SING_BOX_VERSION="1.12.10"
 RUN set -ex; \
     if [ -z "$SING_BOX_VERSION" ]; then \
         V2RAY_VERSION=$(curl -sSf https://github.com/SagerNet/sing-box/tags \
@@ -73,7 +73,7 @@ RUN set -ex; \
     mv /tmp/sing-box /usr/local/bin/
 
 # ===== 安装 cloudflared =====
-ARG CLOUDFLARED_VERSION="2025.9.1"
+ARG CLOUDFLARED_VERSION="2025.10.0"
 RUN set -ex; \
     if [ -z "$CLOUDFLARED_VERSION" ]; then \
         V2RAY_VERSION=$(curl -sSf https://github.com/cloudflare/cloudflared/tags \
@@ -86,7 +86,7 @@ RUN set -ex; \
     mv /tmp/cloudflared /usr/local/bin/
 
 # ===== 安装 x-ui =====
-ARG XUI_VERSION="2.8.4"
+ARG XUI_VERSION="2.8.5"
 RUN set -ex; \
     if [ -z "$XUI_VERSION" ]; then \
         V2RAY_VERSION=$(curl -sSf https://github.com/MHSanaei/3x-ui/tags \
@@ -99,7 +99,7 @@ RUN set -ex; \
   mv x-ui /usr/local/bin/
 
 # ===== 安装 Xray =====
-ARG XRAY_VERSION="25.9.11"
+ARG XRAY_VERSION="25.10.15"
 RUN set -ex; \
     if [ -z "$XRAY_VERSION" ]; then \
         XRAY_VERSION=$(curl -sSf https://github.com/XTLS/Xray-core/tags \
