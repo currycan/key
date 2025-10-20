@@ -14,6 +14,11 @@ https://github.com/fscarmen/sing-box
 
 https://bianyuan.xyz/
 
+https://github.com/v2rayA/v2rayA
+https://github.com/v2raya/v2raya-openwrt
+https://v2raya.org/docs/prologue/installation/openwrt/
+https://pengtech.net/network/v2rayA_install.html
+
 ## 镜像制作
 
 ```bash
