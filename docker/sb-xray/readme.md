@@ -14,6 +14,9 @@ https://github.com/fscarmen/sing-box
 
 https://bianyuan.xyz/
 
+# 节点重命名
+https://github.com/sub-store-org/Sub-Store/blob/master/scripts/vmess-ws-obfs-host.js
+
 https://github.com/v2rayA/v2rayA
 https://github.com/v2raya/v2raya-openwrt
 https://v2raya.org/docs/prologue/installation/openwrt/
@@ -26,9 +29,9 @@ docker buildx build \
   --platform linux/amd64,linux/arm64 \
   --build-arg XUI_VERSION="2.8.5" \
   --build-arg V2RAY_VERSION="5.41.0" \
-  --build-arg SING_BOX_VERSION="1.12.10" \
+  --build-arg SING_BOX_VERSION="1.12.11" \
   --build-arg XRAY_VERSION="25.10.15" \
-  --tag currycan/sb-xray:25.10.16 \
+  --tag currycan/sb-xray:25.10.24 \
   --push .
 ```
 

@@ -61,7 +61,7 @@ RUN set -ex; \
     mv v2ray /usr/local/bin/
 
 # ===== 安装 Sing-box =====
-ARG SING_BOX_VERSION="1.12.10"
+ARG SING_BOX_VERSION="1.12.11"
 RUN set -ex; \
     if [ -z "$SING_BOX_VERSION" ]; then \
         V2RAY_VERSION=$(curl -sSf https://github.com/SagerNet/sing-box/tags \
