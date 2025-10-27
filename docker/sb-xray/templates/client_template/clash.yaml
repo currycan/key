@@ -240,7 +240,7 @@ proxy-groups:
     lazy: true
     tolerance: 50
     type: url-test
-    url: https://i.ytimg.com/generate_204
+    # url: https://i.ytimg.com/generate_204
     include-all: true
 
   - name: 🇨🇳 TW 台湾
@@ -250,7 +250,7 @@ proxy-groups:
     lazy: true
     tolerance: 50
     type: url-test
-    url: https://i.ytimg.com/generate_204
+    # url: https://i.ytimg.com/generate_204
     include-all: true
 
   - name: 🇸🇬 SG 新加坡
@@ -260,7 +260,7 @@ proxy-groups:
     lazy: true
     tolerance: 50
     type: url-test
-    url: https://i.ytimg.com/generate_204
+    # url: https://i.ytimg.com/generate_204
     include-all: true
 
   - name: 🇰🇷 KR 节点
@@ -270,7 +270,7 @@ proxy-groups:
     lazy: true
     tolerance: 50
     type: url-test
-    url: https://i.ytimg.com/generate_204
+    # url: https://i.ytimg.com/generate_204
     include-all: true
 
   - name: 🇯🇵 JP 日本
@@ -280,7 +280,7 @@ proxy-groups:
     lazy: true
     tolerance: 50
     type: url-test
-    url: https://i.ytimg.com/generate_204
+    # url: https://i.ytimg.com/generate_204
     include-all: true
 
   - name: 🇺🇲 US 美国
@@ -290,7 +290,7 @@ proxy-groups:
     lazy: true
     tolerance: 50
     type: url-test
-    url: https://i.ytimg.com/generate_204
+    # url: https://i.ytimg.com/generate_204
     include-all: true
 
   - name: 🇩🇪 DE 德国
@@ -300,7 +300,7 @@ proxy-groups:
     lazy: true
     tolerance: 50
     type: url-test
-    url: https://i.ytimg.com/generate_204
+    # url: https://i.ytimg.com/generate_204
     include-all: true
 
   - name: 🇬🇧 UK 英国
@@ -310,7 +310,7 @@ proxy-groups:
     lazy: true
     tolerance: 50
     type: url-test
-    url: https://i.ytimg.com/generate_204
+    # url: https://i.ytimg.com/generate_204
     include-all: true
 
   - name: 🇫🇷 FR 法国
@@ -320,7 +320,7 @@ proxy-groups:
     lazy: true
     tolerance: 50
     type: url-test
-    url: https://i.ytimg.com/generate_204
+    # url: https://i.ytimg.com/generate_204
     include-all: true
 
   - name: 🇮🇳 IN 印度
@@ -330,14 +330,14 @@ proxy-groups:
     lazy: true
     tolerance: 50
     type: url-test
-    url: https://i.ytimg.com/generate_204
+    # url: https://i.ytimg.com/generate_204
     include-all: true
 
   - name: ⚡ VLESS
     filter: "(?i)vless|Reality"
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Download.png
     type: url-test
-    url: https://i.ytimg.com/generate_204
+    # url: https://i.ytimg.com/generate_204
     interval: 300
     tolerance: 50
     lazy: true
@@ -347,7 +347,7 @@ proxy-groups:
     filter: "(?i)hysteria2|hy2"
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Rocket.png
     type: url-test
-    url: https://i.ytimg.com/generate_204
+    # url: https://i.ytimg.com/generate_204
     interval: 300
     tolerance: 50
     lazy: true
@@ -357,7 +357,7 @@ proxy-groups:
   #   filter: "(?i)tuic"
   #   icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Magic.png
   #   type: url-test
-  #   url: https://i.ytimg.com/generate_204
+  #   # url: https://i.ytimg.com/generate_204
   #   interval: 300
   #   tolerance: 50
   #   lazy: true
@@ -367,7 +367,7 @@ proxy-groups:
     filter: "(?i)shadow|-ss"
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Cydia.png
     type: url-test
-    url: https://i.ytimg.com/generate_204
+    # url: https://i.ytimg.com/generate_204
     interval: 300
     tolerance: 50
     lazy: true
@@ -377,7 +377,7 @@ proxy-groups:
     filter: "(?i)trojan"
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Filter.png
     type: url-test
-    url: https://i.ytimg.com/generate_204
+    # url: https://i.ytimg.com/generate_204
     interval: 300
     tolerance: 50
     lazy: true
@@ -387,7 +387,7 @@ proxy-groups:
     filter: "(?i)vmess"
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Heart.png
     type: url-test
-    url: https://i.ytimg.com/generate_204
+    # url: https://i.ytimg.com/generate_204
     interval: 300
     tolerance: 50
     lazy: true
@@ -397,7 +397,7 @@ proxy-groups:
   #   filter: "(?i)anytls"
   #   icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Lock.png
   #   type: url-test
-  #   url: https://i.ytimg.com/generate_204
+  #   # url: https://i.ytimg.com/generate_204
   #   interval: 300
   #   tolerance: 50
   #   lazy: true
