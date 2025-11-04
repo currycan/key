@@ -61,7 +61,7 @@ RUN set -ex; \
     mv v2ray /usr/local/bin/
 
 # ===== 安装 Sing-box =====
-ARG SING_BOX_VERSION="1.12.11"
+ARG SING_BOX_VERSION="1.12.12"
 RUN set -ex; \
     if [ -z "$SING_BOX_VERSION" ]; then \
         V2RAY_VERSION=$(curl -sSf https://github.com/SagerNet/sing-box/tags \
@@ -73,7 +73,7 @@ RUN set -ex; \
     mv /tmp/sing-box /usr/local/bin/
 
 # ===== 安装 cloudflared =====
-ARG CLOUDFLARED_VERSION="2025.10.0"
+ARG CLOUDFLARED_VERSION="2025.10.1"
 RUN set -ex; \
     if [ -z "$CLOUDFLARED_VERSION" ]; then \
         V2RAY_VERSION=$(curl -sSf https://github.com/cloudflare/cloudflared/tags \
@@ -187,6 +187,10 @@ ENV DEST_HOST="www.microsoft.com"
 ENV DOMAIN=""
 ENV CDNDOMAIN=""
 ENV LISTENING_PORT="433"
+
+# sing-box
+ENV SINGBOX_SERVER_NAME="addons.mozilla.org"
+ENV SINGBOX_METHOD="2022-blake3-aes-128-gcm"
 
 # v2ray
 ENV ALTERID="0"

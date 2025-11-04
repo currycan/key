@@ -11,10 +11,10 @@ proxy-groups:
     lazy: true
     type: select
     proxies: &proxies
-      - 🤖 relay
-      - 🔮 负载均衡
       - ♻️ 自动选择
       - 🛫 手动切换
+      - 🤖 relay
+      - 🔮 负载均衡
       - 🔯 故障转移
       - ⚡ VLESS
       - 🤡 Hysteria2
@@ -32,6 +32,22 @@ proxy-groups:
       # - 🇫🇷 FR 法国
       # - 🇮🇳 IN 印度
       - 🎯 全球直连
+  - name: ♻️ 自动选择
+    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Auto.png
+    interval: 120
+    lazy: true
+    tolerance: 50
+    type: url-test
+    include-all: true
+  - name: 🛫 手动切换
+    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Airport.png
+    interval: 120
+    lazy: true
+    tolerance: 50
+    type: select
+    include-all: true
+  # 代理的转发链, 在 proxies 中不应该包含 relay. 不支持 UDP.
+  # 流量: clash <-> VLESS <-> Hysteria2 <-> Shadowsocks <-> Trojan <-> VMess <-> 互联网
   - name: 🤖 relay
     type: relay
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Ryan.png
@@ -50,22 +66,6 @@ proxy-groups:
     tolerance: 50
     type: load-balance
     strategy: consistent-hashing
-    include-all: true
-  - name: ♻️ 自动选择
-    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Auto.png
-    interval: 120
-    lazy: true
-    tolerance: 50
-    type: url-test
-    include-all: true
-  # 代理的转发链, 在 proxies 中不应该包含 relay. 不支持 UDP.
-  # 流量: clash <-> VLESS <-> Hysteria2 <-> Shadowsocks <-> Trojan <-> VMess <-> 互联网
-  - name: 🛫 手动切换
-    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Airport.png
-    interval: 120
-    lazy: true
-    tolerance: 50
-    type: select
     include-all: true
   - name: 🔯 故障转移
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Star.png

@@ -13,7 +13,7 @@
                 }
             ],
             "handshake": {
-                "server": "addons.mozilla.org",
+                "server": "${SINGBOX_SERVER_NAME}",
                 "server_port": 443
             },
             "strict_mode": true
@@ -23,7 +23,7 @@
             "tag": "shadowtls-in",
             "listen": "127.0.0.1",
             "network": "tcp",
-            "method": "2022-blake3-aes-128-gcm",
+            "method": "${SINGBOX_METHOD}",
             "password": "${SHADOWTLS_PASSWORD}",
             "multiplex": {
                 "enabled": true,

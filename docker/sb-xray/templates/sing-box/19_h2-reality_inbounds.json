@@ -13,11 +13,11 @@
             ],
             "tls": {
                 "enabled": true,
-                "server_name": "addons.mozilla.org",
+                "server_name": "${SINGBOX_SERVER_NAME}",
                 "reality": {
                     "enabled": true,
                     "handshake": {
-                        "server": "addons.mozilla.org",
+                        "server": "${SINGBOX_SERVER_NAME}",
                         "server_port": 443
                     },
                     "private_key": "${SB_REALITY_PRIVATE_KEY}",

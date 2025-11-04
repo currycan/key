@@ -50,7 +50,7 @@ show_qrcode() {
 show_v2rayn_link() {
     # 生成 V2rayN 订阅文件
     V2RAYN_SUBSCRIBE+="
-vless://${SB_UUID}@${DOMAIN}:${PORT_XTLS_REALITY}?encryption=none&security=reality&sni=addons.mozilla.org&fp=chrome&pbk=${SB_REALITY_PUBLIC_KEY}&type=tcp&headerType=none&host=${DOMAIN}#${REGION_INFO}|${NODE_NAME}|xtls-reality
+vless://${SB_UUID}@${DOMAIN}:${PORT_XTLS_REALITY}?encryption=none&security=reality&sni=${SINGBOX_SERVER_NAME}&fp=chrome&pbk=${SB_REALITY_PUBLIC_KEY}&type=tcp&headerType=none&host=${DOMAIN}#${REGION_INFO}|${NODE_NAME}|xtls-reality
 "
     V2RAYN_SUBSCRIBE+="
 hysteria2://${SB_UUID}@${DOMAIN}:${PORT_HYSTERIA2}/?alpn=h3&insecure=1#${REGION_INFO}|${NODE_NAME}|hysteria2
@@ -60,7 +60,7 @@ hysteria2://${SB_UUID}@${DOMAIN}:${PORT_HYSTERIA2}/?alpn=h3&insecure=1#${REGION_
 tuic://${SB_UUID}:${SB_UUID}@${DOMAIN}:${PORT_TUIC}?alpn=h3&congestion_control=bbr#${REGION_INFO}|${NODE_NAME}|tuic
 "
     V2RAYN_SUBSCRIBE+="
-ss://$(echo -n "aes-128-gcm:${SB_UUID}@${DOMAIN}:${PORT_SHADOWSOCKS}" | base64 -w0)#${REGION_INFO}|${NODE_NAME}|shadowsocks
+ss://$(echo -n "${SINGBOX_METHOD}:${SHADOWTLS_PASSWORD}@${DOMAIN}:${PORT_SHADOWSOCKS}" | base64 -w0)#${REGION_INFO}|${NODE_NAME}|shadowsocks
 "
     V2RAYN_SUBSCRIBE+="
 trojan://${SB_UUID}@${DOMAIN}:${PORT_TROJAN}?security=tls&type=tcp&headerType=none#${REGION_INFO}|${NODE_NAME}|trojan
@@ -72,7 +72,7 @@ vmess://$(echo -n "{ \"v\": \"2\", \"ps\": \"${REGION_INFO}|${NODE_NAME}|vmess-w
 vless://${SB_UUID}@${DOMAIN}:${LISTENING_PORT}?encryption=none&security=tls&sni=${DOMAIN}&type=ws&host=${DOMAIN}&path=%2F${SB_UUID}-vless%3Fed%3D2048#${REGION_INFO}|${NODE_NAME}|vless-ws-tls
 "
     V2RAYN_SUBSCRIBE+="
-vless://${SB_UUID}@${DOMAIN}:${PORT_GRPC_REALITY}?encryption=none&security=reality&sni=addons.mozilla.org&fp=chrome&pbk=${SB_REALITY_PUBLIC_KEY}&type=grpc&serviceName=grpc&mode=gun#${REGION_INFO}|${NODE_NAME}|grpc-reality
+vless://${SB_UUID}@${DOMAIN}:${PORT_GRPC_REALITY}?encryption=none&security=reality&sni=${SINGBOX_SERVER_NAME}&fp=chrome&pbk=${SB_REALITY_PUBLIC_KEY}&type=grpc&serviceName=grpc&mode=gun#${REGION_INFO}|${NODE_NAME}|grpc-reality
 "
     V2RAYN_SUBSCRIBE+="
 # 需把 tls 里的 inSecure 设置为 true

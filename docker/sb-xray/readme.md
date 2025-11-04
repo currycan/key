@@ -29,9 +29,9 @@ docker buildx build \
   --platform linux/amd64,linux/arm64 \
   --build-arg XUI_VERSION="2.8.5" \
   --build-arg V2RAY_VERSION="5.41.0" \
-  --build-arg SING_BOX_VERSION="1.12.11" \
+  --build-arg SING_BOX_VERSION="1.12.12" \
   --build-arg XRAY_VERSION="25.10.15" \
-  --tag currycan/sb-xray:25.10.24 \
+  --tag currycan/sb-xray:25.11.4 \
   --push .
 ```
 

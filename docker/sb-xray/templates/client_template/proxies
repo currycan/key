@@ -7,7 +7,7 @@ proxies:
     network: tcp
     udp: true
     tls: true
-    servername: addons.mozilla.org
+    servername: ${SINGBOX_SERVER_NAME}
     client-fingerprint: chrome
     reality-opts:
       public-key: ${SB_REALITY_PUBLIC_KEY}
@@ -53,12 +53,12 @@ proxies:
     type: ss
     server: ${DOMAIN}
     port: ${PORT_SHADOWTLS}
-    cipher: 2022-blake3-aes-128-gcm
+    cipher: ${SINGBOX_METHOD}
     password: ${SHADOWTLS_PASSWORD}
     plugin: shadow-tls
     client-fingerprint: chrome
     plugin-opts:
-      host: addons.mozilla.org
+      host: ${SINGBOX_SERVER_NAME}
       password: "${SB_UUID}"
       version: 3
     smux:
@@ -78,8 +78,8 @@ proxies:
     type: ss
     server: ${DOMAIN}
     port: ${PORT_SHADOWSOCKS}
-    cipher: aes-128-gcm
-    password: ${SB_UUID}
+    cipher: ${SINGBOX_METHOD}
+    password: ${SHADOWTLS_PASSWORD}
     smux:
       enabled: true
       protocol: h2mux
@@ -179,7 +179,7 @@ proxies:
     tls: true
     udp: true
     client-fingerprint: chrome
-    servername: addons.mozilla.org
+    servername: ${SINGBOX_SERVER_NAME}
     grpc-opts:
       grpc-service-name: "grpc"
     reality-opts:

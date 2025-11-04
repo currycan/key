@@ -5,8 +5,8 @@
             "tag": "sing-box shadowsocks",
             "listen": "::",
             "listen_port": ${PORT_SHADOWSOCKS},
-            "method": "aes-128-gcm",
-            "password": "${SB_UUID}",
+            "method": "${SINGBOX_METHOD}",
+            "password": "${SHADOWTLS_PASSWORD}",
             "multiplex": {
                 "enabled": true,
                 "padding": true,

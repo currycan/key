@@ -1,13 +1,13 @@
 # 代理配置
 proxies:
 # XTLS Reality 配置
-- {name: "${REGION_INFO}|${NODE_NAME}|xtls-reality", server: ${DOMAIN}, port: ${PORT_XTLS_REALITY}, type: vless, tls: true, packet-encoding: xudp, uuid: ${SB_UUID}, servername: addons.mozilla.org, skip-cert-verify: false, udp: true, tfo: false}
+- {name: "${REGION_INFO}|${NODE_NAME}|xtls-reality", server: ${DOMAIN}, port: ${PORT_XTLS_REALITY}, type: vless, tls: true, packet-encoding: xudp, uuid: ${SB_UUID}, servername: ${SINGBOX_SERVER_NAME}, skip-cert-verify: false, udp: true, tfo: false}
 # Hysteria2 配置
 - {name: "${REGION_INFO}|${NODE_NAME}|hysteria2", server: ${NODE_IP}, port: ${PORT_HYSTERIA2}, type: hysteria2, ports: ${PORT_HYSTERIA2}, password: ${SB_UUID}, skip-cert-verify: false, udp: true, tfo: false}
 # TUIC 配置
 - {name: "${REGION_INFO}|${NODE_NAME}|tuic", server: ${NODE_IP}, port: ${PORT_TUIC}, type: tuic, uuid: ${SB_UUID}, password: ${SB_UUID}, alpn: [h3], congestion-controller: bbr, skip-cert-verify: false, udp: true, tfo: false}
 # Shadowsocks 配置
-- {name: "${REGION_INFO}|${NODE_NAME}|shadowsocks", server: ${DOMAIN}, port: ${PORT_SHADOWSOCKS}, type: ss, cipher: aes-128-gcm, password: ${SB_UUID}, udp: true, tfo: false}
+- {name: "${REGION_INFO}|${NODE_NAME}|shadowsocks", server: ${DOMAIN}, port: ${PORT_SHADOWSOCKS}, type: ss, cipher: ${SINGBOX_METHOD}, password: ${SHADOWTLS_PASSWORD}, udp: true, tfo: false}
 # Trojan 配置
 - {name: "${REGION_INFO}|${NODE_NAME}|trojan", server: ${DOMAIN}, port: ${PORT_TROJAN}, type: trojan, password: ${SB_UUID}, skip-cert-verify: false, udp: true, tfo: false}
 # VMESS WS TLS 配置
@@ -15,7 +15,7 @@ proxies:
 # VLESS WS TLS 配置
 - {name: "${REGION_INFO}|${NODE_NAME}|vless-ws-tls", server: ${DOMAIN}, port: ${LISTENING_PORT}, type: vless, tls: true, packet-encoding: xudp, uuid: ${SB_UUID}, servername: ${DOMAIN}, skip-cert-verify: false, udp: true, tfo: false}
 # gRPC Reality 配置
-- {name: "${REGION_INFO}|${NODE_NAME}|grpc-reality", server: ${DOMAIN}, port: ${PORT_GRPC_REALITY}, type: vless, tls: true, packet-encoding: xudp, uuid: ${SB_UUID}, servername: addons.mozilla.org, skip-cert-verify: false, udp: true, tfo: false}
+- {name: "${REGION_INFO}|${NODE_NAME}|grpc-reality", server: ${DOMAIN}, port: ${PORT_GRPC_REALITY}, type: vless, tls: true, packet-encoding: xudp, uuid: ${SB_UUID}, servername: ${SINGBOX_SERVER_NAME}, skip-cert-verify: false, udp: true, tfo: false}
 # AnyTLS 配置
 - {name: "${REGION_INFO}|${NODE_NAME}|anytls", server: ${NODE_IP}, port: ${PORT_ANYTLS}, type: anytls, password: ${SB_UUID}, skip-cert-verify: false, udp: true, tfo: false}
 # 备用 VMESS 配置

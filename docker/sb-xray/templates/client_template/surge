@@ -3,9 +3,9 @@ ${REGION_INFO}|${NODE_NAME}|hysteria2=hysteria2,${DOMAIN},${PORT_HYSTERIA2},pass
 # TUICv5
 ${REGION_INFO}|${NODE_NAME}|tuic=tuic-v5,${DOMAIN},${PORT_TUIC},uuid=${SB_UUID},password="${SB_UUID}",alpn=h3,sni=off,skip-cert-verify=true
 # ShadowTLS+Shadowsocks2022
-${REGION_INFO}|${NODE_NAME}|ShadowTLS=ss,${DOMAIN},${PORT_SHADOWTLS},encrypt-method=2022-blake3-aes-128-gcm,password="${SHADOWTLS_PASSWORD}",shadow-tls-password=${SB_UUID},shadow-tls-sni=addons.mozilla.org,shadow-tls-version=3
+${REGION_INFO}|${NODE_NAME}|ShadowTLS=ss,${DOMAIN},${PORT_SHADOWTLS},encrypt-method=${SINGBOX_METHOD},password="${SHADOWTLS_PASSWORD}",shadow-tls-password=${SB_UUID},shadow-tls-sni=${SINGBOX_SERVER_NAME},shadow-tls-version=3
 # 普通ShadowsocksAEAD
-${REGION_INFO}|${NODE_NAME}|shadowsocks=ss,${DOMAIN},${PORT_SHADOWSOCKS},encrypt-method=aes-128-gcm,password="${SB_UUID}"
+${REGION_INFO}|${NODE_NAME}|shadowsocks=ss,${DOMAIN},${PORT_SHADOWSOCKS},encrypt-method=${SINGBOX_METHOD},password="${SHADOWTLS_PASSWORD}"
 # Trojan
 ${REGION_INFO}|${NODE_NAME}|trojan=trojan,${DOMAIN},${PORT_TROJAN},password="${SB_UUID}",tls=true,sni=${DOMAIN},skip-cert-verify=true
 # VMessWS+TLS(AEAD)
