@@ -18,15 +18,7 @@ proxies:
 - {name: "${REGION_INFO}|${NODE_NAME}|grpc-reality", server: ${DOMAIN}, port: ${PORT_GRPC_REALITY}, type: vless, tls: true, packet-encoding: xudp, uuid: ${SB_UUID}, servername: ${SINGBOX_SERVER_NAME}, skip-cert-verify: false, udp: true, tfo: false}
 # AnyTLS 配置
 - {name: "${REGION_INFO}|${NODE_NAME}|anytls", server: ${NODE_IP}, port: ${PORT_ANYTLS}, type: anytls, password: ${SB_UUID}, skip-cert-verify: false, udp: true, tfo: false}
-# 备用 VMESS 配置
+# VMESS 配置
 - {name: "${REGION_INFO}|${NODE_NAME}.${DOMAIN}-VMESS", server: ${DOMAIN}, port: ${LISTENING_PORT}, type: vmess, uuid: ${V2RAY_UUID}, alterId: ${ALTERID}, cipher: auto, tls: true, skip-cert-verify: false, network: ${NETWORK}, ws-opts: {path: /${V2RAY_URL_PATH}, headers: {Host: ${DOMAIN}}}, udp: true, tfo: false}
 # XTLS Vision Reality 直连配置
 - {name: "${REGION_INFO}|${NODE_NAME}|XTLS(Vision) Reality直连", server: ${DOMAIN}, port: ${LISTENING_PORT}, type: vless, tls: true, packet-encoding: xudp, uuid: ${XRAY_REALITY_UUID}, servername: ${DOMAIN}, flow: xtls-rprx-vision, reality-opts: {public-key: ${XRAY_REALITY_PUBLIC_KEY}, short-id: ${XRAY_REALITY_SHORTID}}, client-fingerprint: random, skip-cert-verify: false, udp: true, tfo: false}
-# Xhttp Reality 直连配置
-- {name: "${REGION_INFO}|${NODE_NAME}|Xhttp Reality直连", server: ${DOMAIN}, port: ${LISTENING_PORT}, type: vless, tls: true, packet-encoding: xudp, uuid: ${XRAY_XHTTP_UUID}, servername: ${DOMAIN}, reality-opts: {public-key: ${XRAY_REALITY_PUBLIC_KEY}, short-id: ${XRAY_REALITY_SHORTID}}, client-fingerprint: random, skip-cert-verify: false, udp: true, tfo: false}
-# 上行Xhttp TLS CDN | 下行Xhttp Reality 配置
-- {name: "${REGION_INFO}|${NODE_NAME}|上行Xhttp TLS CDN|下行Xhttp Reality", server: ${DOMAIN}, port: ${LISTENING_PORT}, type: vless, tls: true, packet-encoding: xudp, uuid: ${XRAY_XHTTP_UUID}, servername: ${CDNDOMAIN}, alpn: [h2], skip-cert-verify: false, udp: true, tfo: false}
-# 上行Xhttp Reality | 下行 Xhttp TLS CDN 配置
-- {name: "${REGION_INFO}|${NODE_NAME}|上行Xhttp Reality|下行 Xhttp TLS CDN", server: ${DOMAIN}, port: ${LISTENING_PORT}, type: vless, tls: true, packet-encoding: xudp, uuid: ${XRAY_XHTTP_UUID}, servername: ${DOMAIN}, alpn: [h2], reality-opts: {public-key: ${XRAY_REALITY_PUBLIC_KEY}, short-id: ${XRAY_REALITY_SHORTID}}, client-fingerprint: random, skip-cert-verify: false, udp: true, tfo: false}
-# Xhttp TLS CDN 上下行不分离配置
-- {name: "${REGION_INFO}|${NODE_NAME}|Xhttp TLS CDN上下行不分离", server: ${DOMAIN}, port: ${LISTENING_PORT}, type: vless, tls: true, packet-encoding: xudp, uuid: ${XRAY_XHTTP_UUID}, servername: ${CDNDOMAIN}, alpn: [h2], reality-opts: {public-key: ${XRAY_REALITY_PUBLIC_KEY}, short-id: ${XRAY_REALITY_SHORTID}}, client-fingerprint: random, skip-cert-verify: false, udp: true, tfo: false}
