@@ -7,11 +7,12 @@ proxies:
     network: tcp
     udp: true
     tls: true
+    flow: xtls-rprx-vision
     servername: ${SINGBOX_SERVER_NAME}
     client-fingerprint: chrome
     reality-opts:
       public-key: ${SB_REALITY_PUBLIC_KEY}
-      short-id: ""
+      short-id: "${XRAY_REALITY_SHORTID}"
     smux:
       enabled: true
       protocol: h2mux
@@ -184,7 +185,7 @@ proxies:
       grpc-service-name: "grpc"
     reality-opts:
       public-key: ${SB_REALITY_PUBLIC_KEY}
-      short-id: ""
+      short-id: "${XRAY_REALITY_SHORTID}"
     smux:
       enabled: true
       protocol: h2mux

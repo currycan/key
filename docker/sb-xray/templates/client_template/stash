@@ -1,4 +1,19 @@
 proxies:
+- name: ${REGION_INFO}|${NODE_NAME}|xtls-reality
+  type: vless
+  server: ${DOMAIN}
+  port: ${PORT_XTLS_REALITY}
+  uuid: ${SB_UUID}
+  network: tcp
+  udp: true
+  tls: true
+  flow: xtls-rprx-vision
+  servername: ${SINGBOX_SERVER_NAME}
+  client-fingerprint: chrome
+  reality-opts:
+    public-key: ${SB_REALITY_PUBLIC_KEY}
+    short-id: "${XRAY_REALITY_SHORTID}"
+
 - name: ${REGION_INFO}|${NODE_NAME}|hysteria2
   type: hysteria2
   server: ${DOMAIN}

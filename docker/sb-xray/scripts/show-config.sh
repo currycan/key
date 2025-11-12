@@ -50,7 +50,7 @@ show_qrcode() {
 show_v2rayn_link() {
     # 生成 V2rayN 订阅文件
     V2RAYN_SUBSCRIBE+="
-vless://${SB_UUID}@${DOMAIN}:${PORT_XTLS_REALITY}?encryption=none&security=reality&sni=${SINGBOX_SERVER_NAME}&fp=chrome&pbk=${SB_REALITY_PUBLIC_KEY}&type=tcp&headerType=none&host=${DOMAIN}#${REGION_INFO}|${NODE_NAME}|xtls-reality
+vless://${SB_UUID}@${DOMAIN}:${PORT_XTLS_REALITY}?encryption=none&flow=xtls-rprx-vision&security=reality&sni=${SINGBOX_SERVER_NAME}&fp=chrome&pbk=${SB_REALITY_PUBLIC_KEY}&sid=${XRAY_REALITY_SHORTID}&type=tcp&headerType=none&host=${DOMAIN}#${REGION_INFO}|${NODE_NAME}|xtls-reality
 "
     V2RAYN_SUBSCRIBE+="
 hysteria2://${SB_UUID}@${DOMAIN}:${PORT_HYSTERIA2}/?alpn=h3&insecure=1#${REGION_INFO}|${NODE_NAME}|hysteria2
@@ -75,7 +75,7 @@ vmess://$(echo -n "{ \"v\": \"2\", \"ps\": \"${REGION_INFO}|${NODE_NAME}|vmess-w
 vless://${SB_UUID}@${DOMAIN}:${LISTENING_PORT}?encryption=none&security=tls&sni=${DOMAIN}&type=ws&host=${DOMAIN}&path=%2F${SB_UUID}-vless%3Fed%3D2048#${REGION_INFO}|${NODE_NAME}|vless-ws-tls
 "
     V2RAYN_SUBSCRIBE+="
-vless://${SB_UUID}@${DOMAIN}:${PORT_GRPC_REALITY}?encryption=none&security=reality&sni=${SINGBOX_SERVER_NAME}&fp=chrome&pbk=${SB_REALITY_PUBLIC_KEY}&type=grpc&serviceName=grpc&mode=gun#${REGION_INFO}|${NODE_NAME}|grpc-reality
+vless://${SB_UUID}@${DOMAIN}:${PORT_GRPC_REALITY}?encryption=none&security=reality&sni=${SINGBOX_SERVER_NAME}&fp=chrome&pbk=${SB_REALITY_PUBLIC_KEY}&sid=${XRAY_REALITY_SHORTID}&type=grpc&serviceName=grpc&mode=gun#${REGION_INFO}|${NODE_NAME}|grpc-reality
 "
     V2RAYN_SUBSCRIBE+="
 # 需把 tls 里的 inSecure 设置为 true

@@ -9,7 +9,7 @@
             "users": [
                 {
                     "uuid": "${SB_UUID}",
-                    "flow": ""
+                    "flow": "xtls-rprx-vision"
                 }
             ],
             "tls": {
@@ -23,7 +23,7 @@
                     },
                     "private_key": "${SB_REALITY_PRIVATE_KEY}",
                     "short_id": [
-                        ""
+                        "${XRAY_REALITY_SHORTID}"
                     ]
                 }
             },
