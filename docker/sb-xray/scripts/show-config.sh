@@ -60,6 +60,9 @@ hysteria2://${SB_UUID}@${DOMAIN}:${PORT_HYSTERIA2}/?alpn=h3&insecure=1#${REGION_
 tuic://${SB_UUID}:${SB_UUID}@${DOMAIN}:${PORT_TUIC}?alpn=h3&congestion_control=bbr#${REGION_INFO}|${NODE_NAME}|tuic
 "
     V2RAYN_SUBSCRIBE+="
+ss://$(echo -n "${SINGBOX_METHOD}:${SHADOWTLS_PASSWORD}@${DOMAIN}:${PORT_SHADOWTLS}/?plugin=shadow-tls;host=${SINGBOX_SERVER_NAME};password=${SB_UUID};version=3" | base64 -w0)#${REGION_INFO}|${NODE_NAME}|ShadowTLS
+"
+    V2RAYN_SUBSCRIBE+="
 ss://$(echo -n "${SINGBOX_METHOD}:${SHADOWTLS_PASSWORD}@${DOMAIN}:${PORT_SHADOWSOCKS}" | base64 -w0)#${REGION_INFO}|${NODE_NAME}|shadowsocks
 "
     V2RAYN_SUBSCRIBE+="

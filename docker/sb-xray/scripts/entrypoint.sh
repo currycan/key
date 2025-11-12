@@ -95,27 +95,14 @@ check_chatgpt_access() {
         -H "Origin: https://platform.openai.com"
         -H "Referer: https://platform.openai.com/"
     )
-    local CHECK_RESULT1
-    CHECK_RESULT1=$(curl "${CURL_OPTS[@]}" "${API_HEADERS[@]}" "$API_URL")
+    local CHECK_RESULT
+    CHECK_RESULT=$(curl "${CURL_OPTS[@]}" "${API_HEADERS[@]}" "$API_URL")
 
-    if [[ -z "$CHECK_RESULT1" ]] || grep -qi "unsupported_country" <<< "$CHECK_RESULT1"; then
-        echo "warp-ep"  # API 不可用或地区封锁
-        return
-    fi
-
-    # ===== 2. Web 检测 =====
-    local WEB_URL="https://ios.chat.openai.com/"
-    local WEB_HEADERS=(
-        -H "Accept: */*;q=0.8,application/signed-exchange;v=b3;q=0.7"
-        -H "Upgrade-Insecure-Requests: 1"
-    )
-    local CHECK_RESULT2
-    CHECK_RESULT2=$(curl "${CURL_OPTS[@]}" "${WEB_HEADERS[@]}" "$WEB_URL")
-
-    if [[ -z "$CHECK_RESULT2" ]] || grep -qi "VPN" <<< "$CHECK_RESULT2"; then
-        chatgpt_out="warp-ep"
+    if [[ -z "$CHECK_RESULT" ]] || grep -qi "unsupported_country" <<< "$CHECK_RESULT"; then
+        log WARN "ChatGPT access requires proxy (warp-ep)"
+        echo "warp-ep"
     else
-        chatgpt_out="direct"
+        echo "direct"
     fi
 }
 
@@ -142,8 +129,6 @@ function generateRandomStr() {
 
 # 生成环境变量
 function generateEnv() {
-    local env_file="/.env/xray"
-
     if [ ! -f "$env_file" ]; then
         log INFO "Generating environment variables..."
 
@@ -159,14 +144,17 @@ function generateEnv() {
 
         # # 获取地理位置信息
         log DEBUG "Generating geographical location information"
-        local geo_output=$(curl -fsSL --max-time 10 --retry 2 http://www.ip111.cn/ | grep '这是您访问国内网站所使用的IP' -B 2 | head -n 1 | awk -F' ' '{print $2$3"|"$1}' | tr -d '</p>')
+        local geo_output=$(curl -fsSL --max-time 10 --retry 2 https://www.ip111.cn/ | grep '这是您访问国内网站所使用的IP' -B 2 | head -n 1 | awk -F' ' '{print $2$3"|"$1}' | tr -d '</p>')
 
         # 检查系统是否已经安装 tcp-brutal
         log DEBUG "Checking brutal module"
-        local is_brutal
-        [ -x "$(type -p lsmod)" ] && lsmod | grep -q brutal && is_brutal=true
+        is_brutal=false
+        if [ -d "/sys/module/brutal" ]; then
+            is_brutal=true
+        else
+            log WARN "brutal module not detected, Xray XTLS Brutal will not be available"
+        fi
 
-        check_chatgpt_access
         detect_ip_strategy_api
 
         sb_shadowtls_password=$(sing-box generate rand --base64 16)
@@ -188,7 +176,7 @@ function generateEnv() {
             ["V2RAY_URL_PATH"]=$(generateRandomStr path 20)
             ["GEOIP_INFO"]=${geo_output}
             ["IS_BRUTAL"]=${is_brutal}
-            ["CHATGPT_OUT"]=${chatgpt_out}
+            ["CHATGPT_OUT"]=$(check_chatgpt_access)
             ["STRATEGY"]=${strategy}
             ["SHADOWTLS_PASSWORD"]=${sb_shadowtls_password}
             ["SB_REALITY_PRIVATE_KEY"]=${sb_reality_private}
@@ -208,12 +196,10 @@ function generateEnv() {
         )
 
         # 写入文件
-        mkdir -p "$(dirname "$env_file")"
+        log INFO "Environment file generated"
         for key in "${!config[@]}"; do
             echo "export $key='${config[$key]}'" >>"$env_file"
         done
-        log INFO "Environment file generated"
-        cat $env_file
     fi
 
     # 解密密钥文件
@@ -408,7 +394,11 @@ function issueCertificate() {
 if [ "${1#-}" = 'supervisord' ] && [ "$(id -u)" = '0' ]; then
     mkdir -p ${LOGDIR}/{supervisor,xray,sing-box,v2ray,dufs,nginx,x-ui}
 
+    env_file="/.env/xray"
+    mkdir -p "$(dirname "$env_file")"
     generateEnv
+    cat $env_file
+
     createConfig
 
     setupDhParam

@@ -73,7 +73,7 @@ RUN set -ex; \
     mv /tmp/sing-box /usr/local/bin/
 
 # ===== 安装 cloudflared =====
-ARG CLOUDFLARED_VERSION="2025.10.1"
+ARG CLOUDFLARED_VERSION="2025.11.1"
 RUN set -ex; \
     if [ -z "$CLOUDFLARED_VERSION" ]; then \
         V2RAY_VERSION=$(curl -sSf https://github.com/cloudflare/cloudflared/tags \
