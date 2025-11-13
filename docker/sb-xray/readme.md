@@ -31,7 +31,7 @@ docker buildx build \
   --build-arg V2RAY_VERSION="5.41.0" \
   --build-arg SING_BOX_VERSION="1.12.12" \
   --build-arg XRAY_VERSION="25.10.15" \
-  --tag currycan/sb-xray:25.11.11 \
+  --tag currycan/sb-xray:25.11.13 \
   --push .
 ```
 

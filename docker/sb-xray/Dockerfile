@@ -190,7 +190,7 @@ ENV LISTENING_PORT="433"
 
 # sing-box
 ENV SINGBOX_SERVER_NAME="addons.mozilla.org"
-ENV SINGBOX_METHOD="2022-blake3-aes-128-gcm"
+ENV SINGBOX_METHOD="2022-blake3-aes-256-gcm"
 
 # v2ray
 ENV ALTERID="0"

@@ -64,11 +64,11 @@ detect_ip_strategy_api() {
     fi
 
     if [[ "$IS_IPV4" == "yes" && "$IS_IPV6" == "yes" ]]; then
-        strategy=prefer_ipv4
+        echo prefer_ipv4
     elif [[ "$IS_IPV6" == "yes" ]]; then
-        strategy=ipv6_only
+        echo ipv6_only
     else
-        strategy=ipv4_only
+        echo ipv4_only
     fi
 }
 
@@ -87,7 +87,7 @@ check_chatgpt_access() {
         -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36"
     )
 
-    # ===== 1. API 检测 =====
+    # ===== API 检测 =====
     local API_URL="https://api.openai.com/compliance/cookie_requirements"
     local API_HEADERS=(
         -H "Authorization: Bearer null"
@@ -127,9 +127,36 @@ function generateRandomStr() {
     esac
 }
 
+function decryptSecretsEnv() {
+    # 解密密钥文件
+    local secret_file="/.env/secret"
+    mkdir -p "$(dirname "${secret_file}")"
+
+    if [ ! -f "$secret_file" ]; then
+        checkRequiredEnv DECODE
+        log INFO "Downloading encrypted secrets..."
+
+        if ! curl -fsSLo /tmp/tmp.bin "https://raw.githubusercontent.com/currycan/key/master/tmp.bin"; then
+            log ERROR "Failed to download secret file"
+            exit 1
+        fi
+
+        if ! crypctl decrypt -i /tmp/tmp.bin -o "$secret_file" -k "${DECODE}"; then
+            log ERROR "Secret decryption failed, check DECODE environment variable"
+            exit 1
+        fi
+        rm -f /tmp/tmp.bin
+        log INFO "Secrets decrypted successfully"
+    fi
+    source "${secret_file}"
+}
+
 # 生成环境变量
 function generateEnv() {
-    if [ ! -f "$env_file" ]; then
+    local env_file="/.env/xray"
+    mkdir -p "$(dirname "${env_file}")"
+
+    if [ ! -f "${env_file}" ]; then
         log INFO "Generating environment variables..."
 
         # 生成X25519密钥
@@ -144,7 +171,7 @@ function generateEnv() {
 
         # # 获取地理位置信息
         log DEBUG "Generating geographical location information"
-        local geo_output=$(curl -fsSL --max-time 10 --retry 2 https://www.ip111.cn/ | grep '这是您访问国内网站所使用的IP' -B 2 | head -n 1 | awk -F' ' '{print $2$3"|"$1}' | tr -d '</p>')
+        local geo_output=$(curl -fsSL --max-time 10 --retry 2 https://ip111.cn/ | grep '这是您访问国内网站所使用的IP' -B 2 | head -n 1 | awk -F' ' '{print $2$3"|"$1}' | tr -d '</p>')
 
         # 检查系统是否已经安装 tcp-brutal
         log DEBUG "Checking brutal module"
@@ -155,9 +182,12 @@ function generateEnv() {
             log WARN "brutal module not detected, Xray XTLS Brutal will not be available"
         fi
 
-        detect_ip_strategy_api
+        if [ "$SINGBOX_METHOD" = "2022-blake3-aes-128-gcm" ]; then
+            sb_shadowtls_password=$(sing-box generate rand --base64 16)
+        else
+            sb_shadowtls_password=$(sing-box generate rand --base64 32)
+        fi
 
-        sb_shadowtls_password=$(sing-box generate rand --base64 16)
         sb_reality_keypair=$(sing-box generate reality-keypair) && sb_reality_private=$(awk '/PrivateKey/{print $NF}' <<< "$sb_reality_keypair") && sb_reality_public=$(awk '/PublicKey/{print $NF}' <<< "$sb_reality_keypair")
 
         # 生成随机参数
@@ -177,7 +207,7 @@ function generateEnv() {
             ["GEOIP_INFO"]=${geo_output}
             ["IS_BRUTAL"]=${is_brutal}
             ["CHATGPT_OUT"]=$(check_chatgpt_access)
-            ["STRATEGY"]=${strategy}
+            ["STRATEGY"]=$(detect_ip_strategy_api)
             ["SHADOWTLS_PASSWORD"]=${sb_shadowtls_password}
             ["SB_REALITY_PRIVATE_KEY"]=${sb_reality_private}
             ["SB_REALITY_PUBLIC_KEY"]=${sb_reality_public}
@@ -198,35 +228,16 @@ function generateEnv() {
         # 写入文件
         log INFO "Environment file generated"
         for key in "${!config[@]}"; do
-            echo "export $key='${config[$key]}'" >>"$env_file"
+            echo "export $key='${config[$key]}'" >>"${env_file}"
         done
     fi
-
-    # 解密密钥文件
-    local secret_file="/.env/secret"
-    if [ ! -f "$secret_file" ]; then
-        checkRequiredEnv DECODE
-        log INFO "Downloading encrypted secrets..."
-
-        if ! curl -fsSLo /tmp/tmp.bin "https://raw.githubusercontent.com/currycan/key/master/tmp.bin"; then
-            log ERROR "Failed to download secret file"
-            exit 1
-        fi
-
-        if ! crypctl decrypt -i /tmp/tmp.bin -o "$secret_file" -k "${DECODE}"; then
-            log ERROR "Secret decryption failed, check DECODE environment variable"
-            exit 1
-        fi
-        rm -f /tmp/tmp.bin
-        log INFO "Secrets decrypted successfully"
-    fi
+    source "${env_file}"
+    cat "${env_file}"
 }
 
 # 生成配置文件
 function createConfig() {
     log INFO "Creating configurations..."
-    source "/.env/xray"
-    source "/.env/secret"
 
     # 提取所有环境变量名，生成用于envsubst的变量列表
     ENV_LIST=$(env | grep -v '^_' | cut -d= -f1 | sed 's/^/${/;s/$/}/' | xargs)
@@ -318,18 +329,18 @@ function registerAccount() {
 
 # DNS服务商配置
 function setDnsApi() {
-    local dns_api="${DNS_API,,}"
+    local dns_api=$1
 
     case "${dns_api}" in
         ali)
             checkRequiredEnv "ALI_KEY" "ALI_SECRET"
             export Ali_Key="${ALI_KEY}" Ali_Secret="${ALI_SECRET}"
-            DNS_PROVIDER="dns_ali"
+            export DNS_PROVIDER="dns_ali"
             ;;
         cf)
             checkRequiredEnv "CF_TOKEN" "CF_ZONE_ID" "CF_ACCOUNT_ID"
             export CF_Token="${CF_TOKEN}" CF_Zone_ID="${CF_ZONE_ID}" CF_Account_ID="${CF_ACCOUNT_ID}"
-            DNS_PROVIDER="dns_cf"
+            export DNS_PROVIDER="dns_cf"
             ;;
         *)
             log ERROR "错误：不支持的DNS服务商 '${dns_api}'" >&2
@@ -340,8 +351,8 @@ function setDnsApi() {
 
 # https://github.com/acmesh-official/acme.sh/wiki/dnsapi#dns_cf
 function issueCertificate() {
-    export DEBUG=${ACMESH_DEBUG}
     local cert_type=$1
+
     [[ -z "${CERT_TYPE_MAP[${cert_type}]}" ]] && {
         log ERROR "错误：无效证书类型 '${cert_type}'" >&2
         exit 1
@@ -350,58 +361,50 @@ function issueCertificate() {
     # 解析域名和DNS配置
     IFS=' ' read -r domain_var dns_provider <<< "${CERT_TYPE_MAP[${cert_type}]}"
     local domain="${!domain_var}"
+
     local cert_file="${SSL_PATH}/${domain}.crt"
+    local key_file="${SSL_PATH}/${domain}.key"
+    local ca_file="${SSL_PATH}/${domain}-ca.crt"
 
-    # 跳过已存在的证书
-    [[ -f "$cert_file" && -f "${SSL_PATH}/${domain}.key" ]] && {
+    # 申请证书并安装
+    if [[ -f "${cert_file}" && -f "${key_file}" && -f "${ca_file}" ]];then
         log INFO "证书已存在: ${domain}"
-        return 0
-    }
-
-    registerAccount
-    export DNS_API="${dns_provider}"
-    setDnsApi
-
-    # 动态构建域名参数（buypass不支持通配符）
-    local domains=("-d" "${domain}")
-    if [[ "${ACMESH_SERVER_NAME}" == "letsencrypt" ]]; then
-        domains+=("-d" "*.${domain}")
-    fi
-
-    # 申请并安装证书
-    set +e
-    acme_output=$(acme.sh --issue --dns "${DNS_PROVIDER}" "${domains[@]}" 2>&1)
-    exit_code=$?
-    set -e
-    # 根据退出码和输出内容判断是否为正常跳过
-    if [[ $exit_code -ne 0 ]]; then
-        if echo "$acme_output" | grep -e "Skipping. Next renewal"; then
-            log INFO "证书未到期，跳过续期。"
+    else
+        if ls /acmecerts/${domain}*/${domain}.key >/dev/null 2>&1; then
+            log INFO "acme ${domain} 证书已申请完成"
         else
-            log ERROR "证书申请失败: ${domain}" >&2
-            exit 1
-        fi
-    fi
+            # 配置调试模式
+            export DEBUG=${ACMESH_DEBUG}
 
-    acme.sh --install-cert -d "${domain}" \
-        --key-file "${SSL_PATH}/${domain}.key" \
-        --fullchain-file "${cert_file}" \
-        --ca-file "${SSL_PATH}/${domain}-ca.crt" \
-        --reloadcmd "/usr/sbin/nginx -s reload"
+            registerAccount
+            setDnsApi ${dns_provider}
+
+            # 动态构建域名参数（buypass不支持通配符）
+            local domains=("-d" "${domain}")
+            if [[ "${ACMESH_SERVER_NAME}" == "letsencrypt" ]]; then
+                domains+=("-d" "*.${domain}")
+            fi
+            # 申请证书
+            acme.sh --issue --dns "${DNS_PROVIDER}" "${domains[@]}"
+        fi
+        # 删除 nginx 配置，避免加载证书报错
+        rm -f /etc/nginx/conf.d/* /etc/nginx/stream.d/*
+        # 安装证书，并配置自动更新
+        acme.sh --install-cert -d "${domain}" \
+            --key-file "${SSL_PATH}/${domain}.key" \
+            --fullchain-file "${cert_file}" \
+            --ca-file "${SSL_PATH}/${domain}-ca.crt" \
+            --reloadcmd "/usr/sbin/nginx"
+        /usr/sbin/nginx -s quit && rm -f var/run/nginx/nginx.pid
+    fi
 }
 
 # 主执行流程
 if [ "${1#-}" = 'supervisord' ] && [ "$(id -u)" = '0' ]; then
     mkdir -p ${LOGDIR}/{supervisor,xray,sing-box,v2ray,dufs,nginx,x-ui}
 
-    env_file="/.env/xray"
-    mkdir -p "$(dirname "$env_file")"
+    decryptSecretsEnv
     generateEnv
-    cat $env_file
-
-    createConfig
-
-    setupDhParam
 
     log INFO "Obtaining SSL certificate..."
     # 证书类型映射表 (类型: [域名变量名,DNS服务商])
@@ -409,12 +412,17 @@ if [ "${1#-}" = 'supervisord' ] && [ "$(id -u)" = '0' ]; then
         ["normal"]="DOMAIN ali"
         ["cdn"]="CDNDOMAIN cf"
     )
-    checkRequiredEnv ACMESH_REGISTER_EMAIL
     # 生成证书
     issueCertificate "normal"
-    sleep 5
     issueCertificate "cdn"
 
+    # 生成配置文件
+    createConfig
+
+    # 创建 nginx dhparam 证书
+    setupDhParam
+
+    # 配置 x-ui
     log INFO "Initializing X-UI..."
     x-ui setting -username "${XUI_ACCOUNT}" -password "${PASSWORD}" -port "${XUI_LOCAL_PORT}" -webBasePath "${XUI_WEBBASEPATH}"
 
