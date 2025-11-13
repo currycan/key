@@ -7,7 +7,7 @@ services:
       - CDNDOMAIN=$cdndomain
       - XUI_ACCOUNT=$domain
       - DECODE=$code
-      - ACMESH_DEBUG=2
+      - ACMESH_DEBUG=1
       - ACMESH_SERVER_NAME=letsencrypt
       - DEST_HOST=harvard.edu
       - LISTENING_PORT=443

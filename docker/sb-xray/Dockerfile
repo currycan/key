@@ -153,7 +153,7 @@ RUN set -ex; \
 ENV AUTO_UPGRADE=1
 ENV LE_WORKING_DIR=/acme.sh
 ENV LE_CONFIG_HOME=/acmecerts
-ENV ACMESH_DEBUG=1
+ENV ACMESH_DEBUG=2
 ENV PATH=/acme.sh/:$PATH
 RUN set -ex && curl -L https://get.acme.sh | sh
 
