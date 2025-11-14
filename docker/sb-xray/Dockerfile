@@ -132,7 +132,7 @@ RUN set -ex; \
     ln -sf /usr/local/bin/bin/xray* /usr/local/bin/xray; \
     ln -sf /usr/local/bin/bin/*.dat /usr/local/bin/
 
-FROM docker.io/currycan/nginx:1.29.2
+FROM docker.io/currycan/nginx:1.29.3
 
 # Create a non-root user and group
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
