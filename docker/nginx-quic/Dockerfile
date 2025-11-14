@@ -54,14 +54,16 @@ RUN set -ex; \
 
 # Nginx
 # https://github.com/nginx/nginx
-ARG NGINX_VERSION=release-1.29.2
+ARG NGINX_VERSION=release-1.29.3
 ARG DTR_VER=1.29.2
 ARG RCP_VER=1.27.1
+# https://github.com/nginx-modules/ngx_http_tls_dyn_size
+# https://github.com/openresty/openresty
 RUN set -ex; \
-  git clone https://github.com/nginx/nginx --branch "$NGINX_VERSION" /src/nginx; \
+  git clone https://github.com/nginx/nginx --branch "${NGINX_VERSION}" /src/nginx; \
   cd /src/nginx; \
-  curl -fsSL https://raw.githubusercontent.com/nginx-modules/ngx_http_tls_dyn_size/refs/heads/master/nginx__dynamic_tls_records_"$DTR_VER"%2B.patch -o /src/nginx/1.patch; \
-  curl -fsSL https://raw.githubusercontent.com/openresty/openresty/refs/heads/master/patches/nginx/"$RCP_VER"/nginx-"$RCP_VER"-resolver_conf_parsing.patch -o /src/nginx/2.patch; \
+  curl -fsSL https://raw.githubusercontent.com/nginx-modules/ngx_http_tls_dyn_size/refs/heads/master/nginx__dynamic_tls_records_${DTR_VER}%2B.patch -o /src/nginx/1.patch; \
+  curl -fsSL https://raw.githubusercontent.com/openresty/openresty/refs/heads/master/patches/nginx/${RCP_VER}/nginx-${RCP_VER}-resolver_conf_parsing.patch -o /src/nginx/2.patch; \
   sed -i "s|nginx/|NPMplus/|g" /src/nginx/src/core/nginx.h; \
   sed -i "s|Server: nginx|Server: NPMplus|g" /src/nginx/src/http/ngx_http_header_filter_module.c; \
   sed -i "/<hr><center>/d" /src/nginx/src/http/ngx_http_special_response.c; \
@@ -96,7 +98,7 @@ RUN set -ex; \
   make -j$(nproc) libquickjs.a; \
   echo "quickjs $(cat VERSION)"
 
-ARG NJS_VERSION=0.9.3
+ARG NJS_VERSION=0.9.4
 RUN set -ex; \
   echo "Cloning and configuring njs ${NJS_VERSION} ..."; \
   git clone --recursive --depth 1 --single-branch -b ${NJS_VERSION} https://github.com/nginx/njs /src/njs; \
@@ -205,7 +207,7 @@ RUN set -ex; \
   make -j "$(nproc)" install; \
   ln -s /etc/nginx/sbin/nginx /usr/sbin/nginx
 
-ARG LUA_CORE_VERSIOM=v0.1.31
+ARG LUA_CORE_VERSIOM=v0.1.32
 ARG LUA_LRCACHE_VERSION=v0.15
 RUN set -ex; \
   echo "Building nginx lua..."; \
@@ -237,7 +239,7 @@ RUN set -ex; \
   ninja
 
 # OpenTelemetry lib
-ARG OPENTELEMETRY_VERSION=v1.19.0
+ARG OPENTELEMETRY_VERSION=v1.23.0
 RUN set -ex; \
   echo "Cloning opentelemetry-cpp ${OPENTELEMETRY_VERSION} ..."; \
   git clone --recursive --depth 1 --branch ${OPENTELEMETRY_VERSION} https://github.com/open-telemetry/opentelemetry-cpp /src/opentelemetry-cpp; \

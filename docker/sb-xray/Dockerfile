@@ -27,10 +27,13 @@ RUN set -ex; \
   mv crypctl /usr/local/bin/
 
 # ===== 安装 Dufs =====
+ARG DUFS_VERSION="0.45.0"
 RUN set -ex; \
-    DUFS_VERSION=$(curl -sSf https://github.com/sigoden/dufs/tags \
-      | grep "releases/tag/" | grep -Ev "rc|alpha|beta" \
-      | grep -o "[0-9]\+\.[0-9]\+\.[0-9]\+" | head -n 1); \
+    if [ -z "$V2RAY_VERSION" ]; then \
+        DUFS_VERSION=$(curl -sSf https://github.com/sigoden/dufs/tags \
+          | grep "releases/tag/" | grep -Ev "rc|alpha|beta" \
+          | grep -o "[0-9]\+\.[0-9]\+\.[0-9]\+" | head -n 1); \
+    fi; \
     case "${TARGETARCH}" in \
       amd64)   BINARY_FILE="dufs-v${DUFS_VERSION}-x86_64-unknown-linux-musl.tar.gz";; \
       arm64)   BINARY_FILE="dufs-v${DUFS_VERSION}-arm-unknown-linux-musleabihf.tar.gz";; \
