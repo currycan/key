@@ -148,7 +148,6 @@ function decryptSecretsEnv() {
         rm -f /tmp/tmp.bin
         log INFO "Secrets decrypted successfully"
     fi
-    source "${secret_file}"
 }
 
 # 生成环境变量
@@ -168,6 +167,16 @@ function generateEnv() {
 
         local reality_private_key reality_public_key
         read -r reality_private_key reality_public_key <<<$(gen_x25519_key)
+
+        # 生成mlkem768加密密钥
+        gen_mlkem768_secret() {
+            log DEBUG "Generating Xray mlkem768 key"
+            local mlkem768_secret=$(xray mlkem768)
+            echo "$(echo "${mlkem768_secret}" | sed -n '1p' | awk -F': ' '{print $2}') $(echo "${mlkem768_secret}" | sed -n '2p' | awk -F': ' '{print $2}')"
+        }
+
+        local mlkem768_seed mlkem768_client
+        read -r mlkem768_seed mlkem768_client <<<$(gen_mlkem768_secret)
 
         # # 获取地理位置信息
         log DEBUG "Generating geographical location information"
@@ -196,6 +205,8 @@ function generateEnv() {
             ["DUFS_PORT"]=$(generateRandomStr port)
             ["PASSWORD"]=$(generateRandomStr password 16)
             ["XRAY_REALITY_UUID"]=$(generateRandomStr uuid)
+            ["XRAY_MLKEM768_SEED"]=${mlkem768_seed}
+            ["XRAY_MLKEM768_CLIENT"]=${mlkem768_client}
             ["XRAY_REALITY_PRIVATE_KEY"]=${reality_private_key}
             ["XRAY_REALITY_PUBLIC_KEY"]=${reality_public_key}
             ["XRAY_REALITY_SHORTID"]=$(openssl rand -hex 8)
@@ -231,8 +242,6 @@ function generateEnv() {
             echo "export $key='${config[$key]}'" >>"${env_file}"
         done
     fi
-    source "${env_file}"
-    cat "${env_file}"
 }
 
 # 生成配置文件
@@ -405,6 +414,9 @@ if [ "${1#-}" = 'supervisord' ] && [ "$(id -u)" = '0' ]; then
 
     decryptSecretsEnv
     generateEnv
+    source "/.env/secret"
+    source "/.env/xray"
+    cat "/.env/xray"
 
     log INFO "Obtaining SSL certificate..."
     # 证书类型映射表 (类型: [域名变量名,DNS服务商])
