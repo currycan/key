@@ -63,7 +63,7 @@ proxies:
   ws-opts:
     path: /${SB_UUID}-vmess
     headers:
-      Host: ${DOMAIN}
+      Host: common.${DOMAIN}
 
 - name: ${REGION_INFO}|${NODE_NAME}|vless-ws-tls
   type: vless
@@ -72,13 +72,13 @@ proxies:
   uuid: ${SB_UUID}
   udp: true
   tls: true
-  servername: ${DOMAIN}
+  servername: common.${DOMAIN}
   network: ws
   skip-cert-verify: true
   ws-opts:
     path: /${SB_UUID}-vless
     headers:
-      Host: ${DOMAIN}
+      Host: common.${DOMAIN}
     max-early-data: 2048
     early-data-header-name: Sec-WebSocket-Protocol
 
@@ -94,8 +94,8 @@ proxies:
   ws-opts:
     path: /${V2RAY_URL_PATH}
     headers:
-      Host: ${DOMAIN}
-  servername: ${DOMAIN}
+      Host: common.${DOMAIN}
+  servername: common.${DOMAIN}
 
 - name: ${REGION_INFO}|${NODE_NAME}|XTLS(Vision)+Reality直连
   type: vless

@@ -12,7 +12,7 @@
                         "email": "vless@xhttp.reality"
                     }
                 ],
-                "decryption": "none"
+                "decryption": "mlkem768x25519plus.native.600s.${XRAY_MLKEM768_SEED}"
             },
             "streamSettings": {
                 "network": "xhttp",
