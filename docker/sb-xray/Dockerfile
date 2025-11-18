@@ -43,26 +43,6 @@ RUN set -ex; \
     upx --lzma --best /tmp/dufs; \
     mv /tmp/dufs /usr/local/bin/
 
-# ===== 安装 V2Ray =====
-ARG V2RAY_VERSION="5.41.0"
-RUN set -ex; \
-    if [ -z "$V2RAY_VERSION" ]; then \
-        V2RAY_VERSION=$(curl -sSf https://github.com/v2fly/v2ray-core/tags \
-            | grep "releases/tag/" | grep -Ev "rc|alpha|beta" \
-            | grep -o "[0-9]\+\.[0-9]\+\.[0-9]\+" | head -n 1); \
-    fi; \
-    case "${TARGETARCH}" in \
-      amd64)   BINARY_FILE="v2ray-linux-64.zip";; \
-      arm64)   BINARY_FILE="v2ray-linux-arm64-v8a.zip";; \
-      *)       echo "Unsupported architecture: ${TARGETARCH}"; exit 1 ;; \
-    esac; \
-    mkdir -p /tmp/v2ray; \
-    cd /tmp/v2ray; \
-    curl -fsSLO "https://github.com/v2fly/v2ray-core/releases/download/v${V2RAY_VERSION}/${BINARY_FILE}"; \
-    unzip "${BINARY_FILE}"; \
-    upx --lzma --best v2ray; \
-    mv v2ray /usr/local/bin/
-
 # ===== 安装 Sing-box =====
 ARG SING_BOX_VERSION="1.12.12"
 RUN set -ex; \
@@ -193,11 +173,7 @@ ENV LISTENING_PORT="433"
 
 # sing-box
 ENV SINGBOX_SERVER_NAME="addons.mozilla.org"
-ENV SINGBOX_METHOD="2022-blake3-aes-256-gcm"
-
-# v2ray
-ENV ALTERID="0"
-ENV NETWORK="ws"
+ENV SS_METHOD="2022-blake3-aes-256-gcm"
 
 # acme.sh
 ENV ACMESH_REGISTER_EMAIL=""

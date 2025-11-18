@@ -191,7 +191,7 @@ function generateEnv() {
             log WARN "brutal module not detected, Xray XTLS Brutal will not be available"
         fi
 
-        if [ "$SINGBOX_METHOD" = "2022-blake3-aes-128-gcm" ]; then
+        if [ "$SS_METHOD" = "2022-blake3-aes-128-gcm" ]; then
             sb_shadowtls_password=$(sing-box generate rand --base64 16)
         else
             sb_shadowtls_password=$(sing-box generate rand --base64 32)
@@ -204,35 +204,23 @@ function generateEnv() {
             ["XUI_LOCAL_PORT"]=$(generateRandomStr port)
             ["DUFS_PORT"]=$(generateRandomStr port)
             ["PASSWORD"]=$(generateRandomStr password 16)
-            ["XRAY_REALITY_UUID"]=$(generateRandomStr uuid)
+            ["XRAY_UUID"]=$(generateRandomStr uuid)
             ["XRAY_MLKEM768_SEED"]=${mlkem768_seed}
             ["XRAY_MLKEM768_CLIENT"]=${mlkem768_client}
             ["XRAY_REALITY_PRIVATE_KEY"]=${reality_private_key}
             ["XRAY_REALITY_PUBLIC_KEY"]=${reality_public_key}
             ["XRAY_REALITY_SHORTID"]=$(openssl rand -hex 8)
-            ["XRAY_XHTTP_UUID"]=$(generateRandomStr uuid)
-            ["XRAY_XHTTP_URL_PATH"]=$(generateRandomStr path 20)
-            ["V2RAY_LOCAL_PORT"]=$(generateRandomStr port)
-            ["V2RAY_UUID"]=$(generateRandomStr uuid)
-            ["V2RAY_URL_PATH"]=$(generateRandomStr path 20)
+            ["XRAY_URL_PATH"]=$(generateRandomStr path 20)
             ["GEOIP_INFO"]=${geo_output}
             ["IS_BRUTAL"]=${is_brutal}
             ["CHATGPT_OUT"]=$(check_chatgpt_access)
             ["STRATEGY"]=$(detect_ip_strategy_api)
-            ["SHADOWTLS_PASSWORD"]=${sb_shadowtls_password}
-            ["SB_REALITY_PRIVATE_KEY"]=${sb_reality_private}
-            ["SB_REALITY_PUBLIC_KEY"]=${sb_reality_public}
+            ["RANDOM_PASSWORD"]=${sb_shadowtls_password}
             ["SB_UUID"]=$(generateRandomStr uuid)
-            ["PORT_XTLS_REALITY"]=$(generateRandomStr port)
             ["PORT_HYSTERIA2"]=$(generateRandomStr port)
             ["PORT_TUIC"]=$(generateRandomStr port)
             ["PORT_SHADOWTLS"]=$(generateRandomStr port)
             ["PORT_SHADOWSOCKS"]=$(generateRandomStr port)
-            ["PORT_TROJAN"]=$(generateRandomStr port)
-            ["PORT_VMESS_WS"]=$(generateRandomStr port)
-            ["PORT_VLESS_WS"]=$(generateRandomStr port)
-            ["PORT_H2_REALITY"]=$(generateRandomStr port)
-            ["PORT_GRPC_REALITY"]=$(generateRandomStr port)
             ["PORT_ANYTLS"]=$(generateRandomStr port)
         )
 
@@ -295,12 +283,6 @@ function createConfig() {
             log DEBUG "Generating $output"
             envsubst <"$template" >"$output"
         done
-    fi
-
-    # 生成V2ray配置
-    if [ ! -f "${WORKDIR}/v2ray/*.json" ]; then
-        mkdir -p "${WORKDIR}/v2ray/"
-        envsubst </templates/v2ray/config.json >${WORKDIR}/v2ray/config.json
     fi
 
     # 生成Dufs配置
@@ -410,7 +392,7 @@ function issueCertificate() {
 
 # 主执行流程
 if [ "${1#-}" = 'supervisord' ] && [ "$(id -u)" = '0' ]; then
-    mkdir -p ${LOGDIR}/{supervisor,xray,sing-box,v2ray,dufs,nginx,x-ui}
+    mkdir -p ${LOGDIR}/{supervisor,xray,sing-box,dufs,nginx,x-ui}
 
     decryptSecretsEnv
     generateEnv

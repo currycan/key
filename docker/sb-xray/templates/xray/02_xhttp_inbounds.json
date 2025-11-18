@@ -7,7 +7,7 @@
             "settings": {
                 "clients": [
                     {
-                        "id": "${XRAY_XHTTP_UUID}",
+                        "id": "${XRAY_UUID}",
                         "level": 0,
                         "email": "vless@xhttp.reality"
                     }
@@ -18,7 +18,7 @@
                 "network": "xhttp",
                 "xhttpSettings": {
                     "host": "",
-                    "path": "/${XRAY_XHTTP_URL_PATH}",
+                    "path": "/${XRAY_URL_PATH}",
                     "mode": "auto",
                     "extra": {
                         "noSSEHeader": false,

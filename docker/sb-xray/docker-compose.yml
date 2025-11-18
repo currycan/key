@@ -21,7 +21,6 @@ services:
       - ./acmecerts:/acmecerts
       - ./.envs:/.env
       - ./sb-xray:/sb-xray
-      - ./logs:/sb-xray/logs
       - ./nginx/http:/etc/nginx/conf.d
       - ./nginx/tcp:/etc/nginx/stream.d
       - ./nginx/dhparam:/etc/nginx/dhparam

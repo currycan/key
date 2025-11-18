@@ -1,24 +1,18 @@
 # 代理配置
 proxies:
-# XTLS Reality 配置
-- {name: "${REGION_INFO}|${NODE_NAME}|xtls-reality", server: ${DOMAIN}, port: ${PORT_XTLS_REALITY}, type: vless, uuid: ${SB_UUID}, tls: true, flow: xtls-rprx-vision, reality-opts: {public-key: ${SB_REALITY_PUBLIC_KEY}, short-id: ${XRAY_REALITY_SHORTID}}, servername: ${SINGBOX_SERVER_NAME}, client-fingerprint: chrome, network: tcp, udp: true}
 # Hysteria2 配置
 - {name: "${REGION_INFO}|${NODE_NAME}|hysteria2", server: ${DOMAIN}, port: ${PORT_HYSTERIA2}, type: hysteria2, password: ${SB_UUID}, auth: ${SB_UUID},up: 2500 Mbps, down: 2500 Mbps, skip-cert-verify: false, udp: true, tfo: false}
 # TUIC 配置
 - {name: "${REGION_INFO}|${NODE_NAME}|tuic", server: ${DOMAIN}, port: ${PORT_TUIC}, type: tuic, uuid: ${SB_UUID}, password: ${SB_UUID}, alpn: [h3], congestion-controller: bbr, skip-cert-verify: false, udp: true, tfo: false}
 # Shadowsocks 配置
-- {name: "${REGION_INFO}|${NODE_NAME}|shadowsocks", server: ${DOMAIN}, port: ${PORT_SHADOWSOCKS}, type: ss, cipher: ${SINGBOX_METHOD}, password: ${SHADOWTLS_PASSWORD}, udp: true, tfo: false}
-# Trojan 配置
-- {name: "${REGION_INFO}|${NODE_NAME}|trojan", server: ${DOMAIN}, port: ${PORT_TROJAN}, type: trojan, password: ${SB_UUID}, skip-cert-verify: false, udp: true, tfo: false}
-# VMESS WS TLS 配置
-- {name: "${REGION_INFO}|${NODE_NAME}|vmess-ws-tls", server: ${DOMAIN}, port: ${LISTENING_PORT}, type: vmess, uuid: ${SB_UUID}, alterId: ${ALTERID}, cipher: auto, tls: true, skip-cert-verify: false, network: ${NETWORK}, ws-opts: {path: /${SB_UUID}-vmess, headers: {Host: common.${DOMAIN}}}, udp: true, tfo: false}
-# VLESS WS TLS 配置
-- {name: "${REGION_INFO}|${NODE_NAME}|vless-ws-tls", server: ${DOMAIN}, port: ${LISTENING_PORT}, type: vless, uuid: ${SB_UUID}, tls: true, tfo: false, skip-cert-verify: true, servername: common.${DOMAIN}, network: ws, ws-opts: {path: /${SB_UUID}-vless, headers: {Host: common.${DOMAIN}}}}
-# gRPC Reality 配置
-- {name: "${REGION_INFO}|${NODE_NAME}|grpc-reality", server: ${DOMAIN}, port: ${PORT_GRPC_REALITY}, type: vless, uuid: ${SB_UUID}, tls: true, tfo: false, skip-cert-verify: true, reality-opts: {public-key: ${SB_REALITY_PUBLIC_KEY, short-id: ${XRAY_REALITY_SHORTID}}, servername: ${SINGBOX_SERVER_NAME}, client-fingerprint: chrome, network: grpc, grpc-opts: {grpc-mode: gun, grpc-service-name: grpc}}
+- {name: "${REGION_INFO}|${NODE_NAME}|shadowsocks", server: ${DOMAIN}, port: ${PORT_SHADOWSOCKS}, type: ss, cipher: ${SS_METHOD}, password: ${RANDOM_PASSWORD}, udp: true, tfo: false}
 # AnyTLS 配置
 - {name: "${REGION_INFO}|${NODE_NAME}|anytls", server: ${DOMAIN}, port: ${PORT_ANYTLS}, type: anytls, password: ${SB_UUID}, skip-cert-verify: false, udp: true, tfo: false}
-# VMESS 配置
-- {name: "${REGION_INFO}|${NODE_NAME}.${DOMAIN}-VMESS", server: ${DOMAIN}, port: ${LISTENING_PORT}, type: vmess, uuid: ${V2RAY_UUID}, alterId: ${ALTERID}, cipher: auto, tls: true, skip-cert-verify: false, network: ${NETWORK}, ws-opts: {path: /${V2RAY_URL_PATH}, headers: {Host: common.${DOMAIN}}}, udp: true, tfo: false}
+# Trojan 配置
+- {name: "${REGION_INFO}|${NODE_NAME}|trojan-ws-tls", server: ${DOMAIN}, port: ${LISTENING_PORT}, type: trojan, password: ${XRAY_UUID}, network: ws, ws-opts: {path: /${XRAY_URL_PATH}-trojan, headers: {Host: common.${DOMAIN}}}, tls: true, skip-cert-verify: false, udp: true, tfo: false}
+# VLESS WS TLS 配置
+- {name: "${REGION_INFO}|${NODE_NAME}|vless-ws-tls", server: ${DOMAIN}, port: ${LISTENING_PORT}, type: vless, uuid: ${XRAY_UUID}, tls: true, tfo: false, skip-cert-verify: true, servername: common.${DOMAIN}, network: ws, ws-opts: {path: /${XRAY_UUID}-vless, headers: {Host: common.${DOMAIN}}}}
+# VMESS WS TLS 配置
+- {name: "${REGION_INFO}|${NODE_NAME}|vmess-ws-tls", server: ${DOMAIN}, port: ${LISTENING_PORT}, type: vmess, uuid: ${XRAY_UUID}, alterId: 0, cipher: auto, tls: true, skip-cert-verify: false, network: ws, ws-opts: {path: /${XRAY_UUID}-vmess, headers: {Host: common.${DOMAIN}}}, udp: true, tfo: false}
 # XTLS Vision Reality 直连配置
-- {name: "${REGION_INFO}|${NODE_NAME}|XTLS(Vision) Reality直连", server: ${DOMAIN}, port: ${LISTENING_PORT}, type: vless, tls: true, packet-encoding: xudp, uuid: ${XRAY_REALITY_UUID}, servername: ${DOMAIN}, flow: xtls-rprx-vision, reality-opts: {public-key: ${XRAY_REALITY_PUBLIC_KEY}, short-id: ${XRAY_REALITY_SHORTID}}, client-fingerprint: random, skip-cert-verify: false, udp: true, tfo: false}
+- {name: "${REGION_INFO}|${NODE_NAME}|XTLS(Vision) Reality直连", server: ${DOMAIN}, port: ${LISTENING_PORT}, type: vless, tls: true, packet-encoding: xudp, uuid: ${XRAY_UUID}, servername: ${DOMAIN}, flow: xtls-rprx-vision, reality-opts: {public-key: ${XRAY_REALITY_PUBLIC_KEY}, short-id: ${XRAY_REALITY_SHORTID}}, client-fingerprint: random, skip-cert-verify: false, udp: true, tfo: false}

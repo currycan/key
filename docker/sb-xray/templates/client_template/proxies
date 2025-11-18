@@ -1,31 +1,4 @@
 proxies:
-  - name: "${REGION_INFO}|${NODE_NAME}|xtls-reality"
-    type: vless
-    server: ${DOMAIN}
-    port: ${PORT_XTLS_REALITY}
-    uuid: ${SB_UUID}
-    network: tcp
-    udp: true
-    tls: true
-    flow: xtls-rprx-vision
-    servername: ${SINGBOX_SERVER_NAME}
-    client-fingerprint: chrome
-    reality-opts:
-      public-key: ${SB_REALITY_PUBLIC_KEY}
-      short-id: "${XRAY_REALITY_SHORTID}"
-    smux:
-      enabled: true
-      protocol: h2mux
-      padding: true
-      max-connections: 8
-      min-streams: 16
-      statistic: true
-      only-tcp: false
-    brutal-opts:
-      enabled: ${IS_BRUTAL}
-      up: "2500 Mbps"
-      down: "2500 Mbps"
-
   - name: "${REGION_INFO}|${NODE_NAME}|hysteria2"
     type: hysteria2
     server: ${DOMAIN}
@@ -54,8 +27,8 @@ proxies:
     type: ss
     server: ${DOMAIN}
     port: ${PORT_SHADOWTLS}
-    cipher: ${SINGBOX_METHOD}
-    password: ${SHADOWTLS_PASSWORD}
+    cipher: ${SS_METHOD}
+    password: ${RANDOM_PASSWORD}
     plugin: shadow-tls
     client-fingerprint: chrome
     plugin-opts:
@@ -79,114 +52,8 @@ proxies:
     type: ss
     server: ${DOMAIN}
     port: ${PORT_SHADOWSOCKS}
-    cipher: ${SINGBOX_METHOD}
-    password: ${SHADOWTLS_PASSWORD}
-    smux:
-      enabled: true
-      protocol: h2mux
-      padding: true
-      max-connections: 8
-      min-streams: 16
-      statistic: true
-      only-tcp: false
-    brutal-opts:
-      enabled: ${IS_BRUTAL}
-      up: "2500 Mbps"
-      down: "2500 Mbps"
-
-  - name: "${REGION_INFO}|${NODE_NAME}|trojan"
-    type: trojan
-    server: ${DOMAIN}
-    port: ${PORT_TROJAN}
-    password: ${SB_UUID}
-    client-fingerprint: random
-    skip-cert-verify: true
-    smux:
-      enabled: true
-      protocol: h2mux
-      padding: true
-      max-connections: 8
-      min-streams: 16
-      statistic: true
-      only-tcp: false
-    brutal-opts:
-      enabled: ${IS_BRUTAL}
-      up: "2500 Mbps"
-      down: "2500 Mbps"
-
-  - name: "${REGION_INFO}|${NODE_NAME}|vmess-ws-tls"
-    type: vmess
-    server: ${DOMAIN}
-    port: ${LISTENING_PORT}
-    uuid: ${SB_UUID}
-    udp: true
-    tls: true
-    servername: common.${DOMAIN}
-    alterId: 0
-    cipher: auto
-    skip-cert-verify: true
-    network: ws
-    ws-opts:
-      path: "/${SB_UUID}-vmess"
-      headers:
-        Host: common.${DOMAIN}
-    smux:
-      enabled: true
-      protocol: h2mux
-      padding: true
-      max-connections: 8
-      min-streams: 16
-      statistic: true
-      only-tcp: false
-    brutal-opts:
-      enabled: ${IS_BRUTAL}
-      up: "2500 Mbps"
-      down: "2500 Mbps"
-
-  - name: "${REGION_INFO}|${NODE_NAME}|vless-ws-tls"
-    type: vless
-    server: ${DOMAIN}
-    port: ${LISTENING_PORT}
-    uuid: ${SB_UUID}
-    udp: true
-    tls: true
-    servername: common.${DOMAIN}
-    network: ws
-    skip-cert-verify: true
-    ws-opts:
-      path: "/${SB_UUID}-vless"
-      headers:
-        Host: common.${DOMAIN}
-      max-early-data: 2048
-      early-data-header-name: Sec-WebSocket-Protocol
-    smux:
-      enabled: true
-      protocol: h2mux
-      padding: true
-      max-connections: 8
-      min-streams: 16
-      statistic: true
-      only-tcp: false
-    brutal-opts:
-      enabled: ${IS_BRUTAL}
-      up: "2500 Mbps"
-      down: "2500 Mbps"
-
-  - name: "${REGION_INFO}|${NODE_NAME}|grpc-reality"
-    type: vless
-    server: ${DOMAIN}
-    port: ${PORT_GRPC_REALITY}
-    uuid: ${SB_UUID}
-    network: grpc
-    tls: true
-    udp: true
-    client-fingerprint: chrome
-    servername: ${SINGBOX_SERVER_NAME}
-    grpc-opts:
-      grpc-service-name: "grpc"
-    reality-opts:
-      public-key: ${SB_REALITY_PUBLIC_KEY}
-      short-id: "${XRAY_REALITY_SHORTID}"
+    cipher: ${SS_METHOD}
+    password: ${RANDOM_PASSWORD}
     smux:
       enabled: true
       protocol: h2mux
@@ -211,26 +78,58 @@ proxies:
     idle-session-timeout: 30
     skip-cert-verify: true
 
-  - name: "${REGION_INFO}|${NODE_NAME}|VMESS"
+  - name: "${REGION_INFO}|${NODE_NAME}|trojan-ws-tls"
+    type: trojan
+    server: ${DOMAIN}
+    port: ${LISTENING_PORT}
+    password: ${XRAY_UUID}
+    udp: true
+    tls: true
+    servername: common.${DOMAIN}
+    network: ws
+    skip-cert-verify: true
+    ws-opts:
+      path: "/${XRAY_UUID}-trojan"
+      headers:
+        Host: common.${DOMAIN}
+
+  - name: "${REGION_INFO}|${NODE_NAME}|vless-ws-tls"
+    type: vless
+    server: ${DOMAIN}
+    port: ${LISTENING_PORT}
+    uuid: ${XRAY_UUID}
+    udp: true
+    tls: true
+    servername: common.${DOMAIN}
+    network: ws
+    skip-cert-verify: true
+    ws-opts:
+      path: "/${XRAY_UUID}-vless"
+      headers:
+        Host: common.${DOMAIN}
+
+  - name: "${REGION_INFO}|${NODE_NAME}|vmess-ws-tls"
     type: vmess
     server: ${DOMAIN}
     port: ${LISTENING_PORT}
-    cipher: auto
-    uuid: ${V2RAY_UUID}
-    alterId: ${ALTERID}
+    uuid: ${XRAY_UUID}
+    udp: true
     tls: true
-    network: ${NETWORK}
+    servername: common.${DOMAIN}
+    alterId: 0
+    cipher: auto
+    skip-cert-verify: true
+    network: ws
     ws-opts:
-      path: "/${V2RAY_URL_PATH}"
+      path: "/${XRAY_UUID}-vmess"
       headers:
         Host: common.${DOMAIN}
-    servername: common.${DOMAIN}
 
   - name: "${REGION_INFO}|${NODE_NAME}|XTLS(Vision)+Reality直连"
     type: vless
     server: ${DOMAIN}
     port: ${LISTENING_PORT}
-    uuid: ${XRAY_REALITY_UUID}
+    uuid: ${XRAY_UUID}
     tls: true
     flow: xtls-rprx-vision
     client-fingerprint: chrome
@@ -246,7 +145,7 @@ proxies:
     type: vless
     server: ${DOMAIN}
     port: ${LISTENING_PORT}
-    uuid: ${XRAY_XHTTP_UUID}
+    uuid: ${XRAY_UUID}
     tls: true
     client-fingerprint: chrome
     skip-cert-verify: false
@@ -255,14 +154,15 @@ proxies:
       short-id: ${XRAY_REALITY_SHORTID}
     network: xhttp
     xhttp-opts:
-      path: "/${XRAY_XHTTP_URL_PATH}"
+      path: "/${XRAY_URL_PATH}"
     servername: ${DOMAIN}
+    encryption: "none"
 
   - name: "${REGION_INFO}|${NODE_NAME}|上行Xhttp+TLS+CDN|下行Xhttp+Reality"
     type: vless
     server: ${DOMAIN}
     port: ${LISTENING_PORT}
-    uuid: ${XRAY_XHTTP_UUID}
+    uuid: ${XRAY_UUID}
     tls: true
     client-fingerprint: chrome
     alpn:
@@ -272,14 +172,15 @@ proxies:
     xhttp-opts:
       headers:
         Host: ${CDNDOMAIN}
-      path: "/${XRAY_XHTTP_URL_PATH}"
+      path: "/${XRAY_URL_PATH}"
     servername: ${CDNDOMAIN}
+    encryption: "mlkem768x25519plus.native.0rtt.${XRAY_MLKEM768_CLIENT}"
 
   - name: "${REGION_INFO}|${NODE_NAME}|上行Xhttp+Reality|下行Xhttp+TLS+CDN"
     type: vless
     server: ${DOMAIN}
     port: ${LISTENING_PORT}
-    uuid: ${XRAY_XHTTP_UUID}
+    uuid: ${XRAY_UUID}
     tls: true
     client-fingerprint: chrome
     alpn:
@@ -290,14 +191,15 @@ proxies:
       short-id: ${XRAY_REALITY_SHORTID}
     network: xhttp
     xhttp-opts:
-      path: "/${XRAY_XHTTP_URL_PATH}"
+      path: "/${XRAY_URL_PATH}"
     servername: ${DOMAIN}
+    encryption: "mlkem768x25519plus.native.0rtt.${XRAY_MLKEM768_CLIENT}"
 
   - name: "${REGION_INFO}|${NODE_NAME}|Xhttp+TLS+CDN上下行不分离"
     type: vless
     server: ${DOMAIN}
     port: ${LISTENING_PORT}
-    uuid: ${XRAY_XHTTP_UUID}
+    uuid: ${XRAY_UUID}
     tls: true
     client-fingerprint: chrome
     alpn:
@@ -307,5 +209,6 @@ proxies:
     xhttp-opts:
       headers:
         Host: ${CDNDOMAIN}
-      path: "/${XRAY_XHTTP_URL_PATH}"
+      path: "/${XRAY_URL_PATH}"
     servername: ${CDNDOMAIN}
+    encryption: "mlkem768x25519plus.native.0rtt.${XRAY_MLKEM768_CLIENT}"

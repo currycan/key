@@ -23,8 +23,8 @@
             "tag": "shadowtls-in",
             "listen": "127.0.0.1",
             "network": "tcp",
-            "method": "${SINGBOX_METHOD}",
-            "password": "${SHADOWTLS_PASSWORD}",
+            "method": "${SS_METHOD}",
+            "password": "${RANDOM_PASSWORD}",
             "multiplex": {
                 "enabled": true,
                 "padding": true,

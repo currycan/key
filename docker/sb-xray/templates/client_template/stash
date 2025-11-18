@@ -1,19 +1,4 @@
 proxies:
-- name: ${REGION_INFO}|${NODE_NAME}|xtls-reality
-  type: vless
-  server: ${DOMAIN}
-  port: ${PORT_XTLS_REALITY}
-  uuid: ${SB_UUID}
-  network: tcp
-  udp: true
-  tls: true
-  flow: xtls-rprx-vision
-  servername: ${SINGBOX_SERVER_NAME}
-  client-fingerprint: chrome
-  reality-opts:
-    public-key: ${SB_REALITY_PUBLIC_KEY}
-    short-id: "${XRAY_REALITY_SHORTID}"
-
 - name: ${REGION_INFO}|${NODE_NAME}|hysteria2
   type: hysteria2
   server: ${DOMAIN}
@@ -25,8 +10,8 @@ proxies:
   type: ss
   server: ${DOMAIN}
   port: ${PORT_SHADOWTLS}
-  cipher: ${SINGBOX_METHOD}
-  password: ${SHADOWTLS_PASSWORD}
+  cipher: ${SS_METHOD}
+  password: ${RANDOM_PASSWORD}
   plugin: shadow-tls
   client-fingerprint: chrome
   plugin-opts:
@@ -38,22 +23,44 @@ proxies:
   type: ss
   server: ${DOMAIN}
   port: ${PORT_SHADOWSOCKS}
-  cipher: ${SINGBOX_METHOD}
-  password: ${SHADOWTLS_PASSWORD}
+  cipher: ${SS_METHOD}
+  password: ${RANDOM_PASSWORD}
 
-- name: ${REGION_INFO}|${NODE_NAME}|trojan
+- name: "${REGION_INFO}|${NODE_NAME}|trojan-ws-tls"
   type: trojan
   server: ${DOMAIN}
-  port: ${PORT_TROJAN}
-  password: ${SB_UUID}
-  client-fingerprint: random
+  port: ${LISTENING_PORT}
+  password: ${XRAY_UUID}
+  udp: true
+  tls: true
+  servername: common.${DOMAIN}
+  network: ws
   skip-cert-verify: true
+  ws-opts:
+    path: "/${XRAY_UUID}-trojan"
+    headers:
+      Host: common.${DOMAIN}
 
-- name: ${REGION_INFO}|${NODE_NAME}|vmess-ws-tls
+- name: "${REGION_INFO}|${NODE_NAME}|vless-ws-tls"
+  type: vless
+  server: ${DOMAIN}
+  port: ${LISTENING_PORT}
+  uuid: ${XRAY_UUID}
+  udp: true
+  tls: true
+  servername: common.${DOMAIN}
+  network: ws
+  skip-cert-verify: true
+  ws-opts:
+    path: "/${XRAY_UUID}-vless"
+    headers:
+      Host: common.${DOMAIN}
+
+- name: "${REGION_INFO}|${NODE_NAME}|vmess-ws-tls"
   type: vmess
   server: ${DOMAIN}
   port: ${LISTENING_PORT}
-  uuid: ${SB_UUID}
+  uuid: ${XRAY_UUID}
   udp: true
   tls: true
   servername: common.${DOMAIN}
@@ -62,47 +69,15 @@ proxies:
   skip-cert-verify: true
   network: ws
   ws-opts:
-    path: /${SB_UUID}-vmess
+    path: "/${XRAY_UUID}-vmess"
     headers:
       Host: common.${DOMAIN}
 
-- name: ${REGION_INFO}|${NODE_NAME}|vless-ws-tls
+- name: "${REGION_INFO}|${NODE_NAME}|XTLS(Vision)+Reality直连"
   type: vless
   server: ${DOMAIN}
   port: ${LISTENING_PORT}
-  uuid: ${SB_UUID}
-  udp: true
-  tls: true
-  servername: common.${DOMAIN}
-  network: ws
-  skip-cert-verify: true
-  ws-opts:
-    path: /${SB_UUID}-vless
-    headers:
-      Host: common.${DOMAIN}
-    max-early-data: 2048
-    early-data-header-name: Sec-WebSocket-Protocol
-
-- name: ${REGION_INFO}|${NODE_NAME}|VMESS
-  type: vmess
-  server: ${DOMAIN}
-  port: ${LISTENING_PORT}
-  cipher: auto
-  uuid: ${V2RAY_UUID}
-  alterId: ${ALTERID}
-  tls: true
-  network: ${NETWORK}
-  ws-opts:
-    path: /${V2RAY_URL_PATH}
-    headers:
-      Host: common.${DOMAIN}
-  servername: common.${DOMAIN}
-
-- name: ${REGION_INFO}|${NODE_NAME}|XTLS(Vision)+Reality直连
-  type: vless
-  server: ${DOMAIN}
-  port: ${LISTENING_PORT}
-  uuid: ${XRAY_REALITY_UUID}
+  uuid: ${XRAY_UUID}
   tls: true
   flow: xtls-rprx-vision
   client-fingerprint: chrome

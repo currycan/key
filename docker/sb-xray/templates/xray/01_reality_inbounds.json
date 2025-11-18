@@ -7,7 +7,7 @@
             "settings": {
                 "clients": [
                     {
-                        "id": "${XRAY_REALITY_UUID}",
+                        "id": "${XRAY_UUID}",
                         "level": 0,
                         "email": "vless@xtls.reality",
                         "flow": "xtls-rprx-vision"
