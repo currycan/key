@@ -83,7 +83,7 @@ anytls://${SB_UUID}@${DOMAIN}:${PORT_ANYTLS}?security=tls&type=tcp#${REGION_INFO
 "
     # vmess ws tls
     V2RAYN_SUBSCRIBE+="
-vmess://$(echo -n "{\"add\":\"${DOMAIN}\",\"aid\":\"${ALTERID}\",\"host\":\"common.${DOMAIN}\",\"id\":\"${V2RAY_UUID}\",\"net\":\"${NETWORK}\",\"path\":\"/${V2RAY_URL_PATH}\",\"port\":\"${LISTENING_PORT}\",\"ps\":\"${REGION_INFO}|${DOMAIN}-VMESS\",\"tls\":\"tls\",\"type\":\"\",\"v\":\"2\"}" | base64 -w0)
+vmess://$(echo -n "{\"add\":\"${DOMAIN}\",\"aid\":\"${ALTERID}\",\"host\":\"common.${DOMAIN}\",\"id\":\"${V2RAY_UUID}\",\"net\":\"${NETWORK}\",\"path\":\"/${V2RAY_URL_PATH}\",\"port\":\"${LISTENING_PORT}\",\"ps\":\"${REGION_INFO}|${DOMAIN}-VMESS\",\"tls\":\"tls\",\"sni\": \"common.${DOMAIN}\",\"type\":\"\",\"v\":\"2\"}" | base64 -w0)
 "
     # XTLS(Vision)+Reality直连
     V2RAYN_SUBSCRIBE+="

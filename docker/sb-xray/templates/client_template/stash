@@ -56,6 +56,7 @@ proxies:
   uuid: ${SB_UUID}
   udp: true
   tls: true
+  servername: common.${DOMAIN}
   alterId: 0
   cipher: auto
   skip-cert-verify: true
