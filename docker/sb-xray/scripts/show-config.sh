@@ -56,7 +56,7 @@ hysteria2://${SB_UUID}@${NODE_IP}:${PORT_HYSTERIA2}/?alpn=h3&insecure=1#${REGION
     # tuic
     V2RAYN_SUBSCRIBE+="
 # 需把 tls 里的 inSecure 设置为 true
-tuic://${SB_UUID}:${SB_UUID}@${NODE_IP}:${PORT_TUIC}?alpn=h3&congestion_control=bbr#${REGION_INFO}|${NODE_NAME}|tuic
+tuic://${SB_UUID}:${SB_UUID}@${NODE_IP}:${PORT_TUIC}?alpn=h3&insecure=1&congestion_control=bbr#${REGION_INFO}|${NODE_NAME}|tuic
 "
     # ShadowTLS
 #     V2RAYN_SUBSCRIBE+="
@@ -69,7 +69,7 @@ ss://$(echo -n "${SS_METHOD}:${RANDOM_PASSWORD}@${NODE_IP}:${PORT_SHADOWSOCKS}" 
     # anytls
     V2RAYN_SUBSCRIBE+="
 # 需把 tls 里的 inSecure 设置为 true
-anytls://${SB_UUID}@${NODE_IP}:${PORT_ANYTLS}?security=tls&type=tcp#${REGION_INFO}|${NODE_NAME}|anytls
+anytls://${SB_UUID}@${NODE_IP}:${PORT_ANYTLS}?security=tls&allowInsecure=1&type=tcp#${REGION_INFO}|${NODE_NAME}|anytls
 "
     # Trojan WS
     V2RAYN_SUBSCRIBE+="
