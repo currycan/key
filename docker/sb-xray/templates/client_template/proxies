@@ -1,14 +1,14 @@
 proxies:
-  - name: "${REGION_INFO}|${NODE_NAME}|hysteria2"
+  - name: ${REGION_INFO}|${NODE_NAME}|hysteria2
     type: hysteria2
     server: ${DOMAIN}
     port: ${PORT_HYSTERIA2}
-    up: "2500 Mbps"
-    down: "2500 Mbps"
+    up: 2500 Mbps
+    down: 2500 Mbps
     password: ${SB_UUID}
     skip-cert-verify: true
 
-  - name: "${REGION_INFO}|${NODE_NAME}|tuic"
+  - name: ${REGION_INFO}|${NODE_NAME}|tuic
     type: tuic
     server: ${DOMAIN}
     port: ${PORT_TUIC}
@@ -23,7 +23,7 @@ proxies:
     congestion-controller: bbr
     skip-cert-verify: true
 
-  - name: "${REGION_INFO}|${NODE_NAME}|ShadowTLS"
+  - name: ${REGION_INFO}|${NODE_NAME}|ShadowTLS
     type: ss
     server: ${DOMAIN}
     port: ${PORT_SHADOWTLS}
@@ -33,7 +33,7 @@ proxies:
     client-fingerprint: chrome
     plugin-opts:
       host: ${SINGBOX_SERVER_NAME}
-      password: "${SB_UUID}"
+      password: ${SB_UUID}
       version: 3
     smux:
       enabled: true
@@ -45,10 +45,10 @@ proxies:
       only-tcp: false
     brutal-opts:
       enabled: ${IS_BRUTAL}
-      up: "2500 Mbps"
-      down: "2500 Mbps"
+      up: 2500 Mbps
+      down: 2500 Mbps
 
-  - name: "${REGION_INFO}|${NODE_NAME}|shadowsocks"
+  - name: ${REGION_INFO}|${NODE_NAME}|shadowsocks
     type: ss
     server: ${DOMAIN}
     port: ${PORT_SHADOWSOCKS}
@@ -64,10 +64,10 @@ proxies:
       only-tcp: false
     brutal-opts:
       enabled: ${IS_BRUTAL}
-      up: "2500 Mbps"
-      down: "2500 Mbps"
+      up: 2500 Mbps
+      down: 2500 Mbps
 
-  - name: "${REGION_INFO}|${NODE_NAME}|anytls"
+  - name: ${REGION_INFO}|${NODE_NAME}|anytls
     type: anytls
     server: ${DOMAIN}
     port: ${PORT_ANYTLS}
@@ -78,54 +78,51 @@ proxies:
     idle-session-timeout: 30
     skip-cert-verify: true
 
-  - name: "${REGION_INFO}|${NODE_NAME}|trojan-ws-tls"
+  - name: ${REGION_INFO}|${NODE_NAME}|trojan-ws-tls
     type: trojan
     server: ${DOMAIN}
     port: ${LISTENING_PORT}
     password: ${XRAY_UUID}
-    udp: true
     tls: true
     servername: common.${DOMAIN}
     network: ws
-    skip-cert-verify: true
+    skip-cert-verify: false
     ws-opts:
-      path: "/${XRAY_UUID}-trojan"
+      path: /${XRAY_URL_PATH}-trojan
       headers:
         Host: common.${DOMAIN}
 
-  - name: "${REGION_INFO}|${NODE_NAME}|vless-ws-tls"
+  - name: ${REGION_INFO}|${NODE_NAME}|vless-ws-tls
     type: vless
     server: ${DOMAIN}
     port: ${LISTENING_PORT}
     uuid: ${XRAY_UUID}
-    udp: true
     tls: true
     servername: common.${DOMAIN}
     network: ws
-    skip-cert-verify: true
+    skip-cert-verify: false
     ws-opts:
-      path: "/${XRAY_UUID}-vless"
+      path: /${XRAY_URL_PATH}-vless
       headers:
         Host: common.${DOMAIN}
 
-  - name: "${REGION_INFO}|${NODE_NAME}|vmess-ws-tls"
+  - name: ${REGION_INFO}|${NODE_NAME}|vmess-ws-tls
     type: vmess
     server: ${DOMAIN}
     port: ${LISTENING_PORT}
     uuid: ${XRAY_UUID}
-    udp: true
     tls: true
     servername: common.${DOMAIN}
     alterId: 0
     cipher: auto
-    skip-cert-verify: true
+    skip-cert-verify: false
     network: ws
     ws-opts:
-      path: "/${XRAY_UUID}-vmess"
+      path: /${XRAY_URL_PATH}-vmess
       headers:
         Host: common.${DOMAIN}
 
-  - name: "${REGION_INFO}|${NODE_NAME}|XTLS(Vision)+Reality直连"
+  - name: ${REGION_INFO}|${NODE_NAME}|XTLS(Vision)+Reality直连
     type: vless
     server: ${DOMAIN}
     port: ${LISTENING_PORT}
@@ -141,7 +138,7 @@ proxies:
     network: tcp
     servername: ${DOMAIN}
 
-  - name: "${REGION_INFO}|${NODE_NAME}|Xhttp+Reality直连"
+  - name: ${REGION_INFO}|${NODE_NAME}|Xhttp+Reality直连
     type: vless
     server: ${DOMAIN}
     port: ${LISTENING_PORT}
@@ -154,11 +151,11 @@ proxies:
       short-id: ${XRAY_REALITY_SHORTID}
     network: xhttp
     xhttp-opts:
-      path: "/${XRAY_URL_PATH}"
+      path: /${XRAY_URL_PATH}
     servername: ${DOMAIN}
-    encryption: "none"
+    encryption: none
 
-  - name: "${REGION_INFO}|${NODE_NAME}|上行Xhttp+TLS+CDN|下行Xhttp+Reality"
+  - name: ${REGION_INFO}|${NODE_NAME}|上行Xhttp+TLS+CDN|下行Xhttp+Reality
     type: vless
     server: ${DOMAIN}
     port: ${LISTENING_PORT}
@@ -172,11 +169,11 @@ proxies:
     xhttp-opts:
       headers:
         Host: ${CDNDOMAIN}
-      path: "/${XRAY_URL_PATH}"
+      path: /${XRAY_URL_PATH}
     servername: ${CDNDOMAIN}
-    encryption: "mlkem768x25519plus.native.0rtt.${XRAY_MLKEM768_CLIENT}"
+    encryption: mlkem768x25519plus.native.0rtt.${XRAY_MLKEM768_CLIENT}
 
-  - name: "${REGION_INFO}|${NODE_NAME}|上行Xhttp+Reality|下行Xhttp+TLS+CDN"
+  - name: ${REGION_INFO}|${NODE_NAME}|上行Xhttp+Reality|下行Xhttp+TLS+CDN
     type: vless
     server: ${DOMAIN}
     port: ${LISTENING_PORT}
@@ -191,11 +188,11 @@ proxies:
       short-id: ${XRAY_REALITY_SHORTID}
     network: xhttp
     xhttp-opts:
-      path: "/${XRAY_URL_PATH}"
+      path: /${XRAY_URL_PATH}
     servername: ${DOMAIN}
-    encryption: "mlkem768x25519plus.native.0rtt.${XRAY_MLKEM768_CLIENT}"
+    encryption: mlkem768x25519plus.native.0rtt.${XRAY_MLKEM768_CLIENT}
 
-  - name: "${REGION_INFO}|${NODE_NAME}|Xhttp+TLS+CDN上下行不分离"
+  - name: ${REGION_INFO}|${NODE_NAME}|Xhttp+TLS+CDN上下行不分离
     type: vless
     server: ${DOMAIN}
     port: ${LISTENING_PORT}
@@ -209,6 +206,6 @@ proxies:
     xhttp-opts:
       headers:
         Host: ${CDNDOMAIN}
-      path: "/${XRAY_URL_PATH}"
+      path: /${XRAY_URL_PATH}
     servername: ${CDNDOMAIN}
-    encryption: "mlkem768x25519plus.native.0rtt.${XRAY_MLKEM768_CLIENT}"
+    encryption: mlkem768x25519plus.native.0rtt.${XRAY_MLKEM768_CLIENT}

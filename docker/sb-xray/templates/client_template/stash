@@ -26,54 +26,51 @@ proxies:
   cipher: ${SS_METHOD}
   password: ${RANDOM_PASSWORD}
 
-- name: "${REGION_INFO}|${NODE_NAME}|trojan-ws-tls"
+- name: ${REGION_INFO}|${NODE_NAME}|trojan-ws-tls
   type: trojan
   server: ${DOMAIN}
   port: ${LISTENING_PORT}
   password: ${XRAY_UUID}
-  udp: true
   tls: true
   servername: common.${DOMAIN}
   network: ws
-  skip-cert-verify: true
+  skip-cert-verify: false
   ws-opts:
-    path: "/${XRAY_UUID}-trojan"
+    path: /${XRAY_URL_PATH}-trojan
     headers:
       Host: common.${DOMAIN}
 
-- name: "${REGION_INFO}|${NODE_NAME}|vless-ws-tls"
+- name: ${REGION_INFO}|${NODE_NAME}|vless-ws-tls
   type: vless
   server: ${DOMAIN}
   port: ${LISTENING_PORT}
   uuid: ${XRAY_UUID}
-  udp: true
   tls: true
   servername: common.${DOMAIN}
   network: ws
-  skip-cert-verify: true
+  skip-cert-verify: false
   ws-opts:
-    path: "/${XRAY_UUID}-vless"
+    path: /${XRAY_URL_PATH}-vless
     headers:
       Host: common.${DOMAIN}
 
-- name: "${REGION_INFO}|${NODE_NAME}|vmess-ws-tls"
+- name: ${REGION_INFO}|${NODE_NAME}|vmess-ws-tls
   type: vmess
   server: ${DOMAIN}
   port: ${LISTENING_PORT}
   uuid: ${XRAY_UUID}
-  udp: true
   tls: true
   servername: common.${DOMAIN}
   alterId: 0
   cipher: auto
-  skip-cert-verify: true
+  skip-cert-verify: false
   network: ws
   ws-opts:
-    path: "/${XRAY_UUID}-vmess"
+    path: /${XRAY_URL_PATH}-vmess
     headers:
       Host: common.${DOMAIN}
 
-- name: "${REGION_INFO}|${NODE_NAME}|XTLS(Vision)+Reality直连"
+- name: ${REGION_INFO}|${NODE_NAME}|XTLS(Vision)+Reality直连
   type: vless
   server: ${DOMAIN}
   port: ${LISTENING_PORT}
