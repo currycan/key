@@ -1,11 +1,11 @@
 # Hysteria2
-${REGION_INFO}|${NODE_NAME}|hysteria2=hysteria2,${DOMAIN},${PORT_HYSTERIA2},password=${SB_UUID},skip-cert-verify=true,download-bandwidth=2500
+${REGION_INFO}|${NODE_NAME}|hysteria2=hysteria2,${NODE_IP},${PORT_HYSTERIA2},password=${SB_UUID},skip-cert-verify=true,download-bandwidth=2500
 # TUICv5
-${REGION_INFO}|${NODE_NAME}|tuic=tuic-v5,${DOMAIN},${PORT_TUIC},uuid=${SB_UUID},password=${SB_UUID},alpn=h3,sni=off,skip-cert-verify=true
+${REGION_INFO}|${NODE_NAME}|tuic=tuic-v5,${NODE_IP},${PORT_TUIC},uuid=${SB_UUID},password=${SB_UUID},alpn=h3,sni=off,skip-cert-verify=true
 # ShadowTLS+Shadowsocks2022
-${REGION_INFO}|${NODE_NAME}|ShadowTLS=ss,${DOMAIN},${PORT_SHADOWTLS},encrypt-method=${SS_METHOD},password=${RANDOM_PASSWORD},shadow-tls-password=${SB_UUID},shadow-tls-sni=${SINGBOX_SERVER_NAME},shadow-tls-version=3
-# 普通ShadowsocksAEAD
-${REGION_INFO}|${NODE_NAME}|shadowsocks=ss,${DOMAIN},${PORT_SHADOWSOCKS},encrypt-method=${SS_METHOD},password=${RANDOM_PASSWORD}
+${REGION_INFO}|${NODE_NAME}|ShadowTLS=ss,${NODE_IP},${PORT_SHADOWTLS},encrypt-method=${SS_METHOD},password=${RANDOM_PASSWORD},shadow-tls-password=${SB_UUID},shadow-tls-sni=${SINGBOX_SERVER_NAME},shadow-tls-version=3
+# 普通Shadowsocks
+${REGION_INFO}|${NODE_NAME}|shadowsocks=ss,${NODE_IP},${PORT_SHADOWSOCKS},encrypt-method=${SS_METHOD},password=${RANDOM_PASSWORD}
 # Trojan WS+TLS
 ${REGION_INFO}|${NODE_NAME}|trojan-ws-tls=trojan,${DOMAIN},${LISTENING_PORT},password=${XRAY_UUID},tls=true,ws=true,ws-path=/${XRAY_URL_PATH}-trojan,ws-headers=Host:common.${DOMAIN},sni=common.${DOMAIN},skip-cert-verify=false
 # VMess WS+TLS

@@ -1,14 +1,14 @@
 proxies:
 - name: ${REGION_INFO}|${NODE_NAME}|hysteria2
   type: hysteria2
-  server: ${DOMAIN}
+  server: ${NODE_IP}
   port: ${PORT_HYSTERIA2}
   password: ${SB_UUID}
   skip-cert-verify: true
 
 - name: ${REGION_INFO}|${NODE_NAME}|ShadowTLS
   type: ss
-  server: ${DOMAIN}
+  server: ${NODE_IP}
   port: ${PORT_SHADOWTLS}
   cipher: ${SS_METHOD}
   password: ${RANDOM_PASSWORD}
@@ -21,7 +21,7 @@ proxies:
 
 - name: ${REGION_INFO}|${NODE_NAME}|shadowsocks
   type: ss
-  server: ${DOMAIN}
+  server: ${NODE_IP}
   port: ${PORT_SHADOWSOCKS}
   cipher: ${SS_METHOD}
   password: ${RANDOM_PASSWORD}

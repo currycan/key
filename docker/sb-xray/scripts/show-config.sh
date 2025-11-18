@@ -51,25 +51,25 @@ show_v2rayn_link() {
     # 生成 V2rayN 订阅文件
     # hysteria2
     V2RAYN_SUBSCRIBE+="
-hysteria2://${SB_UUID}@${DOMAIN}:${PORT_HYSTERIA2}/?alpn=h3&insecure=1#${REGION_INFO}|${NODE_NAME}|hysteria2
+hysteria2://${SB_UUID}@${NODE_IP}:${PORT_HYSTERIA2}/?alpn=h3&insecure=1#${REGION_INFO}|${NODE_NAME}|hysteria2
 "
     # tuic
     V2RAYN_SUBSCRIBE+="
 # 需把 tls 里的 inSecure 设置为 true
-tuic://${SB_UUID}:${SB_UUID}@${DOMAIN}:${PORT_TUIC}?alpn=h3&congestion_control=bbr#${REGION_INFO}|${NODE_NAME}|tuic
+tuic://${SB_UUID}:${SB_UUID}@${NODE_IP}:${PORT_TUIC}?alpn=h3&congestion_control=bbr#${REGION_INFO}|${NODE_NAME}|tuic
 "
     # ShadowTLS
 #     V2RAYN_SUBSCRIBE+="
-# ss://$(echo -n "${SS_METHOD}:${RANDOM_PASSWORD}@${DOMAIN}:${PORT_SHADOWTLS}/?plugin=shadow-tls;host=${SINGBOX_SERVER_NAME};password=${SB_UUID};version=3" | base64 -w0)#${REGION_INFO}|${NODE_NAME}|ShadowTLS
+# ss://$(echo -n "${SS_METHOD}:${RANDOM_PASSWORD}@${NODE_IP}:${PORT_SHADOWTLS}/?plugin=shadow-tls;host=${SINGBOX_SERVER_NAME};password=${SB_UUID};version=3" | base64 -w0)#${REGION_INFO}|${NODE_NAME}|ShadowTLS
 # "
     # shadowsocks
     V2RAYN_SUBSCRIBE+="
-ss://$(echo -n "${SS_METHOD}:${RANDOM_PASSWORD}@${DOMAIN}:${PORT_SHADOWSOCKS}" | base64 -w0)#${REGION_INFO}|${NODE_NAME}|shadowsocks
+ss://$(echo -n "${SS_METHOD}:${RANDOM_PASSWORD}@${NODE_IP}:${PORT_SHADOWSOCKS}" | base64 -w0)#${REGION_INFO}|${NODE_NAME}|shadowsocks
 "
     # anytls
     V2RAYN_SUBSCRIBE+="
 # 需把 tls 里的 inSecure 设置为 true
-anytls://${SB_UUID}@${DOMAIN}:${PORT_ANYTLS}?security=tls&type=tcp#${REGION_INFO}|${NODE_NAME}|anytls
+anytls://${SB_UUID}@${NODE_IP}:${PORT_ANYTLS}?security=tls&type=tcp#${REGION_INFO}|${NODE_NAME}|anytls
 "
     # Trojan WS
     V2RAYN_SUBSCRIBE+="
