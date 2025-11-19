@@ -3,10 +3,10 @@ proxies:
 # Hysteria2 配置
 - {name: ${REGION_INFO}|${NODE_NAME}|hysteria2, server: ${NODE_IP}, port: ${PORT_HYSTERIA2}, type: hysteria2, password: ${SB_UUID}, auth: ${SB_UUID},up: 2500 Mbps, down: 2500 Mbps, skip-cert-verify: true, udp: true, tfo: false}
 # TUIC 配置
-- {name: ${REGION_INFO}|${NODE_NAME}|tuic, server: ${NODE_IP}, port: ${PORT_TUIC}, type: tuic, uuid: ${SB_UUID}, password: ${SB_UUID}, alpn: [h3], congestion-controller: bbr, skip-cert-verify: true, udp: true, tfo: false}
+# - {name: ${REGION_INFO}|${NODE_NAME}|tuic, server: ${NODE_IP}, port: ${PORT_TUIC}, type: tuic, uuid: ${SB_UUID}, password: ${SB_UUID}, alpn: [h3], congestion-controller: bbr, skip-cert-verify: true, udp: true, tfo: false， version: 5}
 # Shadowsocks 配置
-- {name: ${REGION_INFO}|${NODE_NAME}|shadowsocks, server: ${NODE_IP}, port: ${PORT_SHADOWSOCKS}, type: ss, cipher: ${SS_METHOD}, password: ${RANDOM_PASSWORD}, udp: true, tfo: false}
+# - {name: ${REGION_INFO}|${NODE_NAME}|shadowsocks, server: ${NODE_IP}, port: ${PORT_SHADOWSOCKS}, type: ss, cipher: ${SS_METHOD}, password: ${RANDOM_PASSWORD}, udp: true, tfo: false}
 # AnyTLS 配置
-- {name: ${REGION_INFO}|${NODE_NAME}|anytls, server: ${NODE_IP}, port: ${PORT_ANYTLS}, type: anytls, password: ${SB_UUID}, skip-cert-verify: true, udp: true, tfo: false}
+# - {name: ${REGION_INFO}|${NODE_NAME}|anytls, server: ${NODE_IP}, port: ${PORT_ANYTLS}, type: anytls, password: ${SB_UUID}, skip-cert-verify: true, udp: true, tfo: false}
 # XTLS Vision Reality 直连配置
 - {name: ${REGION_INFO}|${NODE_NAME}|XTLS(Vision) Reality直连, server: ${DOMAIN}, port: ${LISTENING_PORT}, type: vless, tls: true, packet-encoding: xudp, uuid: ${XRAY_UUID}, servername: ${DOMAIN}, flow: xtls-rprx-vision, reality-opts: {public-key: ${XRAY_REALITY_PUBLIC_KEY}, short-id: ${XRAY_REALITY_SHORTID}}, client-fingerprint: random, skip-cert-verify: false, udp: true, tfo: false}

@@ -6,6 +6,31 @@ proxies:
   password: ${SB_UUID}
   skip-cert-verify: true
 
+# - name: ${REGION_INFO}|${NODE_NAME}|tuic
+#   type: tuic
+#   server: ${NODE_IP}
+#   port: ${PORT_TUIC}
+#   uuid: ${SB_UUID}
+#   sni: ''
+#   password: ${SB_UUID}
+#   alpn:
+#     - h3
+#   skip-cert-verify: true
+#   version: 5
+
+# - name: ${REGION_INFO}|${NODE_NAME}|ShadowTLS
+#   type: ss
+#   server: ${NODE_IP}
+#   port: ${PORT_SHADOWTLS}
+#   cipher: ${SS_METHOD}
+#   password: ${RANDOM_PASSWORD}
+#   plugin: shadow-tls
+#   client-fingerprint: chrome
+#   plugin-opts:
+#     host: ${DOMAIN}
+#     password: ${SB_UUID}
+#     version: 3
+
 - name: ${REGION_INFO}|${NODE_NAME}|XTLS(Vision)+Reality直连
   type: vless
   server: ${DOMAIN}

@@ -22,6 +22,7 @@ proxies:
     udp-relay-mode: native
     congestion-controller: bbr
     skip-cert-verify: true
+    version: 5
 
   - name: ${REGION_INFO}|${NODE_NAME}|ShadowTLS
     type: ss
