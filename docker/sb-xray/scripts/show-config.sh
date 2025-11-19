@@ -60,7 +60,7 @@ tuic://${SB_UUID}:${SB_UUID}@${NODE_IP}:${PORT_TUIC}?alpn=h3&insecure=1&congesti
 "
     # ShadowTLS
 #     V2RAYN_SUBSCRIBE+="
-# ss://$(echo -n "${SS_METHOD}:${RANDOM_PASSWORD}@${NODE_IP}:${PORT_SHADOWTLS}/?plugin=shadow-tls;host=${SINGBOX_SERVER_NAME};password=${SB_UUID};version=3" | base64 -w0)#${REGION_INFO}|${NODE_NAME}|ShadowTLS
+# ss://$(echo -n "${SS_METHOD}:${RANDOM_PASSWORD}@${NODE_IP}:${PORT_SHADOWTLS}/?plugin=shadow-tls;host=${DOMAIN};password=${SB_UUID};version=3" | base64 -w0)#${REGION_INFO}|${NODE_NAME}|ShadowTLS
 # "
     # shadowsocks
     V2RAYN_SUBSCRIBE+="
@@ -70,18 +70,6 @@ ss://$(echo -n "${SS_METHOD}:${RANDOM_PASSWORD}@${NODE_IP}:${PORT_SHADOWSOCKS}" 
     V2RAYN_SUBSCRIBE+="
 # 需把 tls 里的 inSecure 设置为 true
 anytls://${SB_UUID}@${NODE_IP}:${PORT_ANYTLS}?security=tls&allowInsecure=1&type=tcp#${REGION_INFO}|${NODE_NAME}|anytls
-"
-    # Trojan WS
-    V2RAYN_SUBSCRIBE+="
-trojan://${XRAY_UUID}@${DOMAIN}:${LISTENING_PORT}?encryption=none&security=tls&type=ws&host=common.${DOMAIN}&path=%2F${XRAY_URL_PATH}-trojan#${REGION_INFO}|${NODE_NAME}|trojan-ws-tls
-"
-    # VLESS TLS WS
-    V2RAYN_SUBSCRIBE+="
-vless://${XRAY_UUID}@${DOMAIN}:${LISTENING_PORT}?encryption=none&security=tls&sni=common.${DOMAIN}&type=ws&host=common.${DOMAIN}&path=%2F${XRAY_URL_PATH}-vless#${REGION_INFO}|${NODE_NAME}|vless-ws-tls
-"
-    # VMESS TLS WS
-    V2RAYN_SUBSCRIBE+="
-vmess://$(echo -n "{\"add\":\"${DOMAIN}\",\"aid\":\"0\",\"host\":\"common.${DOMAIN}\",\"id\":\"${XRAY_UUID}\",\"net\":\"ws\",\"path\":\"/${XRAY_URL_PATH}-vmess\",\"port\":\"${LISTENING_PORT}\",\"ps\":\"${REGION_INFO}|${NODE_NAME}|Vmess\",\"tls\":\"tls\",\"sni\": \"common.${DOMAIN}\",\"type\":\"\",\"v\":\"2\"}" | base64 -w0)
 "
     # XTLS(Vision)+Reality直连
     V2RAYN_SUBSCRIBE+="
@@ -121,7 +109,6 @@ show_all_link() {
     print_colored ${RED} "Index:
 https://${DOMAIN}/sb-xray/
 "
-
     print_colored ${MAGENTA} "通用链接:
 https://${DOMAIN}/sb-xray/proxies"
 

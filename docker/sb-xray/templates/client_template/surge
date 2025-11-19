@@ -3,10 +3,4 @@ ${REGION_INFO}|${NODE_NAME}|hysteria2=hysteria2,${NODE_IP},${PORT_HYSTERIA2},pas
 # TUICv5
 ${REGION_INFO}|${NODE_NAME}|tuic=tuic-v5,${NODE_IP},${PORT_TUIC},uuid=${SB_UUID},password=${SB_UUID},alpn=h3,sni=off,skip-cert-verify=true
 # ShadowTLS+Shadowsocks2022
-${REGION_INFO}|${NODE_NAME}|ShadowTLS=ss,${NODE_IP},${PORT_SHADOWTLS},encrypt-method=${SS_METHOD},password=${RANDOM_PASSWORD},shadow-tls-password=${SB_UUID},shadow-tls-sni=${SINGBOX_SERVER_NAME},shadow-tls-version=3
-# 普通Shadowsocks
-${REGION_INFO}|${NODE_NAME}|shadowsocks=ss,${NODE_IP},${PORT_SHADOWSOCKS},encrypt-method=${SS_METHOD},password=${RANDOM_PASSWORD}
-# Trojan WS+TLS
-${REGION_INFO}|${NODE_NAME}|trojan-ws-tls=trojan,${DOMAIN},${LISTENING_PORT},password=${XRAY_UUID},tls=true,ws=true,ws-path=/${XRAY_URL_PATH}-trojan,ws-headers=Host:common.${DOMAIN},sni=common.${DOMAIN},skip-cert-verify=false
-# VMess WS+TLS
-${REGION_INFO}|${NODE_NAME}|vmess-ws-tls=vmess,${DOMAIN},${LISTENING_PORT},username=${XRAY_UUID},ws=true,ws-path=/${XRAY_URL_PATH}-vmess,ws-headers=Host:common.${DOMAIN},vmess-aead=true,tls=true,sni=common.${DOMAIN},skip-cert-verify=false,udp-relay=true
+${REGION_INFO}|${NODE_NAME}|ShadowTLS=ss,${NODE_IP},${PORT_SHADOWTLS},encrypt-method=${SS_METHOD},password=${RANDOM_PASSWORD},shadow-tls-password=${SB_UUID},shadow-tls-sni=${DOMAIN},shadow-tls-version=3

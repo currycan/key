@@ -13,7 +13,7 @@
                 }
             ],
             "handshake": {
-                "server": "${SINGBOX_SERVER_NAME}",
+                "server": "${DOMAIN}",
                 "server_port": 443
             },
             "strict_mode": true

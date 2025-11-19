@@ -32,7 +32,7 @@ proxies:
     plugin: shadow-tls
     client-fingerprint: chrome
     plugin-opts:
-      host: ${SINGBOX_SERVER_NAME}
+      host: ${DOMAIN}
       password: ${SB_UUID}
       version: 3
     smux:
@@ -77,50 +77,6 @@ proxies:
     idle-session-check-interval: 30
     idle-session-timeout: 30
     skip-cert-verify: true
-
-  - name: ${REGION_INFO}|${NODE_NAME}|trojan-ws-tls
-    type: trojan
-    server: ${DOMAIN}
-    port: ${LISTENING_PORT}
-    password: ${XRAY_UUID}
-    tls: true
-    servername: common.${DOMAIN}
-    network: ws
-    skip-cert-verify: false
-    ws-opts:
-      path: /${XRAY_URL_PATH}-trojan
-      headers:
-        Host: common.${DOMAIN}
-
-  - name: ${REGION_INFO}|${NODE_NAME}|vless-ws-tls
-    type: vless
-    server: ${DOMAIN}
-    port: ${LISTENING_PORT}
-    uuid: ${XRAY_UUID}
-    tls: true
-    servername: common.${DOMAIN}
-    network: ws
-    skip-cert-verify: false
-    ws-opts:
-      path: /${XRAY_URL_PATH}-vless
-      headers:
-        Host: common.${DOMAIN}
-
-  - name: ${REGION_INFO}|${NODE_NAME}|vmess-ws-tls
-    type: vmess
-    server: ${DOMAIN}
-    port: ${LISTENING_PORT}
-    uuid: ${XRAY_UUID}
-    tls: true
-    servername: common.${DOMAIN}
-    alterId: 0
-    cipher: auto
-    skip-cert-verify: false
-    network: ws
-    ws-opts:
-      path: /${XRAY_URL_PATH}-vmess
-      headers:
-        Host: common.${DOMAIN}
 
   - name: ${REGION_INFO}|${NODE_NAME}|XTLS(Vision)+Reality直连
     type: vless

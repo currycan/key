@@ -158,7 +158,7 @@ COPY templates/ /templates/
 ADD https://raw.githubusercontent.com/currycan/key/master/vimrc /root/.vimrc
 
 ENV WORKDIR=/sb-xray
-ENV LOGDIR=${WORKDIR}/logs
+ENV LOGDIR=/var/log/
 
 WORKDIR ${WORKDIR}
 
@@ -172,7 +172,6 @@ ENV CDNDOMAIN=""
 ENV LISTENING_PORT="433"
 
 # sing-box
-ENV SINGBOX_SERVER_NAME="addons.mozilla.org"
 ENV SS_METHOD="2022-blake3-aes-256-gcm"
 
 # acme.sh

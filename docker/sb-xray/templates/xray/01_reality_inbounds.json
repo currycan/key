@@ -29,7 +29,8 @@
                     "target": "/dev/shm/nginx.sock",
                     "xver": 1,
                     "serverNames": [
-                        "${DOMAIN}"
+                        "${DOMAIN}",
+                        "${CDNDOMAIN}"
                     ],
                     "privateKey": "${XRAY_REALITY_PRIVATE_KEY}",
                     "shortIds": [

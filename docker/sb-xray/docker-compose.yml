@@ -25,6 +25,7 @@ services:
       - ./nginx/tcp:/etc/nginx/stream.d
       - ./nginx/dhparam:/etc/nginx/dhparam
       - ./data:/data
+      - ./logs:/var/log
     restart: always
     tty: true
     network_mode: host
