@@ -29,7 +29,7 @@ RUN set -ex; \
 # ===== 安装 Dufs =====
 ARG DUFS_VERSION="0.45.0"
 RUN set -ex; \
-    if [ -z "$V2RAY_VERSION" ]; then \
+    if [ -z "$DUFS_VERSION" ]; then \
         DUFS_VERSION=$(curl -sSf https://github.com/sigoden/dufs/tags \
           | grep "releases/tag/" | grep -Ev "rc|alpha|beta" \
           | grep -o "[0-9]\+\.[0-9]\+\.[0-9]\+" | head -n 1); \
@@ -47,7 +47,7 @@ RUN set -ex; \
 ARG SING_BOX_VERSION="1.12.12"
 RUN set -ex; \
     if [ -z "$SING_BOX_VERSION" ]; then \
-        V2RAY_VERSION=$(curl -sSf https://github.com/SagerNet/sing-box/tags \
+        SING_BOX_VERSION=$(curl -sSf https://github.com/SagerNet/sing-box/tags \
             | grep "releases/tag/" | grep -Ev "rc|alpha|beta" \
             | grep -o "[0-9]\+\.[0-9]\+\.[0-9]\+" | head -n 1); \
     fi; \
@@ -59,7 +59,7 @@ RUN set -ex; \
 ARG CLOUDFLARED_VERSION="2025.11.1"
 RUN set -ex; \
     if [ -z "$CLOUDFLARED_VERSION" ]; then \
-        V2RAY_VERSION=$(curl -sSf https://github.com/cloudflare/cloudflared/tags \
+        CLOUDFLARED_VERSION=$(curl -sSf https://github.com/cloudflare/cloudflared/tags \
             | grep "releases/tag/" | grep -Ev "rc|alpha|beta" \
             | grep -o "[0-9]\+\.[0-9]\+\.[0-9]\+" | head -n 1); \
     fi; \
@@ -72,7 +72,7 @@ RUN set -ex; \
 ARG XUI_VERSION="2.8.5"
 RUN set -ex; \
     if [ -z "$XUI_VERSION" ]; then \
-        V2RAY_VERSION=$(curl -sSf https://github.com/MHSanaei/3x-ui/tags \
+        XUI_VERSION=$(curl -sSf https://github.com/MHSanaei/3x-ui/tags \
             | grep "releases/tag/" | grep -Ev "rc|alpha|beta" \
             | grep -o "[0-9]\+\.[0-9]\+\.[0-9]\+" | head -n 1); \
     fi; \

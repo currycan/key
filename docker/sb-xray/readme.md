@@ -28,7 +28,7 @@ https://pengtech.net/network/v2rayA_install.html
 docker buildx build \
   --platform linux/amd64,linux/arm64 \
   --build-arg XUI_VERSION="2.8.5" \
-  --build-arg V2RAY_VERSION="5.41.0" \
+  --build-arg DUFS_VERSION="0.45.0" \
   --build-arg SING_BOX_VERSION="1.12.12" \
   --build-arg XRAY_VERSION="25.10.15" \
   --tag currycan/sb-xray:25.11.14 \
