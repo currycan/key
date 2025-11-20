@@ -87,7 +87,7 @@ proxies:
     tls: true
     client-fingerprint: chrome
     alpn:
-      - h2
+      - h3
     skip-cert-verify: false
     network: grpc
     host: ${CDNDOMAIN}
@@ -105,7 +105,7 @@ proxies:
     tls: true
     client-fingerprint: chrome
     alpn:
-      - h2
+      - h3
     skip-cert-verify: false
     network: grpc
     host: ${CDNDOMAIN}
@@ -123,7 +123,7 @@ proxies:
     host: ${CDNDOMAIN}
     sni: ${CDNDOMAIN}
     alpn:
-      - h2
+      - h3
     skip-cert-verify: false
     grpc-opts:
       grpc-service-name: ${XRAY_URL_PATH}-trojan
@@ -179,7 +179,7 @@ proxies:
     servername: ${CDNDOMAIN}
     encryption: mlkem768x25519plus.native.0rtt.${XRAY_MLKEM768_CLIENT}
 
-  - name: ${REGION_INFO}|${NODE_NAME}|上行Xhttp+Reality|下行Xhttp+TLS+CDN
+  - name: ${REGION_INFO}|${NODE_NAME}
     type: vless
     server: ${DOMAIN}
     port: ${LISTENING_PORT}
@@ -187,7 +187,7 @@ proxies:
     tls: true
     client-fingerprint: chrome
     alpn:
-      - h2
+      - h3
     skip-cert-verify: false
     reality-opts:
       public-key: ${XRAY_REALITY_PUBLIC_KEY}

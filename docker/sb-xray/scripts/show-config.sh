@@ -73,15 +73,15 @@ anytls://${SB_UUID}@${NODE_IP}:${PORT_ANYTLS}?security=tls&allowInsecure=1&type=
 "
     # VLESS TLS gRPC
     V2RAYN_SUBSCRIBE+="
-vless://${XRAY_UUID}@${DOMAIN}:${LISTENING_PORT}?type=grpc&host=${CDNDOMAIN}&security=tls&sni=${CDNDOMAIN}&alpn=h2&fp=chrome&serviceName=${XRAY_URL_PATH}-vless#${REGION_INFO}|${NODE_NAME}|VLESS-TLS-gRPC
+vless://${XRAY_UUID}@${DOMAIN}:${LISTENING_PORT}?type=grpc&host=${CDNDOMAIN}&security=tls&sni=${CDNDOMAIN}&alpn=h3&fp=chrome&serviceName=${XRAY_URL_PATH}-vless#${REGION_INFO}|${NODE_NAME}|VLESS-TLS-gRPC
 "
     # VMess TLS gRPC
     V2RAYN_SUBSCRIBE+="
-vmess://$(echo -n "{\"v\":\"2\",\"ps\":\"${REGION_INFO}|${NODE_NAME}|VMess-TLS-gRPC\",\"add\":\"${DOMAIN}\",\"port\":\"${LISTENING_PORT}\",\"id\":\"${XRAY_UUID}\",\"aid\":\"0\",\"scy\":\"auto\",\"net\":\"grpc\",\"type\":\"none\",\"host\":\"${CDNDOMAIN}\",\"path\":\"${XRAY_URL_PATH}-vmess\",\"tls\":\"tls\",\"sni\":\"${CDNDOMAIN}\",\"alpn\":\"h2\",\"fp\":\"chrome\"}" | base64 -w0)
+vmess://$(echo -n "{\"v\":\"2\",\"ps\":\"${REGION_INFO}|${NODE_NAME}|VMess-TLS-gRPC\",\"add\":\"${DOMAIN}\",\"port\":\"${LISTENING_PORT}\",\"id\":\"${XRAY_UUID}\",\"aid\":\"0\",\"scy\":\"auto\",\"net\":\"grpc\",\"type\":\"none\",\"host\":\"${CDNDOMAIN}\",\"path\":\"${XRAY_URL_PATH}-vmess\",\"tls\":\"tls\",\"sni\":\"${CDNDOMAIN}\",\"alpn\":\"h3\",\"fp\":\"chrome\"}" | base64 -w0)
 "
     # Trojan TLS gRPC
     V2RAYN_SUBSCRIBE+="
-trojan://${XRAY_UUID}@${DOMAIN}:${LISTENING_PORT}?security=tls&type=grpc&serviceName=${XRAY_URL_PATH}-trojan&host=${CDNDOMAIN}&alpn=h2&sni=${CDNDOMAIN}#${REGION_INFO}|${NODE_NAME}|Trojan-TLS-gRPC
+trojan://${XRAY_UUID}@${DOMAIN}:${LISTENING_PORT}?security=tls&type=grpc&serviceName=${XRAY_URL_PATH}-trojan&host=${CDNDOMAIN}&alpn=h3&sni=${CDNDOMAIN}#${REGION_INFO}|${NODE_NAME}|Trojan-TLS-gRPC
 "
     # XTLS(Vision)+Reality直连
     V2RAYN_SUBSCRIBE+="
