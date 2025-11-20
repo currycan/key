@@ -39,7 +39,7 @@ proxies:
   tls: true
   client-fingerprint: chrome
   alpn:
-    - h3
+    - h2
   skip-cert-verify: false
   network: grpc
   host: ${CDNDOMAIN}
@@ -57,7 +57,7 @@ proxies:
   tls: true
   client-fingerprint: chrome
   alpn:
-    - h3
+    - h2
   skip-cert-verify: false
   network: grpc
   host: ${CDNDOMAIN}
@@ -75,7 +75,7 @@ proxies:
   host: ${CDNDOMAIN}
   sni: ${CDNDOMAIN}
   alpn:
-    - h3
+    - h2
   skip-cert-verify: false
   grpc-opts:
     grpc-service-name: ${XRAY_URL_PATH}-trojan

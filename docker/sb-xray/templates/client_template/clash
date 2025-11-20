@@ -9,10 +9,10 @@ proxies:
 # AnyTLS 配置
 - {name: ${REGION_INFO}|${NODE_NAME}|anytls, server: ${NODE_IP}, port: ${PORT_ANYTLS}, type: anytls, password: ${SB_UUID}, skip-cert-verify: true, udp: true, tfo: false}
 # VLESS TLS gRPC 配置
-- {name: ${REGION_INFO}|${NODE_NAME}|VLESS-TLS-gRPC, server: ${CDNDOMAIN}, port: ${LISTENING_PORT}, type: vless, tls: true, uuid: ${XRAY_UUID}, servername: ${CDNDOMAIN}, alpn: [h3], network: grpc, grpc-opts: {grpc-service-name: vless}, client-fingerprint: chrome, skip-cert-verify: false}
+- {name: ${REGION_INFO}|${NODE_NAME}|VLESS-TLS-gRPC, server: ${CDNDOMAIN}, port: ${LISTENING_PORT}, type: vless, tls: true, uuid: ${XRAY_UUID}, servername: ${CDNDOMAIN}, alpn: [h2], network: grpc, grpc-opts: {grpc-service-name: vless}, client-fingerprint: chrome, skip-cert-verify: false}
 # VMess TLS gRPC 配置
-- {name: ${REGION_INFO}|${NODE_NAME}|VMess-TLS-gRPC, server: ${CDNDOMAIN}, port: ${LISTENING_PORT}, type: vmess, tls: true, uuid: ${XRAY_UUID}, alterId: 0, cipher: auto, servername: ${CDNDOMAIN}, alpn: [h3], network: grpc, grpc-opts: {grpc-service-name: vmess}, client-fingerprint: chrome, skip-cert-verify: false}
+- {name: ${REGION_INFO}|${NODE_NAME}|VMess-TLS-gRPC, server: ${CDNDOMAIN}, port: ${LISTENING_PORT}, type: vmess, tls: true, uuid: ${XRAY_UUID}, alterId: 0, cipher: auto, servername: ${CDNDOMAIN}, alpn: [h2], network: grpc, grpc-opts: {grpc-service-name: vmess}, client-fingerprint: chrome, skip-cert-verify: false}
 # Trojan TLS gRPC 配置
-- {name: ${REGION_INFO}|${NODE_NAME}|Trojan-TLS-gRPC, server: ${CDNDOMAIN}, port: ${LISTENING_PORT}, type: trojan, password: ${XRAY_UUID}, tls: true, sni: ${CDNDOMAIN}, alpn: [h3], network: grpc, grpc-opts: {grpc-service-name: trojan}, skip-cert-verify: false}
+- {name: ${REGION_INFO}|${NODE_NAME}|Trojan-TLS-gRPC, server: ${CDNDOMAIN}, port: ${LISTENING_PORT}, type: trojan, password: ${XRAY_UUID}, tls: true, sni: ${CDNDOMAIN}, alpn: [h2], network: grpc, grpc-opts: {grpc-service-name: trojan}, skip-cert-verify: false}
 # XTLS Vision Reality 直连配置
 - {name: ${REGION_INFO}|${NODE_NAME}|XTLS(Vision) Reality直连, server: ${DOMAIN}, port: ${LISTENING_PORT}, type: vless, tls: true, packet-encoding: xudp, uuid: ${XRAY_UUID}, servername: ${DOMAIN}, flow: xtls-rprx-vision, reality-opts: {public-key: ${XRAY_REALITY_PUBLIC_KEY}, short-id: ${XRAY_REALITY_SHORTID}}, client-fingerprint: random, skip-cert-verify: false, udp: true, tfo: false}

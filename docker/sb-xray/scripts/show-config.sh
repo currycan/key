@@ -73,15 +73,15 @@ anytls://${SB_UUID}@${NODE_IP}:${PORT_ANYTLS}?security=tls&allowInsecure=1&type=
 "
     # VLESS TLS gRPC
     V2RAYN_SUBSCRIBE+="
-vless://${XRAY_UUID}@${DOMAIN}:${LISTENING_PORT}?type=grpc&host=${CDNDOMAIN}&security=tls&sni=${CDNDOMAIN}&alpn=h3&fp=chrome&serviceName=${XRAY_URL_PATH}-vless#${REGION_INFO}|${NODE_NAME}|VLESS-TLS-gRPC
+vless://${XRAY_UUID}@${DOMAIN}:${LISTENING_PORT}?type=grpc&host=${CDNDOMAIN}&security=tls&sni=${CDNDOMAIN}&alpn=h2&fp=chrome&serviceName=${XRAY_URL_PATH}-vless#${REGION_INFO}|${NODE_NAME}|VLESS-TLS-gRPC
 "
     # VMess TLS gRPC
     V2RAYN_SUBSCRIBE+="
-vmess://$(echo -n "{\"v\":\"2\",\"ps\":\"${REGION_INFO}|${NODE_NAME}|VMess-TLS-gRPC\",\"add\":\"${DOMAIN}\",\"port\":\"${LISTENING_PORT}\",\"id\":\"${XRAY_UUID}\",\"aid\":\"0\",\"scy\":\"auto\",\"net\":\"grpc\",\"type\":\"none\",\"host\":\"${CDNDOMAIN}\",\"path\":\"${XRAY_URL_PATH}-vmess\",\"tls\":\"tls\",\"sni\":\"${CDNDOMAIN}\",\"alpn\":\"h3\",\"fp\":\"chrome\"}" | base64 -w0)
+vmess://$(echo -n "{\"v\":\"2\",\"ps\":\"${REGION_INFO}|${NODE_NAME}|VMess-TLS-gRPC\",\"add\":\"${DOMAIN}\",\"port\":\"${LISTENING_PORT}\",\"id\":\"${XRAY_UUID}\",\"aid\":\"0\",\"scy\":\"auto\",\"net\":\"grpc\",\"type\":\"none\",\"host\":\"${CDNDOMAIN}\",\"path\":\"${XRAY_URL_PATH}-vmess\",\"tls\":\"tls\",\"sni\":\"${CDNDOMAIN}\",\"alpn\":\"h2\",\"fp\":\"chrome\"}" | base64 -w0)
 "
     # Trojan TLS gRPC
     V2RAYN_SUBSCRIBE+="
-trojan://${XRAY_UUID}@${DOMAIN}:${LISTENING_PORT}?security=tls&type=grpc&serviceName=${XRAY_URL_PATH}-trojan&host=${CDNDOMAIN}&alpn=h3&sni=${CDNDOMAIN}#${REGION_INFO}|${NODE_NAME}|Trojan-TLS-gRPC
+trojan://${XRAY_UUID}@${DOMAIN}:${LISTENING_PORT}?security=tls&type=grpc&serviceName=${XRAY_URL_PATH}-trojan&host=${CDNDOMAIN}&alpn=h2&sni=${CDNDOMAIN}#${REGION_INFO}|${NODE_NAME}|Trojan-TLS-gRPC
 "
     # XTLS(Vision)+Reality直连
     V2RAYN_SUBSCRIBE+="
@@ -98,7 +98,7 @@ vless://${XRAY_UUID}@${CDNDOMAIN}:${LISTENING_PORT}?encryption=mlkem768x25519plu
 "
     # 上行 Xhttp+Reality | 下行 Xhttp+TLS+CDN
     V2RAYN_SUBSCRIBE+="
-vless://${XRAY_UUID}@${DOMAIN}:${LISTENING_PORT}?encryption=mlkem768x25519plus.native.0rtt.${XRAY_MLKEM768_CLIENT}&security=reality&sni=${DOMAIN}&fp=chrome&pbk=${XRAY_REALITY_PUBLIC_KEY}&sid=${XRAY_REALITY_SHORTID}&type=xhttp&path=%2F${XRAY_URL_PATH}-xhttp&mode=auto&extra=%22downloadSettings%22%3A%20%7B%0D%0A%20%20%22address%22%3A%20%22${DOMAIN}%22%2C%0D%0A%20%20%22port%22%3A%20${LISTENING_PORT}%2C%0D%0A%20%20%22network%22%3A%20%22xhttp%22%2C%0D%0A%20%20%22security%22%3A%20%22tls%22%2C%0D%0A%20%20%22tlsSettings%22%3A%20%7B%0D%0A%20%20%20%20%22serverName%22%3A%20%22${CDNDOMAIN}%22%2C%0D%0A%20%20%20%20%22allowInsecure%22%3A%20false%2C%0D%0A%20%20%20%20%22alpn%22%3A%20%5B%22h3%22%5D%2C%0D%0A%20%20%20%20%22fingerprint%22%3A%20%22chrome%22%0D%0A%20%20%7D%2C%0D%0A%20%20%22xhttpSettings%22%3A%20%7B%0D%0A%20%20%20%20%22host%22%3A%20%22${CDNDOMAIN}%22%2C%0D%0A%20%20%20%20%22path%22%3A%20%22%2F${XRAY_URL_PATH}-xhttp%22%2C%0D%0A%20%20%20%20%22mode%22%3A%20%22auto%22%0D%0A%20%20%20%20%7D%0D%0A%20%20%7D%0D%0A%7D#${REGION_INFO}|${NODE_NAME}|上行Xhttp+Reality|下行 Xhttp+TLS+CDN
+vless://${XRAY_UUID}@${DOMAIN}:${LISTENING_PORT}?encryption=mlkem768x25519plus.native.0rtt.${XRAY_MLKEM768_CLIENT}&security=reality&sni=${DOMAIN}&fp=chrome&pbk=${XRAY_REALITY_PUBLIC_KEY}&sid=${XRAY_REALITY_SHORTID}&type=xhttp&path=%2F${XRAY_URL_PATH}-xhttp&mode=auto&extra=%22downloadSettings%22%3A%20%7B%0D%0A%20%20%22address%22%3A%20%22${DOMAIN}%22%2C%0D%0A%20%20%22port%22%3A%20${LISTENING_PORT}%2C%0D%0A%20%20%22network%22%3A%20%22xhttp%22%2C%0D%0A%20%20%22security%22%3A%20%22tls%22%2C%0D%0A%20%20%22tlsSettings%22%3A%20%7B%0D%0A%20%20%20%20%22serverName%22%3A%20%22${CDNDOMAIN}%22%2C%0D%0A%20%20%20%20%22allowInsecure%22%3A%20false%2C%0D%0A%20%20%20%20%22alpn%22%3A%20%5B%22h2%22%5D%2C%0D%0A%20%20%20%20%22fingerprint%22%3A%20%22chrome%22%0D%0A%20%20%7D%2C%0D%0A%20%20%22xhttpSettings%22%3A%20%7B%0D%0A%20%20%20%20%22host%22%3A%20%22${CDNDOMAIN}%22%2C%0D%0A%20%20%20%20%22path%22%3A%20%22%2F${XRAY_URL_PATH}-xhttp%22%2C%0D%0A%20%20%20%20%22mode%22%3A%20%22auto%22%0D%0A%20%20%20%20%7D%0D%0A%20%20%7D%0D%0A%7D#${REGION_INFO}|${NODE_NAME}|上行Xhttp+Reality|下行 Xhttp+TLS+CDN
 "
     # Xhttp+TLS+CDN 上下行不分离
     V2RAYN_SUBSCRIBE+="

@@ -229,11 +229,11 @@ flowchart TD
 ## 客户端示例配置
 - VMess+gRPC（示例）：
   - 入口域名：`example.com`（或 `cdn.example.com`）
-  - 传输：`grpc`，`serviceName=vmess`，`alpn=h3`，`tls=true`
+  - 传输：`grpc`，`serviceName=vmess`，`alpn=h2`，`tls=true`
   - 凭据：`id=${XRAY_UUID}`，`alterId=0`
 - Trojan+gRPC（示例）：
   - 入口域名：`example.com`（或 `cdn.example.com`）
-  - 传输：`grpc`，`serviceName=trojan`，`alpn=h3`，`tls=true`
+  - 传输：`grpc`，`serviceName=trojan`，`alpn=h2`，`tls=true`
   - 凭据：`password=${XRAY_UUID}`
 - Shadowsocks（示例）：
   - 服务器：`example.com`

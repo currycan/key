@@ -3,6 +3,8 @@ proxies:
     type: hysteria2
     server: ${NODE_IP}
     port: ${PORT_HYSTERIA2}
+    alpn:
+      - h3
     up: 2500 Mbps
     down: 2500 Mbps
     password: ${SB_UUID}
@@ -87,7 +89,7 @@ proxies:
     tls: true
     client-fingerprint: chrome
     alpn:
-      - h3
+      - h2
     skip-cert-verify: false
     network: grpc
     host: ${CDNDOMAIN}
@@ -105,7 +107,7 @@ proxies:
     tls: true
     client-fingerprint: chrome
     alpn:
-      - h3
+      - h2
     skip-cert-verify: false
     network: grpc
     host: ${CDNDOMAIN}
@@ -123,7 +125,7 @@ proxies:
     host: ${CDNDOMAIN}
     sni: ${CDNDOMAIN}
     alpn:
-      - h3
+      - h2
     skip-cert-verify: false
     grpc-opts:
       grpc-service-name: ${XRAY_URL_PATH}-trojan
@@ -187,7 +189,7 @@ proxies:
     tls: true
     client-fingerprint: chrome
     alpn:
-      - h3
+      - h2
     skip-cert-verify: false
     reality-opts:
       public-key: ${XRAY_REALITY_PUBLIC_KEY}
