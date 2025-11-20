@@ -83,7 +83,7 @@ proxies:
 
   - name: ${REGION_INFO}|${NODE_NAME}|VLESS-TLS-gRPC
     type: vless
-    server: ${DOMAIN}
+    server: ${CDNDOMAIN}
     port: ${LISTENING_PORT}
     uuid: ${XRAY_UUID}
     tls: true
@@ -165,7 +165,7 @@ proxies:
 
   - name: ${REGION_INFO}|${NODE_NAME}|上行Xhttp+TLS+CDN|下行Xhttp+Reality
     type: vless
-    server: ${DOMAIN}
+    server: ${CDNDOMAIN}
     port: ${LISTENING_PORT}
     uuid: ${XRAY_UUID}
     tls: true
@@ -181,7 +181,7 @@ proxies:
     servername: ${CDNDOMAIN}
     encryption: mlkem768x25519plus.native.0rtt.${XRAY_MLKEM768_CLIENT}
 
-  - name: ${REGION_INFO}|${NODE_NAME}
+  - name: ${REGION_INFO}|${NODE_NAME}|上行Xhttp+Reality|下行 Xhttp+TLS+CDN
     type: vless
     server: ${DOMAIN}
     port: ${LISTENING_PORT}
@@ -197,12 +197,12 @@ proxies:
     network: xhttp
     xhttp-opts:
       path: /${XRAY_URL_PATH}-xhttp
-    servername: ${DOMAIN}
+    servername: ${CDNDOMAIN}
     encryption: mlkem768x25519plus.native.0rtt.${XRAY_MLKEM768_CLIENT}
 
   - name: ${REGION_INFO}|${NODE_NAME}|Xhttp+TLS+CDN上下行不分离
     type: vless
-    server: ${DOMAIN}
+    server: ${CDNDOMAIN}
     port: ${LISTENING_PORT}
     uuid: ${XRAY_UUID}
     tls: true

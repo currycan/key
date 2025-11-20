@@ -33,7 +33,7 @@ proxies:
 
 - name: ${REGION_INFO}|${NODE_NAME}|VLESS-TLS-gRPC
   type: vless
-  server: ${DOMAIN}
+  server: ${CDNDOMAIN}
   port: ${LISTENING_PORT}
   uuid: ${XRAY_UUID}
   tls: true
