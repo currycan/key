@@ -122,19 +122,22 @@ show_all_link() {
     print_colored ${RED} "Index:
 https://${DOMAIN}/sb-xray/
 "
-    print_colored ${MAGENTA} "通用链接:
+    print_colored ${MAGENTA} "全部订阅:
 https://${DOMAIN}/sb-xray/proxies"
 
     print_colored ${CYAN} "V2rayN 订阅:
 https://${DOMAIN}/sb-xray/v2rayn"
 
-    print_colored ${YELLOW} "clash 订阅:
+    print_colored ${GREEN} "Clash 订阅:
+https://${DOMAIN}/sb-xray/clash"
+
+    print_colored ${YELLOW} "clash 订阅完整配置:
 https://${DOMAIN}/sb-xray/clash-${NODE_NAME}.yaml"
 
-    print_colored ${BLUE} "stash 订阅:
+    print_colored ${BLUE} "stash 订阅完整配置:
 https://${DOMAIN}/sb-xray/stash-${NODE_NAME}.yaml"
 
-print_colored ${GREEN} "surge 订阅:
+print_colored ${GREEN} "surge 订阅完整配置:
 https://${DOMAIN}/sb-xray/surge-${NODE_NAME}.conf
 
 ******************************************************************"

@@ -1,18 +1,128 @@
-# 代理配置
 proxies:
-# Hysteria2 配置
-- {name: ${REGION_INFO}|${NODE_NAME}|hysteria2, server: ${NODE_IP}, port: ${PORT_HYSTERIA2}, type: hysteria2, password: ${SB_UUID}, auth: ${SB_UUID},up: 2500 Mbps, down: 2500 Mbps, skip-cert-verify: true, udp: true, tfo: false}
-# TUIC 配置
-- {name: ${REGION_INFO}|${NODE_NAME}|tuic, server: ${NODE_IP}, port: ${PORT_TUIC}, type: tuic, uuid: ${SB_UUID}, password: ${SB_UUID}, alpn: [h3], congestion-controller: bbr, skip-cert-verify: true, udp: true, tfo: false， version: 5}
-# Shadowsocks 配置
-# - {name: ${REGION_INFO}|${NODE_NAME}|shadowsocks, server: ${NODE_IP}, port: ${PORT_SHADOWSOCKS}, type: ss, cipher: ${SS_METHOD}, password: ${RANDOM_PASSWORD}, udp: true, tfo: false}
-# AnyTLS 配置
-- {name: ${REGION_INFO}|${NODE_NAME}|anytls, server: ${NODE_IP}, port: ${PORT_ANYTLS}, type: anytls, password: ${SB_UUID}, skip-cert-verify: true, udp: true, tfo: false}
-# VLESS TLS gRPC 配置
-- {name: ${REGION_INFO}|${NODE_NAME}|VLESS-TLS-gRPC, server: ${CDNDOMAIN}, port: ${LISTENING_PORT}, type: vless, tls: true, uuid: ${XRAY_UUID}, servername: ${CDNDOMAIN}, alpn: [h2], network: grpc, grpc-opts: {grpc-service-name: vless}, client-fingerprint: chrome, skip-cert-verify: false}
-# VMess TLS gRPC 配置
-- {name: ${REGION_INFO}|${NODE_NAME}|VMess-TLS-gRPC, server: ${CDNDOMAIN}, port: ${LISTENING_PORT}, type: vmess, tls: true, uuid: ${XRAY_UUID}, alterId: 0, cipher: auto, servername: ${CDNDOMAIN}, alpn: [h2], network: grpc, grpc-opts: {grpc-service-name: vmess}, client-fingerprint: chrome, skip-cert-verify: false}
-# Trojan TLS gRPC 配置
-- {name: ${REGION_INFO}|${NODE_NAME}|Trojan-TLS-gRPC, server: ${CDNDOMAIN}, port: ${LISTENING_PORT}, type: trojan, password: ${XRAY_UUID}, tls: true, sni: ${CDNDOMAIN}, alpn: [h2], network: grpc, grpc-opts: {grpc-service-name: trojan}, skip-cert-verify: false}
-# XTLS Vision Reality 直连配置
-- {name: ${REGION_INFO}|${NODE_NAME}|XTLS(Vision) Reality直连, server: ${DOMAIN}, port: ${LISTENING_PORT}, type: vless, tls: true, packet-encoding: xudp, uuid: ${XRAY_UUID}, servername: ${DOMAIN}, flow: xtls-rprx-vision, reality-opts: {public-key: ${XRAY_REALITY_PUBLIC_KEY}, short-id: ${XRAY_REALITY_SHORTID}}, client-fingerprint: random, skip-cert-verify: false, udp: true, tfo: false}
+  - name: ${REGION_INFO}|${NODE_NAME}|hysteria2
+    type: hysteria2
+    server: ${NODE_IP}
+    port: ${PORT_HYSTERIA2}
+    alpn:
+      - h3
+    up: 2500 Mbps
+    down: 2500 Mbps
+    password: ${SB_UUID}
+    skip-cert-verify: true
+
+  - name: ${REGION_INFO}|${NODE_NAME}|tuic
+    type: tuic
+    server: ${NODE_IP}
+    port: ${PORT_TUIC}
+    uuid: ${SB_UUID}
+    password: ${SB_UUID}
+    alpn:
+      - h3
+    disable-sni: true
+    reduce-rtt: true
+    request-timeout: 8000
+    udp-relay-mode: native
+    congestion-controller: bbr
+    skip-cert-verify: true
+    version: 5
+
+  - name: ${REGION_INFO}|${NODE_NAME}|ShadowTLS
+    type: ss
+    server: ${NODE_IP}
+    port: ${PORT_SHADOWTLS}
+    cipher: ${SS_METHOD}
+    password: ${RANDOM_PASSWORD}
+    plugin: shadow-tls
+    client-fingerprint: chrome
+    plugin-opts:
+      host: ${DOMAIN}
+      password: ${SB_UUID}
+      version: 3
+    smux:
+      enabled: true
+      protocol: h2mux
+      padding: true
+      max-connections: 8
+      min-streams: 16
+      statistic: true
+      only-tcp: false
+    brutal-opts:
+      enabled: ${IS_BRUTAL}
+      up: 2500 Mbps
+      down: 2500 Mbps
+
+  - name: ${REGION_INFO}|${NODE_NAME}|anytls
+    type: anytls
+    server: ${NODE_IP}
+    port: ${PORT_ANYTLS}
+    password: ${SB_UUID}
+    client-fingerprint: chrome
+    udp: true
+    idle-session-check-interval: 30
+    idle-session-timeout: 30
+    skip-cert-verify: true
+
+  - name: ${REGION_INFO}|${NODE_NAME}|VLESS-TLS-gRPC
+    type: vless
+    server: ${CDNDOMAIN}
+    port: ${LISTENING_PORT}
+    uuid: ${XRAY_UUID}
+    tls: true
+    client-fingerprint: chrome
+    alpn:
+      - h2
+    skip-cert-verify: false
+    network: grpc
+    host: ${CDNDOMAIN}
+    grpc-opts:
+      grpc-service-name: ${XRAY_URL_PATH}-vless
+    servername: ${CDNDOMAIN}
+
+  - name: ${REGION_INFO}|${NODE_NAME}|VMess-TLS-gRPC
+    type: vmess
+    server: ${CDNDOMAIN}
+    port: ${LISTENING_PORT}
+    uuid: ${XRAY_UUID}
+    alterId: 0
+    cipher: auto
+    tls: true
+    client-fingerprint: chrome
+    alpn:
+      - h2
+    skip-cert-verify: false
+    network: grpc
+    host: ${CDNDOMAIN}
+    grpc-opts:
+      grpc-service-name: ${XRAY_URL_PATH}-vmess
+    servername: ${CDNDOMAIN}
+
+  - name: ${REGION_INFO}|${NODE_NAME}|Trojan-TLS-gRPC
+    type: trojan
+    server: ${CDNDOMAIN}
+    port: ${LISTENING_PORT}
+    password: ${XRAY_UUID}
+    tls: true
+    network: grpc
+    host: ${CDNDOMAIN}
+    sni: ${CDNDOMAIN}
+    alpn:
+      - h2
+    skip-cert-verify: false
+    grpc-opts:
+      grpc-service-name: ${XRAY_URL_PATH}-trojan
+
+  - name: ${REGION_INFO}|${NODE_NAME}|XTLS(Vision)+Reality直连
+    type: vless
+    server: ${DOMAIN}
+    port: ${LISTENING_PORT}
+    uuid: ${XRAY_UUID}
+    tls: true
+    flow: xtls-rprx-vision
+    client-fingerprint: chrome
+    skip-cert-verify: false
+    reality-opts:
+      public-key: ${XRAY_REALITY_PUBLIC_KEY}
+      short-id: ${XRAY_REALITY_SHORTID}
+      _spider-x: /
+    network: tcp
+    servername: ${DOMAIN}
