@@ -79,6 +79,55 @@ proxies:
     idle-session-timeout: 30
     skip-cert-verify: true
 
+  - name: ${REGION_INFO}|${NODE_NAME}|VLESS-TLS-gRPC
+    type: vless
+    server: ${DOMAIN}
+    port: ${LISTENING_PORT}
+    uuid: ${XRAY_UUID}
+    tls: true
+    client-fingerprint: chrome
+    alpn:
+      - h2
+    skip-cert-verify: false
+    network: grpc
+    host: ${CDNDOMAIN}
+    grpc-opts:
+      grpc-service-name: ${XRAY_URL_PATH}-vless
+    servername: ${CDNDOMAIN}
+
+  - name: ${REGION_INFO}|${NODE_NAME}|VMess-TLS-gRPC
+    type: vmess
+    server: ${CDNDOMAIN}
+    port: ${LISTENING_PORT}
+    uuid: ${XRAY_UUID}
+    alterId: 0
+    cipher: auto
+    tls: true
+    client-fingerprint: chrome
+    alpn:
+      - h2
+    skip-cert-verify: false
+    network: grpc
+    host: ${CDNDOMAIN}
+    grpc-opts:
+      grpc-service-name: ${XRAY_URL_PATH}-vmess
+    servername: ${CDNDOMAIN}
+
+  - name: ${REGION_INFO}|${NODE_NAME}|Trojan-TLS-gRPC
+    type: trojan
+    server: ${CDNDOMAIN}
+    port: ${LISTENING_PORT}
+    password: ${XRAY_UUID}
+    tls: true
+    network: grpc
+    host: ${CDNDOMAIN}
+    sni: ${CDNDOMAIN}
+    alpn:
+      - h2
+    skip-cert-verify: false
+    grpc-opts:
+      grpc-service-name: ${XRAY_URL_PATH}-trojan
+
   - name: ${REGION_INFO}|${NODE_NAME}|XTLS(Vision)+Reality直连
     type: vless
     server: ${DOMAIN}
@@ -108,7 +157,7 @@ proxies:
       short-id: ${XRAY_REALITY_SHORTID}
     network: xhttp
     xhttp-opts:
-      path: /${XRAY_URL_PATH}
+      path: /${XRAY_URL_PATH}-xhttp
     servername: ${DOMAIN}
     encryption: none
 
@@ -126,7 +175,7 @@ proxies:
     xhttp-opts:
       headers:
         Host: ${CDNDOMAIN}
-      path: /${XRAY_URL_PATH}
+      path: /${XRAY_URL_PATH}-xhttp
     servername: ${CDNDOMAIN}
     encryption: mlkem768x25519plus.native.0rtt.${XRAY_MLKEM768_CLIENT}
 
@@ -145,7 +194,7 @@ proxies:
       short-id: ${XRAY_REALITY_SHORTID}
     network: xhttp
     xhttp-opts:
-      path: /${XRAY_URL_PATH}
+      path: /${XRAY_URL_PATH}-xhttp
     servername: ${DOMAIN}
     encryption: mlkem768x25519plus.native.0rtt.${XRAY_MLKEM768_CLIENT}
 
@@ -163,6 +212,6 @@ proxies:
     xhttp-opts:
       headers:
         Host: ${CDNDOMAIN}
-      path: /${XRAY_URL_PATH}
+      path: /${XRAY_URL_PATH}-xhttp
     servername: ${CDNDOMAIN}
     encryption: mlkem768x25519plus.native.0rtt.${XRAY_MLKEM768_CLIENT}

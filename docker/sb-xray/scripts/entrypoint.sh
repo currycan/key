@@ -240,57 +240,43 @@ function createConfig() {
     ENV_LIST=$(env | grep -v '^_' | cut -d= -f1 | sed 's/^/${/;s/$/}/' | xargs)
 
     # 生成Supervisord配置
-    if [ ! -f /etc/supervisord.conf ]; then
-        log DEBUG "Generating supervisord /etc/supervisord.conf"
-        envsubst </templates/supervisord/supervisord.conf >/etc/supervisord.conf
-    fi
-    if [ ! -f /etc/supervisor.d/daemon.ini ]; then
-        mkdir -p /etc/supervisor.d/
-        log DEBUG "Generating supervisord /etc/supervisor.d/daemon.ini"
-        envsubst </templates/supervisord/daemon.ini >/etc/supervisor.d/daemon.ini
-    fi
+    log DEBUG "Generating supervisord /etc/supervisord.conf"
+    envsubst </templates/supervisord/supervisord.conf >/etc/supervisord.conf
+    mkdir -p /etc/supervisor.d/
+    log DEBUG "Generating supervisord /etc/supervisor.d/daemon.ini"
+    envsubst </templates/supervisord/daemon.ini >/etc/supervisor.d/daemon.ini
 
     # 生成Nginx配置
     log DEBUG "Generating Nginx nginx.conf"
     envsubst "${ENV_LIST}" </templates/nginx/nginx.conf >/etc/nginx/nginx.conf
     cp -f /templates/nginx/network_internal.conf /etc/nginx/network_internal.conf
-    if [ ! -f /etc/nginx/conf.d/http.conf ]; then
-        mkdir -p /etc/nginx/conf.d/
-        log DEBUG "Generating Nginx http.conf"
-        envsubst "${ENV_LIST}" </templates/nginx/http.conf >/etc/nginx/conf.d/http.conf
-    fi
-    if [ ! -f /etc/nginx/stream.d/tcp.conf ]; then
-        mkdir -p /etc/nginx/stream.d/
-        log DEBUG "Generating Nginx tcp.conf"
-        envsubst "${ENV_LIST}" </templates/nginx/tcp.conf >/etc/nginx/stream.d/tcp.conf
-    fi
+    mkdir -p /etc/nginx/conf.d/
+    log DEBUG "Generating Nginx http.conf"
+    envsubst "${ENV_LIST}" </templates/nginx/http.conf >/etc/nginx/conf.d/http.conf
+    mkdir -p /etc/nginx/stream.d/
+    log DEBUG "Generating Nginx tcp.conf"
+    envsubst "${ENV_LIST}" </templates/nginx/tcp.conf >/etc/nginx/stream.d/tcp.conf
 
     # 生成Xray配置
-    if [ ! -f "${WORKDIR}/xray/*.json" ]; then
-        mkdir -p "${WORKDIR}/xray/"
-        for template in /templates/xray/*.json; do
-            local output="${WORKDIR}/xray/$(basename "$template")"
-            log DEBUG "Generating $output"
-            envsubst <"$template" >"$output"
-        done
-    fi
+    mkdir -p "${WORKDIR}/xray/"
+    for template in /templates/xray/*.json; do
+        output="${WORKDIR}/xray/$(basename "$template")"
+        log DEBUG "Generating $output"
+        envsubst <"$template" >"$output"
+    done
 
     # 生成Sing-box配置
-    if [ ! -f "${WORKDIR}/sing-box/*.json" ]; then
-        mkdir -p "${WORKDIR}/sing-box/"
-        for template in /templates/sing-box/*.json; do
-            local output="${WORKDIR}/sing-box/$(basename "$template")"
-            log DEBUG "Generating $output"
-            envsubst <"$template" >"$output"
-        done
-    fi
+    mkdir -p "${WORKDIR}/sing-box/"
+    for template in /templates/sing-box/*.json; do
+        local output="${WORKDIR}/sing-box/$(basename "$template")"
+        log DEBUG "Generating $output"
+        envsubst <"$template" >"$output"
+    done
 
     # 生成Dufs配置
-    if [ ! -f "${WORKDIR}/dufs/conf.yml" ]; then
-        mkdir -p "${WORKDIR}/dufs"
-        log DEBUG "Generating Dufs config"
-        envsubst <"/templates/dufs/conf.yml" >"${WORKDIR}/dufs/conf.yml"
-    fi
+    mkdir -p "${WORKDIR}/dufs"
+    log DEBUG "Generating Dufs config"
+    envsubst <"/templates/dufs/conf.yml" >"${WORKDIR}/dufs/conf.yml"
 }
 
 # 配置 nginx dhparam 证书

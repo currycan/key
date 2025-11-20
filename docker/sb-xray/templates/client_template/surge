@@ -2,5 +2,11 @@
 ${REGION_INFO}|${NODE_NAME}|hysteria2=hysteria2,${NODE_IP},${PORT_HYSTERIA2},password=${SB_UUID},skip-cert-verify=true,download-bandwidth=2500
 # TUICv5
 ${REGION_INFO}|${NODE_NAME}|tuic=tuic-v5,${NODE_IP},${PORT_TUIC},uuid=${SB_UUID},password=${SB_UUID},alpn=h3,sni=off,skip-cert-verify=true
-# ShadowTLS+Shadowsocks2022
+# ShadowTLS
 ${REGION_INFO}|${NODE_NAME}|ShadowTLS=ss,${NODE_IP},${PORT_SHADOWTLS},encrypt-method=${SS_METHOD},password=${RANDOM_PASSWORD},shadow-tls-password=${SB_UUID},shadow-tls-sni=${DOMAIN},shadow-tls-version=3
+# VLESS-TLS-gRPC
+${REGION_INFO}|${NODE_NAME}|VLESS-TLS-gRPC=vless,${DOMAIN},${LISTENING_PORT},uuid=${XRAY_UUID},tls=true,alpn=h2,servername=${CDNDOMAIN},transport=grpc,grpc-service-name=${XRAY_URL_PATH}-vless,skip-cert-verify=false
+# VMess-TLS-gRPC
+${REGION_INFO}|${NODE_NAME}|VMess-TLS-gRPC=vmess,${DOMAIN},${LISTENING_PORT},encrypt-method=auto,uuid=${XRAY_UUID},tls=true,alpn=h2,servername=${CDNDOMAIN},transport=grpc,grpc-service-name=${XRAY_URL_PATH}-vmess,skip-cert-verify=false
+# Trojan-TLS-gRPC
+${REGION_INFO}|${NODE_NAME}|Trojan-TLS-gRPC=trojan,${DOMAIN},${LISTENING_PORT},password=${XRAY_UUID},tls=true,alpn=h2,sni=${CDNDOMAIN},transport=grpc,grpc-service-name=${XRAY_URL_PATH}-trojan,skip-cert-verify=false
