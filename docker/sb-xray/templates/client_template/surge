@@ -3,4 +3,4 @@ ${REGION_INFO}|${NODE_NAME}|hysteria2=hysteria2,${NODE_IP},${PORT_HYSTERIA2},pas
 # TUICv5
 ${REGION_INFO}|${NODE_NAME}|tuic=tuic-v5,${NODE_IP},${PORT_TUIC},uuid=${SB_UUID},password=${SB_UUID},alpn=h3,sni=off,skip-cert-verify=true
 # VMESS TLS WS
-${REGION_INFO}|${NODE_NAME}|VMess-TLS-WS=vmess,${CDNDOMAIN},${LISTENING_PORT},username=${XRAY_UUID},tls=true,sni=${CDNDOMAIN},skip-cert-verify=false,ws=true,ws-path=/${XRAY_URL_PATH}-vmessws,ws-headers=Host:${CDNDOMAIN}
+${REGION_INFO}|${NODE_NAME}|VMess-TLS-WS=vmess,${CDNDOMAIN},${LISTENING_PORT},username=${XRAY_UUID},tls=true,sni=${CDNDOMAIN},skip-cert-verify=false,ws=true,ws-path=/${XRAY_URL_PATH}-vmessws,ws-headers=Host:${CDNDOMAIN},vmess-aead=true,udp-relay=true
