@@ -152,7 +152,8 @@ RUN set -ex; \
   rm -rf /tmp/*
 
 COPY --from=builder --chmod=755 /usr/local/bin/ /usr/local/bin/
-COPY 3DCEList /home/wwwroot/3DCEList
+ADD web.tgz /home/wwwroot/
+RUN chown -R nginx:nginx /home/wwwroot
 COPY --chmod=755 scripts /scripts
 COPY templates/ /templates/
 ADD https://raw.githubusercontent.com/currycan/key/master/vimrc /root/.vimrc

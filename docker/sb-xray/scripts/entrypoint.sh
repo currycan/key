@@ -252,7 +252,8 @@ function createConfig() {
     cp -f /templates/nginx/network_internal.conf /etc/nginx/network_internal.conf
     mkdir -p /etc/nginx/conf.d/
     log DEBUG "Generating Nginx http.conf"
-    envsubst "${ENV_LIST}" </templates/nginx/http.conf >/etc/nginx/conf.d/http.conf
+    export RANDOM_NUM=$(shuf -i 0-9 -n 1)
+    envsubst "${ENV_LIST} \${RANDOM_NUM}" </templates/nginx/http.conf >/etc/nginx/conf.d/http.conf
     mkdir -p /etc/nginx/stream.d/
     log DEBUG "Generating Nginx tcp.conf"
     envsubst "${ENV_LIST}" </templates/nginx/tcp.conf >/etc/nginx/stream.d/tcp.conf
