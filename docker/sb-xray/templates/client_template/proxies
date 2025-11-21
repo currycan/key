@@ -26,50 +26,6 @@ proxies:
     skip-cert-verify: true
     version: 5
 
-  - name: ${REGION_INFO}|${NODE_NAME}|ShadowTLS
-    type: ss
-    server: ${NODE_IP}
-    port: ${PORT_SHADOWTLS}
-    cipher: ${SS_METHOD}
-    password: ${RANDOM_PASSWORD}
-    plugin: shadow-tls
-    client-fingerprint: chrome
-    plugin-opts:
-      host: ${DOMAIN}
-      password: ${SB_UUID}
-      version: 3
-    smux:
-      enabled: true
-      protocol: h2mux
-      padding: true
-      max-connections: 8
-      min-streams: 16
-      statistic: true
-      only-tcp: false
-    brutal-opts:
-      enabled: ${IS_BRUTAL}
-      up: 2500 Mbps
-      down: 2500 Mbps
-
-  - name: ${REGION_INFO}|${NODE_NAME}|shadowsocks
-    type: ss
-    server: ${NODE_IP}
-    port: ${PORT_SHADOWSOCKS}
-    cipher: ${SS_METHOD}
-    password: ${RANDOM_PASSWORD}
-    smux:
-      enabled: true
-      protocol: h2mux
-      padding: true
-      max-connections: 8
-      min-streams: 16
-      statistic: true
-      only-tcp: false
-    brutal-opts:
-      enabled: ${IS_BRUTAL}
-      up: 2500 Mbps
-      down: 2500 Mbps
-
   - name: ${REGION_INFO}|${NODE_NAME}|anytls
     type: anytls
     server: ${NODE_IP}
@@ -81,22 +37,7 @@ proxies:
     idle-session-timeout: 30
     skip-cert-verify: true
 
-  - name: ${REGION_INFO}|${NODE_NAME}|VLESS-TLS-gRPC
-    type: vless
-    server: ${CDNDOMAIN}
-    port: ${LISTENING_PORT}
-    uuid: ${XRAY_UUID}
-    tls: true
-    client-fingerprint: chrome
-    alpn:
-      - h2
-    skip-cert-verify: false
-    network: grpc
-    grpc-opts:
-      grpc-service-name: ${XRAY_URL_PATH}-vless
-    servername: ${CDNDOMAIN}
-
-  - name: ${REGION_INFO}|${NODE_NAME}|VMess-TLS-gRPC
+  - name: ${REGION_INFO}|${NODE_NAME}|VMess-TLS-WS
     type: vmess
     server: ${CDNDOMAIN}
     port: ${LISTENING_PORT}
@@ -108,42 +49,12 @@ proxies:
     alpn:
       - h2
     skip-cert-verify: false
-    network: grpc
-    grpc-opts:
-      grpc-service-name: ${XRAY_URL_PATH}-vmess
+    network: ws
+    ws-opts:
+      headers:
+        Host: ${CDNDOMAIN}
+      path: /${XRAY_URL_PATH}-vmessws
     servername: ${CDNDOMAIN}
-
-  - name: ${REGION_INFO}|${NODE_NAME}|Trojan-TLS-gRPC
-    type: trojan
-    server: ${CDNDOMAIN}
-    port: ${LISTENING_PORT}
-    password: ${XRAY_UUID}
-    tls: true
-    client-fingerprint: chrome
-    alpn:
-      - h2
-    skip-cert-verify: false
-    network: grpc
-    grpc-opts:
-      grpc-service-name: ${XRAY_URL_PATH}-trojan
-    servername: reality.${DOMAIN}
-
-  - name: ${REGION_INFO}|${NODE_NAME}|Trojan-REALITY-gRPC
-    type: trojan
-    server: ${DOMAIN}
-    port: ${LISTENING_PORT}
-    password: ${XRAY_UUID}
-    tls: true
-    network: grpc
-    alpn:
-      - h2
-    skip-cert-verify: false
-    grpc-opts:
-      grpc-service-name: ${XRAY_URL_PATH}-trojan
-    reality-opts:
-      public-key: ${XRAY_REALITY_PUBLIC_KEY}
-      short-id: ${XRAY_REALITY_SHORTID}
-    servername: reality.${DOMAIN}
 
   - name: ${REGION_INFO}|${NODE_NAME}|XTLS(Vision)+Reality直连
     type: vless
@@ -159,7 +70,7 @@ proxies:
       short-id: ${XRAY_REALITY_SHORTID}
       _spider-x: /
     network: tcp
-    servername: reality.${DOMAIN}
+    servername: ${DOMAIN}
 
   - name: ${REGION_INFO}|${NODE_NAME}|Xhttp+Reality直连
     type: vless
@@ -175,7 +86,7 @@ proxies:
     network: xhttp
     xhttp-opts:
       path: /${XRAY_URL_PATH}-xhttp
-    servername: reality.${DOMAIN}
+    servername: ${DOMAIN}
     encryption: none
 
   - name: ${REGION_INFO}|${NODE_NAME}|上行Xhttp+TLS+CDN|下行Xhttp+Reality
@@ -212,7 +123,7 @@ proxies:
     network: xhttp
     xhttp-opts:
       path: /${XRAY_URL_PATH}-xhttp
-    servername: reality.${DOMAIN}
+    servername: ${DOMAIN}
     encryption: mlkem768x25519plus.native.0rtt.${XRAY_MLKEM768_CLIENT}
 
   - name: ${REGION_INFO}|${NODE_NAME}|Xhttp+TLS+CDN上下行不分离

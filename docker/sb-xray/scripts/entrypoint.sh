@@ -191,14 +191,6 @@ function generateEnv() {
             log WARN "brutal module not detected, Xray XTLS Brutal will not be available"
         fi
 
-        if [ "$SS_METHOD" = "2022-blake3-aes-128-gcm" ]; then
-            sb_shadowtls_password=$(sing-box generate rand --base64 16)
-        else
-            sb_shadowtls_password=$(sing-box generate rand --base64 32)
-        fi
-
-        sb_reality_keypair=$(sing-box generate reality-keypair) && sb_reality_private=$(awk '/PrivateKey/{print $NF}' <<< "$sb_reality_keypair") && sb_reality_public=$(awk '/PublicKey/{print $NF}' <<< "$sb_reality_keypair")
-
         # 生成随机参数
         declare -A config=(
             ["XUI_LOCAL_PORT"]=$(generateRandomStr port)
@@ -210,17 +202,14 @@ function generateEnv() {
             ["XRAY_REALITY_PRIVATE_KEY"]=${reality_private_key}
             ["XRAY_REALITY_PUBLIC_KEY"]=${reality_public_key}
             ["XRAY_REALITY_SHORTID"]=$(openssl rand -hex 8)
-            ["XRAY_URL_PATH"]=$(generateRandomStr path 20)
+            ["XRAY_URL_PATH"]=$(generateRandomStr path 32)
             ["GEOIP_INFO"]=${geo_output}
             ["IS_BRUTAL"]=${is_brutal}
             ["CHATGPT_OUT"]=$(check_chatgpt_access)
             ["STRATEGY"]=$(detect_ip_strategy_api)
-            ["RANDOM_PASSWORD"]=${sb_shadowtls_password}
             ["SB_UUID"]=$(generateRandomStr uuid)
             ["PORT_HYSTERIA2"]=$(generateRandomStr port)
             ["PORT_TUIC"]=$(generateRandomStr port)
-            ["PORT_SHADOWTLS"]=$(generateRandomStr port)
-            ["PORT_SHADOWSOCKS"]=$(generateRandomStr port)
             ["PORT_ANYTLS"]=$(generateRandomStr port)
         )
 
