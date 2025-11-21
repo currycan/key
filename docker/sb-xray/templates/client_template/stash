@@ -42,7 +42,6 @@ proxies:
       - h2
     skip-cert-verify: false
     network: grpc
-    host: ${CDNDOMAIN}
     grpc-opts:
       grpc-service-name: ${XRAY_URL_PATH}-vless
     servername: ${CDNDOMAIN}
@@ -60,7 +59,6 @@ proxies:
       - h2
     skip-cert-verify: false
     network: grpc
-    host: ${CDNDOMAIN}
     grpc-opts:
       grpc-service-name: ${XRAY_URL_PATH}-vmess
     servername: ${CDNDOMAIN}
@@ -71,14 +69,31 @@ proxies:
     port: ${LISTENING_PORT}
     password: ${XRAY_UUID}
     tls: true
+    client-fingerprint: chrome
+    alpn:
+      - h2
+    skip-cert-verify: false
     network: grpc
-    host: ${CDNDOMAIN}
-    sni: ${CDNDOMAIN}
+    grpc-opts:
+      grpc-service-name: ${XRAY_URL_PATH}-trojan
+    servername: reality.${DOMAIN}
+
+  - name: ${REGION_INFO}|${NODE_NAME}|Trojan-REALITY-gRPC
+    type: trojan
+    server: ${DOMAIN}
+    port: ${LISTENING_PORT}
+    password: ${XRAY_UUID}
+    tls: true
+    network: grpc
     alpn:
       - h2
     skip-cert-verify: false
     grpc-opts:
       grpc-service-name: ${XRAY_URL_PATH}-trojan
+    reality-opts:
+      public-key: ${XRAY_REALITY_PUBLIC_KEY}
+      short-id: ${XRAY_REALITY_SHORTID}
+    servername: reality.${DOMAIN}
 
   - name: ${REGION_INFO}|${NODE_NAME}|XTLS(Vision)+Reality直连
     type: vless
@@ -94,4 +109,4 @@ proxies:
       short-id: ${XRAY_REALITY_SHORTID}
       _spider-x: /
     network: tcp
-    servername: ${DOMAIN}
+    servername: reality.${DOMAIN}

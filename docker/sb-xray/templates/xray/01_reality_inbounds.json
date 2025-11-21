@@ -26,10 +26,11 @@
                 "security": "reality",
                 "realitySettings": {
                     "show": false,
-                    "target": "/dev/shm/nginx.sock",
+                    "target": "/dev/shm/web.sock",
                     "xver": 1,
                     "serverNames": [
                         "${DOMAIN}",
+                        "reality.${DOMAIN}",
                         "${CDNDOMAIN}"
                     ],
                     "privateKey": "${XRAY_REALITY_PRIVATE_KEY}",
