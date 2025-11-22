@@ -86,8 +86,13 @@ proxies:
     network: xhttp
     xhttp-opts:
       path: /${XRAY_URL_PATH}-xhttp
+      mode: auto
+      extra-opts:
+        host: ""
+        path: /${XRAY_URL_PATH}-xhttp
+        mode: auto
     servername: ${DOMAIN}
-    encryption: none
+    encryption: mlkem768x25519plus.native.0rtt.${XRAY_MLKEM768_CLIENT}
 
   - name: ${REGION_INFO}|${NODE_NAME}|上行Xhttp+TLS+CDN|下行Xhttp+Reality
     type: vless
@@ -102,8 +107,25 @@ proxies:
     network: xhttp
     xhttp-opts:
       headers:
-        Host: ${CDNDOMAIN}
       path: /${XRAY_URL_PATH}-xhttp
+      mode: auto
+      extra-opts:
+        downloadSettings:
+          address: ${DOMAIN}
+          port: ${LISTENING_PORT}
+          network: xhttp
+          security: reality
+          realitySettings:
+            show: false
+            serverName: ${DOMAIN}
+            fingerprint: chrome
+            publicKey: ${XRAY_REALITY_PUBLIC_KEY}
+            shortId: ${XRAY_REALITY_SHORTID}
+            spiderX: /
+          xhttpSettings:
+            host: ""
+            path: /${XRAY_URL_PATH}-xhttp
+            mode: auto
     servername: ${CDNDOMAIN}
     encryption: mlkem768x25519plus.native.0rtt.${XRAY_MLKEM768_CLIENT}
 
@@ -123,6 +145,23 @@ proxies:
     network: xhttp
     xhttp-opts:
       path: /${XRAY_URL_PATH}-xhttp
+      mode: auto
+      extra-opts:
+        downloadSettings:
+          address: ${DOMAIN}
+          port: ${LISTENING_PORT}
+          network: xhttp
+          security: tls
+          tlsSettings:
+            serverName: ${DOMAIN}
+            allowInsecure: false
+            alpn:
+              - h2
+            fingerprint: chrome
+          xhttpSettings:
+            host: ${DOMAIN}
+            path: /${XRAY_URL_PATH}-xhttp
+            mode: auto
     servername: ${DOMAIN}
     encryption: mlkem768x25519plus.native.0rtt.${XRAY_MLKEM768_CLIENT}
 
@@ -136,10 +175,12 @@ proxies:
     alpn:
       - h2
     skip-cert-verify: false
+    reality-opts:
+      public-key: ${XRAY_REALITY_PUBLIC_KEY}
+      short-id: ${XRAY_REALITY_SHORTID}
     network: xhttp
     xhttp-opts:
-      headers:
-        Host: ${CDNDOMAIN}
       path: /${XRAY_URL_PATH}-xhttp
+      mode: auto
     servername: ${CDNDOMAIN}
     encryption: mlkem768x25519plus.native.0rtt.${XRAY_MLKEM768_CLIENT}
