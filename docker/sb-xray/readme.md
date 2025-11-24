@@ -29,7 +29,7 @@ docker buildx build \
   --build-arg DUFS_VERSION="0.45.0" \
   --build-arg SING_BOX_VERSION="1.12.12" \
   --build-arg XRAY_VERSION="25.10.15" \
-  --tag currycan/sb-xray:25.11.14 \
+  --tag currycan/sb-xray:25.11.24 \
   --push .
 ```
 
