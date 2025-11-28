@@ -35,17 +35,19 @@ docker buildx build \
 
 ### 订阅转换
 
-https://kb.nssurge.com/surge-knowledge-base/zh/guidelines/detached-profile
+https://github.com/LM-Firefly/subconverter
 
-自建订阅转换不会有隐私泄露等风险，但需要一定技术基础。
+https://github.com/LM-Firefly/Firefly-sub
 
-以下教程源自网络收集，与本文无关，仅作为示例：
-
-前端：https://github.com/CareyWang/sub-web
-
-后端：https://github.com/tindy2013/subconverter
+https://github.com/DoingDog/clashconf?tab=readme-ov-file
 
 相关教程：https://ednovas.xyz/2021/06/06/subs/
+
+```bash
+docker run -d --restart=always --name subconverter -p 25500:25500 ghcr.io/lm-firefly/subconverter:latest
+````
+
+http://172.18.18.254:25500/sub?
 
 ### CDN 域名报错：您重定向的次数过多
 
