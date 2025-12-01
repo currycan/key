@@ -4,5 +4,4 @@
 
 https://mylink.ansandy.site/sub?
 
-
-https://raw.githubusercontent.com/currycan/key/refs/heads/master/ACL4SSR/ACL4SSR_Online_Full_Mannix_No_DNS_Leak_Mine.ini
+https://raw.githubusercontent.com/currycan/key/refs/heads/master/docker/sb-xray/templates/ACL4SSR/ACL4SSR_Online_Full.ini
