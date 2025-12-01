@@ -12,6 +12,9 @@ https://github.com/fscarmen/sing-box
 
 https://bianyuan.xyz/
 
+https://github.com/zsokami/ACL4SSR
+https://github.com/blackmatrix7/ios_rule_script/tree/master/rule/Clash
+
 # 节点重命名
 https://github.com/sub-store-org/Sub-Store/blob/master/scripts/vmess-ws-obfs-host.js
 
