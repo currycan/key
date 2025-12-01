@@ -9,3 +9,36 @@
 https://mylink.ansandy.site/sub?
 
 https://raw.githubusercontent.com/currycan/key/master/docker/sb-xray/templates/ACL4SSR/ACL4SSR_Online_Full.ini
+
+## Tailscale 设置
+
+[openwrt软路由安装tailscale - DEV Community](https://dev.to/dragon72463399/openwrtruan-lu-you-an-zhuang-tailscale-a7j)
+
+[pkgs.tailscale.com/stable/](https://pkgs.tailscale.com/stable/)
+
+> https://pkgs.tailscale.com/stable/tailscale_1.90.9_amd64.tgz
+
+### 安装
+
+首先直接在 iStore 商店安装tailscale, **不要启动服务**，然后进行如下升级:
+
+```bash
+VERSION=1.90.9
+ARCH=amd64
+
+wget https://pkgs.tailscale.com/stable/tailscale_${VERSION}_${ARCH}.tgz
+
+tar -zxvf tailscale_${VERSION}_${ARCH}.tgz
+
+mv tailscale_${VERSION}_${ARCH}/tailscale /usr/sbin/
+mv tailscale_${VERSION}_${ARCH}/tailscaled /usr/sbin/
+```
+
+```bash
+tailscale up --accept-dns=false --accept-routes --advertise-exit-node --advertise-routes=172.18.18.0/23 --hostname=n305-op
+
+tailscale up --auth-key=tskey-auth-k4b4ZhKopD11CNTRL-BPYfNiKp7uE5ZFMsFDXDtEVrfSR7em9G XXX
+
+```
+
+在OpenWrt上新建一个接口，协议选**静态地址**，设备选**tailscale0**，地址为Taliscale管理页面上分配的**地址100.X.X.X**，掩码255.0.0.0。防火墙区域选lan区域。
