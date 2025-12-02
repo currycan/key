@@ -143,7 +143,7 @@ main() {
     envsubst </templates/client_template/clash >${WORKDIR}/subscribe/clash
     envsubst </templates/client_template/stash >${WORKDIR}/subscribe/stash
     envsubst </templates/client_template/surge >${WORKDIR}/subscribe/surge
-    envsubst </templates/templates/ACL4SSR/ACL4SSR_Online_Full.ini >${WORKDIR}/subscribe/ACL4SSR_Online_Full.ini
+    envsubst </templates/ACL4SSR/ACL4SSR_Online_Full.ini >${WORKDIR}/subscribe/ACL4SSR_Online_Full.ini
 
     CLIENTS=("clash" "stash")
     # 循环生成文件
