@@ -25,6 +25,7 @@ https://raw.githubusercontent.com/currycan/key/master/docker/sb-xray/templates/A
 ```bash
 VERSION=1.90.9
 ARCH=amd64
+# ARCH=arm64
 
 wget https://pkgs.tailscale.com/stable/tailscale_${VERSION}_${ARCH}.tgz
 
@@ -37,8 +38,22 @@ mv tailscale_${VERSION}_${ARCH}/tailscaled /usr/sbin/
 ```bash
 tailscale up --accept-dns=false --accept-routes --advertise-exit-node --advertise-routes=172.18.18.0/23 --hostname=n305-op
 
-tailscale up --auth-key=tskey-auth-k4b4ZhKopD11CNTRL-BPYfNiKp7uE5ZFMsFDXDtEVrfSR7em9G XXX
+tailscale up --accept-dns=false --accept-routes --advertise-exit-node --advertise-routes=192.168.8.0/24 --hostname=mt3000
+
+tailscale up --auth-key=xxx XXX
 
 ```
 
 在OpenWrt上新建一个接口，协议选**静态地址**，设备选**tailscale0**，地址为Taliscale管理页面上分配的**地址100.X.X.X**，掩码255.0.0.0。防火墙区域选lan区域。
+
+## ZeroTier 设置
+
+在 ZeroTier 网页端配置路由，[ZeroTier Central - Networks](https://my.zerotier.com/)
+
+- 找到 "Advanced" -> "Managed Routes"（路由管理）。
+- 添加一条规则：
+  Destination (目标网段)： 输入你家里的物理网段，例如 192.168.1.0/24。
+  Via (经过)： 输入那台网关设备的 ZeroTier 虚拟 IP，例如 10.147.20.5。
+  点击 Submit (提交)。
+
+默认免费只能添加一条规则，使用时可以手动切换

@@ -82,7 +82,7 @@ RUN set -ex; \
   mv x-ui /usr/local/bin/
 
 # ===== 安装 Xray =====
-ARG XRAY_VERSION="25.10.15"
+ARG XRAY_VERSION="25.12.1"
 RUN set -ex; \
     if [ -z "$XRAY_VERSION" ]; then \
         XRAY_VERSION=$(curl -sSf https://github.com/XTLS/Xray-core/tags \

@@ -1,6 +1,6 @@
 services:
   sb-xray:
-    image: docker.io/currycan/sb-xray:25.11.24
+    image: docker.io/currycan/sb-xray:25.12.1
     container_name: sb-xray
     environment:
       - DOMAIN=$domain
