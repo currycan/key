@@ -357,7 +357,8 @@ function issueCertificate() {
         # 删除 nginx 配置，避免加载证书报错
         rm -f /etc/nginx/conf.d/* /etc/nginx/stream.d/*
         # 安装证书，并配置自动更新
-        acme.sh --install-cert -d "${domain}" \
+        acme.sh --upgrade
+        acme.sh --install-cert --ecc -d "${domain}" \
             --key-file "${SSL_PATH}/${domain}.key" \
             --fullchain-file "${cert_file}" \
             --ca-file "${SSL_PATH}/${domain}-ca.crt" \
