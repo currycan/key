@@ -255,9 +255,9 @@ def generateSurgeSubFile(account: Account = None,
 
     surge_config['Proxy Group']['proxy'] = f"select, auto, fallback, {', '.join(surge_config['Proxy'].keys())}"
     surge_config['Proxy Group']['auto'] = (f"url-test, {', '.join(surge_config['Proxy'].keys())}, "
-                                           f"url=http://www.gstatic.com/generate_204, interval=43200")
+                                           f"url=https://cp.cloudflare.com/generate_204, interval=43200")
     surge_config['Proxy Group']['fallback'] = (f"fallback, {', '.join(surge_config['Proxy'].keys())}, "
-                                               f"url=http://www.gstatic.com/generate_204, interval=43200")
+                                               f"url=https://cp.cloudflare.com/generate_204, interval=43200")
 
     # generate a tmp file to store the path of surge.ini
     temp_file = tempfile.NamedTemporaryFile(mode='w+t', delete=False, encoding='utf8')

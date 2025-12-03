@@ -48,6 +48,8 @@ tailscale up --auth-key=xxx XXX
 
 ## ZeroTier 设置
 
+docker pull zyclonite/zerotier:router-1.16.0
+
 在 ZeroTier 网页端配置路由，[ZeroTier Central - Networks](https://my.zerotier.com/)
 
 - 找到 "Advanced" -> "Managed Routes"（路由管理）。

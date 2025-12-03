@@ -1,14 +1,14 @@
 proxies:
   - name: ${REGION_INFO}|${NODE_NAME}|hysteria2
     type: hysteria2
-    server: ${NODE_IP}
+    server: ${DOMAIN}
     port: ${PORT_HYSTERIA2}
     password: ${SB_UUID}
     skip-cert-verify: true
 
   - name: ${REGION_INFO}|${NODE_NAME}|tuic
     type: tuic
-    server: ${NODE_IP}
+    server: ${DOMAIN}
     port: ${PORT_TUIC}
     uuid: ${SB_UUID}
     sni: ''
