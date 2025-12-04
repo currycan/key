@@ -43,18 +43,6 @@ RUN set -ex; \
     upx --lzma --best /tmp/dufs; \
     mv /tmp/dufs /usr/local/bin/
 
-# ===== 安装 Sing-box =====
-ARG SING_BOX_VERSION="1.12.12"
-RUN set -ex; \
-    if [ -z "$SING_BOX_VERSION" ]; then \
-        SING_BOX_VERSION=$(curl -sSf https://github.com/SagerNet/sing-box/tags \
-            | grep "releases/tag/" | grep -Ev "rc|alpha|beta" \
-            | grep -o "[0-9]\+\.[0-9]\+\.[0-9]\+" | head -n 1); \
-    fi; \
-    curl -fsSL "https://github.com/SagerNet/sing-box/releases/download/v${SING_BOX_VERSION}/sing-box-${SING_BOX_VERSION}-linux-${TARGETARCH}.tar.gz" | tar --strip-components=1 -xzC /tmp/; \
-    upx --lzma --best /tmp/sing-box; \
-    mv /tmp/sing-box /usr/local/bin/
-
 # ===== 安装 cloudflared =====
 ARG CLOUDFLARED_VERSION="2025.11.1"
 RUN set -ex; \
@@ -81,8 +69,20 @@ RUN set -ex; \
   upx --lzma --best x-ui; \
   mv x-ui /usr/local/bin/
 
+# ===== 安装 Sing-box =====
+ARG SING_BOX_VERSION="1.12.12"
+RUN set -ex; \
+    if [ -z "$SING_BOX_VERSION" ]; then \
+        SING_BOX_VERSION=$(curl -sSf https://github.com/SagerNet/sing-box/tags \
+            | grep "releases/tag/" | grep -Ev "rc|alpha|beta" \
+            | grep -o "[0-9]\+\.[0-9]\+\.[0-9]\+" | head -n 1); \
+    fi; \
+    curl -fsSL "https://github.com/SagerNet/sing-box/releases/download/v${SING_BOX_VERSION}/sing-box-${SING_BOX_VERSION}-linux-${TARGETARCH}.tar.gz" | tar --strip-components=1 -xzC /tmp/; \
+    upx --lzma --best /tmp/sing-box; \
+    mv /tmp/sing-box /usr/local/bin/
+
 # ===== 安装 Xray =====
-ARG XRAY_VERSION="25.12.1"
+ARG XRAY_VERSION="25.12.2"
 RUN set -ex; \
     if [ -z "$XRAY_VERSION" ]; then \
         XRAY_VERSION=$(curl -sSf https://github.com/XTLS/Xray-core/tags \
