@@ -100,17 +100,9 @@ RUN set -ex; \
     unzip "${BINARY_FILE}"; \
     rm -f "${BINARY_FILE}" geoip.dat geosite.dat; \
     upx --lzma --best xray; \
-    curl -fsSLO https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geoip.dat; \
-    curl -fsSLO https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geosite.dat; \
-    curl -fsSLo geoip_IR.dat https://github.com/chocolate4u/Iran-v2ray-rules/releases/latest/download/geoip.dat; \
-    curl -fsSLo geosite_IR.dat https://github.com/chocolate4u/Iran-v2ray-rules/releases/latest/download/geosite.dat; \
-    curl -fsSLo geoip_RU.dat https://github.com/runetfreedom/russia-v2ray-rules-dat/releases/latest/download/geoip.dat; \
-    curl -fsSLo geosite_RU.dat https://github.com/runetfreedom/russia-v2ray-rules-dat/releases/latest/download/geosite.dat; \
     mkdir -p /usr/local/bin/bin; \
     mv xray /usr/local/bin/bin/xray-linux-${TARGETARCH}; \
-    mv *.dat /usr/local/bin/bin; \
-    ln -sf /usr/local/bin/bin/xray* /usr/local/bin/xray; \
-    ln -sf /usr/local/bin/bin/*.dat /usr/local/bin/
+    ln -sf /usr/local/bin/bin/xray* /usr/local/bin/xray;
 
 FROM docker.io/currycan/nginx:1.29.3
 

@@ -377,6 +377,9 @@ if [ "${1#-}" = 'supervisord' ] && [ "$(id -u)" = '0' ]; then
     source "/.env/xray"
     cat "/.env/xray"
 
+    log INFO "Updating GeoIP and GeoSite databases..."
+    /scripts/geo_update.sh
+
     log INFO "Obtaining SSL certificate..."
     # 证书类型映射表 (类型: [域名变量名,DNS服务商])
     declare -A CERT_TYPE_MAP=(
@@ -399,6 +402,17 @@ if [ "${1#-}" = 'supervisord' ] && [ "$(id -u)" = '0' ]; then
 
     log INFO "Starting fail2ban..."
     fail2ban-client -x start
+
+    # 配置定时任务
+    log INFO "Setting up cron job for geo update..."
+    CRON_FILE="/var/spool/cron/crontabs/root"
+    # 确保文件存在
+    touch "$CRON_FILE"
+    # 删除旧的 geo_update 任务（如果存在），避免重复
+    sed -i '/geo_update.sh/d' "$CRON_FILE"
+    # 追加新任务
+    echo "0 1 * * * /scripts/geo_update.sh >> /var/log/geo_update.log 2>&1" >> "$CRON_FILE"
+    chmod 0600 "$CRON_FILE"
 
     # 显示访问信息
     [[ ! -f "/usr/local/bin/show" ]] && ln -sf "/scripts/show-config.sh" "/usr/local/bin/show"
