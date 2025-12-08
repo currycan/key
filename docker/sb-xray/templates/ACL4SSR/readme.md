@@ -12,6 +12,9 @@ https://mylink.ansandy.site/sub?
 
 https://raw.githubusercontent.com/currycan/key/master/docker/sb-xray/templates/ACL4SSR/ACL4SSR_Online_Full.ini
 
+https://raw.githubusercontent.com/currycan/key/master/docker/sb-xray/templates/ACL4SSR/ACL4SSR_Online.ini
+
+
 ## Tailscale 设置
 
 [openwrt软路由安装tailscale - DEV Community](https://dev.to/dragon72463399/openwrtruan-lu-you-an-zhuang-tailscale-a7j)
