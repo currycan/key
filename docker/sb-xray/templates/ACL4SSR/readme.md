@@ -1,5 +1,7 @@
 # 说明
 
+[Google Emojis & Text | ⌕ ⋆.˚ 💻🔍🌐… | Copy & Paste](https://emojicombos.com/google)
+
 [ACL4SSR 在线订阅转换](https://acl4ssr-sub.github.io/)
 
 [zsokami/ACL4SSR: 自定义 订阅转换 配置转换 规则转换 的远程配置。正则匹配大小写、简繁体，更好地匹配中转、IPLC节点。自带旗帜 emoji 添加逻辑，原名不包含旗帜 emoji 才添加，原名已包含旗帜 emoji 则不添加。添加某些影视/动漫 APP 广告拦截规则（附 hosts 文件）。附无 DNS 泄漏配置。修改自 ACL4SSR\_Online\_Full.ini](https://github.com/zsokami/ACL4SSR)
