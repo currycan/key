@@ -5,40 +5,33 @@ proxy-providers:
 
 proxy-groups:
   # 功能分组
+  - name: 🎯 全球直连
+    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Direct.png
+    type: select
+    proxies:
+      - DIRECT
+  - name: 🛑 广告拦截
+    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/AdBlack.png
+    type: select
+    proxies:
+      - REJECT
   - name: 🚀 节点选择
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Static.png
     interval: 15
     lazy: true
     type: select
     proxies: &proxies
-      - ♻️ 自动选择
+      - 👍 VLESS
+      - 🧹 Hysteria2
+      - 🫧 VMess
       - 🛫 手动切换
-      - 🤖 relay
-      - 🔮 负载均衡
+      - ♻️ 自动选择
       - 🔯 故障转移
-      - ⚡ VLESS
-      - 🤡 Hysteria2
-      - 🔒 Shadowsocks
-      - 🛡️ Trojan
-      - 🌐 VMess
-      - 🇭🇰 HK 香港
-      - 🇨🇳 TW 台湾
-      - 🇸🇬 SG 新加坡
-      - 🇰🇷 KR 节点
-      - 🇯🇵 JP 日本
-      - 🇺🇲 US 美国
-      # - 🇩🇪 DE 德国
-      # - 🇬🇧 UK 英国
-      # - 🇫🇷 FR 法国
-      # - 🇮🇳 IN 印度
+      - 🔮 负载均衡
+      - 🇯🇵 日本节点
+      - 🇺🇲 美国节点
+      - 🇰🇷 韩国节点
       - 🎯 全球直连
-  - name: ♻️ 自动选择
-    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Auto.png
-    interval: 120
-    lazy: true
-    tolerance: 50
-    type: url-test
-    include-all: true
   - name: 🛫 手动切换
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Airport.png
     interval: 120
@@ -46,26 +39,12 @@ proxy-groups:
     tolerance: 50
     type: select
     include-all: true
-  # 代理的转发链, 在 proxies 中不应该包含 relay. 不支持 UDP.
-  # 流量: clash <-> VLESS <-> Hysteria2 <-> Shadowsocks <-> Trojan <-> VMess <-> 互联网
-  - name: 🤖 relay
-    type: relay
-    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Ryan.png
-    benchmark-url: http://www.apple.com # 建议只使用HTTP协议
-    benchmark-timeout: 5 # 延迟测试超时，单位：秒
-    proxies:
-      - ⚡ VLESS
-      # - 🤡 Hysteria2
-      # - 🔒 Shadowsocks
-      - 🛡️ Trojan
-      # - 🌐 VMess
-  - name: 🔮 负载均衡
-    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Qure.png
+  - name: ♻️ 自动选择
+    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Auto.png
     interval: 120
     lazy: true
     tolerance: 50
-    type: load-balance
-    strategy: consistent-hashing
+    type: url-test
     include-all: true
   - name: 🔯 故障转移
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Star.png
@@ -74,33 +53,80 @@ proxy-groups:
     tolerance: 50
     type: fallback
     include-all: true
-  - name: 🎯 全球直连
-    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Direct.png
+  - name: 🔮 负载均衡
+    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Qure.png
+    interval: 120
+    lazy: true
+    tolerance: 50
+    type: load-balance
+    strategy: consistent-hashing
+    include-all: true
+  - name: 🤖 Ai平台
+    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/ChatGPT.png
+    interval: 120
+    lazy: true
+    tolerance: 50
     type: select
     proxies:
-      - DIRECT
+      - 🇺🇲 美国节点
+      - 🚀 节点选择
+      - ♻️ 自动选择
+      - 🛫 手动切换
+      - 🇯🇵 日本节点
+      - 🇰🇷 韩国节点
+  - name: 📦 Github
+    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/GitHub.png
+    interval: 120
+    lazy: true
+    tolerance: 50
+    type: select
+    proxies:
+      - 🇺🇲 美国节点
+      - 🚀 节点选择
+      - ♻️ 自动选择
+      - 🛫 手动切换
+      - 🇯🇵 日本节点
+      - 🇰🇷 韩国节点
   - name: 🍒 TikTok
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Media.png
     type: select
     proxies:
-      - 🇰🇷 KR 节点
+      - 🇰🇷 韩国节点
       - 🚀 节点选择
       - ♻️ 自动选择
       - 🛫 手动切换
-  - name: 🧚 AI
-    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/ChatGPT.png
-    type: select
-    proxies:
-      - 🚀 节点选择
-      - ♻️ 自动选择
-      - 🛫 手动切换
-  - name: 📺 Netflix
+      - 🇯🇵 日本节点
+      - 🇺🇲 美国节点
+  - name: 🍿 Netflix
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Netflix.png
     type: select
     proxies:
       - 🚀 节点选择
       - ♻️ 自动选择
       - 🛫 手动切换
+      - 🇯🇵 日本节点
+      - 🇺🇲 美国节点
+      - 🇰🇷 韩国节点
+  - name: ▶️ Youtube
+    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/YouTube.png
+    type: select
+    proxies:
+      - 🚀 节点选择
+      - ♻️ 自动选择
+      - 🛫 手动切换
+      - 🇯🇵 日本节点
+      - 🇺🇲 美国节点
+      - 🇰🇷 韩国节点
+  - name: 📲 电报消息
+    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Telegram_X.png
+    type: select
+    proxies:
+      - 🚀 节点选择
+      - ♻️ 自动选择
+      - 🛫 手动切换
+      - 🇯🇵 日本节点
+      - 🇺🇲 美国节点
+      - 🇰🇷 韩国节点
   - name: 🌍 国外媒体
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Streaming.png
     type: select
@@ -108,69 +134,84 @@ proxy-groups:
       - 🚀 节点选择
       - ♻️ 自动选择
       - 🛫 手动切换
-  - name: 📹 国内媒体
+      - 🇯🇵 日本节点
+      - 🇺🇲 美国节点
+      - 🇰🇷 韩国节点
+  - name: 🌏 国内媒体
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/CN.png
     type: select
     proxies:
       - 🎯 全球直连
-      - 🇭🇰 HK 香港
-      - 🇨🇳 TW 台湾
+      - 🛫 手动切换
   - name: 🎮 游戏平台
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Game.png
     type: select
     proxies:
-      - 🎯 全球直连
       - 🚀 节点选择
       - ♻️ 自动选择
       - 🛫 手动切换
-  - name: 🛑 广告拦截
-    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/AdBlack.png
-    type: select
-    proxies:
-      - REJECT
-      - 🎯 全球直连
+      - 🇯🇵 日本节点
+      - 🇺🇲 美国节点
+      - 🇰🇷 韩国节点
   - name: 🐟 漏网之鱼
     icon: https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/1f41f.png
     type: select
     proxies:
-      - ♻️ 自动选择
       - 🚀 节点选择
+      - ♻️ 自动选择
+      - 🛫 手动切换
+      - 👍 VLESS
+      - 🧹 Hysteria2
+      - 🫧 VMess
       - 🎯 全球直连
 
+
+  # 基于协议分组
+  - name: 👍 VLESS
+    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Heart.png
+    type: select
+    filter: "(?i)vless|Reality"
+    interval: 300
+    tolerance: 50
+    lazy: true
+    include-all: true
+  - name: 🫧 VMess
+    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Download.png
+    filter: "(?i)vmess"
+    type: select
+    interval: 300
+    tolerance: 50
+    lazy: true
+    include-all: true
+  - name: 🧹 Hysteria2
+    filter: "(?i)hysteria2|hy2"
+    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Rocket.png
+    type: select
+    interval: 300
+    tolerance: 50
+    lazy: true
+    include-all: true
+  # - name: 🗽 TUIC
+  #   filter: "(?i)tuic"
+  #   icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Magic.png
+  #   type: select
+  #   interval: 300
+  #   tolerance: 50
+  #   lazy: true
+  #   include-all: true
+
+    # - name: 🎭 AnyTLS
+    #   filter: "(?i)anytls"
+    #   icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Lock.png
+    #   type: select
+    #   interval: 300
+    #   tolerance: 50
+    #   lazy: true
+    #   include-all: true
+
+
   # 基于地区分组
-  - name: 🇭🇰 HK 香港
-    filter: "香港|HK|(?i)Hong"
-    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Hong_Kong.png
-    interval: 120
-    lazy: true
-    tolerance: 50
-    type: url-test
-    include-all: true
-  - name: 🇨🇳 TW 台湾
-    filter: "台|🇹🇼|湾|TW|(?i)Taiwan"
-    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Taiwan.png
-    interval: 120
-    lazy: true
-    tolerance: 50
-    type: url-test
-    include-all: true
-  - name: 🇸🇬 SG 新加坡
-    filter: "新加坡|坡|狮城|🇸🇬|SG|(?i)Singapore"
-    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Singapore.png
-    interval: 120
-    lazy: true
-    tolerance: 50
-    type: url-test
-    include-all: true
-  - name: 🇰🇷 KR 节点
-    filter: "韩|🇰🇷|KR|(?i)Korea"
-    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Korea.png
-    interval: 120
-    lazy: true
-    tolerance: 50
-    type: url-test
-    include-all: true
-  - name: 🇯🇵 JP 日本
+  - name: 🇯🇵 日本节点
     filter: "日|🇯🇵|东京|JP|(?i)Japan"
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Japan.png
     interval: 120
@@ -178,7 +219,7 @@ proxy-groups:
     tolerance: 50
     type: url-test
     include-all: true
-  - name: 🇺🇲 US 美国
+  - name: 🇺🇲 美国节点
     filter: "美|🇺🇲|US|(?i)States|American"
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/United_States.png
     interval: 120
@@ -186,141 +227,398 @@ proxy-groups:
     tolerance: 50
     type: url-test
     include-all: true
-  # - name: 🇩🇪 DE 德国
-  #   filter: "德|🇩🇪|DE|(?i)Germany"
-  #   icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Germany.png
+  - name: 🇰🇷 韩国节点
+    filter: "韩|🇰🇷|KR|(?i)Korea"
+    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Korea.png
+    interval: 120
+    lazy: true
+    tolerance: 50
+    type: url-test
+    include-all: true
+  - name: 🇭🇰 香港节点
+    filter: "香港|HK|(?i)Hong"
+    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Hong_Kong.png
+    interval: 120
+    lazy: true
+    tolerance: 50
+    type: url-test
+    include-all: true
+  # - name: 🇨🇳 台湾节点
+  #   filter: "台|🇹🇼|湾|TW|(?i)Taiwan"
+  #   icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Taiwan.png
   #   interval: 120
   #   lazy: true
   #   tolerance: 50
   #   type: url-test
   #   include-all: true
-  # - name: 🇬🇧 UK 英国
-  #   filter: "英|🇬🇧|UK|(?i)Britain|(?i)England"
-  #   icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/United_Kingdom.png
-  #   interval: 120
-  #   lazy: true
-  #   tolerance: 50
-  #   type: url-test
-  #   include-all: true
-  # - name: 🇫🇷 FR 法国
-  #   filter: "法|🇫🇷|FR|(?i)France"
-  #   icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/France.png
-  #   interval: 120
-  #   lazy: true
-  #   tolerance: 50
-  #   type: url-test
-  #   include-all: true
-  # - name: 🇮🇳 IN 印度
-  #   filter: "印|🇮🇳|IN|(?i)India"
-  #   icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/India.png
+  # - name: 🇸🇬 新加坡节点
+  #   filter: "新加坡|坡|狮城|🇸🇬|SG|(?i)Singapore"
+  #   icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Singapore.png
   #   interval: 120
   #   lazy: true
   #   tolerance: 50
   #   type: url-test
   #   include-all: true
 
-  # 基于协议分组
-  - name: ⚡ VLESS
-    filter: "(?i)vless|Reality"
-    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Download.png
-    type: url-test
-    interval: 300
-    tolerance: 50
-    lazy: true
-    include-all: true
-  - name: 🤡 Hysteria2
-    filter: "(?i)hysteria2|hy2"
-    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Rocket.png
-    type: url-test
-    interval: 300
-    tolerance: 50
-    lazy: true
-    include-all: true
-  # - name: 🦄 TUIC
-  #   filter: "(?i)tuic"
-  #   icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Magic.png
-  #   type: url-test
-  #   interval: 300
-  #   tolerance: 50
-  #   lazy: true
-  #   include-all: true
-  - name: 🔒 Shadowsocks
-    filter: "(?i)shadow|-ss"
-    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Cydia.png
-    type: url-test
-    interval: 300
-    tolerance: 50
-    lazy: true
-    include-all: true
-  - name: 🛡️ Trojan
-    filter: "(?i)trojan"
-    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Filter.png
-    type: url-test
-    interval: 300
-    tolerance: 50
-    lazy: true
-    include-all: true
-  - name: 🌐 VMess
-    filter: "(?i)vmess"
-    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Heart.png
-    type: url-test
-    interval: 300
-    tolerance: 50
-    lazy: true
-    include-all: true
-    # - name: 🔐 AnyTLS
-    #   filter: "(?i)anytls"
-    #   icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Lock.png
-    #   type: url-test
-    #   interval: 300
-    #   tolerance: 50
-    #   lazy: true
-    #   include-all: true
+
+
+rule-providers:
+  BanProgramAD1 (Domain):
+    type: http
+    behavior: domain
+    url: "https://sub.koyeb.app/getruleset?type=3&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL3pzb2thbWkvQUNMNFNTUi9tYWluL0JhblByb2dyYW1BRDEubGlzdA"
+    path: ./providers/6173259271625813138_domain.yaml
+    interval: 86400
+  BanAD (Domain):
+    type: http
+    behavior: domain
+    url: "https://sub.koyeb.app/getruleset?type=3&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvQmFuQUQubGlzdA"
+    path: ./providers/5345470858595246832_domain.yaml
+    interval: 86400
+  BanProgramAD (Domain):
+    type: http
+    behavior: domain
+    url: "https://sub.koyeb.app/getruleset?type=3&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvQmFuUHJvZ3JhbUFELmxpc3Q"
+    path: ./providers/12627286518854712958_domain.yaml
+    interval: 86400
+  BanProgramAD (IP-CIDR):
+    type: http
+    behavior: ipcidr
+    url: "https://sub.koyeb.app/getruleset?type=4&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvQmFuUHJvZ3JhbUFELmxpc3Q"
+    path: ./providers/12627286518854712958_ipcidr.yaml
+    interval: 86400
+  BanEasyList (Domain):
+    type: http
+    behavior: domain
+    url: "https://sub.koyeb.app/getruleset?type=3&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvQmFuRWFzeUxpc3QubGlzdA"
+    path: ./providers/7984683288196514873_domain.yaml
+    interval: 86400
+  BanEasyList (IP-CIDR):
+    type: http
+    behavior: ipcidr
+    url: "https://sub.koyeb.app/getruleset?type=4&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvQmFuRWFzeUxpc3QubGlzdA"
+    path: ./providers/7984683288196514873_ipcidr.yaml
+    interval: 86400
+  BanEasyListChina (Domain):
+    type: http
+    behavior: domain
+    url: "https://sub.koyeb.app/getruleset?type=3&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvQmFuRWFzeUxpc3RDaGluYS5saXN0"
+    path: ./providers/1547920301658357570_domain.yaml
+    interval: 86400
+  BanEasyListChina (IP-CIDR):
+    type: http
+    behavior: ipcidr
+    url: "https://sub.koyeb.app/getruleset?type=4&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvQmFuRWFzeUxpc3RDaGluYS5saXN0"
+    path: ./providers/1547920301658357570_ipcidr.yaml
+    interval: 86400
+  Advertising (Domain):
+    type: http
+    behavior: domain
+    url: "https://sub.koyeb.app/getruleset?type=3&url=aHR0cHM6Ly9jZG4uanNkZWxpdnIubmV0L2doL2JsYWNrbWF0cml4Ny9pb3NfcnVsZV9zY3JpcHRAbWFzdGVyL3J1bGUvQ2xhc2gvQWR2ZXJ0aXNpbmcvQWR2ZXJ0aXNpbmcubGlzdA"
+    path: ./providers/3250201892755691665_domain.yaml
+    interval: 86400
+  Advertising (IP-CIDR):
+    type: http
+    behavior: ipcidr
+    url: "https://sub.koyeb.app/getruleset?type=4&url=aHR0cHM6Ly9jZG4uanNkZWxpdnIubmV0L2doL2JsYWNrbWF0cml4Ny9pb3NfcnVsZV9zY3JpcHRAbWFzdGVyL3J1bGUvQ2xhc2gvQWR2ZXJ0aXNpbmcvQWR2ZXJ0aXNpbmcubGlzdA"
+    path: ./providers/3250201892755691665_ipcidr.yaml
+    interval: 86400
+  Hijacking (Domain):
+    type: http
+    behavior: domain
+    url: "https://sub.koyeb.app/getruleset?type=3&url=aHR0cHM6Ly9jZG4uanNkZWxpdnIubmV0L2doL2JsYWNrbWF0cml4Ny9pb3NfcnVsZV9zY3JpcHRAbWFzdGVyL3J1bGUvQ2xhc2gvSGlqYWNraW5nL0hpamFja2luZy5saXN0"
+    path: ./providers/18410151021040566953_domain.yaml
+    interval: 86400
+  Hijacking (IP-CIDR):
+    type: http
+    behavior: ipcidr
+    url: "https://sub.koyeb.app/getruleset?type=4&url=aHR0cHM6Ly9jZG4uanNkZWxpdnIubmV0L2doL2JsYWNrbWF0cml4Ny9pb3NfcnVsZV9zY3JpcHRAbWFzdGVyL3J1bGUvQ2xhc2gvSGlqYWNraW5nL0hpamFja2luZy5saXN0"
+    path: ./providers/18410151021040566953_ipcidr.yaml
+    interval: 86400
+  Privacy (Domain):
+    type: http
+    behavior: domain
+    url: "https://sub.koyeb.app/getruleset?type=3&url=aHR0cHM6Ly9jZG4uanNkZWxpdnIubmV0L2doL2JsYWNrbWF0cml4Ny9pb3NfcnVsZV9zY3JpcHRAbWFzdGVyL3J1bGUvQ2xhc2gvUHJpdmFjeS9Qcml2YWN5Lmxpc3Q"
+    path: ./providers/1511080090493608493_domain.yaml
+    interval: 86400
+  Privacy (IP-CIDR):
+    type: http
+    behavior: ipcidr
+    url: "https://sub.koyeb.app/getruleset?type=4&url=aHR0cHM6Ly9jZG4uanNkZWxpdnIubmV0L2doL2JsYWNrbWF0cml4Ny9pb3NfcnVsZV9zY3JpcHRAbWFzdGVyL3J1bGUvQ2xhc2gvUHJpdmFjeS9Qcml2YWN5Lmxpc3Q"
+    path: ./providers/1511080090493608493_ipcidr.yaml
+    interval: 86400
+  AdGuardSDNSFilter (Domain):
+    type: http
+    behavior: domain
+    url: "https://sub.koyeb.app/getruleset?type=3&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2JsYWNrbWF0cml4Ny9pb3NfcnVsZV9zY3JpcHQvbWFzdGVyL3J1bGUvQ2xhc2gvQWRHdWFyZFNETlNGaWx0ZXIvQWRHdWFyZFNETlNGaWx0ZXIubGlzdA"
+    path: ./providers/5854820330617275891_domain.yaml
+    interval: 86400
+  EasyPrivacy (Domain):
+    type: http
+    behavior: domain
+    url: "https://sub.koyeb.app/getruleset?type=3&url=aHR0cHM6Ly9jZG4uanNkZWxpdnIubmV0L2doL2JsYWNrbWF0cml4Ny9pb3NfcnVsZV9zY3JpcHRAbWFzdGVyL3J1bGUvQ2xhc2gvRWFzeVByaXZhY3kvRWFzeVByaXZhY3kubGlzdA"
+    path: ./providers/6137925603980307349_domain.yaml
+    interval: 86400
+  BlockHttpDNS (Domain):
+    type: http
+    behavior: domain
+    url: "https://sub.koyeb.app/getruleset?type=3&url=aHR0cHM6Ly9jZG4uanNkZWxpdnIubmV0L2doL2JsYWNrbWF0cml4Ny9pb3NfcnVsZV9zY3JpcHRAbWFzdGVyL3J1bGUvQ2xhc2gvQmxvY2tIdHRwRE5TL0Jsb2NrSHR0cEROUy5saXN0"
+    path: ./providers/3452236464567388431_domain.yaml
+    interval: 86400
+  BlockHttpDNS (IP-CIDR):
+    type: http
+    behavior: ipcidr
+    url: "https://sub.koyeb.app/getruleset?type=4&url=aHR0cHM6Ly9jZG4uanNkZWxpdnIubmV0L2doL2JsYWNrbWF0cml4Ny9pb3NfcnVsZV9zY3JpcHRAbWFzdGVyL3J1bGUvQ2xhc2gvQmxvY2tIdHRwRE5TL0Jsb2NrSHR0cEROUy5saXN0"
+    path: ./providers/3452236464567388431_ipcidr.yaml
+    interval: 86400
+  ChinaMedia (Domain):
+    type: http
+    behavior: domain
+    url: "https://sub.koyeb.app/getruleset?type=3&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvQ2hpbmFNZWRpYS5saXN0"
+    path: ./providers/6311591946191099983_domain.yaml
+    interval: 86400
+  ChinaMedia (IP-CIDR):
+    type: http
+    behavior: ipcidr
+    url: "https://sub.koyeb.app/getruleset?type=4&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvQ2hpbmFNZWRpYS5saXN0"
+    path: ./providers/6311591946191099983_ipcidr.yaml
+    interval: 86400
+  LocalAreaNetwork (Domain):
+    type: http
+    behavior: domain
+    url: "https://sub.koyeb.app/getruleset?type=3&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvTG9jYWxBcmVhTmV0d29yay5saXN0"
+    path: ./providers/7156953299935574564_domain.yaml
+    interval: 86400
+  LocalAreaNetwork (IP-CIDR):
+    type: http
+    behavior: ipcidr
+    url: "https://sub.koyeb.app/getruleset?type=4&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvTG9jYWxBcmVhTmV0d29yay5saXN0"
+    path: ./providers/7156953299935574564_ipcidr.yaml
+    interval: 86400
+  ChinaIPs (IP-CIDR):
+    type: http
+    behavior: ipcidr
+    url: "https://sub.koyeb.app/getruleset?type=4&url=aHR0cHM6Ly9jZG4uanNkZWxpdnIubmV0L2doL2JsYWNrbWF0cml4Ny9pb3NfcnVsZV9zY3JpcHRAbWFzdGVyL3J1bGUvU3VyZ2UvQ2hpbmFJUHMvQ2hpbmFJUHMubGlzdA"
+    path: ./providers/13827040339102188340_ipcidr.yaml
+    interval: 86400
+  ChinaDNS (Domain):
+    type: http
+    behavior: domain
+    url: "https://sub.koyeb.app/getruleset?type=3&url=aHR0cHM6Ly9jZG4uanNkZWxpdnIubmV0L2doL2JsYWNrbWF0cml4Ny9pb3NfcnVsZV9zY3JpcHRAbWFzdGVyL3J1bGUvQ2xhc2gvQ2hpbmFETlMvQ2hpbmFETlMubGlzdA"
+    path: ./providers/7614443458375883975_domain.yaml
+    interval: 86400
+  ChinaDNS (IP-CIDR):
+    type: http
+    behavior: ipcidr
+    url: "https://sub.koyeb.app/getruleset?type=4&url=aHR0cHM6Ly9jZG4uanNkZWxpdnIubmV0L2doL2JsYWNrbWF0cml4Ny9pb3NfcnVsZV9zY3JpcHRAbWFzdGVyL3J1bGUvQ2xhc2gvQ2hpbmFETlMvQ2hpbmFETlMubGlzdA"
+    path: ./providers/7614443458375883975_ipcidr.yaml
+    interval: 86400
+  China (Domain):
+    type: http
+    behavior: domain
+    url: "https://sub.koyeb.app/getruleset?type=3&url=aHR0cHM6Ly9jZG4uanNkZWxpdnIubmV0L2doL2JsYWNrbWF0cml4Ny9pb3NfcnVsZV9zY3JpcHRAbWFzdGVyL3J1bGUvQ2xhc2gvQ2hpbmEvQ2hpbmEubGlzdA"
+    path: ./providers/14554867306680425917_domain.yaml
+    interval: 86400
+  China (IP-CIDR):
+    type: http
+    behavior: ipcidr
+    url: "https://sub.koyeb.app/getruleset?type=4&url=aHR0cHM6Ly9jZG4uanNkZWxpdnIubmV0L2doL2JsYWNrbWF0cml4Ny9pb3NfcnVsZV9zY3JpcHRAbWFzdGVyL3J1bGUvQ2xhc2gvQ2hpbmEvQ2hpbmEubGlzdA"
+    path: ./providers/14554867306680425917_ipcidr.yaml
+    interval: 86400
+  Direct (Domain):
+    type: http
+    behavior: domain
+    url: "https://sub.koyeb.app/getruleset?type=3&url=aHR0cHM6Ly9jZG4uanNkZWxpdnIubmV0L2doL2JsYWNrbWF0cml4Ny9pb3NfcnVsZV9zY3JpcHRAbWFzdGVyL3J1bGUvQ2xhc2gvRGlyZWN0L0RpcmVjdC5saXN0"
+    path: ./providers/18048151772316621409_domain.yaml
+    interval: 86400
+  UnBan (Domain):
+    type: http
+    behavior: domain
+    url: "https://sub.koyeb.app/getruleset?type=3&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvVW5CYW4ubGlzdA"
+    path: ./providers/7573362162235439048_domain.yaml
+    interval: 86400
+  UnBan1 (Domain):
+    type: http
+    behavior: domain
+    url: "https://sub.koyeb.app/getruleset?type=3&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL3pzb2thbWkvQUNMNFNTUi9tYWluL1VuQmFuMS5saXN0"
+    path: ./providers/6867818846410615414_domain.yaml
+    interval: 86400
+  ChinaOnly (Domain):
+    type: http
+    behavior: domain
+    url: "https://sub.koyeb.app/getruleset?type=3&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL3pzb2thbWkvQUNMNFNTUi9tYWluL0NoaW5hT25seS5saXN0"
+    path: ./providers/7276131223849330222_domain.yaml
+    interval: 86400
+  SteamCN (Domain):
+    type: http
+    behavior: domain
+    url: "https://sub.koyeb.app/getruleset?type=3&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvUnVsZXNldC9TdGVhbUNOLmxpc3Q"
+    path: ./providers/9218514496462299588_domain.yaml
+    interval: 86400
+  ChinaDomain (Domain):
+    type: http
+    behavior: domain
+    url: "https://sub.koyeb.app/getruleset?type=3&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvQ2hpbmFEb21haW4ubGlzdA"
+    path: ./providers/4162648423616508953_domain.yaml
+    interval: 86400
+  ChinaDomain (IP-CIDR):
+    type: http
+    behavior: ipcidr
+    url: "https://sub.koyeb.app/getruleset?type=4&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvQ2hpbmFEb21haW4ubGlzdA"
+    path: ./providers/4162648423616508953_ipcidr.yaml
+    interval: 86400
+  ChinaCompanyIp (IP-CIDR):
+    type: http
+    behavior: ipcidr
+    url: "https://sub.koyeb.app/getruleset?type=4&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvQ2hpbmFDb21wYW55SXAubGlzdA"
+    path: ./providers/2560834305431378741_ipcidr.yaml
+    interval: 86400
+  Download (Domain):
+    type: http
+    behavior: domain
+    url: "https://sub.koyeb.app/getruleset?type=3&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvRG93bmxvYWQubGlzdA"
+    path: ./providers/892107463922605120_domain.yaml
+    interval: 86400
+  Epic (Domain):
+    type: http
+    behavior: domain
+    url: "https://sub.koyeb.app/getruleset?type=3&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvUnVsZXNldC9FcGljLmxpc3Q"
+    path: ./providers/2002866050337731182_domain.yaml
+    interval: 86400
+  Origin (Domain):
+    type: http
+    behavior: domain
+    url: "https://sub.koyeb.app/getruleset?type=3&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvUnVsZXNldC9PcmlnaW4ubGlzdA"
+    path: ./providers/8760189456110913115_domain.yaml
+    interval: 86400
+  Sony (Domain):
+    type: http
+    behavior: domain
+    url: "https://sub.koyeb.app/getruleset?type=3&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvUnVsZXNldC9Tb255Lmxpc3Q"
+    path: ./providers/6043895292220349504_domain.yaml
+    interval: 86400
+  Steam (Domain):
+    type: http
+    behavior: domain
+    url: "https://sub.koyeb.app/getruleset?type=3&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvUnVsZXNldC9TdGVhbS5saXN0"
+    path: ./providers/1173690015095316719_domain.yaml
+    interval: 86400
+  Nintendo (Domain):
+    type: http
+    behavior: domain
+    url: "https://sub.koyeb.app/getruleset?type=3&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvUnVsZXNldC9OaW50ZW5kby5saXN0"
+    path: ./providers/8436305167591952502_domain.yaml
+    interval: 86400
+  AI (Domain):
+    type: http
+    behavior: domain
+    url: "https://sub.koyeb.app/getruleset?type=3&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvUnVsZXNldC9BSS5saXN0"
+    path: ./providers/7329684518282624683_domain.yaml
+    interval: 86400
+  GitHub (Domain):
+    type: http
+    behavior: domain
+    url: "https://sub.koyeb.app/getruleset?type=3&url=aHR0cHM6Ly9jZG4uanNkZWxpdnIubmV0L2doL2JsYWNrbWF0cml4Ny9pb3NfcnVsZV9zY3JpcHRAbWFzdGVyL3J1bGUvQ2xhc2gvR2l0SHViL0dpdEh1Yi5saXN0"
+    path: ./providers/1847193322117767149_domain.yaml
+    interval: 86400
+  TikTok (Domain):
+    type: http
+    behavior: domain
+    url: "https://sub.koyeb.app/getruleset?type=3&url=aHR0cHM6Ly9jZG4uanNkZWxpdnIubmV0L2doL2JsYWNrbWF0cml4Ny9pb3NfcnVsZV9zY3JpcHRAbWFzdGVyL3J1bGUvQ2xhc2gvVGlrVG9rL1Rpa1Rvay5saXN0"
+    path: ./providers/12274975154429114715_domain.yaml
+    interval: 86400
+  Netflix (Domain):
+    type: http
+    behavior: domain
+    url: "https://sub.koyeb.app/getruleset?type=3&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvUnVsZXNldC9OZXRmbGl4Lmxpc3Q"
+    path: ./providers/6953567076524950087_domain.yaml
+    interval: 86400
+  Netflix (IP-CIDR):
+    type: http
+    behavior: ipcidr
+    url: "https://sub.koyeb.app/getruleset?type=4&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvUnVsZXNldC9OZXRmbGl4Lmxpc3Q"
+    path: ./providers/6953567076524950087_ipcidr.yaml
+    interval: 86400
+  YouTube (Domain):
+    type: http
+    behavior: domain
+    url: "https://sub.koyeb.app/getruleset?type=3&url=aHR0cHM6Ly9jZG4uanNkZWxpdnIubmV0L2doL2JsYWNrbWF0cml4Ny9pb3NfcnVsZV9zY3JpcHRAbWFzdGVyL3J1bGUvQ2xhc2gvWW91VHViZS9Zb3VUdWJlLmxpc3Q"
+    path: ./providers/17615167881516852173_domain.yaml
+    interval: 86400
+  YouTube (IP-CIDR):
+    type: http
+    behavior: ipcidr
+    url: "https://sub.koyeb.app/getruleset?type=4&url=aHR0cHM6Ly9jZG4uanNkZWxpdnIubmV0L2doL2JsYWNrbWF0cml4Ny9pb3NfcnVsZV9zY3JpcHRAbWFzdGVyL3J1bGUvQ2xhc2gvWW91VHViZS9Zb3VUdWJlLmxpc3Q"
+    path: ./providers/17615167881516852173_ipcidr.yaml
+    interval: 86400
+  YouTubeMusic (Domain):
+    type: http
+    behavior: domain
+    url: "https://sub.koyeb.app/getruleset?type=3&url=aHR0cHM6Ly9jZG4uanNkZWxpdnIubmV0L2doL2JsYWNrbWF0cml4Ny9pb3NfcnVsZV9zY3JpcHRAbWFzdGVyL3J1bGUvQ2xhc2gvWW91VHViZU11c2ljL1lvdVR1YmVNdXNpYy5saXN0"
+    path: ./providers/9712910775996727615_domain.yaml
+    interval: 86400
+  Telegram (Domain):
+    type: http
+    behavior: domain
+    url: "https://sub.koyeb.app/getruleset?type=3&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvVGVsZWdyYW0ubGlzdA"
+    path: ./providers/6502624741183612233_domain.yaml
+    interval: 86400
+  Telegram (IP-CIDR):
+    type: http
+    behavior: ipcidr
+    url: "https://sub.koyeb.app/getruleset?type=4&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvVGVsZWdyYW0ubGlzdA"
+    path: ./providers/6502624741183612233_ipcidr.yaml
+    interval: 86400
+  ProxyMedia (Domain):
+    type: http
+    behavior: domain
+    url: "https://sub.koyeb.app/getruleset?type=3&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvUHJveHlNZWRpYS5saXN0"
+    path: ./providers/11865208451954205364_domain.yaml
+    interval: 86400
+  ProxyMedia (IP-CIDR):
+    type: http
+    behavior: ipcidr
+    url: "https://sub.koyeb.app/getruleset?type=4&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvUHJveHlNZWRpYS5saXN0"
+    path: ./providers/11865208451954205364_ipcidr.yaml
+    interval: 86400
+  GlobalMedia (Domain):
+    type: http
+    behavior: domain
+    url: "https://sub.koyeb.app/getruleset?type=3&url=aHR0cHM6Ly9jZG4uanNkZWxpdnIubmV0L2doL2JsYWNrbWF0cml4Ny9pb3NfcnVsZV9zY3JpcHRAbWFzdGVyL3J1bGUvQ2xhc2gvR2xvYmFsTWVkaWEvR2xvYmFsTWVkaWEubGlzdA"
+    path: ./providers/1066734618065479657_domain.yaml
+    interval: 86400
+  GlobalMedia (IP-CIDR):
+    type: http
+    behavior: ipcidr
+    url: "https://sub.koyeb.app/getruleset?type=4&url=aHR0cHM6Ly9jZG4uanNkZWxpdnIubmV0L2doL2JsYWNrbWF0cml4Ny9pb3NfcnVsZV9zY3JpcHRAbWFzdGVyL3J1bGUvQ2xhc2gvR2xvYmFsTWVkaWEvR2xvYmFsTWVkaWEubGlzdA"
+    path: ./providers/1066734618065479657_ipcidr.yaml
+    interval: 86400
+  ProxyGFWlist (Domain):
+    type: http
+    behavior: domain
+    url: "https://sub.koyeb.app/getruleset?type=3&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvUHJveHlHRldsaXN0Lmxpc3Q"
+    path: ./providers/1518598190744914170_domain.yaml
+    interval: 86400
+  ProxyGFWlist (IP-CIDR):
+    type: http
+    behavior: ipcidr
+    url: "https://sub.koyeb.app/getruleset?type=4&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvUHJveHlHRldsaXN0Lmxpc3Q"
+    path: ./providers/1518598190744914170_ipcidr.yaml
+    interval: 86400
+  Global (Domain):
+    type: http
+    behavior: domain
+    url: "https://sub.koyeb.app/getruleset?type=3&url=aHR0cHM6Ly9jZG4uanNkZWxpdnIubmV0L2doL2JsYWNrbWF0cml4Ny9pb3NfcnVsZV9zY3JpcHRAbWFzdGVyL3J1bGUvQ2xhc2gvR2xvYmFsL0dsb2JhbC5saXN0"
+    path: ./providers/8599660501690319653_domain.yaml
+    interval: 86400
+  Global (IP-CIDR):
+    type: http
+    behavior: ipcidr
+    url: "https://sub.koyeb.app/getruleset?type=4&url=aHR0cHM6Ly9jZG4uanNkZWxpdnIubmV0L2doL2JsYWNrbWF0cml4Ny9pb3NfcnVsZV9zY3JpcHRAbWFzdGVyL3J1bGUvQ2xhc2gvR2xvYmFsL0dsb2JhbC5saXN0"
+    path: ./providers/8599660501690319653_ipcidr.yaml
+    interval: 86400
 rules:
-  - RULE-SET,LocalAreaNetwork_domain,🎯 全球直连
-  - RULE-SET,LocalAreaNetwork_ipcidr,🎯 全球直连
-  - RULE-SET,Download,🎯 全球直连
-  - RULE-SET,SteamCN,🎯 全球直连
-  - RULE-SET,SteamCN_domain,🎯 全球直连
-  - RULE-SET,Unbreak_domain,🎯 全球直连
-  - RULE-SET,UnBan_domain,🎯 全球直连
-  - RULE-SET,China_domain,🎯 全球直连
-  - RULE-SET,China_ipcidr,🎯 全球直连
-  - RULE-SET,Lan,🎯 全球直连
-  - DOMAIN-KEYWORD,tagss,🎯 全球直连
-  - DOMAIN-KEYWORD,aria2,🎯 全球直连
-  - DOMAIN-KEYWORD,xunlei,🎯 全球直连
-  - DOMAIN-KEYWORD,yunpan,🎯 全球直连
-  - DOMAIN-KEYWORD,Thunder,🎯 全球直连
-  - DOMAIN-KEYWORD,XLLiveUD,🎯 全球直连
-  - DOMAIN-KEYWORD,360buy,🎯 全球直连
-  - DOMAIN-KEYWORD,alicdn,🎯 全球直连
-  - DOMAIN-KEYWORD,alimama,🎯 全球直连
-  - DOMAIN-KEYWORD,alipay,🎯 全球直连
-  - DOMAIN-KEYWORD,appzapp,🎯 全球直连
-  - DOMAIN-KEYWORD,baidupcs,🎯 全球直连
-  - DOMAIN-KEYWORD,bilibili,🎯 全球直连
-  - DOMAIN-KEYWORD,ccgslb,🎯 全球直连
-  - DOMAIN-KEYWORD,chinacache,🎯 全球直连
-  - DOMAIN-KEYWORD,duobao,🎯 全球直连
-  - DOMAIN-KEYWORD,jdpay,🎯 全球直连
-  - DOMAIN-KEYWORD,moke,🎯 全球直连
-  - DOMAIN-KEYWORD,qhimg,🎯 全球直连
-  - DOMAIN-KEYWORD,vpimg,🎯 全球直连
-  - DOMAIN-KEYWORD,xiami,🎯 全球直连
-  - DOMAIN-KEYWORD,xiaomi,🎯 全球直连
-  - RULE-SET,Inside_domain,🎯 全球直连
-  - RULE-SET,Inside_ipcidr,🎯 全球直连
-  - RULE-SET,ChinaDomain_domain,🎯 全球直连
-  - RULE-SET,ChinaDomain_ipcidr,🎯 全球直连
-  - RULE-SET,ChinaCompanyIp_ipcidr,🎯 全球直连
-  - RULE-SET,rule-provider,🎯 全球直连
-
-  - RULE-SET,AdRule_domain,🛑 广告拦截
-  - RULE-SET,AdRule_ipcidr,🛑 广告拦截
-  - RULE-SET,Hijacking_domain,🛑 广告拦截
-  - RULE-SET,Hijacking_ipcidr,🛑 广告拦截
-  - RULE-SET,ZhihuAds,🛑 广告拦截
+  - RULE-SET,BanProgramAD1 (Domain),🛑 广告拦截
   - DOMAIN-KEYWORD,admarvel,🛑 广告拦截
   - DOMAIN-KEYWORD,admaster,🛑 广告拦截
   - DOMAIN-KEYWORD,adsage,🛑 广告拦截
@@ -345,48 +643,415 @@ rules:
   - DOMAIN-KEYWORD,supersonicads,🛑 广告拦截
   - DOMAIN-KEYWORD,wlmonitor,🛑 广告拦截
   - DOMAIN-KEYWORD,zjtoolbar,🛑 广告拦截
-  - RULE-SET,BanAD_domain,🛑 广告拦截
+  - RULE-SET,BanAD (Domain),🛑 广告拦截
   - DOMAIN-KEYWORD,omgmtaw,🛑 广告拦截
-  - RULE-SET,BanProgramAD_domain,🛑 广告拦截
-  - RULE-SET,BanProgramAD_ipcidr,🛑 广告拦截
-  - RULE-SET,BanEasyList_domain,🛑 广告拦截
-  - RULE-SET,BanEasyList_ipcidr,🛑 广告拦截
-  - RULE-SET,BanEasyListChina_domain,🛑 广告拦截
-  - RULE-SET,BanEasyListChina_ipcidr,🛑 广告拦截
-  - RULE-SET,BanEasyPrivacy_domain,🛑 广告拦截
-  - RULE-SET,BanEasyPrivacy_ipcidr,🛑 广告拦截
-
-  - RULE-SET,ChatGPT_domain,🧚 AI
-  - RULE-SET,OpenAI,🧚 AI
-  - RULE-SET,Claude,🧚 AI
-  - RULE-SET,Gemini,🧚 AI
-  - RULE-SET,Copilot,🧚 AI
-  - RULE-SET,Perplexity_domain,🧚 AI
-  - DOMAIN-KEYWORD,grok,🧚 AI
-  - RULE-SET,Grok_domain,🧚 AI
-
-  - DOMAIN-KEYWORD,dualstack.apiproxy-,📺 Netflix
-  - DOMAIN-KEYWORD,dualstack.ichnaea-web-,📺 Netflix
-  - RULE-SET,Netflix,📺 Netflix
-  - RULE-SET,Netflix_domain,📺 Netflix
-  - RULE-SET,Netflix_ipcidr,📺 Netflix
-
-  - RULE-SET,Game,🎮 游戏平台
-
-  - DOMAIN-KEYWORD,jooxweb-api,🌍 国外媒体
-  - DOMAIN-KEYWORD,spotify.com,🌍 国外媒体
-  - DOMAIN-KEYWORD,-spotify-com,🌍 国外媒体
-  - DOMAIN-KEYWORD,abematv.akamaized.net,🌍 国外媒体
-  - DOMAIN-KEYWORD,avoddashs,🌍 国外媒体
-  - DOMAIN-KEYWORD,bbcfmt,🌍 国外媒体
-  - DOMAIN-KEYWORD,uk-live,🌍 国外媒体
-  - DOMAIN-KEYWORD,voddazn,🌍 国外媒体
-  - DOMAIN-KEYWORD,.hbogoasia.,🌍 国外媒体
-  - DOMAIN-KEYWORD,dualstack.apiproxy-,🌍 国外媒体
-  - DOMAIN-KEYWORD,dualstack.ichnaea-web-,🌍 国外媒体
-  - DOMAIN-KEYWORD,-tiktokcdn-com,🌍 国外媒体
-  - RULE-SET,Streaming_domain,🌍 国外媒体
-  - RULE-SET,Streaming_ipcidr,🌍 国外媒体
+  - RULE-SET,BanProgramAD (Domain),🛑 广告拦截
+  - RULE-SET,BanProgramAD (IP-CIDR),🛑 广告拦截,no-resolve
+  - RULE-SET,BanEasyList (Domain),🛑 广告拦截
+  - RULE-SET,BanEasyList (IP-CIDR),🛑 广告拦截,no-resolve
+  - RULE-SET,BanEasyListChina (Domain),🛑 广告拦截
+  - RULE-SET,BanEasyListChina (IP-CIDR),🛑 广告拦截,no-resolve
+  - DOMAIN-KEYWORD,-logging.nextmedia.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,-rtb.gravite.net,🛑 广告拦截
+  - DOMAIN-KEYWORD,-s2s.sensic.net,🛑 广告拦截
+  - DOMAIN-KEYWORD,-spiky.clevertap-prod.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,-tracker.biliapi.net,🛑 广告拦截
+  - DOMAIN-KEYWORD,-txtagstore,🛑 广告拦截
+  - DOMAIN-KEYWORD,.engage.3m.,🛑 广告拦截
+  - DOMAIN-KEYWORD,.estream.,🛑 广告拦截
+  - DOMAIN-KEYWORD,.freecontent.,🛑 广告拦截
+  - DOMAIN-KEYWORD,.net.daraz.,🛑 广告拦截
+  - DOMAIN-KEYWORD,.nimiq.,🛑 广告拦截
+  - DOMAIN-KEYWORD,.zooplus.,🛑 广告拦截
+  - DOMAIN-KEYWORD,_vmind.qqvideo.tc.qq.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,a8clk.,🛑 广告拦截
+  - DOMAIN-KEYWORD,a8cv.,🛑 广告拦截
+  - DOMAIN-KEYWORD,ad.ixigua.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,adjust.,🛑 广告拦截
+  - DOMAIN-KEYWORD,adktrack,🛑 广告拦截
+  - DOMAIN-KEYWORD,admdfs,🛑 广告拦截
+  - DOMAIN-KEYWORD,admob,🛑 广告拦截
+  - DOMAIN-KEYWORD,adnewnc,🛑 广告拦截
+  - DOMAIN-KEYWORD,adsame,🛑 广告拦截
+  - DOMAIN-KEYWORD,adsby,🛑 广告拦截
+  - DOMAIN-KEYWORD,adsdk,🛑 广告拦截
+  - DOMAIN-KEYWORD,adsense,🛑 广告拦截
+  - DOMAIN-KEYWORD,adserve2,🛑 广告拦截
+  - DOMAIN-KEYWORD,adserver,🛑 广告拦截
+  - DOMAIN-KEYWORD,adspace,🛑 广告拦截
+  - DOMAIN-KEYWORD,adsyndication,🛑 广告拦截
+  - DOMAIN-KEYWORD,advert,🛑 广告拦截
+  - DOMAIN-KEYWORD,allyes,🛑 广告拦截
+  - DOMAIN-KEYWORD,analysys,🛑 广告拦截
+  - DOMAIN-KEYWORD,analytics-cdn.,🛑 广告拦截
+  - DOMAIN-KEYWORD,anybest.,🛑 广告拦截
+  - DOMAIN-KEYWORD,backstory.ebay.,🛑 广告拦截
+  - DOMAIN-KEYWORD,click.rum.,🛑 广告拦截
+  - DOMAIN-KEYWORD,cmpworker.,🛑 广告拦截
+  - DOMAIN-KEYWORD,cp-home-pl-,🛑 广告拦截
+  - DOMAIN-KEYWORD,crashlytics,🛑 广告拦截
+  - DOMAIN-KEYWORD,dat8,🛑 广告拦截
+  - DOMAIN-KEYWORD,dc.pimentaafricana,🛑 广告拦截
+  - DOMAIN-KEYWORD,dnserror,🛑 广告拦截
+  - DOMAIN-KEYWORD,doubleclick.,🛑 广告拦截
+  - DOMAIN-KEYWORD,dubester.,🛑 广告拦截
+  - DOMAIN-KEYWORD,fb-business-appeal,🛑 广告拦截
+  - DOMAIN-KEYWORD,fb-community-standards,🛑 广告拦截
+  - DOMAIN-KEYWORD,fb-restriction-appeal,🛑 广告拦截
+  - DOMAIN-KEYWORD,fb-restriction-case,🛑 广告拦截
+  - DOMAIN-KEYWORD,fenxi,🛑 广告拦截
+  - DOMAIN-KEYWORD,flightsy,🛑 广告拦截
+  - DOMAIN-KEYWORD,gettate,🛑 广告拦截
+  - DOMAIN-KEYWORD,googleads,🛑 广告拦截
+  - DOMAIN-KEYWORD,hostingcloud,🛑 广告拦截
+  - DOMAIN-KEYWORD,inmobi,🛑 广告拦截
+  - DOMAIN-KEYWORD,insights-collector.,🛑 广告拦截
+  - DOMAIN-KEYWORD,jads,🛑 广告拦截
+  - DOMAIN-KEYWORD,jshosting,🛑 广告拦截
+  - DOMAIN-KEYWORD,marketing.net,🛑 广告拦截
+  - DOMAIN-KEYWORD,mighbest,🛑 广告拦截
+  - DOMAIN-KEYWORD,mobaders,🛑 广告拦截
+  - DOMAIN-KEYWORD,nbsdk-baichuan,🛑 广告拦截
+  - DOMAIN-KEYWORD,nimiqpool,🛑 广告拦截
+  - DOMAIN-KEYWORD,pancakeswap,🛑 广告拦截
+  - DOMAIN-KEYWORD,plausible.,🛑 广告拦截
+  - DOMAIN-KEYWORD,securepubads,🛑 广告拦截
+  - DOMAIN-KEYWORD,smetrics.,🛑 广告拦截
+  - DOMAIN-KEYWORD,sunnimiq,🛑 广告拦截
+  - DOMAIN-KEYWORD,taboola,🛑 广告拦截
+  - DOMAIN-KEYWORD,telemetry.officeapps.live.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,thetollroads-,🛑 广告拦截
+  - DOMAIN-KEYWORD,track.msadcenter,🛑 广告拦截
+  - DOMAIN-KEYWORD,track.opentable.,🛑 广告拦截
+  - DOMAIN-KEYWORD,track.tiara,🛑 广告拦截
+  - DOMAIN-KEYWORD,trkcmb.business.hsbc.,🛑 广告拦截
+  - DOMAIN-KEYWORD,trkgbm.business.hsbc.,🛑 广告拦截
+  - DOMAIN-KEYWORD,trkhinv.business.hsbc.,🛑 广告拦截
+  - DOMAIN-KEYWORD,trksvg.business.hsbc.,🛑 广告拦截
+  - DOMAIN-KEYWORD,uedas,🛑 广告拦截
+  - DOMAIN-KEYWORD,umtrack,🛑 广告拦截
+  - DOMAIN-KEYWORD,wxsnsdy,🛑 广告拦截
+  - DOMAIN-KEYWORD,zymerget,🛑 广告拦截
+  - DOMAIN-KEYWORD,112wan,🛑 广告拦截
+  - DOMAIN-KEYWORD,789htbet,🛑 广告拦截
+  - DOMAIN-KEYWORD,a.9game.cn,🛑 广告拦截
+  - DOMAIN-KEYWORD,a.wkanx.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,a3.bytecdn.cn,🛑 广告拦截
+  - DOMAIN-KEYWORD,a3.pstatp.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,ad.api.moji.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,ad.ihuman.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,ad.toutiao.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,adash.man.aliyuncs.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,adform,🛑 广告拦截
+  - DOMAIN-KEYWORD,adm3.autoimg.cn,🛑 广告拦截
+  - DOMAIN-KEYWORD,admarvel,🛑 广告拦截
+  - DOMAIN-KEYWORD,admaster,🛑 广告拦截
+  - DOMAIN-KEYWORD,adp.atm.youku.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,adproxy.autohome.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,adsage,🛑 广告拦截
+  - DOMAIN-KEYWORD,adsensor,🛑 广告拦截
+  - DOMAIN-KEYWORD,adservice,🛑 广告拦截
+  - DOMAIN-KEYWORD,adsfilebssdlbig.ali.kugou.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,adshare.toutiao.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,adsmogo,🛑 广告拦截
+  - DOMAIN-KEYWORD,adsrvmedia,🛑 广告拦截
+  - DOMAIN-KEYWORD,adsserving,🛑 广告拦截
+  - DOMAIN-KEYWORD,adsystem,🛑 广告拦截
+  - DOMAIN-KEYWORD,adtrack.ucweb.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,adwords,🛑 广告拦截
+  - DOMAIN-KEYWORD,afpapi.alimama.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,android.bugly.qq.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,ap.51y5.net,🛑 广告拦截
+  - DOMAIN-KEYWORD,api.freed.so,🛑 广告拦截
+  - DOMAIN-KEYWORD,api.sobot.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,apiinit.amap.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,apimg.qunliao.info,🛑 广告拦截
+  - DOMAIN-KEYWORD,app.51y5.net,🛑 广告拦截
+  - DOMAIN-KEYWORD,applogapi.autohome.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,applovin,🛑 广告拦截
+  - DOMAIN-KEYWORD,appsflyer,🛑 广告拦截
+  - DOMAIN-KEYWORD,asewlfjqwlflkew,🛑 广告拦截
+  - DOMAIN-KEYWORD,asiad.byteactivity,🛑 广告拦截
+  - DOMAIN-KEYWORD,av1.xdrig.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,bds.snssdk.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,bdsp.x.jd.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,bj.imp.voiceads.cn,🛑 广告拦截
+  - DOMAIN-KEYWORD,bngpt,🛑 广告拦截
+  - DOMAIN-KEYWORD,bongacash,🛑 广告拦截
+  - DOMAIN-KEYWORD,brushshopy,🛑 广告拦截
+  - DOMAIN-KEYWORD,c-hzgt2.getui.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,c.51y5.net,🛑 广告拦截
+  - DOMAIN-KEYWORD,c.wkanx.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,c1.wkanx.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,c1img.ali.kugou.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,caclick.baidu.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,cds.51y5.net,🛑 广告拦截
+  - DOMAIN-KEYWORD,client-dmp.suishenyun.cn,🛑 广告拦截
+  - DOMAIN-KEYWORD,clk.gentags.net,🛑 广告拦截
+  - DOMAIN-KEYWORD,cm-10-134.getui.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,cm-10-35.getui.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,collectionpv.che168.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,config.51y5.net,🛑 广告拦截
+  - DOMAIN-KEYWORD,config.y5en.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,count.atm.youku.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,cpu.baidu.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,dfkj8,🛑 广告拦截
+  - DOMAIN-KEYWORD,dlads,🛑 广告拦截
+  - DOMAIN-KEYWORD,dm.bytedance.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,dm.pstatp.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,dm.toutiao.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,domob,🛑 广告拦截
+  - DOMAIN-KEYWORD,dtscout,🛑 广告拦截
+  - DOMAIN-KEYWORD,duomeng,🛑 广告拦截
+  - DOMAIN-KEYWORD,dwtrack,🛑 广告拦截
+  - DOMAIN-KEYWORD,e2wysbacctt1,🛑 广告拦截
+  - DOMAIN-KEYWORD,editor.sm.cn,🛑 广告拦截
+  - DOMAIN-KEYWORD,ems.youku.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,exosrv,🛑 广告拦截
+  - DOMAIN-KEYWORD,extlog.snssdk.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,fans.m.tmall.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,fc-video.cdn.bcebos.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,fds.api.moji.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,greenplasticdua,🛑 广告拦截
+  - DOMAIN-KEYWORD,guanggao,🛑 广告拦截
+  - DOMAIN-KEYWORD,haowanyou,🛑 广告拦截
+  - DOMAIN-KEYWORD,highwebmedia,🛑 广告拦截
+  - DOMAIN-KEYWORD,histats,🛑 广告拦截
+  - DOMAIN-KEYWORD,huichuan-mc.sm.cn,🛑 广告拦截
+  - DOMAIN-KEYWORD,huichuan.sm.cn,🛑 广告拦截
+  - DOMAIN-KEYWORD,iflyad.bj.openstorage.cn,🛑 广告拦截
+  - DOMAIN-KEYWORD,image.bianxianmao.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,img1.czb365.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,in-page-push,🛑 广告拦截
+  - DOMAIN-KEYWORD,insurance.lianwifi.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,js.union-wifi.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,juruigj,🛑 广告拦截
+  - DOMAIN-KEYWORD,kepler.jd.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,keplerapi.jd.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,kgipadstat.kugou.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,kgipadstatbak.kugou.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,kgstaticdlbssdlbig.tx.kugou.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,lieyou,🛑 广告拦截
+  - DOMAIN-KEYWORD,lkme.cc,🛑 广告拦截
+  - DOMAIN-KEYWORD,log-dmp.suishenyun.cn,🛑 广告拦截
+  - DOMAIN-KEYWORD,log.cs.pp.cn,🛑 广告拦截
+  - DOMAIN-KEYWORD,login.push.51y5.net,🛑 广告拦截
+  - DOMAIN-KEYWORD,logwebs.kugou.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,m.atm.youku.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,m.panda.voiceads.cn,🛑 广告拦截
+  - DOMAIN-KEYWORD,m.suning.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,mapi.m.jd.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,mathtag,🛑 广告拦截
+  - DOMAIN-KEYWORD,mdapp09,🛑 广告拦截
+  - DOMAIN-KEYWORD,me.api.moji.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,medicine.lanjiyin.com.cn,🛑 广告拦截
+  - DOMAIN-KEYWORD,mifengv,🛑 广告拦截
+  - DOMAIN-KEYWORD,mmiyue,🛑 广告拦截
+  - DOMAIN-KEYWORD,mobads.baidu.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,mobilead.kuwo.cn,🛑 广告拦截
+  - DOMAIN-KEYWORD,mpos-pic.helipay.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,msg.push.51y5.net,🛑 广告拦截
+  - DOMAIN-KEYWORD,nbcollect.kugou.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,nbcollectretry.kugou.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,news-log.51y5.net,🛑 广告拦截
+  - DOMAIN-KEYWORD,news.51y5.net,🛑 广告拦截
+  - DOMAIN-KEYWORD,o333o,🛑 广告拦截
+  - DOMAIN-KEYWORD,omgmta,🛑 广告拦截
+  - DOMAIN-KEYWORD,omniture,🛑 广告拦截
+  - DOMAIN-KEYWORD,onenews,🛑 广告拦截
+  - DOMAIN-KEYWORD,openx,🛑 广告拦截
+  - DOMAIN-KEYWORD,ossp.voicecloud.cn,🛑 广告拦截
+  - DOMAIN-KEYWORD,p3-pack.byteimg.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,p3.pstatp.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,p6-pack.byteimg.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,pagespeed-mod,🛑 广告拦截
+  - DOMAIN-KEYWORD,pangolin-sdk-toutiao,🛑 广告拦截
+  - DOMAIN-KEYWORD,paradisestatic.vivo.com.cn,🛑 广告拦截
+  - DOMAIN-KEYWORD,partnerad,🛑 广告拦截
+  - DOMAIN-KEYWORD,pc.suishenyun.net,🛑 广告拦截
+  - DOMAIN-KEYWORD,pdds.ucweb.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,pglstatp-toutiao,🛑 广告拦截
+  - DOMAIN-KEYWORD,pingfore,🛑 广告拦截
+  - DOMAIN-KEYWORD,policy.jd.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,puds.ucweb.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,r1.ykimg.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,rescn.u3.ucweb.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,rich.kuwo.cn,🛑 广告拦截
+  - DOMAIN-KEYWORD,rt-m.kugou.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,rtmretry.kugou.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,s1.pstatp.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,s2.pstatp.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,s3.pstatp.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,s3a.pstatp.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,sdfp.snssdk.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,sdk.open.talk.getui.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,searchrecommend.kugou.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,server.m.pp.cn,🛑 广告拦截
+  - DOMAIN-KEYWORD,socdm,🛑 广告拦截
+  - DOMAIN-KEYWORD,splashimgbssdl.yun.kugou.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,stsdk.vivo.com.cn,🛑 广告拦截
+  - DOMAIN-KEYWORD,stsdk.vivoglobal.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,stunninglover,🛑 广告拦截
+  - DOMAIN-KEYWORD,supersonicads,🛑 广告拦截
+  - DOMAIN-KEYWORD,talk.bz.getui.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,toateeli,🛑 广告拦截
+  - DOMAIN-KEYWORD,tosv.boe.byted.org,🛑 广告拦截
+  - DOMAIN-KEYWORD,tosv.byted.org,🛑 广告拦截
+  - DOMAIN-KEYWORD,track.uc.cn,🛑 广告拦截
+  - DOMAIN-KEYWORD,tracker.kugou.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,trackercdnbj.kugou.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,trwl1,🛑 广告拦截
+  - DOMAIN-KEYWORD,tunion-api.m.taobao.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,umeng,🛑 广告拦截
+  - DOMAIN-KEYWORD,utp-dmp.ucweb.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,utp.ucweb.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,v0-client-lz.rili.cn,🛑 广告拦截
+  - DOMAIN-KEYWORD,v1.log.moji.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,v2.reachmax.cn,🛑 广告拦截
+  - DOMAIN-KEYWORD,val.atm.youku.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,vidoza,🛑 广告拦截
+  - DOMAIN-KEYWORD,vs10.bj2ct.u3.ucweb.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,wgo.mmstat.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,wixsite.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,wlmonitor,🛑 广告拦截
+  - DOMAIN-KEYWORD,www.qmlog.cn,🛑 广告拦截
+  - DOMAIN-KEYWORD,xn--2qux23c9ziyrq,🛑 广告拦截
+  - DOMAIN-KEYWORD,xxshuyuan,🛑 广告拦截
+  - DOMAIN-KEYWORD,ynuf.alipay.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,zjtoolbar,🛑 广告拦截
+  - DOMAIN-KEYWORD,analytics.,🛑 广告拦截
+  - DOMAIN-KEYWORD,app-analytics,🛑 广告拦截
+  - DOMAIN-KEYWORD,app-log.,🛑 广告拦截
+  - DOMAIN-KEYWORD,applog.,🛑 广告拦截
+  - DOMAIN-KEYWORD,fzlm,🛑 广告拦截
+  - DOMAIN-KEYWORD,ios-log.,🛑 广告拦截
+  - DOMAIN-KEYWORD,ioslog.,🛑 广告拦截
+  - DOMAIN-KEYWORD,pc-log.,🛑 广告拦截
+  - DOMAIN-KEYWORD,pclog.,🛑 广告拦截
+  - RULE-SET,Advertising (Domain),🛑 广告拦截
+  - RULE-SET,Advertising (IP-CIDR),🛑 广告拦截,no-resolve
+  - RULE-SET,Hijacking (Domain),🛑 广告拦截
+  - RULE-SET,Hijacking (IP-CIDR),🛑 广告拦截,no-resolve
+  - DOMAIN-KEYWORD,analytics.,🛑 广告拦截
+  - DOMAIN-KEYWORD,app-analytics,🛑 广告拦截
+  - DOMAIN-KEYWORD,app-log.,🛑 广告拦截
+  - DOMAIN-KEYWORD,applog.,🛑 广告拦截
+  - DOMAIN-KEYWORD,fzlm,🛑 广告拦截
+  - DOMAIN-KEYWORD,ios-log.,🛑 广告拦截
+  - DOMAIN-KEYWORD,ioslog.,🛑 广告拦截
+  - DOMAIN-KEYWORD,pc-log.,🛑 广告拦截
+  - DOMAIN-KEYWORD,pclog.,🛑 广告拦截
+  - RULE-SET,Privacy (Domain),🛑 广告拦截
+  - RULE-SET,Privacy (IP-CIDR),🛑 广告拦截,no-resolve
+  - RULE-SET,AdGuardSDNSFilter (Domain),🛑 广告拦截
+  - RULE-SET,EasyPrivacy (Domain),🛑 广告拦截
+  - RULE-SET,BlockHttpDNS (Domain),🛑 广告拦截
+  - RULE-SET,BlockHttpDNS (IP-CIDR),🛑 广告拦截,no-resolve
+  - RULE-SET,ChinaMedia (Domain),🌏 国内媒体
+  - RULE-SET,ChinaMedia (IP-CIDR),🌏 国内媒体,no-resolve
+  - RULE-SET,LocalAreaNetwork (Domain),🎯 全球直连
+  - RULE-SET,LocalAreaNetwork (IP-CIDR),🎯 全球直连,no-resolve
+  - RULE-SET,ChinaIPs (IP-CIDR),🎯 全球直连,no-resolve
+  - RULE-SET,ChinaDNS (Domain),🎯 全球直连
+  - RULE-SET,ChinaDNS (IP-CIDR),🎯 全球直连,no-resolve
+  - DOMAIN-KEYWORD,.tmall.com,🎯 全球直连
+  - DOMAIN-KEYWORD,alicdn,🎯 全球直连
+  - DOMAIN-KEYWORD,alipay,🎯 全球直连
+  - DOMAIN-KEYWORD,aliyun,🎯 全球直连
+  - DOMAIN-KEYWORD,baidu,🎯 全球直连
+  - DOMAIN-KEYWORD,beplay,🎯 全球直连
+  - DOMAIN-KEYWORD,microsoft,🎯 全球直连
+  - DOMAIN-KEYWORD,officecdn,🎯 全球直连
+  - DOMAIN-KEYWORD,taobao,🎯 全球直连
+  - RULE-SET,China (Domain),🎯 全球直连
+  - RULE-SET,China (IP-CIDR),🎯 全球直连,no-resolve
+  - DOMAIN-KEYWORD,amp-api.podcasts.apple.com,🎯 全球直连
+  - DOMAIN-KEYWORD,anti-ad.net,🎯 全球直连
+  - DOMAIN-KEYWORD,api-adservices.apple.com,🎯 全球直连
+  - DOMAIN-KEYWORD,api.smoot.apple.cn,🎯 全球直连
+  - DOMAIN-KEYWORD,api.smoot.apple.com,🎯 全球直连
+  - DOMAIN-KEYWORD,aw-s.tripcdn.com,🎯 全球直连
+  - DOMAIN-KEYWORD,ax1x.com,🎯 全球直连
+  - DOMAIN-KEYWORD,bfzycdn.com,🎯 全球直连
+  - DOMAIN-KEYWORD,buy.itunes.apple.com,🎯 全球直连
+  - DOMAIN-KEYWORD,cnki.net,🎯 全球直连
+  - DOMAIN-KEYWORD,ctc.qzs.qzone.qq.com,🎯 全球直连
+  - DOMAIN-KEYWORD,deepdyve,🎯 全球直连
+  - DOMAIN-KEYWORD,els-cdn,🎯 全球直连
+  - DOMAIN-KEYWORD,elsevier,🎯 全球直连
+  - DOMAIN-KEYWORD,ess.apple.com,🎯 全球直连
+  - DOMAIN-KEYWORD,gsa.apple.com,🎯 全球直连
+  - DOMAIN-KEYWORD,humb.apple.com,🎯 全球直连
+  - DOMAIN-KEYWORD,icloud.com,🎯 全球直连
+  - DOMAIN-KEYWORD,ls.apple.com,🎯 全球直连
+  - DOMAIN-KEYWORD,o.lencr.org,🎯 全球直连
+  - DOMAIN-KEYWORD,pkulaw,🎯 全球直连
+  - DOMAIN-KEYWORD,push.apple.com,🎯 全球直连
+  - DOMAIN-KEYWORD,readcube,🎯 全球直连
+  - DOMAIN-KEYWORD,sciencedirect,🎯 全球直连
+  - DOMAIN-KEYWORD,ssl.apple.com,🎯 全球直连
+  - DOMAIN-KEYWORD,trip.com,🎯 全球直连
+  - DOMAIN-KEYWORD,ttcdn-tos.kkimg.cc,🎯 全球直连
+  - DOMAIN-KEYWORD,vip.ffzy-online,🎯 全球直连
+  - DOMAIN-KEYWORD,vip.ffzy-play,🎯 全球直连
+  - DOMAIN-KEYWORD,vip.kuaikan-cdn,🎯 全球直连
+  - DOMAIN-KEYWORD,vip.lz-cdn,🎯 全球直连
+  - DOMAIN-KEYWORD,wanfangdata,🎯 全球直连
+  - DOMAIN-KEYWORD,wb_ad,🎯 全球直连
+  - DOMAIN-KEYWORD,weather-adge.apple.com,🎯 全球直连
+  - DOMAIN-KEYWORD,weather-edge.apple.com,🎯 全球直连
+  - DOMAIN-KEYWORD,westlawchina,🎯 全球直连
+  - RULE-SET,Direct (Domain),🎯 全球直连
+  - RULE-SET,UnBan (Domain),🎯 全球直连
+  - RULE-SET,UnBan1 (Domain),🎯 全球直连
+  - RULE-SET,ChinaOnly (Domain),🎯 全球直连
+  - RULE-SET,SteamCN (Domain),🎯 全球直连
+  - DOMAIN-KEYWORD,360buy,🎯 全球直连
+  - DOMAIN-KEYWORD,alicdn,🎯 全球直连
+  - DOMAIN-KEYWORD,alimama,🎯 全球直连
+  - DOMAIN-KEYWORD,alipay,🎯 全球直连
+  - DOMAIN-KEYWORD,appzapp,🎯 全球直连
+  - DOMAIN-KEYWORD,baidupcs,🎯 全球直连
+  - DOMAIN-KEYWORD,bilibili,🎯 全球直连
+  - DOMAIN-KEYWORD,ccgslb,🎯 全球直连
+  - DOMAIN-KEYWORD,chinacache,🎯 全球直连
+  - DOMAIN-KEYWORD,duobao,🎯 全球直连
+  - DOMAIN-KEYWORD,jdpay,🎯 全球直连
+  - DOMAIN-KEYWORD,moke,🎯 全球直连
+  - DOMAIN-KEYWORD,qhimg,🎯 全球直连
+  - DOMAIN-KEYWORD,vpimg,🎯 全球直连
+  - DOMAIN-KEYWORD,xiami,🎯 全球直连
+  - DOMAIN-KEYWORD,xiaomi,🎯 全球直连
+  - RULE-SET,ChinaDomain (Domain),🎯 全球直连
+  - RULE-SET,ChinaDomain (IP-CIDR),🎯 全球直连,no-resolve
+  - RULE-SET,ChinaCompanyIp (IP-CIDR),🎯 全球直连,no-resolve
+  - DOMAIN-KEYWORD,aria2,🎯 全球直连
+  - RULE-SET,Download (Domain),🎯 全球直连
+  - RULE-SET,Epic (Domain),🎮 游戏平台
+  - RULE-SET,Origin (Domain),🎮 游戏平台
+  - RULE-SET,Sony (Domain),🎮 游戏平台
+  - RULE-SET,Steam (Domain),🎮 游戏平台
+  - RULE-SET,Nintendo (Domain),🎮 游戏平台
+  - DOMAIN-KEYWORD,anthropic,🤖 Ai平台
+  - DOMAIN-KEYWORD,claude,🤖 Ai平台
+  - DOMAIN-KEYWORD,openai,🤖 Ai平台
+  - RULE-SET,AI (Domain),🤖 Ai平台
+  - DOMAIN-KEYWORD,github,📦 Github
+  - RULE-SET,GitHub (Domain),📦 Github
+  - DOMAIN-KEYWORD,musical.ly,🍒 TikTok
+  - DOMAIN-KEYWORD,tiktok,🍒 TikTok
+  - RULE-SET,TikTok (Domain),🍒 TikTok
+  - DOMAIN-KEYWORD,apiproxy-device-prod-nlb-,🍿 Netflix
+  - DOMAIN-KEYWORD,dualstack.apiproxy-,🍿 Netflix
+  - DOMAIN-KEYWORD,netflixdnstest,🍿 Netflix
+  - RULE-SET,Netflix (Domain),🍿 Netflix
+  - RULE-SET,Netflix (IP-CIDR),🍿 Netflix,no-resolve
+  - DOMAIN-KEYWORD,youtube,▶️ Youtube
+  - RULE-SET,YouTube (Domain),▶️ Youtube
+  - RULE-SET,YouTube (IP-CIDR),▶️ Youtube,no-resolve
+  - RULE-SET,YouTubeMusic (Domain),▶️ Youtube
+  - RULE-SET,Telegram (Domain),📲 电报消息
+  - RULE-SET,Telegram (IP-CIDR),📲 电报消息,no-resolve
   - DOMAIN-KEYWORD,anthropic,🌍 国外媒体
   - DOMAIN-KEYWORD,claude,🌍 国外媒体
   - DOMAIN-KEYWORD,openai,🌍 国外媒体
@@ -412,33 +1077,36 @@ rules:
   - DOMAIN-KEYWORD,tiktokcdn,🌍 国外媒体
   - DOMAIN-KEYWORD,ttvnw,🌍 国外媒体
   - DOMAIN-KEYWORD,youtube,🌍 国外媒体
-  - RULE-SET,ProxyMedia_domain,🌍 国外媒体
-  - RULE-SET,ProxyMedia_ipcidr,🌍 国外媒体
-  - RULE-SET,GlobalMedia_Classical,🌍 国外媒体
-  - RULE-SET,Spotify,🌍 国外媒体
-
-  - RULE-SET,TikTok,🎶 TikTok
-
-  - RULE-SET,ChinaMedia,📹 国内媒体
-  - RULE-SET,Netease_domain,📹 国内媒体
-  - RULE-SET,Netease_ipcidr,📹 国内媒体
-  - RULE-SET,Bilibili_domain,📹 国内媒体
-  - RULE-SET,BilibiliHMT_domain,📹 国内媒体
-  - RULE-SET,BilibiliHMT_ipcidr,📹 国内媒体
-  - RULE-SET,Bilibili_domain,📹 国内媒体
-  - RULE-SET,iQiyi_domain,📹 国内媒体
-  - RULE-SET,iQiyi_ipcidr,📹 国内媒体
-  - RULE-SET,Letv_domain,📹 国内媒体
-  - RULE-SET,Tencent Video_domain,📹 国内媒体
-  - RULE-SET,Youku_domain,📹 国内媒体
-  - RULE-SET,Youku_ipcidr,📹 国内媒体
-
-  - DOMAIN-KEYWORD,google,🚀 节点选择
-  - DOMAIN-KEYWORD,.blogspot.,🚀 节点选择
-  - DOMAIN-KEYWORD,.facebook.,🚀 节点选择
-  - RULE-SET,Global_domain,🚀 节点选择
-  - RULE-SET,Global_ipcidr,🚀 节点选择
-  - RULE-SET,PikPak,🚀 节点选择
+  - RULE-SET,ProxyMedia (Domain),🌍 国外媒体
+  - RULE-SET,ProxyMedia (IP-CIDR),🌍 国外媒体,no-resolve
+  - DOMAIN-KEYWORD,abematv.akamaized.net,🌍 国外媒体
+  - DOMAIN-KEYWORD,anthropic,🌍 国外媒体
+  - DOMAIN-KEYWORD,apiproxy-device-prod-nlb-,🌍 国外媒体
+  - DOMAIN-KEYWORD,avoddashs,🌍 国外媒体
+  - DOMAIN-KEYWORD,bbcfmt,🌍 国外媒体
+  - DOMAIN-KEYWORD,claude,🌍 国外媒体
+  - DOMAIN-KEYWORD,discovery.uplynk.com,🌍 国外媒体
+  - DOMAIN-KEYWORD,dualstack.apiproxy-,🌍 国外媒体
+  - DOMAIN-KEYWORD,dualstack.ichnaea-web-,🌍 国外媒体
+  - DOMAIN-KEYWORD,hamivideo.cdn.hinet.net,🌍 国外媒体
+  - DOMAIN-KEYWORD,hbogoasia,🌍 国外媒体
+  - DOMAIN-KEYWORD,japonx,🌍 国外媒体
+  - DOMAIN-KEYWORD,japronx,🌍 国外媒体
+  - DOMAIN-KEYWORD,jooxweb-api,🌍 国外媒体
+  - DOMAIN-KEYWORD,netflixdnstest,🌍 国外媒体
+  - DOMAIN-KEYWORD,nivod,🌍 国外媒体
+  - DOMAIN-KEYWORD,nowtv100,🌍 国外媒体
+  - DOMAIN-KEYWORD,olevod,🌍 国外媒体
+  - DOMAIN-KEYWORD,rthklive,🌍 国外媒体
+  - DOMAIN-KEYWORD,spotify,🌍 国外媒体
+  - DOMAIN-KEYWORD,tiktokcdn,🌍 国外媒体
+  - DOMAIN-KEYWORD,ttvnw,🌍 国外媒体
+  - DOMAIN-KEYWORD,tvbanywhere,🌍 国外媒体
+  - DOMAIN-KEYWORD,uk-live,🌍 国外媒体
+  - DOMAIN-KEYWORD,voddazn,🌍 国外媒体
+  - DOMAIN-KEYWORD,youtube,🌍 国外媒体
+  - RULE-SET,GlobalMedia (Domain),🌍 国外媒体
+  - RULE-SET,GlobalMedia (IP-CIDR),🌍 国外媒体,no-resolve
   - DOMAIN-KEYWORD,1e100,🚀 节点选择
   - DOMAIN-KEYWORD,abema,🚀 节点选择
   - DOMAIN-KEYWORD,appledaily,🚀 节点选择
@@ -465,465 +1133,158 @@ rules:
   - DOMAIN-KEYWORD,skydrive,🚀 节点选择
   - DOMAIN-KEYWORD,porn,🚀 节点选择
   - DOMAIN-KEYWORD,ttvnw,🚀 节点选择
-  - RULE-SET,GitHub,🚀 节点选择
-  - RULE-SET,ProxyGFWlist_domain,🚀 节点选择
-  - RULE-SET,ProxyGFWlist_ipcidr,🚀 节点选择
-  - RULE-SET,Outside_domain,🚀 节点选择
-  - RULE-SET,Outside_ipcidr,🚀 节点选择
-  - RULE-SET,ProxyLite_domain,🚀 节点选择
-  - RULE-SET,ProxyLite_ipcidr,🚀 节点选择
-
-  - GEOIP,CN,🎯 全球直连
+  - RULE-SET,ProxyGFWlist (Domain),🚀 节点选择
+  - RULE-SET,ProxyGFWlist (IP-CIDR),🚀 节点选择,no-resolve
+  - DOMAIN-KEYWORD,amazon,🚀 节点选择
+  - DOMAIN-KEYWORD,avoddashs,🚀 节点选择
+  - DOMAIN-KEYWORD,bbcfmt,🚀 节点选择
+  - DOMAIN-KEYWORD,jav,🚀 节点选择
+  - DOMAIN-KEYWORD,musical.ly,🚀 节点选择
+  - DOMAIN-KEYWORD,pinterest,🚀 节点选择
+  - DOMAIN-KEYWORD,tiktok,🚀 节点选择
+  - DOMAIN-KEYWORD,twimg,🚀 节点选择
+  - DOMAIN-KEYWORD,voddazn,🚀 节点选择
+  - DOMAIN-KEYWORD,wikileaks,🚀 节点选择
+  - DOMAIN-KEYWORD,1drv,🚀 节点选择
+  - DOMAIN-KEYWORD,1e100,🚀 节点选择
+  - DOMAIN-KEYWORD,abema,🚀 节点选择
+  - DOMAIN-KEYWORD,appledaily,🚀 节点选择
+  - DOMAIN-KEYWORD,avtb,🚀 节点选择
+  - DOMAIN-KEYWORD,beetalk,🚀 节点选择
+  - DOMAIN-KEYWORD,blogspot,🚀 节点选择
+  - DOMAIN-KEYWORD,dlercloud,🚀 节点选择
+  - DOMAIN-KEYWORD,dropbox,🚀 节点选择
+  - DOMAIN-KEYWORD,facebook,🚀 节点选择
+  - DOMAIN-KEYWORD,fbcdn,🚀 节点选择
+  - DOMAIN-KEYWORD,gmail,🚀 节点选择
+  - DOMAIN-KEYWORD,google,🚀 节点选择
+  - DOMAIN-KEYWORD,instagram,🚀 节点选择
+  - DOMAIN-KEYWORD,onedrive,🚀 节点选择
+  - DOMAIN-KEYWORD,paypal,🚀 节点选择
+  - DOMAIN-KEYWORD,porn,🚀 节点选择
+  - DOMAIN-KEYWORD,sci-hub,🚀 节点选择
+  - DOMAIN-KEYWORD,skydrive,🚀 节点选择
+  - DOMAIN-KEYWORD,spotify,🚀 节点选择
+  - DOMAIN-KEYWORD,telegram,🚀 节点选择
+  - DOMAIN-KEYWORD,ttvnw,🚀 节点选择
+  - DOMAIN-KEYWORD,twitter,🚀 节点选择
+  - DOMAIN-KEYWORD,uk-live,🚀 节点选择
+  - DOMAIN-KEYWORD,whatsapp,🚀 节点选择
+  - DOMAIN-KEYWORD,youtube,🚀 节点选择
+  - RULE-SET,Global (Domain),🚀 节点选择
+  - RULE-SET,Global (IP-CIDR),🚀 节点选择,no-resolve
+  - GEOIP,CN,🎯 全球直连,no-resolve
   - MATCH,🐟 漏网之鱼
 
-rule-providers:
-  rule-provider:
-    type: http
-    behavior: classical
-    url: "https://raw.githubusercontent.com/lwd-temp/anti-ip-attribution/main/generated/rule-provider.yaml"
-    path: ./providers/rule-provider_rule-provider.yaml
-    interval: 86400
-  LocalAreaNetwork_domain:
-    type: http
-    behavior: domain
-    url: "https://pub-api-1.bianyuan.xyz/getruleset?type=3&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvTG9jYWxBcmVhTmV0d29yay5saXN0"
-    path: ./providers/rule-provider_LocalAreaNetwork_domain.yaml
-    interval: 86400
-  LocalAreaNetwork_ipcidr:
-    type: http
-    behavior: ipcidr
-    url: "https://pub-api-1.bianyuan.xyz/getruleset?type=4&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvTG9jYWxBcmVhTmV0d29yay5saXN0"
-    path: ./providers/rule-provider_LocalAreaNetwork_ipcidr.yaml
-    interval: 86400
-  Lan:
-    type: http
-    behavior: classical
-    url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Lan/Lan.yaml"
-    path: ./providers/rule-provider_Lan.yaml
-    interval: 86400
-  PikPak:
-    type: http
-    behavior: classical
-    url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/PikPak/PikPak.yaml"
-    path: ./providers/rule-provider_PikPak.yaml
-    interval: 86400
-  ZhihuAds:
-    type: http
-    behavior: classical
-    url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/ZhihuAds/ZhihuAds.yaml"
-    path: ./providers/rule-provider_ZhihuAds.yaml
-    interval: 86400
-  UnBan_domain:
-    type: http
-    behavior: domain
-    url: "https://pub-api-1.bianyuan.xyz/getruleset?type=3&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvVW5CYW4ubGlzdA"
-    path: ./providers/rule-provider_UnBan_domain.yaml
-    interval: 86400
-  BanAD_domain:
-    type: http
-    behavior: domain
-    url: "https://pub-api-1.bianyuan.xyz/getruleset?type=3&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvQmFuQUQubGlzdA"
-    path: ./providers/rule-provider_BanAD_domain.yaml
-    interval: 86400
-  BanProgramAD_domain:
-    type: http
-    behavior: domain
-    url: "https://pub-api-1.bianyuan.xyz/getruleset?type=3&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvQmFuUHJvZ3JhbUFELmxpc3Q"
-    path: ./providers/rule-provider_BanProgramAD_domain.yaml
-    interval: 86400
-  BanProgramAD_ipcidr:
-    type: http
-    behavior: ipcidr
-    url: "https://pub-api-1.bianyuan.xyz/getruleset?type=4&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvQmFuUHJvZ3JhbUFELmxpc3Q"
-    path: ./providers/rule-provider_BanProgramAD_ipcidr.yaml
-    interval: 86400
-  BanEasyList_domain:
-    type: http
-    behavior: domain
-    url: "https://pub-api-1.bianyuan.xyz/getruleset?type=3&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvQmFuRWFzeUxpc3QubGlzdA"
-    path: ./providers/rule-provider_BanEasyList_domain.yaml
-    interval: 86400
-  BanEasyList_ipcidr:
-    type: http
-    behavior: ipcidr
-    url: "https://pub-api-1.bianyuan.xyz/getruleset?type=4&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvQmFuRWFzeUxpc3QubGlzdA"
-    path: ./providers/rule-provider_BanEasyList_ipcidr.yaml
-    interval: 86400
-  China_domain:
-    type: http
-    behavior: domain
-    url: "https://pub-api-1.bianyuan.xyz/getruleset?type=3&url=c3VyZ2U6cnVsZXMvRGl2aW5lRW5naW5lL1N1cmdlL1J1bGVzZXQvQ2hpbmEubGlzdA"
-    path: ./providers/rule-provider_China_domain.yaml
-    interval: 86400
-  China_ipcidr:
-    type: http
-    behavior: ipcidr
-    url: "https://pub-api-1.bianyuan.xyz/getruleset?type=4&url=c3VyZ2U6cnVsZXMvRGl2aW5lRW5naW5lL1N1cmdlL1J1bGVzZXQvQ2hpbmEubGlzdA"
-    path: ./providers/rule-provider_China_ipcidr.yaml
-    interval: 86400
-  BanEasyListChina_domain:
-    type: http
-    behavior: domain
-    url: "https://pub-api-1.bianyuan.xyz/getruleset?type=3&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvQmFuRWFzeUxpc3RDaGluYS5saXN0"
-    path: ./providers/rule-provider_BanEasyListChina_domain.yaml
-    interval: 86400
-  BanEasyListChina_ipcidr:
-    type: http
-    behavior: ipcidr
-    url: "https://pub-api-1.bianyuan.xyz/getruleset?type=4&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvQmFuRWFzeUxpc3RDaGluYS5saXN0"
-    path: ./providers/rule-provider_BanEasyListChina_ipcidr.yaml
-    interval: 86400
-  BanEasyPrivacy_domain:
-    type: http
-    behavior: domain
-    url: "https://pub-api-1.bianyuan.xyz/getruleset?type=3&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvQmFuRWFzeVByaXZhY3kubGlzdA"
-    path: ./providers/rule-provider_BanEasyPrivacy_domain.yaml
-    interval: 86400
-  BanEasyPrivacy_ipcidr:
-    type: http
-    behavior: ipcidr
-    url: "https://pub-api-1.bianyuan.xyz/getruleset?type=4&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvQmFuRWFzeVByaXZhY3kubGlzdA"
-    path: ./providers/rule-provider_BanEasyPrivacy_ipcidr.yaml
-    interval: 86400
-  Unbreak_domain:
-    type: http
-    behavior: domain
-    url: "https://pub-api-1.bianyuan.xyz/getruleset?type=3&url=c3VyZ2U6cnVsZXMvRGl2aW5lRW5naW5lL1N1cmdlL1J1bGVzZXQvVW5icmVhay5saXN0"
-    path: ./providers/rule-provider_Unbreak_domain.yaml
-    interval: 86400
-  AdRule_domain:
-    type: http
-    behavior: domain
-    url: "https://pub-api-1.bianyuan.xyz/getruleset?type=3&url=c3VyZ2U6cnVsZXMvTm9ieURhL1N1cmdlL0FkUnVsZS5saXN0"
-    path: ./providers/rule-provider_AdRule_domain.yaml
-    interval: 86400
-  AdRule_ipcidr:
-    type: http
-    behavior: ipcidr
-    url: "https://pub-api-1.bianyuan.xyz/getruleset?type=4&url=c3VyZ2U6cnVsZXMvTm9ieURhL1N1cmdlL0FkUnVsZS5saXN0"
-    path: ./providers/rule-provider_AdRule_ipcidr.yaml
-    interval: 86400
-  Hijacking_domain:
-    type: http
-    behavior: domain
-    url: "https://pub-api-1.bianyuan.xyz/getruleset?type=3&url=c3VyZ2U6cnVsZXMvRGl2aW5lRW5naW5lL1N1cmdlL1J1bGVzZXQvR3VhcmQvSGlqYWNraW5nLmxpc3Q"
-    path: ./providers/rule-provider_Hijacking_domain.yaml
-    interval: 86400
-  Hijacking_ipcidr:
-    type: http
-    behavior: ipcidr
-    url: "https://pub-api-1.bianyuan.xyz/getruleset?type=4&url=c3VyZ2U6cnVsZXMvRGl2aW5lRW5naW5lL1N1cmdlL1J1bGVzZXQvR3VhcmQvSGlqYWNraW5nLmxpc3Q"
-    path: ./providers/rule-provider_Hijacking_ipcidr.yaml
-    interval: 86400
-  ChatGPT_domain:
-    type: http
-    behavior: domain
-    url: "https://pub-api-1.bianyuan.xyz/getruleset?type=3&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2N1dGV0aG90dy9DbGFzaFJ1bGUvbWFpbi9SdWxlL0NoYXRHUFQubGlzdA"
-    path: ./providers/rule-provider_ChatGPT_domain.yaml
-    interval: 86400
-  OpenAI:
-    type: http
-    behavior: classical
-    url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/OpenAI/OpenAI.yaml"
-    path: ./providers/rule-provider_OpenAI.yaml
-    interval: 86400
-  Claude:
-    type: http
-    behavior: classical
-    url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Claude/Claude.yaml"
-    path: ./providers/rule-provider_Claude.yaml
-    interval: 86400
-  Gemini:
-    type: http
-    behavior: classical
-    url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Gemini/Gemini.yaml"
-    path: ./providers/rule-provider_Gemini.yaml
-    interval: 86400
-  Copilot:
-    type: http
-    behavior: classical
-    url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Copilot/Copilot.yaml"
-    path: ./providers/rule-provider_Copilot.yaml
-    interval: 86400
-  Perplexity_domain:
-    type: http
-    behavior: domain
-    url: "https://pub-api-1.bianyuan.xyz/getruleset?type=3&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2N1dGV0aG90dy9DbGFzaFJ1bGUvbWFpbi9SdWxlL1BlcnBsZXhpdHkubGlzdA"
-    path: ./providers/rule-provider_Perplexity_domain.yaml
-    interval: 86400
-  Grok_domain:
-    type: http
-    behavior: domain
-    url: "https://pub-api-1.bianyuan.xyz/getruleset?type=3&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2N1dGV0aG90dy9DbGFzaFJ1bGUvbWFpbi9SdWxlL0dyb2subGlzdA"
-    path: ./providers/rule-provider_Grok_domain.yaml
-    interval: 86400
-  Game:
-    type: http
-    behavior: classical
-    url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Game/Game.yaml"
-    path: ./providers/rule-provider_Game.yaml
-    interval: 86400
-  GitHub:
-    type: http
-    behavior: classical
-    url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/GitHub/GitHub.yaml"
-    path: ./providers/rule-provider_GitHub.yaml
-    interval: 86400
-  Spotify:
-    type: http
-    behavior: classical
-    url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Spotify/Spotify.yaml"
-    path: ./providers/rule-provider_Spotify.yaml
-    interval: 86400
-  TikTok:
-    type: http
-    behavior: classical
-    url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/TikTok/TikTok.yaml"
-    path: ./providers/rule-provider_TikTok.yaml
-    interval: 86400
-  GlobalMedia_Classical:
-    type: http
-    behavior: classical
-    url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/GlobalMedia/GlobalMedia_Classical.yaml"
-    path: ./providers/rule-provider_GlobalMedia_Classical.yaml
-    interval: 86400
-  ProxyGFWlist_domain:
-    type: http
-    behavior: domain
-    url: "https://pub-api-1.bianyuan.xyz/getruleset?type=3&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvUHJveHlHRldsaXN0Lmxpc3Q"
-    path: ./providers/rule-provider_ProxyGFWlist_domain.yaml
-    interval: 86400
-  ProxyGFWlist_ipcidr:
-    type: http
-    behavior: ipcidr
-    url: "https://pub-api-1.bianyuan.xyz/getruleset?type=4&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvUHJveHlHRldsaXN0Lmxpc3Q"
-    path: ./providers/rule-provider_ProxyGFWlist_ipcidr.yaml
-    interval: 86400
-  Outside_domain:
-    type: http
-    behavior: domain
-    url: "https://pub-api-1.bianyuan.xyz/getruleset?type=3&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2N1dGV0aG90dy9DbGFzaFJ1bGUvbWFpbi9SdWxlL091dHNpZGUubGlzdA"
-    path: ./providers/rule-provider_Outside_domain.yaml
-    interval: 86400
-  Outside_ipcidr:
-    type: http
-    behavior: ipcidr
-    url: "https://pub-api-1.bianyuan.xyz/getruleset?type=4&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2N1dGV0aG90dy9DbGFzaFJ1bGUvbWFpbi9SdWxlL091dHNpZGUubGlzdA"
-    path: ./providers/rule-provider_Outside_ipcidr.yaml
-    interval: 86400
-  Global_domain:
-    type: http
-    behavior: domain
-    url: "https://pub-api-1.bianyuan.xyz/getruleset?type=3&url=c3VyZ2U6cnVsZXMvRGl2aW5lRW5naW5lL1N1cmdlL1J1bGVzZXQvR2xvYmFsLmxpc3Q"
-    path: ./providers/rule-provider_Global_domain.yaml
-    interval: 86400
-  Global_ipcidr:
-    type: http
-    behavior: ipcidr
-    url: "https://pub-api-1.bianyuan.xyz/getruleset?type=4&url=c3VyZ2U6cnVsZXMvRGl2aW5lRW5naW5lL1N1cmdlL1J1bGVzZXQvR2xvYmFsLmxpc3Q"
-    path: ./providers/rule-provider_Global_ipcidr.yaml
-    interval: 86400
-  Netflix:
-    type: http
-    behavior: classical
-    url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Netflix/Netflix.yaml"
-    path: ./providers/rule-provider_Netflix.yaml
-    interval: 86400
-  Netflix_domain:
-    type: http
-    behavior: domain
-    url: "https://pub-api-1.bianyuan.xyz/getruleset?type=3&url=c3VyZ2U6cnVsZXMvRGl2aW5lRW5naW5lL1N1cmdlL1J1bGVzZXQvU3RyZWFtaW5nTWVkaWEvVmlkZW8vTmV0ZmxpeC5saXN0"
-    path: ./providers/rule-provider_Netflix_domain.yaml
-    interval: 86400
-  Netflix_ipcidr:
-    type: http
-    behavior: ipcidr
-    url: "https://pub-api-1.bianyuan.xyz/getruleset?type=4&url=c3VyZ2U6cnVsZXMvRGl2aW5lRW5naW5lL1N1cmdlL1J1bGVzZXQvU3RyZWFtaW5nTWVkaWEvVmlkZW8vTmV0ZmxpeC5saXN0"
-    path: ./providers/rule-provider_Netflix_ipcidr.yaml
-    interval: 86400
-  Streaming_domain:
-    type: http
-    behavior: domain
-    url: "https://pub-api-1.bianyuan.xyz/getruleset?type=3&url=c3VyZ2U6cnVsZXMvRGl2aW5lRW5naW5lL1N1cmdlL1J1bGVzZXQvU3RyZWFtaW5nTWVkaWEvU3RyZWFtaW5nLmxpc3Q"
-    path: ./providers/rule-provider_Streaming_domain.yaml
-    interval: 86400
-  Streaming_ipcidr:
-    type: http
-    behavior: ipcidr
-    url: "https://pub-api-1.bianyuan.xyz/getruleset?type=4&url=c3VyZ2U6cnVsZXMvRGl2aW5lRW5naW5lL1N1cmdlL1J1bGVzZXQvU3RyZWFtaW5nTWVkaWEvU3RyZWFtaW5nLmxpc3Q"
-    path: ./providers/rule-provider_Streaming_ipcidr.yaml
-    interval: 86400
-  ProxyMedia_domain:
-    type: http
-    behavior: domain
-    url: "https://pub-api-1.bianyuan.xyz/getruleset?type=3&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvUHJveHlNZWRpYS5saXN0"
-    path: ./providers/rule-provider_ProxyMedia_domain.yaml
-    interval: 86400
-  ProxyMedia_ipcidr:
-    type: http
-    behavior: ipcidr
-    url: "https://pub-api-1.bianyuan.xyz/getruleset?type=4&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvUHJveHlNZWRpYS5saXN0"
-    path: ./providers/rule-provider_ProxyMedia_ipcidr.yaml
-    interval: 86400
-  ProxyLite_domain:
-    type: http
-    behavior: domain
-    url: "https://pub-api-1.bianyuan.xyz/getruleset?type=3&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvUHJveHlMaXRlLmxpc3Q"
-    path: ./providers/rule-provider_ProxyLite_domain.yaml
-    interval: 86400
-  ProxyLite_ipcidr:
-    type: http
-    behavior: ipcidr
-    url: "https://pub-api-1.bianyuan.xyz/getruleset?type=4&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvUHJveHlMaXRlLmxpc3Q"
-    path: ./providers/rule-provider_ProxyLite_ipcidr.yaml
-    interval: 86400
-  Netease_domain:
-    type: http
-    behavior: domain
-    url: "https://pub-api-1.bianyuan.xyz/getruleset?type=3&url=aHR0cHM6Ly9jZG4uanNkZWxpdnIubmV0L2doL1NsZWVweUhlZWVhZC9zdWJjb252ZXJ0ZXItY29uZmlnQG1hc3Rlci9ydWxlc2V0L21lZGlhL25ldGVhc2UubGlzdA"
-    path: ./providers/rule-provider_netease_domain.yaml
-    interval: 86400
-  Netease_ipcidr:
-    type: http
-    behavior: ipcidr
-    url: "https://pub-api-1.bianyuan.xyz/getruleset?type=4&url=aHR0cHM6Ly9jZG4uanNkZWxpdnIubmV0L2doL1NsZWVweUhlZWVhZC9zdWJjb252ZXJ0ZXItY29uZmlnQG1hc3Rlci9ydWxlc2V0L21lZGlhL25ldGVhc2UubGlzdA"
-    path: ./providers/rule-provider_netease_ipcidr.yaml
-    interval: 86400
-  Inside_domain:
-    type: http
-    behavior: domain
-    url: "https://pub-api-1.bianyuan.xyz/getruleset?type=3&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2N1dGV0aG90dy9DbGFzaFJ1bGUvbWFpbi9SdWxlL0luc2lkZS5saXN0"
-    path: ./providers/rule-provider_Inside_domain.yaml
-    interval: 86400
-  Inside_ipcidr:
-    type: http
-    behavior: ipcidr
-    url: "https://pub-api-1.bianyuan.xyz/getruleset?type=4&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2N1dGV0aG90dy9DbGFzaFJ1bGUvbWFpbi9SdWxlL0luc2lkZS5saXN0"
-    path: ./providers/rule-provider_Inside_ipcidr.yaml
-    interval: 86400
-  SteamCN:
-    type: http
-    behavior: classical
-    url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/SteamCN/SteamCN.yaml"
-    path: ./providers/rule-provider_SteamCN.yaml
-    interval: 86400
-  SteamCN_domain:
-    type: http
-    behavior: domain
-    url: "https://pub-api-1.bianyuan.xyz/getruleset?type=3&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvUnVsZXNldC9TdGVhbUNOLmxpc3Q"
-    path: ./providers/rule-provider_SteamCN_domain.yaml
-    interval: 86400
-  ChinaDomain_domain:
-    type: http
-    behavior: domain
-    url: "https://pub-api-1.bianyuan.xyz/getruleset?type=3&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvQ2hpbmFEb21haW4ubGlzdA"
-    path: ./providers/rule-provider_ChinaDomain_domain.yaml
-    interval: 86400
-  ChinaDomain_ipcidr:
-    type: http
-    behavior: ipcidr
-    url: "https://pub-api-1.bianyuan.xyz/getruleset?type=4&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvQ2hpbmFEb21haW4ubGlzdA"
-    path: ./providers/rule-provider_ChinaDomain_ipcidr.yaml
-    interval: 86400
-  ChinaCompanyIp_ipcidr:
-    type: http
-    behavior: ipcidr
-    url: "https://pub-api-1.bianyuan.xyz/getruleset?type=4&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvQ2hpbmFDb21wYW55SXAubGlzdA"
-    path: ./providers/rule-provider_ChinaCompanyIp_ipcidr.yaml
-    interval: 86400
-  BilibiliHMT_domain:
-    type: http
-    behavior: domain
-    url: "https://pub-api-1.bianyuan.xyz/getruleset?type=3&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvUnVsZXNldC9CaWxpYmlsaUhNVC5saXN0"
-    path: ./providers/rule-provider_BilibiliHMT_domain.yaml
-    interval: 86400
-  BilibiliHMT_ipcidr:
-    type: http
-    behavior: ipcidr
-    url: "https://pub-api-1.bianyuan.xyz/getruleset?type=4&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvUnVsZXNldC9CaWxpYmlsaUhNVC5saXN0"
-    path: ./providers/rule-provider_BilibiliHMT_ipcidr.yaml
-    interval: 86400
-  Bilibili_domain:
-    type: http
-    behavior: domain
-    url: "https://pub-api-1.bianyuan.xyz/getruleset?type=3&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvUnVsZXNldC9CaWxpYmlsaS5saXN0"
-    path: ./providers/rule-provider_Bilibili_domain.yaml
-    interval: 86400
-  ChinaMedia:
-    type: http
-    behavior: classical
-    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/ChinaMedia/ChinaMedia.yaml
-    path: ./providers/rule-provider_ChinaMedia.yaml
-    interval: 86400
-  iQiyi_domain:
-    type: http
-    behavior: domain
-    url: "https://pub-api-1.bianyuan.xyz/getruleset?type=3&url=c3VyZ2U6cnVsZXMvbGhpZTEvU3VyZ2UvU3VyZ2UgMy9Qcm92aWRlci9NZWRpYS9pUWl5aS5saXN0"
-    path: ./providers/rule-provider_iQiyi_domain.yaml
-    interval: 86400
-  iQiyi_ipcidr:
-    type: http
-    behavior: ipcidr
-    url: "https://pub-api-1.bianyuan.xyz/getruleset?type=4&url=c3VyZ2U6cnVsZXMvbGhpZTEvU3VyZ2UvU3VyZ2UgMy9Qcm92aWRlci9NZWRpYS9pUWl5aS5saXN0"
-    path: ./providers/rule-provider_iQiyi_ipcidr.yaml
-    interval: 86400
-  Letv_domain:
-    type: http
-    behavior: domain
-    url: "https://pub-api-1.bianyuan.xyz/getruleset?type=3&url=c3VyZ2U6cnVsZXMvbGhpZTEvU3VyZ2UvU3VyZ2UgMy9Qcm92aWRlci9NZWRpYS9MZXR2Lmxpc3Q"
-    path: ./providers/rule-provider_Letv_domain.yaml
-    interval: 86400
-  Tencent Video_domain:
-    type: http
-    behavior: domain
-    url: "https://pub-api-1.bianyuan.xyz/getruleset?type=3&url=c3VyZ2U6cnVsZXMvbGhpZTEvU3VyZ2UvU3VyZ2UgMy9Qcm92aWRlci9NZWRpYS9UZW5jZW50IFZpZGVvLmxpc3Q"
-    path: ./providers/rule-provider_Tencent Video_domain.yaml
-    interval: 86400
-  Youku_domain:
-    type: http
-    behavior: domain
-    url: "https://pub-api-1.bianyuan.xyz/getruleset?type=3&url=c3VyZ2U6cnVsZXMvbGhpZTEvU3VyZ2UvU3VyZ2UgMy9Qcm92aWRlci9NZWRpYS9Zb3VrdS5saXN0"
-    path: ./providers/rule-provider_Youku_domain.yaml
-    interval: 86400
-  Youku_ipcidr:
-    type: http
-    behavior: ipcidr
-    url: "https://pub-api-1.bianyuan.xyz/getruleset?type=4&url=c3VyZ2U6cnVsZXMvbGhpZTEvU3VyZ2UvU3VyZ2UgMy9Qcm92aWRlci9NZWRpYS9Zb3VrdS5saXN0"
-    path: ./providers/rule-provider_Youku_ipcidr.yaml
-    interval: 86400
-  Download:
-    type: http
-    behavior: classical
-    url: "https://pub-api-1.bianyuan.xyz/getruleset?type=6&url=c3VyZ2U6cnVsZXMvTm9ieURhL1N1cmdlL0Rvd25sb2FkLmxpc3Q"
-    path: ./providers/rule-provider_Download.yaml
-    interval: 86400
+mixed-port: 18888
+allow-lan: true
+bind-address: "*"
+mode: rule
+log-level: info
+external-controller: 0.0.0.0:19090
+external-ui: ui
+external-ui-url: https://github.com/Zephyruso/zashboard/archive/refs/heads/gh-pages.zip
+secret: ""
+routing-mark: 16666
+experimental:
+  ignore-resolve-fail: true
+  sniff-tls-sni: true
+  udp-fallback-match: true
+profile:
+  store-fake-ip: true
+  store-selected: true
+  tracing: true
+ipv6: true
 dns:
   enable: true
-  ipv6: false
-  listen: :23453
-  enhanced-mode: redir-host
-  respect-rules: true
-  proxy-server-nameserver:
-    - https://120.53.53.53/dns-query
-    - https://223.5.5.5/dns-query
-  nameserver-policy:
-    geosite:cn,private: https://120.53.53.53/dns-query
-    geosite:geolocation-!cn: https://dns.cloudflare.com/dns-query
-    "+.steampowered.com": "223.5.5.5"
-    "geosite:cn,apple,bilibili": https://doh.pub/dns-query
+  listen: 0.0.0.0:1053
+  ipv6: true
+  use-system-hosts: false
+  default-nameserver:
+    - 223.5.5.5
+    - 119.29.29.29
+    - 1.1.1.1
+  enhanced-mode: fake-ip
+  fake-ip-range: 22.0.0.0/8
+  fake-ip-filter-mode: blacklist
+  fake-ip-filter:
+    - "*.example"
+    - "*.home.arpa"
+    - "*.invalid"
+    - "*.lan"
+    - "*.local"
+    - "*.localdomain"
+    - "*.localhost"
+    - "*.test"
+    - mesu.apple.com
+    - swscan.apple.com
+    - "*.router.asus.com"
+    - "*.linksys.com"
+    - "*.linksyssmartwifi.com"
+    - "*.ipv6.microsoft.com"
+    - "*.msftconnecttest.com"
+    - "*.msftncsi.com"
+    - msftconnecttest.com
+    - msftncsi.com
+    - ntp.*.com
+    - ntp1.*.com
+    - ntp2.*.com
+    - ntp3.*.com
+    - ntp4.*.com
+    - ntp5.*.com
+    - ntp6.*.com
+    - ntp7.*.com
+    - time.*.apple.com
+    - time.*.com
+    - time.*.gov
+    - time1.*.com
+    - time2.*.com
+    - time3.*.com
+    - time4.*.com
+    - time5.*.com
+    - time6.*.com
+    - time7.*.com
+    - time.*.edu.cn
+    - "*.time.edu.cn"
+    - "*.ntp.org.cn"
+    - +.pool.ntp.org
+    - time1.cloud.tencent.com
+    - localhost.ptlogin2.qq.com
+    - localhost.sec.qq.com
+    - Mijia Cloud
+    - +.mijia.tech
   nameserver:
-    - tls://jp01.dns4me.net
-    - https://dns.csaonline.de/dns-query
-    - tls://unfiltered.adguard-dns.com
-    - https://120.53.53.53/dns-query
-    - https://223.5.5.5/dns-query
-mixed-port: 7890
-allow-lan: false
-mode: rule
-log-level: warning
-external-controller: 127.0.0.1:9090
-clash-for-android:
-  append-system-dns: false
-unified-delay: true
+    - 223.5.5.5
+    - 119.29.29.29
+    - dhcp://system
+    - https://dns.alidns.com/dns-query
+    - https://doh.pub/dns-query
+    - https://dns.ipv6dns.com/dns-query
+    - https://rubyfish.cn/dns-query
+    - https://all.dns.mullvad.net/dns-query
+    - https://unfiltered.adguard-dns.com/dns-query
+  fallback:
+    - https://cloudflare-dns.com/dns-query
+    - https://dns.google/dns-query
+    - https://doh.dns.sb/dns-query
+    - https://dns.twnic.tw/dns-query
+    - https://doh.opendns.com/dns-query
+    - https://all.dns.mullvad.net/dns-query
+    - https://dns.quad9.net/dns-query
+  fallback-filter:
+    ipcidr:
+      - 0.0.0.0/32
+      - 100.64.0.0/10
+      - 127.0.0.0/8
+      - 240.0.0.0/4
+      - 255.255.255.255/32
+  skip-domain:
+    - Mijia Cloud
+    - +.mijia.tech
+find-process-mode: strict
+tcp-concurrent: true
 global-client-fingerprint: chrome
-keep-alive-interval: 360
+keep-alive-interval: 30
+unified-delay: true
+clash-for-android:
+  ui-subtitle-pattern: "[\\u4e00-\\u9fa5]{2,4}"
