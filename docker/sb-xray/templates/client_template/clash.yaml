@@ -200,14 +200,14 @@ proxy-groups:
   #   lazy: true
   #   include-all: true
 
-    # - name: 🎭 AnyTLS
-    #   filter: "(?i)anytls"
-    #   icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Lock.png
-    #   type: select
-    #   interval: 300
-    #   tolerance: 50
-    #   lazy: true
-    #   include-all: true
+  # - name: 🎭 AnyTLS
+  #   filter: "(?i)anytls"
+  #   icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Lock.png
+  #   type: select
+  #   interval: 300
+  #   tolerance: 50
+  #   lazy: true
+  #   include-all: true
 
 
   # 基于地区分组
