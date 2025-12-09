@@ -29,8 +29,8 @@ docker buildx build \
   --build-arg CLOUDFLARED_VERSION="2025.11.1" \
   --build-arg XUI_VERSION="2.8.5" \
   --build-arg SING_BOX_VERSION="1.12.12" \
-  --build-arg XRAY_VERSION="25.12.2" \
-  --tag currycan/sb-xray:25.12.2 \
+  --build-arg XRAY_VERSION="25.12.8" \
+  --tag currycan/sb-xray:25.12.8 \
   --push .
 ```
 
