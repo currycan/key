@@ -14,6 +14,8 @@ https://raw.githubusercontent.com/currycan/key/master/docker/sb-xray/templates/A
 
 https://raw.githubusercontent.com/currycan/key/master/docker/sb-xray/templates/ACL4SSR/ACL4SSR_Online.ini
 
+https://raw.githubusercontent.com/currycan/key/master/docker/sb-xray/templates/ACL4SSR/ACL4SSR_Online_Lite.ini
+
 
 ## Tailscale 设置
 
