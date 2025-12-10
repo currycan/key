@@ -12,8 +12,6 @@ https://mylink.ansandy.site/sub?
 
 https://raw.githubusercontent.com/currycan/key/master/docker/sb-xray/templates/ACL4SSR/ACL4SSR_Online_Full.ini
 
-https://raw.githubusercontent.com/currycan/key/master/docker/sb-xray/templates/ACL4SSR/ACL4SSR_Online_Lite.ini
-
 https://raw.githubusercontent.com/currycan/key/master/docker/sb-xray/templates/ACL4SSR/ACL4SSR_Online_No_DNS_Leak.ini
 
 
