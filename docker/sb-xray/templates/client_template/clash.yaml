@@ -263,34 +263,195 @@ proxy-groups:
 
 rules:
   - RULE-SET,BanProgramAD1 (Domain),🛑 广告拦截
+  - DOMAIN-KEYWORD,112wan,🛑 广告拦截
+  - DOMAIN-KEYWORD,789htbet,🛑 广告拦截
+  - DOMAIN-KEYWORD,a.9game.cn,🛑 广告拦截
+  - DOMAIN-KEYWORD,a.wkanx.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,a3.bytecdn.cn,🛑 广告拦截
+  - DOMAIN-KEYWORD,a3.pstatp.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,ad.api.moji.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,ad.ihuman.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,ad.toutiao.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,adash.man.aliyuncs.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,adform,🛑 广告拦截
+  - DOMAIN-KEYWORD,adm3.autoimg.cn,🛑 广告拦截
   - DOMAIN-KEYWORD,admarvel,🛑 广告拦截
   - DOMAIN-KEYWORD,admaster,🛑 广告拦截
+  - DOMAIN-KEYWORD,adp.atm.youku.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,adproxy.autohome.com,🛑 广告拦截
   - DOMAIN-KEYWORD,adsage,🛑 广告拦截
   - DOMAIN-KEYWORD,adsensor,🛑 广告拦截
+  - DOMAIN-KEYWORD,adservice,🛑 广告拦截
+  - DOMAIN-KEYWORD,adsfilebssdlbig.ali.kugou.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,adshare.toutiao.com,🛑 广告拦截
   - DOMAIN-KEYWORD,adsmogo,🛑 广告拦截
   - DOMAIN-KEYWORD,adsrvmedia,🛑 广告拦截
   - DOMAIN-KEYWORD,adsserving,🛑 广告拦截
   - DOMAIN-KEYWORD,adsystem,🛑 广告拦截
+  - DOMAIN-KEYWORD,adtrack.ucweb.com,🛑 广告拦截
   - DOMAIN-KEYWORD,adwords,🛑 广告拦截
+  - DOMAIN-KEYWORD,afpapi.alimama.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,android.bugly.qq.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,ap.51y5.net,🛑 广告拦截
+  - DOMAIN-KEYWORD,api.freed.so,🛑 广告拦截
+  - DOMAIN-KEYWORD,api.sobot.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,apiinit.amap.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,apimg.qunliao.info,🛑 广告拦截
+  - DOMAIN-KEYWORD,app.51y5.net,🛑 广告拦截
+  - DOMAIN-KEYWORD,applogapi.autohome.com,🛑 广告拦截
   - DOMAIN-KEYWORD,applovin,🛑 广告拦截
   - DOMAIN-KEYWORD,appsflyer,🛑 广告拦截
+  - DOMAIN-KEYWORD,asewlfjqwlflkew,🛑 广告拦截
+  - DOMAIN-KEYWORD,asiad.byteactivity,🛑 广告拦截
+  - DOMAIN-KEYWORD,av1.xdrig.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,bds.snssdk.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,bdsp.x.jd.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,bj.imp.voiceads.cn,🛑 广告拦截
+  - DOMAIN-KEYWORD,bngpt,🛑 广告拦截
+  - DOMAIN-KEYWORD,bongacash,🛑 广告拦截
+  - DOMAIN-KEYWORD,brushshopy,🛑 广告拦截
+  - DOMAIN-KEYWORD,c-hzgt2.getui.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,c.51y5.net,🛑 广告拦截
+  - DOMAIN-KEYWORD,c.wkanx.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,c1.wkanx.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,c1img.ali.kugou.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,caclick.baidu.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,cds.51y5.net,🛑 广告拦截
+  - DOMAIN-KEYWORD,client-dmp.suishenyun.cn,🛑 广告拦截
+  - DOMAIN-KEYWORD,clk.gentags.net,🛑 广告拦截
+  - DOMAIN-KEYWORD,cm-10-134.getui.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,cm-10-35.getui.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,collectionpv.che168.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,config.51y5.net,🛑 广告拦截
+  - DOMAIN-KEYWORD,config.y5en.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,count.atm.youku.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,cpu.baidu.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,dfkj8,🛑 广告拦截
+  - DOMAIN-KEYWORD,dlads,🛑 广告拦截
+  - DOMAIN-KEYWORD,dm.bytedance.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,dm.pstatp.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,dm.toutiao.com,🛑 广告拦截
   - DOMAIN-KEYWORD,domob,🛑 广告拦截
+  - DOMAIN-KEYWORD,dtscout,🛑 广告拦截
   - DOMAIN-KEYWORD,duomeng,🛑 广告拦截
   - DOMAIN-KEYWORD,dwtrack,🛑 广告拦截
+  - DOMAIN-KEYWORD,e2wysbacctt1,🛑 广告拦截
+  - DOMAIN-KEYWORD,editor.sm.cn,🛑 广告拦截
+  - DOMAIN-KEYWORD,ems.youku.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,exosrv,🛑 广告拦截
+  - DOMAIN-KEYWORD,extlog.snssdk.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,fans.m.tmall.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,fc-video.cdn.bcebos.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,fds.api.moji.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,greenplasticdua,🛑 广告拦截
   - DOMAIN-KEYWORD,guanggao,🛑 广告拦截
+  - DOMAIN-KEYWORD,haowanyou,🛑 广告拦截
+  - DOMAIN-KEYWORD,highwebmedia,🛑 广告拦截
+  - DOMAIN-KEYWORD,histats,🛑 广告拦截
+  - DOMAIN-KEYWORD,huichuan-mc.sm.cn,🛑 广告拦截
+  - DOMAIN-KEYWORD,huichuan.sm.cn,🛑 广告拦截
+  - DOMAIN-KEYWORD,iflyad.bj.openstorage.cn,🛑 广告拦截
+  - DOMAIN-KEYWORD,image.bianxianmao.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,img1.czb365.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,in-page-push,🛑 广告拦截
+  - DOMAIN-KEYWORD,insurance.lianwifi.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,js.union-wifi.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,juruigj,🛑 广告拦截
+  - DOMAIN-KEYWORD,kepler.jd.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,keplerapi.jd.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,kgipadstat.kugou.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,kgipadstatbak.kugou.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,kgstaticdlbssdlbig.tx.kugou.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,lieyou,🛑 广告拦截
+  - DOMAIN-KEYWORD,lkme.cc,🛑 广告拦截
+  - DOMAIN-KEYWORD,log-dmp.suishenyun.cn,🛑 广告拦截
+  - DOMAIN-KEYWORD,log.cs.pp.cn,🛑 广告拦截
+  - DOMAIN-KEYWORD,login.push.51y5.net,🛑 广告拦截
+  - DOMAIN-KEYWORD,logwebs.kugou.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,m.atm.youku.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,m.panda.voiceads.cn,🛑 广告拦截
+  - DOMAIN-KEYWORD,m.suning.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,mapi.m.jd.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,mathtag,🛑 广告拦截
+  - DOMAIN-KEYWORD,mdapp09,🛑 广告拦截
+  - DOMAIN-KEYWORD,me.api.moji.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,medicine.lanjiyin.com.cn,🛑 广告拦截
+  - DOMAIN-KEYWORD,mifengv,🛑 广告拦截
+  - DOMAIN-KEYWORD,mmiyue,🛑 广告拦截
+  - DOMAIN-KEYWORD,mobads.baidu.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,mobilead.kuwo.cn,🛑 广告拦截
+  - DOMAIN-KEYWORD,mpos-pic.helipay.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,msg.push.51y5.net,🛑 广告拦截
+  - DOMAIN-KEYWORD,nbcollect.kugou.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,nbcollectretry.kugou.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,news-log.51y5.net,🛑 广告拦截
+  - DOMAIN-KEYWORD,news.51y5.net,🛑 广告拦截
+  - DOMAIN-KEYWORD,o333o,🛑 广告拦截
   - DOMAIN-KEYWORD,omgmta,🛑 广告拦截
   - DOMAIN-KEYWORD,omniture,🛑 广告拦截
+  - DOMAIN-KEYWORD,onenews,🛑 广告拦截
   - DOMAIN-KEYWORD,openx,🛑 广告拦截
+  - DOMAIN-KEYWORD,ossp.voicecloud.cn,🛑 广告拦截
+  - DOMAIN-KEYWORD,p3-pack.byteimg.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,p3.pstatp.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,p6-pack.byteimg.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,pagespeed-mod,🛑 广告拦截
+  - DOMAIN-KEYWORD,pangolin-sdk-toutiao,🛑 广告拦截
+  - DOMAIN-KEYWORD,paradisestatic.vivo.com.cn,🛑 广告拦截
   - DOMAIN-KEYWORD,partnerad,🛑 广告拦截
+  - DOMAIN-KEYWORD,pc.suishenyun.net,🛑 广告拦截
+  - DOMAIN-KEYWORD,pdds.ucweb.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,pglstatp-toutiao,🛑 广告拦截
   - DOMAIN-KEYWORD,pingfore,🛑 广告拦截
+  - DOMAIN-KEYWORD,policy.jd.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,puds.ucweb.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,r1.ykimg.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,rescn.u3.ucweb.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,rich.kuwo.cn,🛑 广告拦截
+  - DOMAIN-KEYWORD,rt-m.kugou.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,rtmretry.kugou.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,s1.pstatp.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,s2.pstatp.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,s3.pstatp.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,s3a.pstatp.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,sdfp.snssdk.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,sdk.open.talk.getui.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,searchrecommend.kugou.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,server.m.pp.cn,🛑 广告拦截
   - DOMAIN-KEYWORD,socdm,🛑 广告拦截
+  - DOMAIN-KEYWORD,splashimgbssdl.yun.kugou.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,stsdk.vivo.com.cn,🛑 广告拦截
+  - DOMAIN-KEYWORD,stsdk.vivoglobal.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,stunninglover,🛑 广告拦截
   - DOMAIN-KEYWORD,supersonicads,🛑 广告拦截
+  - DOMAIN-KEYWORD,talk.bz.getui.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,toateeli,🛑 广告拦截
+  - DOMAIN-KEYWORD,tosv.boe.byted.org,🛑 广告拦截
+  - DOMAIN-KEYWORD,tosv.byted.org,🛑 广告拦截
+  - DOMAIN-KEYWORD,track.uc.cn,🛑 广告拦截
+  - DOMAIN-KEYWORD,tracker.kugou.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,trackercdnbj.kugou.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,trwl1,🛑 广告拦截
+  - DOMAIN-KEYWORD,tunion-api.m.taobao.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,umeng,🛑 广告拦截
+  - DOMAIN-KEYWORD,utp-dmp.ucweb.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,utp.ucweb.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,v0-client-lz.rili.cn,🛑 广告拦截
+  - DOMAIN-KEYWORD,v1.log.moji.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,v2.reachmax.cn,🛑 广告拦截
+  - DOMAIN-KEYWORD,val.atm.youku.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,vidoza,🛑 广告拦截
+  - DOMAIN-KEYWORD,vs10.bj2ct.u3.ucweb.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,wgo.mmstat.com,🛑 广告拦截
+  - DOMAIN-KEYWORD,wixsite.com,🛑 广告拦截
   - DOMAIN-KEYWORD,wlmonitor,🛑 广告拦截
+  - DOMAIN-KEYWORD,www.qmlog.cn,🛑 广告拦截
+  - DOMAIN-KEYWORD,xn--2qux23c9ziyrq,🛑 广告拦截
+  - DOMAIN-KEYWORD,xxshuyuan,🛑 广告拦截
+  - DOMAIN-KEYWORD,ynuf.alipay.com,🛑 广告拦截
   - DOMAIN-KEYWORD,zjtoolbar,🛑 广告拦截
-  - RULE-SET,BanAD (Domain),🛑 广告拦截
-  - DOMAIN-KEYWORD,omgmtaw,🛑 广告拦截
-  - RULE-SET,BanProgramAD (Domain),🛑 广告拦截
-  - RULE-SET,BanProgramAD (IP-CIDR),🛑 广告拦截,no-resolve
+  - RULE-SET,AdvertisingLite (Domain),🛑 广告拦截
+  - RULE-SET,AdvertisingLite (IP-CIDR),🛑 广告拦截,no-resolve
   - DOMAIN-KEYWORD,.tmall.com,🌏 国内媒体
   - DOMAIN-KEYWORD,alicdn,🌏 国内媒体
   - DOMAIN-KEYWORD,alipay,🌏 国内媒体
@@ -319,44 +480,6 @@ rules:
   - RULE-SET,China_All (IP-CIDR),🎯 全球直连
   - RULE-SET,ChinaDNS (Domain),🎯 全球直连
   - RULE-SET,ChinaDNS (IP-CIDR),🎯 全球直连,no-resolve
-  - RULE-SET,ChinaIPs (IP-CIDR),🎯 全球直连,no-resolve
-  - DOMAIN-KEYWORD,amp-api.podcasts.apple.com,🎯 全球直连
-  - DOMAIN-KEYWORD,anti-ad.net,🎯 全球直连
-  - DOMAIN-KEYWORD,api-adservices.apple.com,🎯 全球直连
-  - DOMAIN-KEYWORD,api.smoot.apple.cn,🎯 全球直连
-  - DOMAIN-KEYWORD,api.smoot.apple.com,🎯 全球直连
-  - DOMAIN-KEYWORD,aw-s.tripcdn.com,🎯 全球直连
-  - DOMAIN-KEYWORD,ax1x.com,🎯 全球直连
-  - DOMAIN-KEYWORD,bfzycdn.com,🎯 全球直连
-  - DOMAIN-KEYWORD,buy.itunes.apple.com,🎯 全球直连
-  - DOMAIN-KEYWORD,cnki.net,🎯 全球直连
-  - DOMAIN-KEYWORD,ctc.qzs.qzone.qq.com,🎯 全球直连
-  - DOMAIN-KEYWORD,deepdyve,🎯 全球直连
-  - DOMAIN-KEYWORD,els-cdn,🎯 全球直连
-  - DOMAIN-KEYWORD,elsevier,🎯 全球直连
-  - DOMAIN-KEYWORD,ess.apple.com,🎯 全球直连
-  - DOMAIN-KEYWORD,gsa.apple.com,🎯 全球直连
-  - DOMAIN-KEYWORD,humb.apple.com,🎯 全球直连
-  - DOMAIN-KEYWORD,icloud.com,🎯 全球直连
-  - DOMAIN-KEYWORD,ls.apple.com,🎯 全球直连
-  - DOMAIN-KEYWORD,o.lencr.org,🎯 全球直连
-  - DOMAIN-KEYWORD,pkulaw,🎯 全球直连
-  - DOMAIN-KEYWORD,push.apple.com,🎯 全球直连
-  - DOMAIN-KEYWORD,readcube,🎯 全球直连
-  - DOMAIN-KEYWORD,sciencedirect,🎯 全球直连
-  - DOMAIN-KEYWORD,ssl.apple.com,🎯 全球直连
-  - DOMAIN-KEYWORD,trip.com,🎯 全球直连
-  - DOMAIN-KEYWORD,ttcdn-tos.kkimg.cc,🎯 全球直连
-  - DOMAIN-KEYWORD,vip.ffzy-online,🎯 全球直连
-  - DOMAIN-KEYWORD,vip.ffzy-play,🎯 全球直连
-  - DOMAIN-KEYWORD,vip.kuaikan-cdn,🎯 全球直连
-  - DOMAIN-KEYWORD,vip.lz-cdn,🎯 全球直连
-  - DOMAIN-KEYWORD,wanfangdata,🎯 全球直连
-  - DOMAIN-KEYWORD,wb_ad,🎯 全球直连
-  - DOMAIN-KEYWORD,weather-adge.apple.com,🎯 全球直连
-  - DOMAIN-KEYWORD,weather-edge.apple.com,🎯 全球直连
-  - DOMAIN-KEYWORD,westlawchina,🎯 全球直连
-  - RULE-SET,Direct (Domain),🎯 全球直连
   - DOMAIN-KEYWORD,aria2,🎯 全球直连
   - DOMAIN-KEYWORD,thunder,🎯 全球直连
   - DOMAIN-KEYWORD,xlliveud,🎯 全球直连
@@ -367,31 +490,12 @@ rules:
   - RULE-SET,LocalAreaNetwork (IP-CIDR),🎯 全球直连,no-resolve
   - RULE-SET,UnBan1 (Domain),🎯 全球直连
   - RULE-SET,ChinaOnly (Domain),🎯 全球直连
+  - RULE-SET,GoogleCN (Domain),🎯 全球直连
   - RULE-SET,SteamCN (Domain),🎯 全球直连
-  - DOMAIN-KEYWORD,360buy,🎯 全球直连
-  - DOMAIN-KEYWORD,alicdn,🎯 全球直连
-  - DOMAIN-KEYWORD,alimama,🎯 全球直连
-  - DOMAIN-KEYWORD,alipay,🎯 全球直连
-  - DOMAIN-KEYWORD,appzapp,🎯 全球直连
-  - DOMAIN-KEYWORD,baidupcs,🎯 全球直连
-  - DOMAIN-KEYWORD,bilibili,🎯 全球直连
-  - DOMAIN-KEYWORD,ccgslb,🎯 全球直连
-  - DOMAIN-KEYWORD,chinacache,🎯 全球直连
-  - DOMAIN-KEYWORD,duobao,🎯 全球直连
-  - DOMAIN-KEYWORD,jdpay,🎯 全球直连
-  - DOMAIN-KEYWORD,moke,🎯 全球直连
-  - DOMAIN-KEYWORD,qhimg,🎯 全球直连
-  - DOMAIN-KEYWORD,vpimg,🎯 全球直连
-  - DOMAIN-KEYWORD,xiami,🎯 全球直连
-  - DOMAIN-KEYWORD,xiaomi,🎯 全球直连
-  - RULE-SET,ChinaDomain (Domain),🎯 全球直连
-  - RULE-SET,ChinaDomain (IP-CIDR),🎯 全球直连,no-resolve
   - RULE-SET,ChinaCompanyIp (IP-CIDR),🎯 全球直连,no-resolve
-  - RULE-SET,Epic (Domain),🎮 游戏平台
+  - RULE-SET,Game,🎮 游戏平台
   - RULE-SET,Origin (Domain),🎮 游戏平台
   - RULE-SET,Sony (Domain),🎮 游戏平台
-  - RULE-SET,Steam (Domain),🎮 游戏平台
-  - RULE-SET,Nintendo (Domain),🎮 游戏平台
   - DOMAIN-KEYWORD,anthropic,🤖 Ai平台
   - DOMAIN-KEYWORD,claude,🤖 Ai平台
   - DOMAIN-KEYWORD,openai,🤖 Ai平台
@@ -403,6 +507,7 @@ rules:
   - RULE-SET,TikTok (Domain),🍒 TikTok
   - DOMAIN-KEYWORD,apiproxy-device-prod-nlb-,🍿 Netflix
   - DOMAIN-KEYWORD,dualstack.apiproxy-,🍿 Netflix
+  - DOMAIN-KEYWORD,dualstack.ichnaea-web-,🍿 Netflix
   - DOMAIN-KEYWORD,netflixdnstest,🍿 Netflix
   - RULE-SET,Netflix (Domain),🍿 Netflix
   - RULE-SET,Netflix (IP-CIDR),🍿 Netflix,no-resolve
@@ -410,35 +515,6 @@ rules:
   - RULE-SET,YouTube (Domain),▶️ Youtube
   - RULE-SET,YouTube (IP-CIDR),▶️ Youtube,no-resolve
   - RULE-SET,YouTubeMusic (Domain),▶️ Youtube
-  - RULE-SET,Telegram (Domain),📲 电报消息
-  - RULE-SET,Telegram (IP-CIDR),📲 电报消息,no-resolve
-  - DOMAIN-KEYWORD,anthropic,🌍 国外媒体
-  - DOMAIN-KEYWORD,claude,🌍 国外媒体
-  - DOMAIN-KEYWORD,openai,🌍 国外媒体
-  - DOMAIN-KEYWORD,abematv.akamaized.net,🌍 国外媒体
-  - DOMAIN-KEYWORD,avoddashs,🌍 国外媒体
-  - DOMAIN-KEYWORD,bbcfmt,🌍 国外媒体
-  - DOMAIN-KEYWORD,uk-live,🌍 国外媒体
-  - DOMAIN-KEYWORD,voddazn,🌍 国外媒体
-  - DOMAIN-KEYWORD,hbogoasia,🌍 国外媒体
-  - DOMAIN-KEYWORD,jooxweb-api,🌍 国外媒体
-  - DOMAIN-KEYWORD,japonx,🌍 国外媒体
-  - DOMAIN-KEYWORD,japronx,🌍 国外媒体
-  - DOMAIN-KEYWORD,nowtv100,🌍 国外媒体
-  - DOMAIN-KEYWORD,rthklive,🌍 国外媒体
-  - DOMAIN-KEYWORD,apiproxy-device-prod-nlb-,🌍 国外媒体
-  - DOMAIN-KEYWORD,dualstack.apiproxy-,🌍 国外媒体
-  - DOMAIN-KEYWORD,netflixdnstest,🌍 国外媒体
-  - DOMAIN-KEYWORD,nivod,🌍 国外媒体
-  - DOMAIN-KEYWORD,olevod,🌍 国外媒体
-  - DOMAIN-KEYWORD,openai,🌍 国外媒体
-  - DOMAIN-KEYWORD,-spotify-,🌍 国外媒体
-  - DOMAIN-KEYWORD,spotify.com,🌍 国外媒体
-  - DOMAIN-KEYWORD,tiktokcdn,🌍 国外媒体
-  - DOMAIN-KEYWORD,ttvnw,🌍 国外媒体
-  - DOMAIN-KEYWORD,youtube,🌍 国外媒体
-  - RULE-SET,ProxyMedia (Domain),🌍 国外媒体
-  - RULE-SET,ProxyMedia (IP-CIDR),🌍 国外媒体,no-resolve
   - DOMAIN-KEYWORD,abematv.akamaized.net,🌍 国外媒体
   - DOMAIN-KEYWORD,anthropic,🌍 国外媒体
   - DOMAIN-KEYWORD,apiproxy-device-prod-nlb-,🌍 国外媒体
@@ -467,34 +543,6 @@ rules:
   - DOMAIN-KEYWORD,youtube,🌍 国外媒体
   - RULE-SET,GlobalMedia (Domain),🌍 国外媒体
   - RULE-SET,GlobalMedia (IP-CIDR),🌍 国外媒体,no-resolve
-  - DOMAIN-KEYWORD,1e100,🚀 节点选择
-  - DOMAIN-KEYWORD,abema,🚀 节点选择
-  - DOMAIN-KEYWORD,appledaily,🚀 节点选择
-  - DOMAIN-KEYWORD,avtb,🚀 节点选择
-  - DOMAIN-KEYWORD,beetalk,🚀 节点选择
-  - DOMAIN-KEYWORD,blogspot,🚀 节点选择
-  - DOMAIN-KEYWORD,dropbox,🚀 节点选择
-  - DOMAIN-KEYWORD,facebook,🚀 节点选择
-  - DOMAIN-KEYWORD,fbcdn,🚀 节点选择
-  - DOMAIN-KEYWORD,github,🚀 节点选择
-  - DOMAIN-KEYWORD,gmail,🚀 节点选择
-  - DOMAIN-KEYWORD,google,🚀 节点选择
-  - DOMAIN-KEYWORD,instagram,🚀 节点选择
-  - DOMAIN-KEYWORD,porn,🚀 节点选择
-  - DOMAIN-KEYWORD,sci-hub,🚀 节点选择
-  - DOMAIN-KEYWORD,spotify,🚀 节点选择
-  - DOMAIN-KEYWORD,telegram,🚀 节点选择
-  - DOMAIN-KEYWORD,twitter,🚀 节点选择
-  - DOMAIN-KEYWORD,whatsapp,🚀 节点选择
-  - DOMAIN-KEYWORD,youtube,🚀 节点选择
-  - DOMAIN-KEYWORD,uk-live,🚀 节点选择
-  - DOMAIN-KEYWORD,1drv,🚀 节点选择
-  - DOMAIN-KEYWORD,onedrive,🚀 节点选择
-  - DOMAIN-KEYWORD,skydrive,🚀 节点选择
-  - DOMAIN-KEYWORD,porn,🚀 节点选择
-  - DOMAIN-KEYWORD,ttvnw,🚀 节点选择
-  - RULE-SET,ProxyGFWlist (Domain),🚀 节点选择
-  - RULE-SET,ProxyGFWlist (IP-CIDR),🚀 节点选择,no-resolve
   - DOMAIN-KEYWORD,amazon,🚀 节点选择
   - DOMAIN-KEYWORD,avoddashs,🚀 节点选择
   - DOMAIN-KEYWORD,bbcfmt,🚀 节点选择
@@ -542,23 +590,17 @@ rule-providers:
     url: "https://url.v1.mk/getruleset?type=3&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL3pzb2thbWkvQUNMNFNTUi9tYWluL0JhblByb2dyYW1BRDEubGlzdA"
     path: ./providers/6173259271625813138_domain.yaml
     interval: 86400
-  BanAD (Domain):
+  AdvertisingLite (Domain):
     type: http
     behavior: domain
-    url: "https://url.v1.mk/getruleset?type=3&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvQmFuQUQubGlzdA"
-    path: ./providers/5345470858595246832_domain.yaml
+    url: "https://url.v1.mk/getruleset?type=3&url=aHR0cHM6Ly9jZG4uanNkZWxpdnIubmV0L2doL2JsYWNrbWF0cml4Ny9pb3NfcnVsZV9zY3JpcHRAbWFzdGVyL3J1bGUvQ2xhc2gvQWR2ZXJ0aXNpbmdMaXRlL0FkdmVydGlzaW5nTGl0ZS5saXN0"
+    path: ./providers/14189821705938495425_domain.yaml
     interval: 86400
-  BanProgramAD (Domain):
-    type: http
-    behavior: domain
-    url: "https://url.v1.mk/getruleset?type=3&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvQmFuUHJvZ3JhbUFELmxpc3Q"
-    path: ./providers/12627286518854712958_domain.yaml
-    interval: 86400
-  BanProgramAD (IP-CIDR):
+  AdvertisingLite (IP-CIDR):
     type: http
     behavior: ipcidr
-    url: "https://url.v1.mk/getruleset?type=4&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvQmFuUHJvZ3JhbUFELmxpc3Q"
-    path: ./providers/12627286518854712958_ipcidr.yaml
+    url: "https://url.v1.mk/getruleset?type=4&url=aHR0cHM6Ly9jZG4uanNkZWxpdnIubmV0L2doL2JsYWNrbWF0cml4Ny9pb3NfcnVsZV9zY3JpcHRAbWFzdGVyL3J1bGUvQ2xhc2gvQWR2ZXJ0aXNpbmdMaXRlL0FkdmVydGlzaW5nTGl0ZS5saXN0"
+    path: ./providers/14189821705938495425_ipcidr.yaml
     interval: 86400
   ChinaMax (Domain):
     type: http
@@ -596,18 +638,6 @@ rule-providers:
     url: "https://url.v1.mk/getruleset?type=4&url=aHR0cHM6Ly9jZG4uanNkZWxpdnIubmV0L2doL2JsYWNrbWF0cml4Ny9pb3NfcnVsZV9zY3JpcHRAbWFzdGVyL3J1bGUvQ2xhc2gvQ2hpbmFETlMvQ2hpbmFETlMubGlzdA"
     path: ./providers/7614443458375883975_ipcidr.yaml
     interval: 86400
-  ChinaIPs (IP-CIDR):
-    type: http
-    behavior: ipcidr
-    url: "https://url.v1.mk/getruleset?type=4&url=aHR0cHM6Ly9jZG4uanNkZWxpdnIubmV0L2doL2JsYWNrbWF0cml4Ny9pb3NfcnVsZV9zY3JpcHRAbWFzdGVyL3J1bGUvU3VyZ2UvQ2hpbmFJUHMvQ2hpbmFJUHMubGlzdA"
-    path: ./providers/13827040339102188340_ipcidr.yaml
-    interval: 86400
-  Direct (Domain):
-    type: http
-    behavior: domain
-    url: "https://url.v1.mk/getruleset?type=3&url=aHR0cHM6Ly9jZG4uanNkZWxpdnIubmV0L2doL2JsYWNrbWF0cml4Ny9pb3NfcnVsZV9zY3JpcHRAbWFzdGVyL3J1bGUvQ2xhc2gvRGlyZWN0L0RpcmVjdC5saXN0"
-    path: ./providers/18048151772316621409_domain.yaml
-    interval: 86400
   Download (Domain):
     type: http
     behavior: domain
@@ -638,23 +668,17 @@ rule-providers:
     url: "https://url.v1.mk/getruleset?type=3&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL3pzb2thbWkvQUNMNFNTUi9tYWluL0NoaW5hT25seS5saXN0"
     path: ./providers/7276131223849330222_domain.yaml
     interval: 86400
+  GoogleCN (Domain):
+    type: http
+    behavior: domain
+    url: "https://url.v1.mk/getruleset?type=3&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL3pzb2thbWkvQUNMNFNTUi9tYWluL0dvb2dsZUNOLmxpc3Q"
+    path: ./providers/8010874583161866269_domain.yaml
+    interval: 86400
   SteamCN (Domain):
     type: http
     behavior: domain
     url: "https://url.v1.mk/getruleset?type=3&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvUnVsZXNldC9TdGVhbUNOLmxpc3Q"
     path: ./providers/9218514496462299588_domain.yaml
-    interval: 86400
-  ChinaDomain (Domain):
-    type: http
-    behavior: domain
-    url: "https://url.v1.mk/getruleset?type=3&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvQ2hpbmFEb21haW4ubGlzdA"
-    path: ./providers/4162648423616508953_domain.yaml
-    interval: 86400
-  ChinaDomain (IP-CIDR):
-    type: http
-    behavior: ipcidr
-    url: "https://url.v1.mk/getruleset?type=4&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvQ2hpbmFEb21haW4ubGlzdA"
-    path: ./providers/4162648423616508953_ipcidr.yaml
     interval: 86400
   ChinaCompanyIp (IP-CIDR):
     type: http
@@ -662,11 +686,11 @@ rule-providers:
     url: "https://url.v1.mk/getruleset?type=4&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvQ2hpbmFDb21wYW55SXAubGlzdA"
     path: ./providers/2560834305431378741_ipcidr.yaml
     interval: 86400
-  Epic (Domain):
+  Game:
     type: http
-    behavior: domain
-    url: "https://url.v1.mk/getruleset?type=3&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvUnVsZXNldC9FcGljLmxpc3Q"
-    path: ./providers/2002866050337731182_domain.yaml
+    behavior: classical
+    url: "https://url.v1.mk/getruleset?type=6&url=aHR0cHM6Ly9jZG4uanNkZWxpdnIubmV0L2doL2JsYWNrbWF0cml4Ny9pb3NfcnVsZV9zY3JpcHRAbWFzdGVyL3J1bGUvQ2xhc2gvR2FtZS9HYW1lLnlhbWw"
+    path: ./providers/14680656611242335552.yaml
     interval: 86400
   Origin (Domain):
     type: http
@@ -679,18 +703,6 @@ rule-providers:
     behavior: domain
     url: "https://url.v1.mk/getruleset?type=3&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvUnVsZXNldC9Tb255Lmxpc3Q"
     path: ./providers/6043895292220349504_domain.yaml
-    interval: 86400
-  Steam (Domain):
-    type: http
-    behavior: domain
-    url: "https://url.v1.mk/getruleset?type=3&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvUnVsZXNldC9TdGVhbS5saXN0"
-    path: ./providers/1173690015095316719_domain.yaml
-    interval: 86400
-  Nintendo (Domain):
-    type: http
-    behavior: domain
-    url: "https://url.v1.mk/getruleset?type=3&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvUnVsZXNldC9OaW50ZW5kby5saXN0"
-    path: ./providers/8436305167591952502_domain.yaml
     interval: 86400
   AI (Domain):
     type: http
@@ -713,14 +725,14 @@ rule-providers:
   Netflix (Domain):
     type: http
     behavior: domain
-    url: "https://url.v1.mk/getruleset?type=3&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvUnVsZXNldC9OZXRmbGl4Lmxpc3Q"
-    path: ./providers/6953567076524950087_domain.yaml
+    url: "https://url.v1.mk/getruleset?type=3&url=aHR0cHM6Ly9jZG4uanNkZWxpdnIubmV0L2doL2JsYWNrbWF0cml4Ny9pb3NfcnVsZV9zY3JpcHRAbWFzdGVyL3J1bGUvQ2xhc2gvTmV0ZmxpeC9OZXRmbGl4Lmxpc3Q"
+    path: ./providers/10142606677693613377_domain.yaml
     interval: 86400
   Netflix (IP-CIDR):
     type: http
     behavior: ipcidr
-    url: "https://url.v1.mk/getruleset?type=4&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvUnVsZXNldC9OZXRmbGl4Lmxpc3Q"
-    path: ./providers/6953567076524950087_ipcidr.yaml
+    url: "https://url.v1.mk/getruleset?type=4&url=aHR0cHM6Ly9jZG4uanNkZWxpdnIubmV0L2doL2JsYWNrbWF0cml4Ny9pb3NfcnVsZV9zY3JpcHRAbWFzdGVyL3J1bGUvQ2xhc2gvTmV0ZmxpeC9OZXRmbGl4Lmxpc3Q"
+    path: ./providers/10142606677693613377_ipcidr.yaml
     interval: 86400
   YouTube (Domain):
     type: http
@@ -740,30 +752,6 @@ rule-providers:
     url: "https://url.v1.mk/getruleset?type=3&url=aHR0cHM6Ly9jZG4uanNkZWxpdnIubmV0L2doL2JsYWNrbWF0cml4Ny9pb3NfcnVsZV9zY3JpcHRAbWFzdGVyL3J1bGUvQ2xhc2gvWW91VHViZU11c2ljL1lvdVR1YmVNdXNpYy5saXN0"
     path: ./providers/9712910775996727615_domain.yaml
     interval: 86400
-  Telegram (Domain):
-    type: http
-    behavior: domain
-    url: "https://url.v1.mk/getruleset?type=3&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvVGVsZWdyYW0ubGlzdA"
-    path: ./providers/6502624741183612233_domain.yaml
-    interval: 86400
-  Telegram (IP-CIDR):
-    type: http
-    behavior: ipcidr
-    url: "https://url.v1.mk/getruleset?type=4&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvVGVsZWdyYW0ubGlzdA"
-    path: ./providers/6502624741183612233_ipcidr.yaml
-    interval: 86400
-  ProxyMedia (Domain):
-    type: http
-    behavior: domain
-    url: "https://url.v1.mk/getruleset?type=3&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvUHJveHlNZWRpYS5saXN0"
-    path: ./providers/11865208451954205364_domain.yaml
-    interval: 86400
-  ProxyMedia (IP-CIDR):
-    type: http
-    behavior: ipcidr
-    url: "https://url.v1.mk/getruleset?type=4&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvUHJveHlNZWRpYS5saXN0"
-    path: ./providers/11865208451954205364_ipcidr.yaml
-    interval: 86400
   GlobalMedia (Domain):
     type: http
     behavior: domain
@@ -775,18 +763,6 @@ rule-providers:
     behavior: ipcidr
     url: "https://url.v1.mk/getruleset?type=4&url=aHR0cHM6Ly9jZG4uanNkZWxpdnIubmV0L2doL2JsYWNrbWF0cml4Ny9pb3NfcnVsZV9zY3JpcHRAbWFzdGVyL3J1bGUvQ2xhc2gvR2xvYmFsTWVkaWEvR2xvYmFsTWVkaWEubGlzdA"
     path: ./providers/1066734618065479657_ipcidr.yaml
-    interval: 86400
-  ProxyGFWlist (Domain):
-    type: http
-    behavior: domain
-    url: "https://url.v1.mk/getruleset?type=3&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvUHJveHlHRldsaXN0Lmxpc3Q"
-    path: ./providers/1518598190744914170_domain.yaml
-    interval: 86400
-  ProxyGFWlist (IP-CIDR):
-    type: http
-    behavior: ipcidr
-    url: "https://url.v1.mk/getruleset?type=4&url=aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0FDTDRTU1IvQUNMNFNTUi9tYXN0ZXIvQ2xhc2gvUHJveHlHRldsaXN0Lmxpc3Q"
-    path: ./providers/1518598190744914170_ipcidr.yaml
     interval: 86400
   Global (Domain):
     type: http
