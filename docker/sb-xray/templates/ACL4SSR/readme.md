@@ -16,6 +16,8 @@ https://raw.githubusercontent.com/currycan/key/master/docker/sb-xray/templates/A
 
 https://raw.githubusercontent.com/currycan/key/master/docker/sb-xray/templates/ACL4SSR/ACL4SSR_Online_Lite.ini
 
+https://raw.githubusercontent.com/currycan/key/master/docker/sb-xray/templates/ACL4SSR/ACL4SSR_Online_MT3000.ini
+
 
 ## DNS
 
