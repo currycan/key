@@ -950,18 +950,19 @@ dns:
   # 对部分域名使用单独的 DNS 服务器
   nameserver-policy:
     geosite:cn,private: https://120.53.53.53/dns-query
-    geosite:geolocation-!cn: https://dns.cloudflare.com/dns-query
-    "+.steampowered.com": "223.5.5.5"
-    "geosite:cn,apple,bilibili": https://doh.pub/dns-query
-    'geosite:!cn': 'tls://8.8.4.4'
+    geosite:gfw: https://dns.cloudflare.com/dns-query
+    geosite:!cn,geosite:geolocation-!cn: 'tls://8.8.4.4'
   nameserver:
     # 不建议配置超过 2 个 DNS 服务器，会增加系统功耗
-    - doq://test.dns.nextdns.io:853
+    - https://dns.cloudflare.com/dns-query
     - https://dns.csaonline.de/dns-query
+    - doq://test.dns.nextdns.io:853
     #  包含中国
     # - https://doh.pub/dns-query
     # - https://doh.360.cn/dns-query
     # - https://dns.alidns.com/dns-query
+    # - https://120.53.53.53/dns-query
+    # - https://223.5.5.5/dns-query
     # - system # 使用 iOS 系统 DNS
   fallback:
     - https://v.recipes/dns-query
