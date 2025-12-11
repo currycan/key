@@ -14,9 +14,6 @@ https://raw.githubusercontent.com/currycan/key/master/docker/sb-xray/templates/A
 
 https://raw.githubusercontent.com/currycan/key/master/docker/sb-xray/templates/ACL4SSR/ACL4SSR_Online_Lite.ini
 
-https://raw.githubusercontent.com/currycan/key/master/docker/sb-xray/templates/ACL4SSR/ACL4SSR_Online_No_DNS_Leak.ini
-
-
 ## Tailscale 设置
 
 [openwrt软路由安装tailscale - DEV Community](https://dev.to/dragon72463399/openwrtruan-lu-you-an-zhuang-tailscale-a7j)
