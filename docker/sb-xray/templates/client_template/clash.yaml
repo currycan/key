@@ -102,6 +102,16 @@ proxy-groups:
       - 🇯🇵 日本节点
       - 🇺🇲 美国节点
       - 🇰🇷 韩国节点
+  - name: 🐟 漏网之鱼
+    icon: https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/1f41f.png
+    type: select
+    proxies:
+      - 🚀 节点选择
+      - 🛫 手动切换
+      - 👍 VLESS
+      - 🧹 Hysteria2
+      - 🫧 VMess
+      - 🎯 全球直连
 
   # 基于协议分组
   - name: 👍 VLESS
@@ -519,7 +529,7 @@ rules:
   - RULE-SET,Global (Domain),🚀 节点选择
   - RULE-SET,Global (IP-CIDR),🚀 节点选择,no-resolve
   - GEOIP,CN,🎯 全球直连,no-resolve
-  - MATCH, 🚀 节点选择
+  - MATCH,🐟 漏网之鱼
 rule-providers:
   BanProgramAD1 (Domain):
     type: http
