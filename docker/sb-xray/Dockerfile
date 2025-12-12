@@ -152,6 +152,7 @@ ADD https://raw.githubusercontent.com/currycan/key/master/vimrc /root/.vimrc
 
 ENV WORKDIR=/sb-xray
 ENV LOGDIR=/var/log/
+ENV SUPERVISOR_LOG_MAX_BYTES="20MB"
 
 WORKDIR ${WORKDIR}
 
