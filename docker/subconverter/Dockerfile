@@ -79,6 +79,7 @@ FROM alpine:3
 # Install runtime dependencies (same as test.Dockerfile + extras if needed)
 RUN set -ex; \
   apk add --no-cache \
+    bash \
     pcre2 \
     libcurl \
     yaml-cpp \
