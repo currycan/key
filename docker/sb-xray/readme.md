@@ -36,6 +36,8 @@ docker buildx build \
 
 ### 订阅转换
 
+https://github.com/MetaCubeX/subconverter
+
 https://github.com/LM-Firefly/subconverter
 
 https://github.com/LM-Firefly/Firefly-sub
