@@ -13,6 +13,7 @@
 [ios\_rule\_script/rule/Clash at master · blackmatrix7/ios\_rule\_script](https://github.com/blackmatrix7/ios_rule_script/tree/master/rule/Clash)
 
 https://mylink.ansandy.site/sub?
+http://172.18.18.254:25500/sub?
 
 https://raw.githubusercontent.com/currycan/key/master/docker/sb-xray/templates/ACL4SSR/ACL4SSR_Online_Full.ini
 
