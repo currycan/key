@@ -8,6 +8,8 @@
 
 [Loyalsoldier/clash-rules: 🦄️ 🎃 👻 Clash Premium 规则集(RULE-SET)，兼容 ClashX Pro、Clash for Windows 等基于 Clash Premium 内核的客户端。](https://github.com/Loyalsoldier/clash-rules)
 
+[Aethersailor/Custom\_OpenClash\_Rules: 分流完善的 OpenClash 订阅转换模板，搭配保姆级 OpenClash 设置教程，无需套娃其他插件即可实现完美分流、DNS无污染无泄漏，且快速的国内外上网体验，配套自动化域名规则提交机器人](https://github.com/Aethersailor/Custom_OpenClash_Rules)
+
 [ios\_rule\_script/rule/Clash at master · blackmatrix7/ios\_rule\_script](https://github.com/blackmatrix7/ios_rule_script/tree/master/rule/Clash)
 
 https://mylink.ansandy.site/sub?
