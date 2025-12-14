@@ -10,7 +10,11 @@
 
 [Aethersailor/Custom\_OpenClash\_Rules: 分流完善的 OpenClash 订阅转换模板，搭配保姆级 OpenClash 设置教程，无需套娃其他插件即可实现完美分流、DNS无污染无泄漏，且快速的国内外上网体验，配套自动化域名规则提交机器人](https://github.com/Aethersailor/Custom_OpenClash_Rules)
 
+[Giveupmoon/OpenClash\_Overwrite: OpenClash覆写模块相关文件](https://github.com/Giveupmoon/OpenClash_Overwrite)
+
 [ios\_rule\_script/rule/Clash at master · blackmatrix7/ios\_rule\_script](https://github.com/blackmatrix7/ios_rule_script/tree/master/rule/Clash)
+
+[全国DNS服务器IP地址大全 公共DNS地址大全 - ToolB](https://toolb.cn/publicdns)
 
 https://mylink.ansandy.site/sub?
 http://172.18.18.254:25500/sub?
@@ -27,6 +31,12 @@ https://raw.githubusercontent.com/currycan/key/master/docker/sb-xray/templates/A
 [内置 DNS 服务 – Stash 用户文档](https://stash.wiki/features/dns-server)
 
 由于部分地区开始劫持公共dns的ip，优化dns部分如下：
+
+https://dns.alidns.com/dns-query
+https://doh.pub/dns-query
+223.5.5.5
+119.29.29.29
+114.114.114.114
 
 
 ## Tailscale 设置
