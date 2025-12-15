@@ -102,7 +102,6 @@ dns:
     - +.gfw.gg
 # 萌狗
     - +.moedog.cloud
-
 # 其他
     - +.ynhtbank.com
     - +.qeayr.cn
@@ -222,14 +221,14 @@ proxy-groups:
   - name: 香港-手动
     type: select
     include-all: true
-    filter: "(?=.*(广港|香港|HK|Hong Kong|🇭🇰|HongKong)).*$"
+    filter: (?i)(?=.*(vless|reality))(?=.*(广港|香港|HK|Hong Kong|🇭🇰|HongKong)).*
 
   - name: 香港-自动
     type: url-test
     include-all: true
     tolerance: 50
     interval: 300
-    filter: "(?=.*(广港|香港|HK|Hong Kong|🇭🇰|HongKong)).*$"
+    filter: (?i)(?=.*(vless|reality))(?=.*(广港|香港|HK|Hong Kong|🇭🇰|HongKong)).*
 
   # 台湾组
   - name: 台湾-故转
