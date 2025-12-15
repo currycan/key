@@ -204,6 +204,12 @@ proxy-groups:
     interval: 300
     filter: "^((?!(直连|拒绝)).)*$"
 
+  # 链式代理-前置-香港
+  - name: 香港-链式前置
+    type: select
+    include-all: true
+    filter: (?i)(?=.*(vless|reality))(?=.*(广港|香港|HK|Hong Kong|🇭🇰|HongKong)).*
+
   # 香港组
   - name: 香港-故转
     type: fallback
