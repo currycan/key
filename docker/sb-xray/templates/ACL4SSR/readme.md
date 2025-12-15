@@ -25,7 +25,10 @@ https://raw.githubusercontent.com/currycan/key/master/docker/sb-xray/templates/A
 
 https://raw.githubusercontent.com/currycan/key/master/docker/sb-xray/templates/ACL4SSR/ACL4SSR_Online_Full.ini
 https://raw.githubusercontent.com/currycan/key/master/docker/sb-xray/templates/ACL4SSR/ACL4SSR_Online_Lite.ini
-https://raw.githubusercontent.com/currycan/key/master/docker/sb-xray/template/ACL4SSR/ACL4SSR_Online_MT3000.ini
+https://raw.githubusercontent.com/currycan/key/master/docker/sb-xray/templates/ACL4SSR/ACL4SSR_Online_MT3000.ini
+
+https://raw.githubusercontent.com/currycan/key/master/docker/sb-xray/templates/ACL4SSR/zashboard-20250417.json
+
 
 
 ## DNS
