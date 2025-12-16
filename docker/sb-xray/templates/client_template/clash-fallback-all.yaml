@@ -53,60 +53,34 @@ default: &default
     - 其他-故转
     - 拒绝
 
-us: &us-node
+normal-media: &normal-media
   type: select
   proxies:
-    - 美国-自动
+    - 美国-故转
+    - 日本-故转
 
-block: &block
+isp-media: &isp-media
   type: select
   proxies:
-    - 拒绝
+    - 韩国-故转
+    - 日本-故转
+    - 美国-故转
 
-direct: &direct
+com: &com
   type: select
   proxies:
     - 直连
+    - 美国-故转
+
+game: &game
+  type: select
+  proxies:
+    - 美国-故转
+    - 日本-故转
+    - 韩国-故转
+    - 香港-故转
 
 proxy-groups:
-  # 业务分流组
-  ## Test
-  - {name: Test, <<: *default}
-  - {name: 国外, <<: *us-node}
-  - {name: 其他, <<: *default}
-  ## Com
-  - {name: Apple, <<: *default}
-  - {name: Google, <<: *default}
-  - {name: Microsoft, <<: *default}
-  ## AI
-  - {name: AI, <<: *us-node}
-  ## Tech
-  - {name: GitHub, <<: *default}
-  - {name: Reddit, <<: *default}
-  # Medium
-  - {name: Telegram, <<: *default}
-  - {name: Twitter(X), <<: *default}
-  - {name: WhatsApp, <<: *default}
-  - {name: Facebook, <<: *default}
-  - {name: BiliBili, <<: *default}
-  - {name: YouTube, <<: *default}
-  - {name: TikTok, <<: *default}
-  - {name: Netflix, <<: *default}
-  - {name: HBO, <<: *default}
-  - {name: Disney, <<: *default}
-  - {name: Amazon, <<: *default}
-  - {name: Crunchyroll, <<: *default}
-  - {name: Popcorn, <<: *default}
-  - {name: Spotify, <<: *default}
-  - {name: Nvidia, <<: *default}
-  ## Game
-  - {name: Steam, <<: *default}
-  - {name: Games, <<: *default}
-  - {name: Crypto, <<: *default}
-  ## Others
-  - {name: 国内, <<: *direct}
-  - {name: Block, <<: *block}
-
   # 链式代理-前置
   - name: 链式前置
     type: select
@@ -118,6 +92,44 @@ proxy-groups:
       # - 台湾-自动
       # - 新加坡-自动
       - 其他-自动
+
+  # 业务分流组
+  ## Test
+  - {name: Test, <<: *default}
+  - {name: 其他, <<: *default}
+  - {name: 国外, <<: *normal-media}
+  ## Com
+  - {name: Apple, <<: *com}
+  - {name: Microsoft, <<: *com}
+  - {name: Nvidia, <<: *com}
+  ## AI
+  - {name: AI, type: select, proxies: [美国-故转]}
+  ## Tech
+  - {name: Google, type: select, proxies: [美国-故转]}
+  - {name: GitHub, type: select, proxies: [美国-故转]}
+  - {name: Reddit, type: select, proxies: [美国-故转]}
+  ## Media
+  - {name: Telegram, <<: *normal-media}
+  - {name: Twitter(X), <<: *normal-media}
+  - {name: WhatsApp, <<: *normal-media}
+  - {name: Facebook, <<: *normal-media}
+  - {name: BiliBili, type: select, proxies: [直连]}
+  - {name: YouTube, <<: *normal-media}
+  - {name: TikTok, <<: *isp-media}
+  - {name: Netflix, <<: *isp-media}
+  - {name: HBO, <<: *isp-media}
+  - {name: Disney, <<: *isp-media}
+  - {name: Amazon, <<: *isp-media}
+  - {name: Crunchyroll, <<: *normal-media}
+  - {name: Popcorn, <<: *normal-media}
+  - {name: Spotify, <<: *normal-media}
+  ## Game
+  - {name: Steam, <<: *game}
+  - {name: Games, <<: *game}
+  - {name: Crypto, <<: *game}
+  ## Others
+  - {name: 国内, type: select, proxies: [直连]}
+  - {name: Block, type: select, proxies: [拒绝]}
 
   - name: 所有-手动
     type: select
@@ -646,7 +658,7 @@ dns:
     '.dev': 127.0.0.1
     '.local': 127.0.0.1
     'alpha.clash.dev': '::1'
-  # 跳过证书验证，解决部分兼容性问题 https://help.nextdns.io/t/g9hdkjz
+  # 跳过证书验证,解决部分兼容性问题 https://help.nextdns.io/t/g9hdkjz
   skip-cert-verify: false
 
 # ========================
