@@ -20,6 +20,7 @@ proxies:
   - {name: 直连, type: direct}
   - {name: 拒绝, type: reject}
 
+  # 发往 la-isp-dialer 的流量先经过 链式前置，从而实现指定下一跳代理的效果
   - name: la-isp-dialer        # 落地节点命名
     type: socks5               # 节点协议
     server: ${ISP_IP}          # 住宅IP 代理地址
