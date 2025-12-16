@@ -16,6 +16,8 @@
 
 [全国DNS服务器IP地址大全 公共DNS地址大全 - ToolB](https://toolb.cn/publicdns)
 
+[MetaCubeX/meta-rules-dat: rules-dat for mihomo](https://github.com/MetaCubeX/meta-rules-dat)
+
 https://mylink.ansandy.site/sub?
 http://172.18.18.254:25500/sub?
 
