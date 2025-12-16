@@ -350,127 +350,127 @@ proxy-groups:
     interval: 300
     filter: "(?i)(?=.*(shadow|-ss))(?=.*(广港|香港|HK|Hong Kong|🇭🇰|HongKong)).*$"
 
-  # 台湾组
-  - name: 台湾-故转
-    type: fallback
-    interval: 300
-    lazy: false
-    proxies:
-      - 台湾-手动
-      - 台湾-自动
-      - 台湾-VLESS
-      - 台湾-VMess
-      - 台湾-Hysteria2
-      - 台湾-TUIC
-      - 台湾-AnyTLS
-      - 台湾-Shadowsocks
-  - name: 台湾-手动
-    type: select
-    include-all: true
-    filter: "(?=.*(广台|台湾|台灣|TW|Tai Wan|🇹🇼|🇨🇳|TaiWan|Taiwan)).*$"
-  - name: 台湾-自动
-    type: url-test
-    include-all: true
-    tolerance: 50
-    interval: 300
-    filter: "(?=.*(广台|台湾|台灣|TW|Tai Wan|🇹🇼|🇨🇳|TaiWan|Taiwan)).*$"
-  - name: 台湾-VLESS
-    type: url-test
-    include-all: true
-    tolerance: 50
-    interval: 300
-    filter: "(?i)(?=.*(vless|reality))(?=.*(广台|台湾|台灣|TW|Tai Wan|🇹🇼|🇨🇳|TaiWan|Taiwan)).*$"
-  - name: 台湾-VMess
-    type: url-test
-    include-all: true
-    tolerance: 50
-    interval: 300
-    filter: "(?i)(?=.*(vmess))(?=.*(广台|台湾|台灣|TW|Tai Wan|🇹🇼|🇨🇳|TaiWan|Taiwan)).*$"
-  - name: 台湾-Hysteria2
-    type: url-test
-    include-all: true
-    tolerance: 50
-    interval: 300
-    filter: "(?i)(?=.*(hysteria2|hy2))(?=.*(广台|台湾|台灣|TW|Tai Wan|🇹🇼|🇨🇳|TaiWan|Taiwan)).*$"
-  - name: 台湾-TUIC
-    type: url-test
-    include-all: true
-    tolerance: 50
-    interval: 300
-    filter: "(?i)(?=.*(tuic))(?=.*(广台|台湾|台灣|TW|Tai Wan|🇹🇼|🇨🇳|TaiWan|Taiwan)).*$"
-  - name: 台湾-AnyTLS
-    type: url-test
-    include-all: true
-    tolerance: 50
-    interval: 300
-    filter: "(?i)(?=.*(anytls))(?=.*(广台|台湾|台灣|TW|Tai Wan|🇹🇼|🇨🇳|TaiWan|Taiwan)).*$"
-  - name: 台湾-Shadowsocks
-    type: url-test
-    include-all: true
-    tolerance: 50
-    interval: 300
-    filter: "(?i)(?=.*(shadow|-ss))(?=.*(广台|台湾|台灣|TW|Tai Wan|🇹🇼|🇨🇳|TaiWan|Taiwan)).*$"
+  # # 台湾组
+  # - name: 台湾-故转
+  #   type: fallback
+  #   interval: 300
+  #   lazy: false
+  #   proxies:
+  #     - 台湾-手动
+  #     - 台湾-自动
+  #     - 台湾-VLESS
+  #     - 台湾-VMess
+  #     - 台湾-Hysteria2
+  #     - 台湾-TUIC
+  #     - 台湾-AnyTLS
+  #     - 台湾-Shadowsocks
+  # - name: 台湾-手动
+  #   type: select
+  #   include-all: true
+  #   filter: "(?=.*(广台|台湾|台灣|TW|Tai Wan|🇹🇼|🇨🇳|TaiWan|Taiwan)).*$"
+  # - name: 台湾-自动
+  #   type: url-test
+  #   include-all: true
+  #   tolerance: 50
+  #   interval: 300
+  #   filter: "(?=.*(广台|台湾|台灣|TW|Tai Wan|🇹🇼|🇨🇳|TaiWan|Taiwan)).*$"
+  # - name: 台湾-VLESS
+  #   type: url-test
+  #   include-all: true
+  #   tolerance: 50
+  #   interval: 300
+  #   filter: "(?i)(?=.*(vless|reality))(?=.*(广台|台湾|台灣|TW|Tai Wan|🇹🇼|🇨🇳|TaiWan|Taiwan)).*$"
+  # - name: 台湾-VMess
+  #   type: url-test
+  #   include-all: true
+  #   tolerance: 50
+  #   interval: 300
+  #   filter: "(?i)(?=.*(vmess))(?=.*(广台|台湾|台灣|TW|Tai Wan|🇹🇼|🇨🇳|TaiWan|Taiwan)).*$"
+  # - name: 台湾-Hysteria2
+  #   type: url-test
+  #   include-all: true
+  #   tolerance: 50
+  #   interval: 300
+  #   filter: "(?i)(?=.*(hysteria2|hy2))(?=.*(广台|台湾|台灣|TW|Tai Wan|🇹🇼|🇨🇳|TaiWan|Taiwan)).*$"
+  # - name: 台湾-TUIC
+  #   type: url-test
+  #   include-all: true
+  #   tolerance: 50
+  #   interval: 300
+  #   filter: "(?i)(?=.*(tuic))(?=.*(广台|台湾|台灣|TW|Tai Wan|🇹🇼|🇨🇳|TaiWan|Taiwan)).*$"
+  # - name: 台湾-AnyTLS
+  #   type: url-test
+  #   include-all: true
+  #   tolerance: 50
+  #   interval: 300
+  #   filter: "(?i)(?=.*(anytls))(?=.*(广台|台湾|台灣|TW|Tai Wan|🇹🇼|🇨🇳|TaiWan|Taiwan)).*$"
+  # - name: 台湾-Shadowsocks
+  #   type: url-test
+  #   include-all: true
+  #   tolerance: 50
+  #   interval: 300
+  #   filter: "(?i)(?=.*(shadow|-ss))(?=.*(广台|台湾|台灣|TW|Tai Wan|🇹🇼|🇨🇳|TaiWan|Taiwan)).*$"
 
-  # 新加坡组
-  - name: 新加坡-故转
-    type: fallback
-    interval: 300
-    lazy: false
-    proxies:
-      - 新加坡-手动
-      - 新加坡-自动
-      - 新加坡-VLESS
-      - 新加坡-VMess
-      - 新加坡-Hysteria2
-      - 新加坡-TUIC
-      - 新加坡-AnyTLS
-      - 新加坡-Shadowsocks
-  - name: 新加坡-手动
-    type: select
-    include-all: true
-    filter: "(?=.*(广新|新加坡|SG|坡|狮城|🇸🇬|Singapore)).*$"
-  - name: 新加坡-自动
-    type: url-test
-    include-all: true
-    tolerance: 50
-    interval: 300
-    filter: "(?=.*(广新|新加坡|SG|坡|狮城|🇸🇬|Singapore)).*$"
-  - name: 新加坡-VLESS
-    type: url-test
-    include-all: true
-    tolerance: 50
-    interval: 300
-    filter: "(?i)(?=.*(vless|reality))(?=.*(广新|新加坡|SG|坡|狮城|🇸🇬|Singapore)).*$"
-  - name: 新加坡-VMess
-    type: url-test
-    include-all: true
-    tolerance: 50
-    interval: 300
-    filter: "(?i)(?=.*(vmess))(?=.*(广新|新加坡|SG|坡|狮城|🇸🇬|Singapore)).*$"
-  - name: 新加坡-Hysteria2
-    type: url-test
-    include-all: true
-    tolerance: 50
-    interval: 300
-    filter: "(?i)(?=.*(hysteria2|hy2))(?=.*(广新|新加坡|SG|坡|狮城|🇸🇬|Singapore)).*$"
-  - name: 新加坡-TUIC
-    type: url-test
-    include-all: true
-    tolerance: 50
-    interval: 300
-    filter: "(?i)(?=.*(tuic))(?=.*(广新|新加坡|SG|坡|狮城|🇸🇬|Singapore)).*$"
-  - name: 新加坡-AnyTLS
-    type: url-test
-    include-all: true
-    tolerance: 50
-    interval: 300
-    filter: "(?i)(?=.*(anytls))(?=.*(广新|新加坡|SG|坡|狮城|🇸🇬|Singapore)).*$"
-  - name: 新加坡-Shadowsocks
-    type: url-test
-    include-all: true
-    tolerance: 50
-    interval: 300
-    filter: "(?i)(?=.*(shadow|-ss))(?=.*(广新|新加坡|SG|坡|狮城|🇸🇬|Singapore)).*$"
+  # # 新加坡组
+  # - name: 新加坡-故转
+  #   type: fallback
+  #   interval: 300
+  #   lazy: false
+  #   proxies:
+  #     - 新加坡-手动
+  #     - 新加坡-自动
+  #     - 新加坡-VLESS
+  #     - 新加坡-VMess
+  #     - 新加坡-Hysteria2
+  #     - 新加坡-TUIC
+  #     - 新加坡-AnyTLS
+  #     - 新加坡-Shadowsocks
+  # - name: 新加坡-手动
+  #   type: select
+  #   include-all: true
+  #   filter: "(?=.*(广新|新加坡|SG|坡|狮城|🇸🇬|Singapore)).*$"
+  # - name: 新加坡-自动
+  #   type: url-test
+  #   include-all: true
+  #   tolerance: 50
+  #   interval: 300
+  #   filter: "(?=.*(广新|新加坡|SG|坡|狮城|🇸🇬|Singapore)).*$"
+  # - name: 新加坡-VLESS
+  #   type: url-test
+  #   include-all: true
+  #   tolerance: 50
+  #   interval: 300
+  #   filter: "(?i)(?=.*(vless|reality))(?=.*(广新|新加坡|SG|坡|狮城|🇸🇬|Singapore)).*$"
+  # - name: 新加坡-VMess
+  #   type: url-test
+  #   include-all: true
+  #   tolerance: 50
+  #   interval: 300
+  #   filter: "(?i)(?=.*(vmess))(?=.*(广新|新加坡|SG|坡|狮城|🇸🇬|Singapore)).*$"
+  # - name: 新加坡-Hysteria2
+  #   type: url-test
+  #   include-all: true
+  #   tolerance: 50
+  #   interval: 300
+  #   filter: "(?i)(?=.*(hysteria2|hy2))(?=.*(广新|新加坡|SG|坡|狮城|🇸🇬|Singapore)).*$"
+  # - name: 新加坡-TUIC
+  #   type: url-test
+  #   include-all: true
+  #   tolerance: 50
+  #   interval: 300
+  #   filter: "(?i)(?=.*(tuic))(?=.*(广新|新加坡|SG|坡|狮城|🇸🇬|Singapore)).*$"
+  # - name: 新加坡-AnyTLS
+  #   type: url-test
+  #   include-all: true
+  #   tolerance: 50
+  #   interval: 300
+  #   filter: "(?i)(?=.*(anytls))(?=.*(广新|新加坡|SG|坡|狮城|🇸🇬|Singapore)).*$"
+  # - name: 新加坡-Shadowsocks
+  #   type: url-test
+  #   include-all: true
+  #   tolerance: 50
+  #   interval: 300
+  #   filter: "(?i)(?=.*(shadow|-ss))(?=.*(广新|新加坡|SG|坡|狮城|🇸🇬|Singapore)).*$"
 
   # 其他组
   - name: 其他-故转
