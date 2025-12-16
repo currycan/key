@@ -145,12 +145,12 @@ main() {
     envsubst </templates/client_template/surge >${WORKDIR}/subscribe/surge
     envsubst </templates/ACL4SSR/ACL4SSR_Online_Full.ini >${WORKDIR}/subscribe/ACL4SSR_Online_Full.ini
 
-    CLIENTS=("clash" "stash")
-    # 循环生成文件
-    for CLIENT in "${CLIENTS[@]}"; do
-        export CLIENT &&  envsubst </templates/client_template/clash.yaml >${WORKDIR}/subscribe/${CLIENT}-${NODE_NAME}.yaml
+    for clinet in /templates/client_template/*.yaml; do
+        local output="${WORKDIR}/subscribe/$(basename "$template")"
+        log DEBUG "Generating $output"
+        envsubst <"$template" >"$output"
     done
-    envsubst </templates/client_template/surge.conf >${WORKDIR}/subscribe/surge-${NODE_NAME}.conf
+    envsubst </templates/client_template/surge.conf >${WORKDIR}/subscribe/surge.conf
 }
 
 main | tee >(sed 's/\x1b\[[0-9;]*m//g' > ${WORKDIR}/subscribe/show-config)
