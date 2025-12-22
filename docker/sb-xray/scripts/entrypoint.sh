@@ -411,7 +411,7 @@ if [ "${1#-}" = 'supervisord' ] && [ "$(id -u)" = '0' ]; then
     # 删除旧的 geo_update 任务（如果存在），避免重复
     sed -i '/geo_update.sh/d' "$CRON_FILE"
     # 追加新任务
-    echo "0 3 * * 1 /scripts/geo_update.sh >> /var/log/geo_update.log 2>&1" >> "$CRON_FILE"
+    echo "0 3 * * * /scripts/geo_update.sh >> /var/log/geo_update.log 2>&1" >> "$CRON_FILE"
     chmod 0600 "$CRON_FILE"
 
     # 显示访问信息

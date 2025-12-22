@@ -39,7 +39,7 @@ proxies:
 
   - name: ${REGION_INFO}|${NODE_NAME}|VMess-TLS-WS
     type: vmess
-    server: ${CDNDOMAIN}
+    server: ${DOMAIN}
     port: ${LISTENING_PORT}
     uuid: ${XRAY_UUID}
     alterId: 0
@@ -52,9 +52,9 @@ proxies:
     network: ws
     ws-opts:
       headers:
-        Host: ${CDNDOMAIN}
+        Host: ${DOMAIN}
       path: /${XRAY_URL_PATH}-vmessws
-    servername: ${CDNDOMAIN}
+    servername: ${DOMAIN}
 
   - name: ${REGION_INFO}|${NODE_NAME}|XTLS(Vision)+Reality直连
     type: vless

@@ -63,8 +63,14 @@ tuic://${SB_UUID}:${SB_UUID}@${DOMAIN}:${PORT_TUIC}?alpn=h3&insecure=1&congestio
 # 需把 tls 里的 inSecure 设置为 true
 anytls://${SB_UUID}@${DOMAIN}:${PORT_ANYTLS}?security=tls&allowInsecure=1&type=tcp#${REGION_INFO}|${NODE_NAME}|anytls
 "
+    # vless+ws+tls cdn
     V2RAYN_SUBSCRIBE+="
-vmess://$(echo -n "{\"v\":\"2\",\"ps\":\"${REGION_INFO}|${NODE_NAME}|VMess-TLS-WS\",\"add\":\"${CDNDOMAIN}\",\"port\":\"${LISTENING_PORT}\",\"id\":\"${XRAY_UUID}\",\"aid\":\"0\",\"scy\":\"auto\",\"net\":\"ws\",\"type\":\"none\",\"host\":\"${CDNDOMAIN}\",\"path\":\"/${XRAY_URL_PATH}-vmessws\",\"tls\":\"tls\",\"sni\":\"${CDNDOMAIN}\",\"alpn\":\"h2\",\"fp\":\"chrome\"}" | base64 -w0)
+#     V2RAYN_SUBSCRIBE+="
+# vmess://$(echo -n "{\"v\":\"2\",\"ps\":\"${REGION_INFO}|${NODE_NAME}|VMess-TLS-WS\",\"add\":\"${CDNDOMAIN}\",\"port\":\"${LISTENING_PORT}\",\"id\":\"${XRAY_UUID}\",\"aid\":\"0\",\"scy\":\"auto\",\"net\":\"ws\",\"type\":\"none\",\"host\":\"${CDNDOMAIN}\",\"path\":\"/${XRAY_URL_PATH}-vmessws\",\"tls\":\"tls\",\"sni\":\"${CDNDOMAIN}\",\"alpn\":\"h2\",\"fp\":\"chrome\"}" | base64 -w0)
+# "
+    # vless+ws+tls 直连
+    V2RAYN_SUBSCRIBE+="
+vmess://$(echo -n "{\"v\":\"2\",\"ps\":\"${REGION_INFO}|${NODE_NAME}|VMess-TLS-WS\",\"add\":\"${DOMAIN}\",\"port\":\"${LISTENING_PORT}\",\"id\":\"${XRAY_UUID}\",\"aid\":\"0\",\"scy\":\"auto\",\"net\":\"ws\",\"type\":\"none\",\"host\":\"${DOMAIN}\",\"path\":\"/${XRAY_URL_PATH}-vmessws\",\"tls\":\"tls\",\"sni\":\"${DOMAIN}\",\"alpn\":\"h2\",\"fp\":\"chrome\"}" | base64 -w0)
 "
     # XTLS(Vision)+Reality直连
     V2RAYN_SUBSCRIBE+="
