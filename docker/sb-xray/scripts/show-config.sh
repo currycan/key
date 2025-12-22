@@ -152,9 +152,8 @@ main() {
     envsubst </templates/ACL4SSR/ACL4SSR_Online_Full.ini >${WORKDIR}/subscribe/ACL4SSR_Online_Full.ini
 
     for clinet in /templates/client_template/*.yaml; do
-        local output="${WORKDIR}/subscribe/$(basename "$template")"
-        log DEBUG "Generating $output"
-        envsubst <"$template" >"$output"
+        output="${WORKDIR}/subscribe/$(basename "$clinet")"
+        envsubst <"$clinet" >"$output"
     done
     envsubst </templates/client_template/surge.conf >${WORKDIR}/subscribe/surge.conf
 }
