@@ -398,7 +398,7 @@ if [ "${1#-}" = 'supervisord' ] && [ "$(id -u)" = '0' ]; then
 
     # 配置 x-ui
     log INFO "Initializing X-UI..."
-    x-ui setting -username "${XUI_ACCOUNT}" -password "${PASSWORD}" -port "${XUI_LOCAL_PORT}" -webBasePath "${XUI_WEBBASEPATH}"
+    x-ui setting -username "${PUBLIC_USER}" -password "${PUBLIC_PASSWORD}" -port "${XUI_LOCAL_PORT}" -webBasePath "${XUI_WEBBASEPATH}"
 
     log INFO "Starting fail2ban..."
     fail2ban-client -x start

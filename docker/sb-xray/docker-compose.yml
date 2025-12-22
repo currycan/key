@@ -5,7 +5,7 @@ services:
     environment:
       - DOMAIN=$domain
       - CDNDOMAIN=$cdndomain
-      - XUI_ACCOUNT=$domain
+      # - XUI_ACCOUNT=$domain
       - DECODE=$code
       - ACMESH_DEBUG=1
       - ACMESH_SERVER_NAME=letsencrypt

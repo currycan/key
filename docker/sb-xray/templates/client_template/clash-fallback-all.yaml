@@ -24,7 +24,7 @@ proxies:
   - name: la-isp-dialer        # 落地节点命名
     type: socks5               # 节点协议
     server: ${ISP_IP}          # 住宅IP 代理地址
-    port: 9298                 # 端口号
+    port: ${ISP_PORT}                 # 端口号
     username: ${ISP_USER}      # 用户名
     password: ${ISP_SECRET}    # 密码
     udp: true

@@ -135,8 +135,8 @@ xui_info() {
     echo -e "${GREEN}=== x-ui 用户信息 ===${RESET}"
     /usr/local/bin/x-ui setting --show
     echo ""
-    print_colored ${CYAN} ">>>>>>>>>>>>>>>>>>>>>>>>>>>>> ${DOMAIN} <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
-    print_colored ${CYAN} ">>>>>>>>>>>>>>>>>>>>>>>>>>>>> ${PASSWORD} <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+    print_colored ${CYAN} ">>>>>>>>>>>>>>>>>>>>>>>>>>>>> ${PUBLIC_USER} <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+    print_colored ${CYAN} ">>>>>>>>>>>>>>>>>>>>>>>>>>>>> ${PUBLIC_PASSWORD} <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
 }
 
 mkdir -p ${WORKDIR}/subscribe
