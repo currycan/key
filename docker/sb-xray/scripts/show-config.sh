@@ -104,7 +104,6 @@ show_all_link() {
 ******************************************************************
 *                                                                *
   *        Sing-box / Xray 多协议多传输客户端配置文件汇总         *
-各客户端配置文件路径: ${WORKDIR}/subscribe/\n 完整模板可参照:\n https://github.com/chika0801/sing-box-examples/tree/main/Tun
 "
 
     print_colored ${RED} "Index:
