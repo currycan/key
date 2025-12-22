@@ -115,18 +115,9 @@ https://${DOMAIN}/sb-xray/proxies"
     print_colored ${CYAN} "V2rayN 订阅:
 https://${DOMAIN}/sb-xray/v2rayn"
 
-    print_colored ${GREEN} "Clash 订阅:
-https://${DOMAIN}/sb-xray/clash"
-
-    print_colored ${YELLOW} "clash 订阅完整配置:
-https://${DOMAIN}/sb-xray/clash-${NODE_NAME}.yaml"
-
-    print_colored ${BLUE} "stash 订阅完整配置:
-https://${DOMAIN}/sb-xray/stash-${NODE_NAME}.yaml"
-
-print_colored ${GREEN} "surge 订阅完整配置:
-https://${DOMAIN}/sb-xray/surge-${NODE_NAME}.conf
-
+    print_colored ${GREEN} "
+*                                                                *
+ *        Sing-box / Xray 多协议多传输客户端配置文件汇总         *
 ******************************************************************"
 }
 
