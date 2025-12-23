@@ -363,15 +363,14 @@ if [ "${1#-}" = 'supervisord' ] && [ "$(id -u)" = '0' ]; then
     log INFO "Obtaining SSL certificate..."
     # 生成证书
     issueCertificate "sb_xray_bundle" "${DOMAIN}:dns_ali|${CDNDOMAIN}:dns_cf"
+    # 创建 nginx dhparam 证书
+    setupDhParam
 
     log INFO "Updating GeoIP and GeoSite databases..."
     /scripts/geo_update.sh
 
     # 生成配置文件
     createConfig
-
-    # 创建 nginx dhparam 证书
-    setupDhParam
 
     # 配置 x-ui
     log INFO "Initializing X-UI..."
