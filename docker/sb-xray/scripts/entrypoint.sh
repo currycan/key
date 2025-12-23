@@ -285,86 +285,69 @@ function setupDhParam() {
     fi
 }
 
-# https://github.com/acmesh-official/acme.sh/wiki/ZeroSSL.com-CA
-function registerAccount() {
-    checkRequiredEnv "ACMESH_SERVER_NAME" "ACMESH_REGISTER_EMAIL"
-    log INFO "Set default server: ${ACMESH_SERVER_NAME}"
-    acme.sh --set-default-ca --server "${ACMESH_SERVER_NAME}"
-    log INFO "Registering account: ${ACMESH_REGISTER_EMAIL}"
-    acme.sh --register-account -m "${ACMESH_REGISTER_EMAIL}"
-}
-
-# DNS服务商配置
-function setDnsApi() {
-    local dns_api=$1
-
-    case "${dns_api}" in
-        ali)
-            checkRequiredEnv "ALI_KEY" "ALI_SECRET"
-            export Ali_Key="${ALI_KEY}" Ali_Secret="${ALI_SECRET}"
-            export DNS_PROVIDER="dns_ali"
-            ;;
-        cf)
-            checkRequiredEnv "CF_TOKEN" "CF_ZONE_ID" "CF_ACCOUNT_ID"
-            export CF_Token="${CF_TOKEN}" CF_Zone_ID="${CF_ZONE_ID}" CF_Account_ID="${CF_ACCOUNT_ID}"
-            export DNS_PROVIDER="dns_cf"
-            ;;
-        *)
-            log ERROR "错误：不支持的DNS服务商 '${dns_api}'" >&2
-            exit 1
-            ;;
-    esac
-}
-
 # https://github.com/acmesh-official/acme.sh/wiki/dnsapi#dns_cf
 function issueCertificate() {
-    local cert_type=$1
 
-    [[ -z "${CERT_TYPE_MAP[${cert_type}]}" ]] && {
-        log ERROR "错误：无效证书类型 '${cert_type}'" >&2
-        exit 1
-    }
+    local cert_name="$1"      # 参数 1: 证书任务标识名 (如: my_sites_bundle)
+    local domain_params=$2    # 配置字符串 (如: "example.com:dns_ali|example.io:dns_cf")
 
-    # 解析域名和DNS配置
-    IFS=' ' read -r domain_var dns_provider <<< "${CERT_TYPE_MAP[${cert_type}]}"
-    local domain="${!domain_var}"
+    # 1. 提取第一个域名作为 acme.sh 的内部索引 ID
+    local first_domain="${domain_params%%:*}"
 
-    local cert_file="${SSL_PATH}/${domain}.crt"
-    local key_file="${SSL_PATH}/${domain}.key"
-    local ca_file="${SSL_PATH}/${domain}-ca.crt"
+    # 2. 定义基于 cert_name 的标准路径
+    local cert_file="${SSL_PATH}/${cert_name}.crt"
+    local key_file="${SSL_PATH}/${cert_name}.key"
+    local ca_file="${SSL_PATH}/${cert_name}-ca.crt"
 
-    # 申请证书并安装
+    # 3. 检查证书是否已存在
     if [[ -f "${cert_file}" && -f "${key_file}" && -f "${ca_file}" ]];then
-        log INFO "证书已存在: ${domain}"
-    else
-        if ls /acmecerts/${domain}*/${domain}.key >/dev/null 2>&1; then
-            log INFO "acme ${domain} 证书已申请完成"
-        else
-            # 配置调试模式
-            export DEBUG=${ACMESH_DEBUG}
-
-            registerAccount
-            setDnsApi ${dns_provider}
-
-            # 动态构建域名参数（buypass不支持通配符）
-            local domains=("-d" "${domain}")
-            if [[ "${ACMESH_SERVER_NAME}" == "letsencrypt" ]]; then
-                domains+=("-d" "*.${domain}")
-            fi
-            # 申请证书
-            acme.sh --issue --dns "${DNS_PROVIDER}" "${domains[@]}"
-        fi
-        # 删除 nginx 配置，避免加载证书报错
-        rm -f /etc/nginx/conf.d/* /etc/nginx/stream.d/*
-        # 安装证书，并配置自动更新
-        acme.sh --upgrade
-        acme.sh --install-cert --ecc -d "${domain}" \
-            --key-file "${SSL_PATH}/${domain}.key" \
-            --fullchain-file "${cert_file}" \
-            --ca-file "${SSL_PATH}/${domain}-ca.crt" \
-            --reloadcmd "/usr/sbin/nginx"
-        /usr/sbin/nginx -s quit && rm -f var/run/nginx/nginx.pid
+        log INFO "证书任务 [$cert_name] 已存在，跳过申请阶段。"
+        return 0
     fi
+
+    # 4. 检查 acme.sh 内部数据库缓存
+    if ! acme.sh --list | grep -q "${first_domain}"; then
+        log INFO "未检测到缓存，开始执行任务 [$cert_name] 的新证书申请..."
+        checkRequiredEnv "ACMESH_SERVER_NAME" "ACMESH_REGISTER_EMAIL" "ALI_KEY" "ALI_SECRET" "CF_TOKEN" "CF_ZONE_ID" "CF_ACCOUNT_ID"
+        # 配置调试模式
+        export DEBUG=${ACMESH_DEBUG:-0}
+        # 导出 API 密钥环境
+        export Ali_Key="${ALI_KEY}" Ali_Secret="${ALI_SECRET}" CF_Token="${CF_TOKEN}" CF_Zone_ID="${CF_ZONE_ID}" CF_Account_ID="${CF_ACCOUNT_ID}"
+        log INFO "Set default server: ${ACMESH_SERVER_NAME}"
+        acme.sh --set-default-ca --server "${ACMESH_SERVER_NAME}"
+        log INFO "Registering account: ${ACMESH_REGISTER_EMAIL}"
+        acme.sh --register-account -m "${ACMESH_REGISTER_EMAIL}"
+        # 动态构建 acme.sh 参数数组
+        local _args=("--issue" "--ecc" "--server" "${ACMESH_SERVER_NAME:-letsencrypt}")
+        # 解析 domain_params
+        IFS='|' read -ra ENTRIES <<< "$domain_params"
+        for entry in "${ENTRIES[@]}"; do
+            local _dom="${entry%%:*}"
+            local _prov="${entry#*:}"
+            # 添加域名本身
+            _args+=("-d" "${_dom}" "--dns" "${_prov}")
+            # 自动添加通配符 (仅限 LetsEncrypt 且排除 IP 格式)
+            if [[ "${ACMESH_SERVER_NAME}" == "letsencrypt" && ! "${_dom}" =~ ^[0-9.]+$ ]]; then
+                _args+=("-d" "*.${_dom}" "--dns" "${_prov}")
+            fi
+        done
+        # 执行申请
+        log DEBUG "执行命令: acme.sh ${_args[*]}"
+        acme.sh "${_args[@]}" || { log ERROR "任务 [$cert_name] 申请失败"; return 1; }
+    fi
+
+    # 5. 安装/部署阶段
+    log WARN "正在清理旧 Nginx 配置并安装证书文件: ${cert_name}"
+    # 清理现有的 Nginx 配置目录，防止路径报错
+    rm -f /etc/nginx/conf.d/* /etc/nginx/stream.d/*
+    # 安装证书并配置 Nginx 重启逻辑
+    acme.sh --install-cert --ecc -d "${first_domain}" \
+        --key-file       "${key_file}" \
+        --fullchain-file "${cert_file}" \
+        --ca-file        "${ca_file}" \
+        --reloadcmd      "/usr/sbin/nginx -s quit; rm -f /var/run/nginx/nginx.pid; /usr/sbin/nginx"
+
+    log INFO "证书任务 [$cert_name] 部署成功。"
 }
 
 # 主执行流程
@@ -377,18 +360,12 @@ if [ "${1#-}" = 'supervisord' ] && [ "$(id -u)" = '0' ]; then
     source "/.env/xray"
     cat "/.env/xray"
 
+    log INFO "Obtaining SSL certificate..."
+    # 生成证书
+    issueCertificate "sb_xray_bundle" "${DOMAIN}:dns_ali|${CDNDOMAIN}:dns_cf"
+
     log INFO "Updating GeoIP and GeoSite databases..."
     /scripts/geo_update.sh
-
-    log INFO "Obtaining SSL certificate..."
-    # 证书类型映射表 (类型: [域名变量名,DNS服务商])
-    declare -A CERT_TYPE_MAP=(
-        ["normal"]="DOMAIN ali"
-        ["cdn"]="CDNDOMAIN cf"
-    )
-    # 生成证书
-    issueCertificate "normal"
-    issueCertificate "cdn"
 
     # 生成配置文件
     createConfig

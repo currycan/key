@@ -18,8 +18,8 @@
                 "alpn": [
                     "h3"
                 ],
-                "certificate_path": "${SSL_PATH}/${DOMAIN}.crt",
-                "key_path": "${SSL_PATH}/${DOMAIN}.key"
+                "certificate_path": "${SSL_PATH}/sb_xray_bundle.crt",
+                "key_path": "${SSL_PATH}/sb_xray_bundle.key"
             }
         }
     ]

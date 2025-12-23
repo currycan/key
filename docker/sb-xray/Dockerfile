@@ -201,7 +201,7 @@ ENV DUFS_RENDER_SPA="true"
 ENV DUFS_LOG_FORMAT=""
 ENV DUFS_COMPRESS="low"
 
-HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
+HEALTHCHECK --interval=30s --timeout=30s --start-period=15s --retries=3 \
     CMD supervisorctl status xray | grep -q 'RUNNING' || exit 1
 
 EXPOSE 80 443
