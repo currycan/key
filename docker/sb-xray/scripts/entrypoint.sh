@@ -341,12 +341,13 @@ function issueCertificate() {
     # 清理现有的 Nginx 配置目录，防止路径报错
     rm -f /etc/nginx/conf.d/* /etc/nginx/stream.d/*
     # 安装证书并配置 Nginx 重启逻辑
+    acme.sh --upgrade
     acme.sh --install-cert --ecc -d "${first_domain}" \
         --key-file       "${key_file}" \
         --fullchain-file "${cert_file}" \
         --ca-file        "${ca_file}" \
-        --reloadcmd      "/usr/sbin/nginx -s quit; rm -f /var/run/nginx/nginx.pid; /usr/sbin/nginx"
-
+        --reloadcmd "/usr/sbin/nginx"
+    /usr/sbin/nginx -s quit && rm -f var/run/nginx/nginx.pid
     log INFO "证书任务 [$cert_name] 部署成功。"
 }
 
