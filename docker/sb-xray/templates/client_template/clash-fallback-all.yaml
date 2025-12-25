@@ -50,8 +50,6 @@ default: &default
     # - 台湾-故转
     # - 新加坡-故转
     - 其他-故转
-    - 直连
-    - 拒绝
 
 normal-media: &normal-media
   type: select
@@ -59,7 +57,7 @@ normal-media: &normal-media
   proxies:
     - 美国-故转
     - 日本-故转
-  filter: "(?i)(?:.*XTLS\\(Vision\\)\\+Reality直连.*|^(?!.*(?:直连|拒绝|la-isp-dialer)).*)"
+  filter: "(?i)^(?!^(?:直连|拒绝)$).*"
 
 fast-media: &fast-media
   type: select
@@ -67,7 +65,7 @@ fast-media: &fast-media
   proxies:
     - 日本-故转
     - 美国-故转
-  filter: "(?i)(?:.*XTLS\\(Vision\\)\\+Reality直连.*|^(?!.*(?:直连|拒绝|la-isp-dialer)).*)"
+  filter: "(?i)^(?!^(?:直连|拒绝)$).*"
 
 isp-media: &isp-media
   type: select
@@ -76,15 +74,14 @@ isp-media: &isp-media
     - 韩国-故转
     - 日本-故转
     - 美国-故转
-  filter: "(?i)(?:.*XTLS\\(Vision\\)\\+Reality直连.*|^(?!.*(?:直连|拒绝|la-isp-dialer)).*)"
+  filter: "(?i)^(?!^(?:直连|拒绝)$).*"
 
 com: &com
   type: select
   include-all: true
   proxies:
-    - 直连
     - 美国-故转
-  filter: "(?i)(?:.*XTLS\\(Vision\\)\\+Reality直连.*|^(?!.*(?:拒绝|la-isp-dialer)).*)"
+  filter: "(?i)^(?!^(?:拒绝)$).*"
 
 game: &game
   type: select
@@ -94,7 +91,7 @@ game: &game
     - 日本-故转
     - 韩国-故转
     - 香港-故转
-  filter: "(?i)(?:.*XTLS\\(Vision\\)\\+Reality直连.*|^(?!.*(?:拒绝|la-isp-dialer)).*)"
+  filter: "(?i)^(?!^(?:拒绝)$).*"
 
 proxy-groups:
   # 链式代理-前置
@@ -108,7 +105,7 @@ proxy-groups:
       - 美国-自动
       - 日本-自动
       - 韩国-自动
-    filter: "(?i)(?:.*XTLS\\(Vision\\)\\+Reality直连.*|^(?!.*(?:直连|拒绝|la-isp-dialer)).*)"
+    filter: "(?i)^(?!^(?:直连|拒绝|la-isp-dialer)$).*"
 
   # Test
   - name: Test
