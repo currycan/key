@@ -1,4 +1,3 @@
-version: "3.7"
 services:
   file:
     image: currycan/ng-file:1.0.0
@@ -7,3 +6,16 @@ services:
     - ./data:/var/www/file
     restart: always
     network_mode: "host"
+
+  sub-store:
+    image: xream/sub-store
+    container_name: substore
+    restart: always
+    environment:
+    - SUB_STORE_CRON=55 23 * * *
+    # http://127.0.0.1:3010/sDFye2FvHNJwheeCkXQpGaGRQBtupYGS
+    - SUB_STORE_FRONTEND_BACKEND_PATH=/sDFye2FvHNJwheeCkXQpGaGRQBtupYGS
+    ports:
+    - "3010:3001"
+    volumes:
+    - ./substore:/opt/app/data
