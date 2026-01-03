@@ -42,13 +42,13 @@ log "Files downloaded successfully."
 # 检查 supervisord 是否在运行
 if [ -e "/var/run/supervisor.sock" ]; then
     log "Restarting ..."
-    supervisorctl restart all
-    # supervisorctl stop xray
-    # # 清理 socket 文件，防止 bind error
-    # rm -f /dev/shm/uds*
-    # supervisorctl start xray
-    # log "Restarting x-ui Xray..."
-    # netstat -tlnp | grep xray-linux | head -1 | awk '{print $7}' | awk -F/ '{print $1}' | xargs kill -9
+    # supervisorctl restart all
+    supervisorctl stop xray
+    # 清理 socket 文件，防止 bind error
+    rm -f /dev/shm/uds*
+    supervisorctl start xray
+    log "Restarting x-ui Xray..."
+    netstat -tlnp | grep xray-linux | head -1 | awk '{print $7}' | awk -F/ '{print $1}' | xargs kill -9
 else
     log "Supervisord not running, skipping service restart."
 fi
