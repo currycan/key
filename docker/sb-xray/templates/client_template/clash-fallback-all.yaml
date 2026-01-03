@@ -46,7 +46,7 @@ default: &default
     - Hysteria2-故转
     - TUIC-故转
     - AnyTLS-故转
-    - Shadowsocks-故转
+    # - Shadowsocks-故转
     # - 台湾-故转
     # - 新加坡-故转
     - 其他-故转
@@ -134,7 +134,7 @@ proxy-groups:
       - 美国-Hysteria2
       - 美国-TUIC
       - 美国-AnyTLS
-      - 美国-Shadowsocks
+      # - 美国-Shadowsocks
   - name: 美国-手动
     type: select
     include-all: true
@@ -177,12 +177,12 @@ proxy-groups:
     tolerance: 50
     interval: 300
     filter: "(?i)(?=.*(anytls))(?=.*(广美|US|美国|纽约|波特兰|达拉斯|俄勒|凤凰城|费利蒙|洛杉|圣何塞|圣克拉|西雅|芝加|🇺🇸|United States)).*$"
-  - name: 美国-Shadowsocks
-    type: select
-    include-all: true
-    tolerance: 50
-    interval: 300
-    filter: "(?i)(?=.*(shadow|-ss))(?=.*(广美|US|美国|纽约|波特兰|达拉斯|俄勒|凤凰城|费利蒙|洛杉|圣何塞|圣克拉|西雅|芝加|🇺🇸|United States)).*$"
+  # - name: 美国-Shadowsocks
+  #   type: select
+  #   include-all: true
+  #   tolerance: 50
+  #   interval: 300
+  #   filter: "(?i)(?=.*(shadow|-ss))(?=.*(广美|US|美国|纽约|波特兰|达拉斯|俄勒|凤凰城|费利蒙|洛杉|圣何塞|圣克拉|西雅|芝加|🇺🇸|United States)).*$"
 
   # 日本组
   - name: 日本-故转
@@ -329,13 +329,13 @@ proxy-groups:
     include-all: true
     tolerance: 50
     interval: 300
-    filter: "(?i)(?=.*(vless|reality))(?=.*(广港|香港|HK|Hong Kong|🇭🇰|HongKong)).*"
+    filter: "(?=.*(广港|香港|HK|Hong Kong|🇭🇰|HongKong)).*$"
   - name: 香港-自动
     type: url-test
     include-all: true
     tolerance: 50
     interval: 300
-    filter: "(?i)(?=.*(vless|reality))(?=.*(广港|香港|HK|Hong Kong|🇭🇰|HongKong)).*"
+    filter: "(?=.*(广港|香港|HK|Hong Kong|🇭🇰|HongKong)).*$"
   # - name: 香港-VLESS
   #   type: select
   #   include-all: true
@@ -663,23 +663,23 @@ proxy-groups:
     interval: 300
     filter: "(?i)anytls"
 
-  - name: Shadowsocks-故转
-    type: fallback
-    interval: 300
-    lazy: false
-    proxies:
-      - Shadowsocks-手动
-      - Shadowsocks-自动
-  - name: Shadowsocks-手动
-    type: select
-    include-all: true
-    filter: "(?i)shadow|-ss"
-  - name: Shadowsocks-自动
-    type: url-test
-    include-all: true
-    tolerance: 50
-    interval: 300
-    filter: "(?i)shadow|-ss"
+  # - name: Shadowsocks-故转
+  #   type: fallback
+  #   interval: 300
+  #   lazy: false
+  #   proxies:
+  #     - Shadowsocks-手动
+  #     - Shadowsocks-自动
+  # - name: Shadowsocks-手动
+  #   type: select
+  #   include-all: true
+  #   filter: "(?i)shadow|-ss"
+  # - name: Shadowsocks-自动
+  #   type: url-test
+  #   include-all: true
+  #   tolerance: 50
+  #   interval: 300
+  #   filter: "(?i)shadow|-ss"
 
   ## 业务分流组
   - name: TikTok
@@ -998,9 +998,9 @@ mode: rule
 log-level: info
 
 external-controller: 0.0.0.0:9090
-# external-ui: ui
-# external-ui-name: zashboard
-# external-ui-url: https://gh-proxy.com/github.com/Zephyruso/zashboard/archive/refs/heads/gh-pages.zip
+external-ui: ui
+external-ui-name: zashboard
+external-ui-url: https://gh-proxy.com/github.com/Zephyruso/zashboard/archive/refs/heads/gh-pages.zip
 secret: "123456"
 
 # ========================
