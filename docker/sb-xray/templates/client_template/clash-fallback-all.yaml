@@ -475,12 +475,6 @@ proxy-groups:
     tolerance: 50
     interval: 300
     filter: "(?=.*(广新|新加坡|SG|坡|狮城|🇸🇬|Singapore)).*$"
-  - name: 新加坡-VLESS
-    type: url-test
-    include-all: true
-    tolerance: 50
-    interval: 300
-    filter: "(?i)(?=.*(vless|reality))(?=.*(广新|新加坡|SG|坡|狮城|🇸🇬|Singapore)).*$"
   - name: 新加坡-自动
     type: url-test
     include-all: true
@@ -935,6 +929,11 @@ rules:
   - RULE-SET,China / Domain,国内
   - RULE-SET,China / IP,国内,no-resolve
   - RULE-SET,Private / Domain,国内
+  - GEOSITE,category-ads-all,REJECT
+  - GEOIP,PRIVATE,DIRECT
+  - GEOIP,private,DIRECT,no-resolve
+  - GEOSITE,CN,DIRECT
+  - GEOIP,CN,DIRECT
   - MATCH,漏网之鱼
 
 # ========================
