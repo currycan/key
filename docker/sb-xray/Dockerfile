@@ -70,7 +70,7 @@ RUN set -ex; \
   mv x-ui /usr/local/bin/
 
 # ===== 安装 Sing-box =====
-ARG SING_BOX_VERSION="1.12.12"
+ARG SING_BOX_VERSION="1.12.14"
 RUN set -ex; \
     if [ -z "$SING_BOX_VERSION" ]; then \
         SING_BOX_VERSION=$(curl -sSf https://github.com/SagerNet/sing-box/tags \
