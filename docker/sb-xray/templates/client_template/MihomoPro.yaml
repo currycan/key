@@ -115,7 +115,7 @@ proxy-groups:
   # ==================== 社交平台 ====================
   - {name: 推特社交,     <<: *SelectAll, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/X.png}
   - {name: 电报消息,     <<: *SelectAll, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Telegram_X.png}
-  - {name: WhatsApp,    <<: *SelectAll, icon: https://github.com/currycan/key/raw/master/icons/whatsapp.png}
+  - {name: WhatsApp,    <<: *SelectAll, icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/whatsapp.png}
   - {name: Facebook,    <<: *SelectAll, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Facebook.png}
   - {name: 社交平台,     <<: *SelectAll, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/PBS.png}
 
@@ -126,7 +126,7 @@ proxy-groups:
   - {name: 亚马逊,       <<: *SelectAll, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Amazon.png}
   - {name: 苹果服务,     <<: *SelectAll, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Apple.png}
   - {name: 微软服务,     <<: *SelectAll, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Microsoft.png}
-  - {name: 英伟达,       <<: *SelectUS, icon: https://github.com/currycan/key/raw/master/icons/nvidia.png}
+  - {name: 英伟达,       <<: *SelectUS, icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/nvidia.png}
 
   # ==================== 游戏 ====================
   - {name: Steam,       <<: *SelectUS, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Steam.png}
@@ -167,67 +167,67 @@ proxy-groups:
 
   # # ==================== 区域协议组 ====================
   # # 香港
-  # - {name: 香港-VLESS,     type: select, include-all: true, filter: '^(?=.*(?i)(vless|reality))(?=.*(?i)(港|🇭🇰|HK|Hong|HKG))(?!.*(排除1|排除2|5x)).*$', icon: https://github.com/currycan/key/raw/master/icons/xray.png}
-  # - {name: 香港-VMess,     type: select, include-all: true, filter: '^(?=.*(?i)(vmess))(?=.*(?i)(港|🇭🇰|HK|Hong|HKG))(?!.*(排除1|排除2|5x)).*$', icon: https://github.com/currycan/key/raw/master/icons/v2ray.png}
-  # - {name: 香港-Hysteria2, type: select, include-all: true, filter: '^(?=.*(?i)(hysteria2|hy2))(?=.*(?i)(港|🇭🇰|HK|Hong|HKG))(?!.*(排除1|排除2|5x)).*$', icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Magic.png}
-  # - {name: 香港-TUIC,      type: select, include-all: true, filter: '^(?=.*(?i)(tuic))(?=.*(?i)(港|🇭🇰|HK|Hong|HKG))(?!.*(排除1|排除2|5x)).*$', icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Rocket.png}
-  # - {name: 香港-AnyTLS,    type: select, include-all: true, filter: '^(?=.*(?i)(anytls))(?=.*(?i)(港|🇭🇰|HK|Hong|HKG))(?!.*(排除1|排除2|5x)).*$', icon: https://github.com/currycan/key/raw/master/icons/anytls.png}
+  # - {name: 香港-VLESS,     type: select, include-all: true, filter: '^(?=.*(?i)(vless|reality))(?=.*(?i)(港|🇭🇰|HK|Hong|HKG))(?!.*(排除1|排除2|5x)).*$', icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/xray.png}
+  # - {name: 香港-VMess,     type: select, include-all: true, filter: '^(?=.*(?i)(vmess))(?=.*(?i)(港|🇭🇰|HK|Hong|HKG))(?!.*(排除1|排除2|5x)).*$', icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/v2ray.png}
+  # - {name: 香港-Hysteria2, type: select, include-all: true, filter: '^(?=.*(?i)(hysteria2|hy2))(?=.*(?i)(港|🇭🇰|HK|Hong|HKG))(?!.*(排除1|排除2|5x)).*$', icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/hy2.png}
+  # - {name: 香港-TUIC,      type: select, include-all: true, filter: '^(?=.*(?i)(tuic))(?=.*(?i)(港|🇭🇰|HK|Hong|HKG))(?!.*(排除1|排除2|5x)).*$', icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/tuic.png}
+  # - {name: 香港-AnyTLS,    type: select, include-all: true, filter: '^(?=.*(?i)(anytls))(?=.*(?i)(港|🇭🇰|HK|Hong|HKG))(?!.*(排除1|排除2|5x)).*$', icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/anytls.png}
 
   # # 台湾
-  # - {name: 台湾-VLESS,     type: select, include-all: true, filter: '^(?=.*(?i)(vless|reality))(?=.*(?i)(台|🇼🇸|🇹🇼|TW|tai|TPE|TSA|KHH))(?!.*(排除1|排除2|5x)).*$', icon: https://github.com/currycan/key/raw/master/icons/xray.png}
-  # - {name: 台湾-VMess,     type: select, include-all: true, filter: '^(?=.*(?i)(vmess))(?=.*(?i)(台|🇼🇸|🇹🇼|TW|tai|TPE|TSA|KHH))(?!.*(排除1|排除2|5x)).*$', icon: https://github.com/currycan/key/raw/master/icons/v2ray.png}
-  # - {name: 台湾-Hysteria2, type: select, include-all: true, filter: '^(?=.*(?i)(hysteria2|hy2))(?=.*(?i)(台|🇼🇸|🇹🇼|TW|tai|TPE|TSA|KHH))(?!.*(排除1|排除2|5x)).*$', icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Magic.png}
-  # - {name: 台湾-TUIC,      type: select, include-all: true, filter: '^(?=.*(?i)(tuic))(?=.*(?i)(台|🇼🇸|🇹🇼|TW|tai|TPE|TSA|KHH))(?!.*(排除1|排除2|5x)).*$', icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Rocket.png}
-  # - {name: 台湾-AnyTLS,    type: select, include-all: true, filter: '^(?=.*(?i)(anytls))(?=.*(?i)(台|🇼🇸|🇹🇼|TW|tai|TPE|TSA|KHH))(?!.*(排除1|排除2|5x)).*$', icon: https://github.com/currycan/key/raw/master/icons/anytls.png}
+  # - {name: 台湾-VLESS,     type: select, include-all: true, filter: '^(?=.*(?i)(vless|reality))(?=.*(?i)(台|🇼🇸|🇹🇼|TW|tai|TPE|TSA|KHH))(?!.*(排除1|排除2|5x)).*$', icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/xray.png}
+  # - {name: 台湾-VMess,     type: select, include-all: true, filter: '^(?=.*(?i)(vmess))(?=.*(?i)(台|🇼🇸|🇹🇼|TW|tai|TPE|TSA|KHH))(?!.*(排除1|排除2|5x)).*$', icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/v2ray.png}
+  # - {name: 台湾-Hysteria2, type: select, include-all: true, filter: '^(?=.*(?i)(hysteria2|hy2))(?=.*(?i)(台|🇼🇸|🇹🇼|TW|tai|TPE|TSA|KHH))(?!.*(排除1|排除2|5x)).*$', icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/hy2.png}
+  # - {name: 台湾-TUIC,      type: select, include-all: true, filter: '^(?=.*(?i)(tuic))(?=.*(?i)(台|🇼🇸|🇹🇼|TW|tai|TPE|TSA|KHH))(?!.*(排除1|排除2|5x)).*$', icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/tuic.png}
+  # - {name: 台湾-AnyTLS,    type: select, include-all: true, filter: '^(?=.*(?i)(anytls))(?=.*(?i)(台|🇼🇸|🇹🇼|TW|tai|TPE|TSA|KHH))(?!.*(排除1|排除2|5x)).*$', icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/anytls.png}
 
   # # 狮城
-  # - {name: 狮城-VLESS,     type: select, include-all: true, filter: '^(?=.*(?i)(vless|reality))(?=.*(?i)(坡|🇸🇬|SG|Sing|SIN|XSP))(?!.*(排除1|排除2|5x)).*$', icon: https://github.com/currycan/key/raw/master/icons/xray.png}
-  # - {name: 狮城-VMess,     type: select, include-all: true, filter: '^(?=.*(?i)(vmess))(?=.*(?i)(坡|🇸🇬|SG|Sing|SIN|XSP))(?!.*(排除1|排除2|5x)).*$', icon: https://github.com/currycan/key/raw/master/icons/v2ray.png}
-  # - {name: 狮城-Hysteria2, type: select, include-all: true, filter: '^(?=.*(?i)(hysteria2|hy2))(?=.*(?i)(坡|🇸🇬|SG|Sing|SIN|XSP))(?!.*(排除1|排除2|5x)).*$', icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Magic.png}
-  # - {name: 狮城-TUIC,      type: select, include-all: true, filter: '^(?=.*(?i)(tuic))(?=.*(?i)(坡|🇸🇬|SG|Sing|SIN|XSP))(?!.*(排除1|排除2|5x)).*$', icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Rocket.png}
-  # - {name: 狮城-AnyTLS,    type: select, include-all: true, filter: '^(?=.*(?i)(anytls))(?=.*(?i)(坡|🇸🇬|SG|Sing|SIN|XSP))(?!.*(排除1|排除2|5x)).*$', icon: https://github.com/currycan/key/raw/master/icons/anytls.png}
+  # - {name: 狮城-VLESS,     type: select, include-all: true, filter: '^(?=.*(?i)(vless|reality))(?=.*(?i)(坡|🇸🇬|SG|Sing|SIN|XSP))(?!.*(排除1|排除2|5x)).*$', icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/xray.png}
+  # - {name: 狮城-VMess,     type: select, include-all: true, filter: '^(?=.*(?i)(vmess))(?=.*(?i)(坡|🇸🇬|SG|Sing|SIN|XSP))(?!.*(排除1|排除2|5x)).*$', icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/v2ray.png}
+  # - {name: 狮城-Hysteria2, type: select, include-all: true, filter: '^(?=.*(?i)(hysteria2|hy2))(?=.*(?i)(坡|🇸🇬|SG|Sing|SIN|XSP))(?!.*(排除1|排除2|5x)).*$', icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/hy2.png}
+  # - {name: 狮城-TUIC,      type: select, include-all: true, filter: '^(?=.*(?i)(tuic))(?=.*(?i)(坡|🇸🇬|SG|Sing|SIN|XSP))(?!.*(排除1|排除2|5x)).*$', icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/tuic.png}
+  # - {name: 狮城-AnyTLS,    type: select, include-all: true, filter: '^(?=.*(?i)(anytls))(?=.*(?i)(坡|🇸🇬|SG|Sing|SIN|XSP))(?!.*(排除1|排除2|5x)).*$', icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/anytls.png}
 
   # # 日本
-  # - {name: 日本-VLESS,     type: select, include-all: true, filter: '^(?=.*(?i)(vless|reality))(?=.*(?i)(日|🇯🇵|JP|Japan|NRT|HND|KIX|CTS|FUK))(?!.*(排除1|排除2|5x)).*$', icon: https://github.com/currycan/key/raw/master/icons/xray.png}
-  # - {name: 日本-VMess,     type: select, include-all: true, filter: '^(?=.*(?i)(vmess))(?=.*(?i)(日|🇯🇵|JP|Japan|NRT|HND|KIX|CTS|FUK))(?!.*(排除1|排除2|5x)).*$', icon: https://github.com/currycan/key/raw/master/icons/v2ray.png}
-  # - {name: 日本-Hysteria2, type: select, include-all: true, filter: '^(?=.*(?i)(hysteria2|hy2))(?=.*(?i)(日|🇯🇵|JP|Japan|NRT|HND|KIX|CTS|FUK))(?!.*(排除1|排除2|5x)).*$', icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Magic.png}
-  # - {name: 日本-TUIC,      type: select, include-all: true, filter: '^(?=.*(?i)(tuic))(?=.*(?i)(日|🇯🇵|JP|Japan|NRT|HND|KIX|CTS|FUK))(?!.*(排除1|排除2|5x)).*$', icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Rocket.png}
-  # - {name: 日本-AnyTLS,    type: select, include-all: true, filter: '^(?=.*(?i)(anytls))(?=.*(?i)(日|🇯🇵|JP|Japan|NRT|HND|KIX|CTS|FUK))(?!.*(排除1|排除2|5x)).*$', icon: https://github.com/currycan/key/raw/master/icons/anytls.png}
+  # - {name: 日本-VLESS,     type: select, include-all: true, filter: '^(?=.*(?i)(vless|reality))(?=.*(?i)(日|🇯🇵|JP|Japan|NRT|HND|KIX|CTS|FUK))(?!.*(排除1|排除2|5x)).*$', icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/xray.png}
+  # - {name: 日本-VMess,     type: select, include-all: true, filter: '^(?=.*(?i)(vmess))(?=.*(?i)(日|🇯🇵|JP|Japan|NRT|HND|KIX|CTS|FUK))(?!.*(排除1|排除2|5x)).*$', icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/v2ray.png}
+  # - {name: 日本-Hysteria2, type: select, include-all: true, filter: '^(?=.*(?i)(hysteria2|hy2))(?=.*(?i)(日|🇯🇵|JP|Japan|NRT|HND|KIX|CTS|FUK))(?!.*(排除1|排除2|5x)).*$', icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/hy2.png}
+  # - {name: 日本-TUIC,      type: select, include-all: true, filter: '^(?=.*(?i)(tuic))(?=.*(?i)(日|🇯🇵|JP|Japan|NRT|HND|KIX|CTS|FUK))(?!.*(排除1|排除2|5x)).*$', icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/tuic.png}
+  # - {name: 日本-AnyTLS,    type: select, include-all: true, filter: '^(?=.*(?i)(anytls))(?=.*(?i)(日|🇯🇵|JP|Japan|NRT|HND|KIX|CTS|FUK))(?!.*(排除1|排除2|5x)).*$', icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/anytls.png}
 
   # # 韩国
-  # - {name: 韩国-VLESS,     type: select, include-all: true, filter: '^(?=.*(?i)(vless|reality))(?=.*(?i)(韩|🇰🇷|韓|首尔|南朝鲜|KR|KOR|Korea|South))(?!.*(排除1|排除2|5x)).*$', icon: https://github.com/currycan/key/raw/master/icons/xray.png}
-  # - {name: 韩国-VMess,     type: select, include-all: true, filter: '^(?=.*(?i)(vmess))(?=.*(?i)(韩|🇰🇷|韓|首尔|南朝鲜|KR|KOR|Korea|South))(?!.*(排除1|排除2|5x)).*$', icon: https://github.com/currycan/key/raw/master/icons/v2ray.png}
-  # - {name: 韩国-Hysteria2, type: select, include-all: true, filter: '^(?=.*(?i)(hysteria2|hy2))(?=.*(?i)(韩|🇰🇷|韓|首尔|南朝鲜|KR|KOR|Korea|South))(?!.*(排除1|排除2|5x)).*$', icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Magic.png}
-  # - {name: 韩国-TUIC,      type: select, include-all: true, filter: '^(?=.*(?i)(tuic))(?=.*(?i)(韩|🇰🇷|韓|首尔|南朝鲜|KR|KOR|Korea|South))(?!.*(排除1|排除2|5x)).*$', icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Rocket.png}
-  # - {name: 韩国-AnyTLS,    type: select, include-all: true, filter: '^(?=.*(?i)(anytls))(?=.*(?i)(韩|🇰🇷|韓|首尔|南朝鲜|KR|KOR|Korea|South))(?!.*(排除1|排除2|5x)).*$', icon: https://github.com/currycan/key/raw/master/icons/anytls.png}
+  # - {name: 韩国-VLESS,     type: select, include-all: true, filter: '^(?=.*(?i)(vless|reality))(?=.*(?i)(韩|🇰🇷|韓|首尔|南朝鲜|KR|KOR|Korea|South))(?!.*(排除1|排除2|5x)).*$', icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/xray.png}
+  # - {name: 韩国-VMess,     type: select, include-all: true, filter: '^(?=.*(?i)(vmess))(?=.*(?i)(韩|🇰🇷|韓|首尔|南朝鲜|KR|KOR|Korea|South))(?!.*(排除1|排除2|5x)).*$', icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/v2ray.png}
+  # - {name: 韩国-Hysteria2, type: select, include-all: true, filter: '^(?=.*(?i)(hysteria2|hy2))(?=.*(?i)(韩|🇰🇷|韓|首尔|南朝鲜|KR|KOR|Korea|South))(?!.*(排除1|排除2|5x)).*$', icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/hy2.png}
+  # - {name: 韩国-TUIC,      type: select, include-all: true, filter: '^(?=.*(?i)(tuic))(?=.*(?i)(韩|🇰🇷|韓|首尔|南朝鲜|KR|KOR|Korea|South))(?!.*(排除1|排除2|5x)).*$', icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/tuic.png}
+  # - {name: 韩国-AnyTLS,    type: select, include-all: true, filter: '^(?=.*(?i)(anytls))(?=.*(?i)(韩|🇰🇷|韓|首尔|南朝鲜|KR|KOR|Korea|South))(?!.*(排除1|排除2|5x)).*$', icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/anytls.png}
 
   # 美国
-  - {name: 美国-VLESS,     type: select, include-all: true, filter: '^(?=.*(?i)(vless|reality))(?=.*(?i)(美|🇺🇸|US|USA|SJC|JFK|LAX|ORD|ATL|DFW|SFO|MIA|SEA|IAD))(?!.*(排除1|排除2|5x)).*$', icon: https://github.com/currycan/key/raw/master/icons/xray.png}
-  - {name: 美国-VMess,     type: select, include-all: true, filter: '^(?=.*(?i)(vmess))(?=.*(?i)(美|🇺🇸|US|USA|SJC|JFK|LAX|ORD|ATL|DFW|SFO|MIA|SEA|IAD))(?!.*(排除1|排除2|5x)).*$', icon: https://github.com/currycan/key/raw/master/icons/v2ray.png}
-  - {name: 美国-Hysteria2, type: select, include-all: true, filter: '^(?=.*(?i)(hysteria2|hy2))(?=.*(?i)(美|🇺🇸|US|USA|SJC|JFK|LAX|ORD|ATL|DFW|SFO|MIA|SEA|IAD))(?!.*(排除1|排除2|5x)).*$', icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Magic.png}
-  - {name: 美国-TUIC,      type: select, include-all: true, filter: '^(?=.*(?i)(tuic))(?=.*(?i)(美|🇺🇸|US|USA|SJC|JFK|LAX|ORD|ATL|DFW|SFO|MIA|SEA|IAD))(?!.*(排除1|排除2|5x)).*$', icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Rocket.png}
-  - {name: 美国-AnyTLS,    type: select, include-all: true, filter: '^(?=.*(?i)(anytls))(?=.*(?i)(美|🇺🇸|US|USA|SJC|JFK|LAX|ORD|ATL|DFW|SFO|MIA|SEA|IAD))(?!.*(排除1|排除2|5x)).*$', icon: https://github.com/currycan/key/raw/master/icons/anytls.png}
+  - {name: 美国-VLESS,     type: select, include-all: true, filter: '^(?=.*(?i)(vless|reality))(?=.*(?i)(美|🇺🇸|US|USA|SJC|JFK|LAX|ORD|ATL|DFW|SFO|MIA|SEA|IAD))(?!.*(排除1|排除2|5x)).*$', icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/xray.png}
+  - {name: 美国-VMess,     type: select, include-all: true, filter: '^(?=.*(?i)(vmess))(?=.*(?i)(美|🇺🇸|US|USA|SJC|JFK|LAX|ORD|ATL|DFW|SFO|MIA|SEA|IAD))(?!.*(排除1|排除2|5x)).*$', icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/v2ray.png}
+  - {name: 美国-Hysteria2, type: select, include-all: true, filter: '^(?=.*(?i)(hysteria2|hy2))(?=.*(?i)(美|🇺🇸|US|USA|SJC|JFK|LAX|ORD|ATL|DFW|SFO|MIA|SEA|IAD))(?!.*(排除1|排除2|5x)).*$', icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/hy2.png}
+  - {name: 美国-TUIC,      type: select, include-all: true, filter: '^(?=.*(?i)(tuic))(?=.*(?i)(美|🇺🇸|US|USA|SJC|JFK|LAX|ORD|ATL|DFW|SFO|MIA|SEA|IAD))(?!.*(排除1|排除2|5x)).*$', icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/tuic.png}
+  - {name: 美国-AnyTLS,    type: select, include-all: true, filter: '^(?=.*(?i)(anytls))(?=.*(?i)(美|🇺🇸|US|USA|SJC|JFK|LAX|ORD|ATL|DFW|SFO|MIA|SEA|IAD))(?!.*(排除1|排除2|5x)).*$', icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/anytls.png}
 
   # ==================== 协议策略组 ====================
-  - {name: VLESS-故转,     <<: *BaseFB, proxies: [VLESS-手动, VLESS-自动], icon: https://github.com/currycan/key/raw/master/icons/xray.png}
-  - {name: VLESS-手动,     type: select, include-all: true, filter: *FilterVLESS, icon: https://github.com/currycan/key/raw/master/icons/xray.png}
-  - {name: VLESS-自动,     <<: *BaseUT, include-all: true, filter: *FilterVLESS, icon: https://github.com/currycan/key/raw/master/icons/xray.png}
+  - {name: VLESS-故转,     <<: *BaseFB, proxies: [VLESS-手动, VLESS-自动], icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/xray.png}
+  - {name: VLESS-手动,     type: select, include-all: true, filter: *FilterVLESS, icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/xray.png}
+  - {name: VLESS-自动,     <<: *BaseUT, include-all: true, filter: *FilterVLESS, icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/xray.png}
 
-  - {name: VMess-故转,     <<: *BaseFB, proxies: [VMess-手动, VMess-自动], icon: https://github.com/currycan/key/raw/master/icons/v2ray.png}
-  - {name: VMess-手动,     type: select, include-all: true, filter: *FilterVMess, icon: https://github.com/currycan/key/raw/master/icons/v2ray.png}
-  - {name: VMess-自动,     <<: *BaseUT, include-all: true, filter: *FilterVMess, icon: https://github.com/currycan/key/raw/master/icons/v2ray.png}
+  - {name: VMess-故转,     <<: *BaseFB, proxies: [VMess-手动, VMess-自动], icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/v2ray.png}
+  - {name: VMess-手动,     type: select, include-all: true, filter: *FilterVMess, icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/v2ray.png}
+  - {name: VMess-自动,     <<: *BaseUT, include-all: true, filter: *FilterVMess, icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/v2ray.png}
 
-  - {name: Hysteria2-故转, <<: *BaseFB, proxies: [Hysteria2-手动, Hysteria2-自动], icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Magic.png}
-  - {name: Hysteria2-手动, type: select, include-all: true, filter: *FilterHy2, icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Magic.png}
-  - {name: Hysteria2-自动, <<: *BaseUT, include-all: true, filter: *FilterHy2, icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Magic.png}
+  - {name: Hysteria2-故转, <<: *BaseFB, proxies: [Hysteria2-手动, Hysteria2-自动], icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/hy2.png}
+  - {name: Hysteria2-手动, type: select, include-all: true, filter: *FilterHy2, icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/hy2.png}
+  - {name: Hysteria2-自动, <<: *BaseUT, include-all: true, filter: *FilterHy2, icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/hy2.png}
 
-  - {name: TUIC-故转,      <<: *BaseFB, proxies: [TUIC-手动, TUIC-自动], icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Rocket.png}
-  - {name: TUIC-手动,      type: select, include-all: true, filter: *FilterTUIC, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Rocket.png}
-  - {name: TUIC-自动,      <<: *BaseUT, include-all: true, filter: *FilterTUIC, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Rocket.png}
+  - {name: TUIC-故转,      <<: *BaseFB, proxies: [TUIC-手动, TUIC-自动], icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/tuic.png}
+  - {name: TUIC-手动,      type: select, include-all: true, filter: *FilterTUIC, icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/tuic.png}
+  - {name: TUIC-自动,      <<: *BaseUT, include-all: true, filter: *FilterTUIC, icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/tuic.png}
 
-  - {name: AnyTLS-故转,    <<: *BaseFB, proxies: [AnyTLS-手动, AnyTLS-自动], icon: https://github.com/currycan/key/raw/master/icons/anytls.png}
-  - {name: AnyTLS-手动,    type: select, include-all: true, filter: *FilterAnyTLS, icon: https://github.com/currycan/key/raw/master/icons/anytls.png}
-  - {name: AnyTLS-自动,    <<: *BaseUT, include-all: true, filter: *FilterAnyTLS, icon: https://github.com/currycan/key/raw/master/icons/anytls.png}
+  - {name: AnyTLS-故转,    <<: *BaseFB, proxies: [AnyTLS-手动, AnyTLS-自动], icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/anytls.png}
+  - {name: AnyTLS-手动,    type: select, include-all: true, filter: *FilterAnyTLS, icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/anytls.png}
+  - {name: AnyTLS-自动,    <<: *BaseUT, include-all: true, filter: *FilterAnyTLS, icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/anytls.png}
 
   # ==================== 其他策略组 ====================
   - {name: 冷门自选,     type: select, include-all: true, filter: *FilterOT, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Europe_Map.png}
