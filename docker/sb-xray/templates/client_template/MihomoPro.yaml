@@ -104,7 +104,7 @@ proxy-groups:
   # ==================== 媒体服务 ====================
   - {name: TikTok,      <<: *SelectISP, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/TikTok.png}
   - {name: YouTube,     <<: *SelectAll, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/YouTube.png}
-  - {name: Netflix,     <<: *SelectISP, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Netflix.png}
+  - {name: Netflix,      <<: *SelectISP, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Netflix.png}
   - {name: Disney,      <<: *SelectISP, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Disney.png}
   - {name: HBO,         <<: *SelectISP, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/HBO.png}
   - {name: Spotify,     <<: *SelectAll, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Spotify.png}
@@ -120,16 +120,16 @@ proxy-groups:
   - {name: 社交平台,     <<: *SelectAll, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/PBS.png}
 
   # ==================== 国外服务 ====================
-  - {name: 谷歌服务,      <<: *SelectAll, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Google_Search.png}
-  - {name: GitHub,       <<: *SelectAll, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/GitHub.png}
-  - {name: Reddit,       <<: *SelectUS, icon: https://github.com/Semporia/Hand-Painted-icon/raw/master/Social_Media/Reddit.png}
+  - {name: 谷歌服务,     <<: *SelectAll, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Google_Search.png}
+  - {name: GitHub,      <<: *SelectAll, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/GitHub.png}
+  - {name: Reddit,      <<: *SelectUS, icon: https://github.com/Semporia/Hand-Painted-icon/raw/master/Social_Media/Reddit.png}
   - {name: 亚马逊,       <<: *SelectAll, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Amazon.png}
   - {name: 苹果服务,     <<: *SelectAll, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Apple.png}
   - {name: 微软服务,     <<: *SelectAll, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Microsoft.png}
   - {name: 英伟达,       <<: *SelectUS, icon: https://github.com/currycan/key/raw/master/icons/nvidia.png}
 
   # ==================== 游戏 ====================
-  - {name: Steam,        <<: *SelectUS, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Steam.png}
+  - {name: Steam,       <<: *SelectUS, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Steam.png}
   - {name: 游戏平台,     <<: *SelectUS, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Game.png}
 
   # ==================== 虚拟币 ====================
