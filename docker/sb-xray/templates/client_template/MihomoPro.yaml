@@ -40,25 +40,27 @@ FilterHy2: &FilterHy2 "^(?=.*(?i)(hysteria2|hy2))(?!.*(排除1|排除2|5x)).*$"
 FilterTUIC: &FilterTUIC "^(?=.*(?i)(tuic))(?!.*(排除1|排除2|5x)).*$"
 FilterAnyTLS: &FilterAnyTLS "^(?=.*(?i)(anytls))(?!.*(排除1|排除2|5x)).*$"
 # 节点筛选正则表达式 - 家宽节点
-FilterISP: &FilterISP "^(?=.*(?i)(原生|家宽|住宅|isp|ISP))(?!.*(排除1|排除2|5x)).*$"
+FilterISP: &FilterISP "^(?=.*(?i)(家宽|住宅|isp|ISP))(?!.*(排除1|排除2|5x)).*$"
+FilterNative: &FilterNative "^(?=.*(?i)(原生|流媒体))(?!.*(排除1|排除2|5x)).*$"
 # 节点筛选正则表达式 - 高速节点
 FilterFAST: &FilterFAST "^(?=.*(?i)(高速))(?!.*(排除1|排除2|5x)).*$"
 # 节点筛选正则表达式 - 过滤链式代理节点
 FilterDialer: &FilterDialer "^(?!.*(DIRECT|直接连接|REJECT|isp-dialer))"
 
 # 策略组代理列表模板 - 预定义的代理节点优先级排序
-SelectDC: &SelectDC {type: select, proxies: [直接连接, 默认代理, 故障转移, ISP-故转, 高速-故转, 香港-故转, 狮城-故转, 日本-故转, 韩国-故转, 美国-故转, 台湾-故转, 其他-故转, 美国-VLESS, 美国-VMess, 美国-Hysteria2, 美国-TUIC, 美国-AnyTLS, VLESS-故转, VMess-故转, Hysteria2-故转, TUIC-故转, AnyTLS-故转, 全球手动]}
-SelectFB: &SelectFB {type: select, proxies: [故障转移, ISP-故转, 高速-故转, 香港-故转, 狮城-故转, 日本-故转, 韩国-故转, 美国-故转, 台湾-故转, 其他-故转, 美国-VLESS, 美国-VMess, 美国-Hysteria2, 美国-TUIC, 美国-AnyTLS, VLESS-故转, VMess-故转, Hysteria2-故转, TUIC-故转, AnyTLS-故转, 全球手动, 直接连接]}
-SelectISP: &SelectISP {type: select, proxies: [ISP-故转, 默认代理, 故障转移, 高速-故转, 香港-故转, 狮城-故转, 日本-故转, 韩国-故转, 美国-故转, 台湾-故转, 其他-故转, 美国-VLESS, 美国-VMess, 美国-Hysteria2, 美国-TUIC, 美国-AnyTLS, VLESS-故转, VMess-故转, Hysteria2-故转, TUIC-故转, AnyTLS-故转, 全球手动, 直接连接]}
-SelectFAST: &SelectFAST {type: select, proxies: [高速-故转, 默认代理, 故障转移, ISP-故转, 香港-故转, 狮城-故转, 日本-故转, 韩国-故转, 美国-故转, 台湾-故转, 其他-故转, 美国-VLESS, 美国-VMess, 美国-Hysteria2, 美国-TUIC, 美国-AnyTLS, VLESS-故转, VMess-故转, Hysteria2-故转, TUIC-故转, AnyTLS-故转, 全球手动, 直接连接]}
-SelectHK: &SelectHK {type: select, proxies: [香港-故转, 默认代理, 故障转移, ISP-故转, 高速-故转, 狮城-故转, 日本-故转, 韩国-故转, 美国-故转, 台湾-故转, 其他-故转, 美国-VLESS, 美国-VMess, 美国-Hysteria2, 美国-TUIC, 美国-AnyTLS, VLESS-故转, VMess-故转, Hysteria2-故转, TUIC-故转, AnyTLS-故转, 全球手动, 直接连接]}
-SelectSG: &SelectSG {type: select, proxies: [狮城-故转, 默认代理, 故障转移, ISP-故转, 高速-故转, 香港-故转, 日本-故转, 韩国-故转, 美国-故转, 台湾-故转, 其他-故转, 美国-VLESS, 美国-VMess, 美国-Hysteria2, 美国-TUIC, 美国-AnyTLS, VLESS-故转, VMess-故转, Hysteria2-故转, TUIC-故转, AnyTLS-故转, 全球手动, 直接连接]}
-SelectJP: &SelectJP {type: select, proxies: [日本-故转, 默认代理, 故障转移, ISP-故转, 高速-故转, 香港-故转, 狮城-故转, 韩国-故转, 美国-故转, 台湾-故转, 其他-故转, 美国-VLESS, 美国-VMess, 美国-Hysteria2, 美国-TUIC, 美国-AnyTLS, VLESS-故转, VMess-故转, Hysteria2-故转, TUIC-故转, AnyTLS-故转, 全球手动, 直接连接]}
-SelectKR: &SelectKR {type: select, proxies: [韩国-故转, 默认代理, 故障转移, ISP-故转, 高速-故转, 香港-故转, 狮城-故转, 日本-故转, 美国-故转, 台湾-故转, 其他-故转, 美国-VLESS, 美国-VMess, 美国-Hysteria2, 美国-TUIC, 美国-AnyTLS, VLESS-故转, VMess-故转, Hysteria2-故转, TUIC-故转, AnyTLS-故转, 全球手动, 直接连接]}
-SelectUS: &SelectUS {type: select, proxies: [美国-故转, 默认代理, 故障转移, ISP-故转, 高速-故转, 香港-故转, 狮城-故转, 日本-故转, 韩国-故转, 台湾-故转, 其他-故转, 美国-VLESS, 美国-VMess, 美国-Hysteria2, 美国-TUIC, 美国-AnyTLS, VLESS-故转, VMess-故转, Hysteria2-故转, TUIC-故转, AnyTLS-故转, 全球手动, 直接连接]}
-SelectTW: &SelectTW {type: select, proxies: [台湾-故转, 默认代理, 故障转移, ISP-故转, 高速-故转, 香港-故转, 狮城-故转, 日本-故转, 韩国-故转, 美国-故转, 其他-故转, 美国-VLESS, 美国-VMess, 美国-Hysteria2, 美国-TUIC, 美国-AnyTLS, VLESS-故转, VMess-故转, Hysteria2-故转, TUIC-故转, AnyTLS-故转, 全球手动, 直接连接]}
-SelectOT: &SelectOT {type: select, proxies: [其他-故转, 默认代理, 故障转移, ISP-故转, 高速-故转, 香港-故转, 狮城-故转, 日本-故转, 韩国-故转, 美国-故转, 台湾-故转, 美国-VLESS, 美国-VMess, 美国-Hysteria2, 美国-TUIC, 美国-AnyTLS, VLESS-故转, VMess-故转, Hysteria2-故转, TUIC-故转, AnyTLS-故转, 全球手动, 直接连接]}
-SelectAll: &SelectAll {type: select, proxies: [默认代理, 故障转移, ISP-故转, 高速-故转, 香港-故转, 狮城-故转, 日本-故转, 韩国-故转, 美国-故转, 台湾-故转, 其他-故转, 美国-VLESS, 美国-VMess, 美国-Hysteria2, 美国-TUIC, 美国-AnyTLS, VLESS-故转, VMess-故转, Hysteria2-故转, TUIC-故转, AnyTLS-故转, 全球手动, 直接连接]}
+SelectDC: &SelectDC {type: select, proxies: [直接连接, 默认代理, 故障转移, ISP-故转, Native-故转, 高速-故转, 香港-故转, 狮城-故转, 日本-故转, 韩国-故转, 美国-故转, 台湾-故转, 其他-故转, 美国-VLESS, 美国-VMess, 美国-Hysteria2, 美国-TUIC, 美国-AnyTLS, VLESS-故转, VMess-故转, Hysteria2-故转, TUIC-故转, AnyTLS-故转, 全球手动]}
+SelectFB: &SelectFB {type: select, proxies: [故障转移, ISP-故转, Native-故转, 高速-故转, 香港-故转, 狮城-故转, 日本-故转, 韩国-故转, 美国-故转, 台湾-故转, 其他-故转, 美国-VLESS, 美国-VMess, 美国-Hysteria2, 美国-TUIC, 美国-AnyTLS, VLESS-故转, VMess-故转, Hysteria2-故转, TUIC-故转, AnyTLS-故转, 全球手动, 直接连接]}
+SelectISP: &SelectISP {type: select, proxies: [ISP-故转, Native-故转, 默认代理, 故障转移, 高速-故转, 香港-故转, 狮城-故转, 日本-故转, 韩国-故转, 美国-故转, 台湾-故转, 其他-故转, 美国-VLESS, 美国-VMess, 美国-Hysteria2, 美国-TUIC, 美国-AnyTLS, VLESS-故转, VMess-故转, Hysteria2-故转, TUIC-故转, AnyTLS-故转, 全球手动, 直接连接]}
+SelectNative: &SelecNative {type: select, proxies: [Native-故转, ISP-故转, 默认代理, 故障转移, 高速-故转, 香港-故转, 狮城-故转, 日本-故转, 韩国-故转, 美国-故转, 台湾-故转, 其他-故转, 美国-VLESS, 美国-VMess, 美国-Hysteria2, 美国-TUIC, 美国-AnyTLS, VLESS-故转, VMess-故转, Hysteria2-故转, TUIC-故转, AnyTLS-故转, 全球手动, 直接连接]}
+SelectFAST: &SelectFAST {type: select, proxies: [高速-故转, 默认代理, 故障转移, ISP-故转, Native-故转, 香港-故转, 狮城-故转, 日本-故转, 韩国-故转, 美国-故转, 台湾-故转, 其他-故转, 美国-VLESS, 美国-VMess, 美国-Hysteria2, 美国-TUIC, 美国-AnyTLS, VLESS-故转, VMess-故转, Hysteria2-故转, TUIC-故转, AnyTLS-故转, 全球手动, 直接连接]}
+SelectHK: &SelectHK {type: select, proxies: [香港-故转, 默认代理, 故障转移, ISP-故转, Native-故转, 高速-故转, 狮城-故转, 日本-故转, 韩国-故转, 美国-故转, 台湾-故转, 其他-故转, 美国-VLESS, 美国-VMess, 美国-Hysteria2, 美国-TUIC, 美国-AnyTLS, VLESS-故转, VMess-故转, Hysteria2-故转, TUIC-故转, AnyTLS-故转, 全球手动, 直接连接]}
+SelectSG: &SelectSG {type: select, proxies: [狮城-故转, 默认代理, 故障转移, ISP-故转, Native-故转, 高速-故转, 香港-故转, 日本-故转, 韩国-故转, 美国-故转, 台湾-故转, 其他-故转, 美国-VLESS, 美国-VMess, 美国-Hysteria2, 美国-TUIC, 美国-AnyTLS, VLESS-故转, VMess-故转, Hysteria2-故转, TUIC-故转, AnyTLS-故转, 全球手动, 直接连接]}
+SelectJP: &SelectJP {type: select, proxies: [日本-故转, 默认代理, 故障转移, ISP-故转, Native-故转, 高速-故转, 香港-故转, 狮城-故转, 韩国-故转, 美国-故转, 台湾-故转, 其他-故转, 美国-VLESS, 美国-VMess, 美国-Hysteria2, 美国-TUIC, 美国-AnyTLS, VLESS-故转, VMess-故转, Hysteria2-故转, TUIC-故转, AnyTLS-故转, 全球手动, 直接连接]}
+SelectKR: &SelectKR {type: select, proxies: [韩国-故转, 默认代理, 故障转移, ISP-故转, Native-故转, 高速-故转, 香港-故转, 狮城-故转, 日本-故转, 美国-故转, 台湾-故转, 其他-故转, 美国-VLESS, 美国-VMess, 美国-Hysteria2, 美国-TUIC, 美国-AnyTLS, VLESS-故转, VMess-故转, Hysteria2-故转, TUIC-故转, AnyTLS-故转, 全球手动, 直接连接]}
+SelectUS: &SelectUS {type: select, proxies: [美国-故转, 默认代理, 故障转移, ISP-故转, Native-故转, 高速-故转, 香港-故转, 狮城-故转, 日本-故转, 韩国-故转, 台湾-故转, 其他-故转, 美国-VLESS, 美国-VMess, 美国-Hysteria2, 美国-TUIC, 美国-AnyTLS, VLESS-故转, VMess-故转, Hysteria2-故转, TUIC-故转, AnyTLS-故转, 全球手动, 直接连接]}
+SelectTW: &SelectTW {type: select, proxies: [台湾-故转, 默认代理, 故障转移, ISP-故转, Native-故转, 高速-故转, 香港-故转, 狮城-故转, 日本-故转, 韩国-故转, 美国-故转, 其他-故转, 美国-VLESS, 美国-VMess, 美国-Hysteria2, 美国-TUIC, 美国-AnyTLS, VLESS-故转, VMess-故转, Hysteria2-故转, TUIC-故转, AnyTLS-故转, 全球手动, 直接连接]}
+SelectOT: &SelectOT {type: select, proxies: [其他-故转, 默认代理, 故障转移, ISP-故转, Native-故转, 高速-故转, 香港-故转, 狮城-故转, 日本-故转, 韩国-故转, 美国-故转, 台湾-故转, 美国-VLESS, 美国-VMess, 美国-Hysteria2, 美国-TUIC, 美国-AnyTLS, VLESS-故转, VMess-故转, Hysteria2-故转, TUIC-故转, AnyTLS-故转, 全球手动, 直接连接]}
+SelectAll: &SelectAll {type: select, proxies: [默认代理, 故障转移, ISP-故转, Native-故转, 高速-故转, 香港-故转, 狮城-故转, 日本-故转, 韩国-故转, 美国-故转, 台湾-故转, 其他-故转, 美国-VLESS, 美国-VMess, 美国-Hysteria2, 美国-TUIC, 美国-AnyTLS, VLESS-故转, VMess-故转, Hysteria2-故转, TUIC-故转, AnyTLS-故转, 全球手动, 直接连接]}
 
 # ==================== 代理提供者 ====================
 # 注意：请提供您的机场订阅链接，每个链接一行，并为每个机场命名，末尾的[优][备]为每个节点添加机场名称前缀，可自定义
@@ -85,7 +87,7 @@ proxy-groups:
   # ==================== 主要策略组 ====================
   - {name: 直接连接,     type: select, proxies: [DIRECT], hidden: true, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Direct.png}
   - {name: 链式前置,     <<: *BaseUT, include-all: true, filter: *FilterDialer, icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Proxy.png}
-  - {name: 故障转移,     <<: *BaseFB, proxies: [ISP-故转, 高速-故转, 香港-故转, 狮城-故转, 日本-故转, 韩国-故转, 美国-故转, 台湾-故转, 其他-故转, VLESS-故转, VMess-故转, Hysteria2-故转, TUIC-故转, AnyTLS-故转, 全球手动, 直接连接], icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/ULB.png}
+  - {name: 故障转移,     <<: *BaseFB, proxies: [ISP-故转, Native-故转, 高速-故转, 香港-故转, 狮城-故转, 日本-故转, 韩国-故转, 美国-故转, 台湾-故转, 其他-故转, VLESS-故转, VMess-故转, Hysteria2-故转, TUIC-故转, AnyTLS-故转, 全球手动, 直接连接], icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/ULB.png}
   - {name: 默认代理,     <<: *SelectFB, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Static.png}
   - {name: 国外流量,     <<: *SelectAll, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Global.png}
   - {name: 国内流量,     <<: *SelectDC, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/China.png}
@@ -97,13 +99,13 @@ proxy-groups:
   # ==================== 媒体服务 ====================
   - {name: TikTok,      <<: *SelectISP, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/TikTok.png}
   - {name: YouTube,     <<: *SelectAll, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/YouTube.png}
-  - {name: Netflix,      <<: *SelectISP, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Netflix.png}
-  - {name: Disney,      <<: *SelectISP, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Disney.png}
-  - {name: HBO,         <<: *SelectISP, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/HBO.png}
-  - {name: Spotify,     <<: *SelectAll, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Spotify.png}
-  - {name: Emby,        <<: *SelectAll, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Emby.png}
-  - {name: 国际媒体,     <<: *SelectAll, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/DomesticMedia.png}
-  - {name: 新闻媒体,     <<: *SelectUS, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Apple_News.png}
+  - {name: Netflix,      <<: *SelecNative, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Netflix.png}
+  - {name: Disney,      <<: *SelecNative, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Disney.png}
+  - {name: HBO,         <<: *SelecNative, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/HBO.png}
+  - {name: Spotify,     <<: *SelecNative, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Spotify.png}
+  - {name: Emby,        <<: *SelecNative, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Emby.png}
+  - {name: 国际媒体,     <<: *SelecNative, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/DomesticMedia.png}
+  - {name: 新闻媒体,     <<: *SelecNative, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Apple_News.png}
   # ==================== 社交平台 ====================
   - {name: 推特社交,     <<: *SelectAll, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/X.png}
   - {name: 电报消息,     <<: *SelectAll, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Telegram_X.png}
@@ -113,11 +115,11 @@ proxy-groups:
   # ==================== 国外服务 ====================
   - {name: 谷歌服务,     <<: *SelectAll, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Google_Search.png}
   - {name: GitHub,      <<: *SelectAll, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/GitHub.png}
-  - {name: Reddit,      <<: *SelectUS, icon: https://github.com/Semporia/Hand-Painted-icon/raw/master/Social_Media/Reddit.png}
+  - {name: Reddit,      <<: *SelecNative, icon: https://github.com/Semporia/Hand-Painted-icon/raw/master/Social_Media/Reddit.png}
   - {name: 亚马逊,       <<: *SelectAll, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Amazon.png}
   - {name: 苹果服务,     <<: *SelectAll, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Apple.png}
   - {name: 微软服务,     <<: *SelectAll, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Microsoft.png}
-  - {name: 英伟达,       <<: *SelectUS, icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/nvidia.png}
+  - {name: 英伟达,       <<: *SelecNative, icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/nvidia.png}
   # ==================== 游戏 ====================
   - {name: Steam,       <<: *SelectUS, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Steam.png}
   - {name: 游戏平台,     <<: *SelectUS, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Game.png}
@@ -128,6 +130,10 @@ proxy-groups:
   - {name: ISP-故转,     <<: *BaseFB, proxies: [ISP-自动, ISP-手动], icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Area.png}
   - {name: ISP-手动,     type: select, include-all: true, filter: *FilterISP, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Area.png}
   - {name: ISP-自动,     <<: *BaseUT, include-all: true, filter: *FilterISP, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Area.png}
+  # ==================== 原生节点策略组 ====================
+  - {name: Native-故转,     <<: *BaseFB, proxies: [Native-自动, Native-手动], icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Clubhouse_1.png}
+  - {name: Native-手动,     type: select, include-all: true, filter: *FilterNative, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Clubhouse_1.png}
+  - {name: Native-自动,     <<: *BaseUT, include-all: true, filter: *FilterNative, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Clubhouse_1.png}
   # ==================== 高速节点策略组 ====================
   - {name: 高速-故转,     <<: *BaseFB, proxies: [高速-自动, 高速-手动], icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Rocket.png}
   - {name: 高速-手动,     type: select, include-all: true, filter: *FilterFAST, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Rocket.png}
