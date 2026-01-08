@@ -122,41 +122,51 @@ CONFIG_FILE="$1"
     #      File.open('$CONFIG_FILE','w') {|f| YAML.dump(Value, f)};
     #   end" 2>/dev/null >> $LOG_FILE
 if [ -f "$CONFIG_FILE" ]; then
-    log_file_path="/tmp/openclash.log"
-    echo "${LOGTIME} - [Custom Overwrite] 开始处理 AnyTLS 协议的跳过证书验证配置..." >> $log_file_path
+    LOG_OUT "Custom Overwrite: 正在处理 AnyTLS 节点跳过证书验证..."
 
-    # 使用 OpenClash 内置的 Ruby 来安全处理 YAML
-    # 逻辑：读取配置 -> 遍历 proxies -> 找到 type 为 anytls 的节点 -> 添加 skip-cert-verify: true -> 保存
+    # 导出变量给 Ruby 使用
+    export CONFIG_FILE
+
     ruby -r yaml -e "
     begin
-        config = YAML.load_file('$CONFIG_FILE')
-        modified = false
+        # 兼容性处理：开启 aliases 允许解析 YAML 锚点，permitted_classes 允许解析日期等
+        # 使用 YAML.load_file 在新版 Ruby 中需要传参，或者使用 YAML.safe_load
+        config = YAML.load_file(ENV['CONFIG_FILE'], aliases: true)
 
-        if config.key?('proxies')
+        modified = false
+        if config['proxies'].is_a?(Array)
             config['proxies'].each do |proxy|
-                # 判断条件：协议类型为 anytls
-                # 注意：Clash 配置文件中 type 通常是小写，这里做个强制小写转换以防万一
+                # 寻找 anytls 协议节点
                 if proxy['type'].to_s.downcase == 'anytls'
-                    proxy['skip-cert-verify'] = true
-                    # 如果需要同时也跳过 UDP 的验证，有些内核版本可能需要 fingerpoint 等其他参数，这里仅处理 TLS 验证
-                    modified = true
+                    # 只有在值不为 true 时才进行修改并标记
+                    if proxy['skip-cert-verify'] != true
+                        proxy['skip-cert-verify'] = true
+                        modified = true
+                    end
                 end
             end
         end
 
         if modified
-            File.open('$CONFIG_FILE', 'w') { |f| f.write(config.to_yaml) }
-            puts 'Modified'
+            File.open(ENV['CONFIG_FILE'], 'w') { |f| f.write(config.to_yaml) }
+            puts 'SUCCESS'
         else
-            puts 'NoChange'
+            puts 'NO_CHANGE'
         end
-    rescue => e
-        puts 'Error: ' + e.message
+    rescue Exception => e
+        puts 'ERROR: ' + e.message
     end
-    " >> $log_file_path 2>&1
+    " >> $LOG_FILE 2>&1
 
-    echo "${LOGTIME} - [Custom Overwrite] AnyTLS 协议处理完成" >> $log_file_path
+    # 根据 Ruby 的输出记录日志
+    if grep -q "SUCCESS" $LOG_FILE; then
+        LOG_OUT "Custom Overwrite: AnyTLS 节点配置已成功修改。"
+    elif grep -q "NO_CHANGE" $LOG_FILE; then
+        LOG_OUT "Custom Overwrite: 未发现 AnyTLS 节点或无需修改。"
+    else
+        LOG_OUT "Custom Overwrite: Ruby 脚本运行出错，请检查 /tmp/openclash.log"
+    fi
 else
-    echo "${LOGTIME} - [Custom Overwrite] 配置文件未找到，跳过处理" >> /tmp/openclash.log
+    LOG_OUT "Custom Overwrite: 错误，找不到配置文件: $CONFIG_FILE"
 fi
 exit 0
