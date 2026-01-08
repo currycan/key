@@ -133,9 +133,9 @@ proxy-groups:
   - {name: ISP-手动,     type: select, include-all: true, filter: *FilterISP, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Area.png}
   - {name: ISP-自动,     <<: *BaseUT, include-all: true, filter: *FilterISP, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Area.png}
   # ==================== 原生节点策略组 ====================
-  - {name: Native-故转,     <<: *BaseFB, proxies: [Native-自动, Native-手动], icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Clubhouse_1.png}
-  - {name: Native-手动,     type: select, include-all: true, filter: *FilterNative, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Clubhouse_1.png}
-  - {name: Native-自动,     <<: *BaseUT, include-all: true, filter: *FilterNative, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Clubhouse_1.png}
+  - {name: Native-故转,   <<: *BaseFB, proxies: [Native-自动, Native-手动], icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Clubhouse_1.png}
+  - {name: Native-手动,   type: select, include-all: true, filter: *FilterNative, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Clubhouse_1.png}
+  - {name: Native-自动,   <<: *BaseUT, include-all: true, filter: *FilterNative, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Clubhouse_1.png}
   # ==================== 高速节点策略组 ====================
   - {name: 高速-故转,     <<: *BaseFB, proxies: [高速-自动, 高速-手动], icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Rocket.png}
   - {name: 高速-手动,     type: select, include-all: true, filter: *FilterFAST, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Rocket.png}
