@@ -66,10 +66,12 @@ SelectAll: &SelectAll {type: select, proxies: [默认代理, 故障转移, ISP-�
 # 注意：请提供您的机场订阅链接，每个链接一行，并为每个机场命名，末尾的[优][备]为每个节点添加机场名称前缀，可自定义
 proxy-providers:
   ${NODE_NAME}: {<<: *BaseProvider, url: "https://${DOMAIN}/sb-xray/${CLIENT}", override: {additional-prefix: "[${NODE_NAME}] "}}
-  # 优质订阅源 - 优质节点集合，使用时请修改
+  # # 优质订阅源 - 优质节点集合，使用时请修改
   # 优质服务商: {<<: *BaseProvider, url: "优质订阅源地址", override: {additional-prefix: "[优] "}}
-  # 备用订阅源 - 次优节点集合，使用时请修改
-# 备用服务商: {<<: *BaseProvider, url: "备用订阅源地址", override: {additional-prefix: "[备] "}}
+  # # 备用订阅源 - 次优节点集合，使用时请修改
+  # 备用服务商: {<<: *BaseProvider, url: "备用订阅源地址", override: {additional-prefix: "[备] "}}
+  # # 落地订阅源 - 落地服务连接，使用时请修改
+  # 落地服务商: {<<: *BaseProvider, url: "落地订阅源地址", override: {additional-prefix: "[中] ", dialer-proxy: 中转服务}}
 
 proxies:
   # 发往 la-isp-dialer 的流量先经过 链式前置，从而实现指定下一跳代理的效果
