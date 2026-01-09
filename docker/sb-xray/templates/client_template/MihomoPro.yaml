@@ -165,12 +165,11 @@ proxy-groups:
   - {name: 美国-手动,     type: select, include-all: true, filter: *FilterUS, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/United_States.png}
   - {name: 美国-自动,     <<: *BaseUT, include-all: true, filter: *FilterUS, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/United_States.png}
   # =================== 其他策略组 ====================
-  - {name: 其他-故转,     <<: *BaseFB, proxies: [其他-自动, 其他-手动], icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Auto.png}
-  - {name: 其他-手动,     type: select, include-all: true, filter: *FilterOT, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Auto.png}
-  - {name: 其他-自动,     <<: *BaseUT, include-all: true, filter: *FilterOT, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Auto.png}
+  - {name: 其他-故转,     <<: *BaseFB, proxies: [其他-自动, 其他-手动], icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Back.png}
+  - {name: 其他-手动,     type: select, include-all: true, filter: *FilterOT, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Back.png}
+  - {name: 其他-自动,     <<: *BaseUT, include-all: true, filter: *FilterOT, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Back.png}
   # ==================== 全球手动策略组 ====================
   - {name: 全球手动,     type: select, include-all: true, filter: *FilterALL, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Clubhouse.png}
-
 
   # 美国
   - {name: 美国-VLESS,     <<: *BaseUT, include-all: true, filter: "^(?=.*(?i)(vless|reality))(?=.*(?i)(广美|US|美国|纽约|波特兰|达拉斯|俄勒|凤凰城|费利蒙|洛杉|圣何塞|圣克拉|西雅|芝加|🇺🇸|United States))(?!.*(排除1|排除2|5x)).*$", icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/xray.png}
