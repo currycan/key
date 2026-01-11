@@ -31,7 +31,19 @@ https://raw.githubusercontent.com/currycan/key/master/docker/sb-xray/templates/A
 
 https://raw.githubusercontent.com/currycan/key/master/docker/sb-xray/templates/ACL4SSR/zashboard-20250417.json
 
+## Sub-store
 
+```bash
+# http://172.18.18.254:3010/sDFye2FvHNJwheeCkXQpGaGRQBtupYGS
+docker run -it -d \
+--restart=always \
+-e "SUB_STORE_CRON=55 23 ** *" \
+-e SUB_STORE_FRONTEND_BACKEND_PATH=/sDFye2FvHNJwheeCkXQpGaGRQBtupYGS \
+-p 3010:3001 \
+-v /etc/sub-store:/opt/app/data \
+--name sub-store \
+xream/sub-store
+```
 
 ## DNS
 
