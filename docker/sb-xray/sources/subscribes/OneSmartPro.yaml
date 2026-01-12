@@ -16,12 +16,12 @@
 BaseProvider:   &BaseProvider {type: http, interval: 86400, proxy: DIRECT, health-check: {enable: true, url: "https://www.google.com/generate_204", interval: 300}, filter: "^(?!.*(❗|群|邀请|返利|循环|官网|客服|网站|网址|获取|订阅|流量|到期|机场|下次|版本|官址|备用|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author))"}
 
 # 策略组类型模板 - 定义不同的策略组基础配置
-BaseFB:         &BaseFB {type: fallback, interval: 200, lazy: true, url: 'https://www.google.com/generate_204'}
-BaseLB:         &BaseLB {type: load-balance, interval: 200, lazy: true, url: 'https://www.google.com/generate_204'}
-BaseSmart:      &BaseSmart {type: smart, interval: 200, lazy: true, url: 'https://www.google.com/generate_204', hidden: true, uselightgbm: true, collectdata: true}
+BaseFB:         &BaseFB {type: fallback, interval: 200, lazy: true, url: "https://www.google.com/generate_204"}
+BaseLB:         &BaseLB {type: load-balance, interval: 200, lazy: true, url: "https://www.google.com/generate_204"}
+BaseSmart:      &BaseSmart {type: smart, interval: 200, lazy: true, url: "https://www.google.com/generate_204", hidden: true, uselightgbm: true, collectdata: true}
 # 全部节点筛选正则表达式 - 所有节点
 FilterALL:      &FilterALL "^(?!.*(❗|DIRECT|直接连接|群|邀请|返利|循环|官网|客服|网站|网址|获取|订阅|流量|到期|机场|下次|版本|官址|备用|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author))"
-# 节点筛选正则表达式 - 基于地理位置和关键词过滤
+# 节点筛选正则表达式 - 基于地理位置过滤
 FilterUS:       &FilterUS "^(?=.*(?i)(广美|US|美国|纽约|波特兰|达拉斯|俄勒|凤凰城|费利蒙|洛杉|圣何塞|圣克拉|西雅|芝加|🇺🇸|United States))(?!.*(排除1|排除2|5x)).*$"
 FilterHK:       &FilterHK "^(?=.*(?i)(广港|香港|HK|Hong Kong|🇭🇰|HongKong))(?!.*(排除1|排除2|5x)).*$"
 FilterTW:       &FilterTW "^(?=.*(?i)(广台|台湾|台灣|TW|Tai Wan|🇹🇼|🇨🇳|TaiWan|Taiwan))(?!.*(排除1|排除2|5x)).*$"
@@ -32,7 +32,7 @@ FilterOT:       &FilterOT "^(?!.*(DIRECT|REJECT|直接连接|原生|家宽|住�
 
 
 # 节点筛选正则表达式 - 基于协议过滤
-FilterVLESS:    &FilterVLESS "^(?=.*(?i)(vless|reality|equaldcdn))(?!.*(排除1|排除2|5x)).*$"
+FilterVLESS:    &FilterVLESS "^(?=.*(?i)(vless|reality))(?!.*(排除1|排除2|5x)).*$"
 FilterVMess:    &FilterVMess "^(?=.*(?i)(vmess))(?!.*(排除1|排除2|5x)).*$"
 FilterHy2:      &FilterHy2 "^(?=.*(?i)(hysteria2|hy2))(?!.*(排除1|排除2|5x)).*$"
 FilterTUIC:     &FilterTUIC "^(?=.*(?i)(tuic))(?!.*(排除1|排除2|5x)).*$"
@@ -71,11 +71,11 @@ SelectOT:       &SelectOT {type: select, proxies: [其他-智选, 一键智选, 
 proxy-providers:
   ${NODE_NAME}: {<<: *BaseProvider, url: "https://${DOMAIN}/sb-xray/${CLIENT}", override: {additional-prefix: "[${NODE_NAME}] ", additional-suffix: " [优]"}}
   # # 优质订阅源 - 优质节点集合，使用时请修改
-  # 优质服务商: {<<: *BaseProvider, url: '优质订阅源地址', override: {additional-suffix: '[优] '}}
+  # 优质服务商: {<<: *BaseProvider, url: "优质订阅源地址", override: {additional-suffix: " [优]"}}
   # # 备用订阅源 - 次优节点集合，使用时请修改
-  # 备用服务商: {<<: *BaseProvider, url: '备用订阅源地址', override: {additional-suffix: '[备] '}}
+  # 备用服务商: {<<: *BaseProvider, url: "备用订阅源地址", override: {additional-suffix: " [备]"}}
   # # 落地订阅源 - 落地服务连接，使用时请修改
-  # 落地服务商: {<<: *BaseProvider, url: '落地订阅源地址', override: {additional-suffix: '[中] ', dialer-proxy: 中转服务}}
+  # 落地服务商: {<<: *BaseProvider, url: "落地订阅源地址", override: {additional-suffix: " [中]", dialer-proxy: 中转服务}}
 
 proxies:
   # 发往 la-isp-dialer 的流量先经过 链式前置，从而实现指定下一跳代理的效果
@@ -133,7 +133,7 @@ proxy-groups:
   # ==================== 虚拟币 ====================
   - {name: 货币平台,    <<: *SelectSG, icon: https://raw.githubusercontent.com/Orz-3/mini/master/Alpha/Bitcloud.png}
   # 中转服务层 - LoadBalance负载均衡，提供中转服务提升连通性，选用一个或多个服务商做中转，比如 优质服务商，可通过正则表达式，过滤掉不需要的节点，使用时请修改
-  - {name: 中转服务,    <<: *BaseLB, use: [${NODE_NAME}], filter: 'HK|TW', hidden: true, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Round_Robin.png}
+  - {name: 中转服务,    <<: *BaseLB, use: [${NODE_NAME}], filter: "HK|TW", hidden: true, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Round_Robin.png}
 
   # 线路特性层 - Fallback故障转移，按特性优化线路选择，建议修改位置顺序发挥线路优势
   - {name: 高质量线路,   <<: *BaseFB, proxies: [美国-智选, 香港-智选, 台湾-智选, 日本-智选, 狮城-智选, 韩国-智选, 其他-智选, 手动选择, 直接连接], icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Round_Robin_1.png}
@@ -141,32 +141,32 @@ proxy-groups:
   - {name: 大带宽线路,   <<: *BaseFB, proxies: [狮城-智选, 香港-智选, 台湾-智选, 日本-智选, 韩国-智选, 美国-智选, 其他-智选, 手动选择, 直接连接], icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Round_Robin_1.png}
   - {name: 低倍率线路,   <<: *BaseFB, proxies: [日本-智选, 香港-智选, 台湾-智选, 狮城-智选, 韩国-智选, 美国-智选, 其他-智选, 手动选择, 直接连接], icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Round_Robin_1.png}
 
-  # 地理策略层 - Smart智选选择，政策权重数值越大优先级越高，修改为关键词节点，比如 优:2;中:1;备:0.5，默认为1，优>中>备，使用时请修改
-  - {name: 香港-智选,          <<: *BaseSmart, filter: *FilterHK, include-all: true, policy-priority: '优:2;中:1;备:0.5', icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Hong_Kong.png}
-  - {name: 台湾-智选,          <<: *BaseSmart, filter: *FilterTW, include-all: true, policy-priority: '优:2;中:1;备:0.5', icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Taiwan.png}
-  - {name: 日本-智选,          <<: *BaseSmart, filter: *FilterJP, include-all: true, policy-priority: '优:2;中:1;备:0.5', icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Japan.png}
-  - {name: 狮城-智选,          <<: *BaseSmart, filter: *FilterSG, include-all: true, policy-priority: '优:2;中:1;备:0.5', icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Singapore.png}
-  - {name: 韩国-智选,          <<: *BaseSmart, filter: *FilterKR, include-all: true, policy-priority: '优:2;中:1;备:0.5', icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Korea.png}
-  - {name: 美国-智选,          <<: *BaseSmart, filter: *FilterUS, include-all: true, policy-priority: '优:2;中:1;备:0.5', icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/United_States.png}
-  - {name: 其他-智选,          <<: *BaseSmart, filter: *FilterOT, include-all: true, policy-priority: '优:2;中:1;备:0.5', icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Back.png}
   # ==================== 家宽节点策略组 ====================
-  - {name: ISP-智选,           <<: *BaseSmart, filter: *FilterISP, include-all: true, policy-priority: '优:2;中:1;备:0.5', icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Area.png}
+  - {name: ISP-智选,           <<: *BaseSmart, filter: *FilterISP, include-all: true, policy-priority: "优:2;中:1;备:0.5", icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Area.png}
   # ==================== 原生节点策略组 ====================
-  - {name: Native-智选,        <<: *BaseSmart, filter: *FilterNative, include-all: true, policy-priority: '优:2;中:1;备:0.5', icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Clubhouse_1.png}
+  - {name: Native-智选,        <<: *BaseSmart, filter: *FilterNative, include-all: true, policy-priority: "优:2;中:1;备:0.5", icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Clubhouse_1.png}
   # ==================== 高速节点策略组 ====================
-  - {name: 高速-智选,          <<: *BaseSmart, filter: *FilterFAST, include-all: true, policy-priority: '优:2;中:1;备:0.5', icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Rocket.png}
+  - {name: 高速-智选,          <<: *BaseSmart, filter: *FilterFAST, include-all: true, policy-priority: "优:2;中:1;备:0.5", icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Rocket.png}
+  # 地理策略层 - Smart智选选择，政策权重数值越大优先级越高，修改为关键词节点，比如 优:2;中:1;备:0.5，默认为1，优>中>备，使用时请修改
+  - {name: 香港-智选,          <<: *BaseSmart, filter: *FilterHK, include-all: true, policy-priority: "优:2;中:1;备:0.5", icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Hong_Kong.png}
+  - {name: 台湾-智选,          <<: *BaseSmart, filter: *FilterTW, include-all: true, policy-priority: "优:2;中:1;备:0.5", icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Taiwan.png}
+  - {name: 日本-智选,          <<: *BaseSmart, filter: *FilterJP, include-all: true, policy-priority: "优:2;中:1;备:0.5", icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Japan.png}
+  - {name: 狮城-智选,          <<: *BaseSmart, filter: *FilterSG, include-all: true, policy-priority: "优:2;中:1;备:0.5", icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Singapore.png}
+  - {name: 韩国-智选,          <<: *BaseSmart, filter: *FilterKR, include-all: true, policy-priority: "优:2;中:1;备:0.5", icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Korea.png}
+  - {name: 美国-智选,          <<: *BaseSmart, filter: *FilterUS, include-all: true, policy-priority: "优:2;中:1;备:0.5", icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/United_States.png}
+  - {name: 其他-智选,          <<: *BaseSmart, filter: *FilterOT, include-all: true, policy-priority: "优:2;中:1;备:0.5", icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Back.png}
   # 美国协议分组
-  - {name: 美国-VLESS智选,     <<: *BaseSmart, include-all: true, filter: "^(?=.*(?i)(vless|reality|equaldcdn))(?=.*(?i)(广美|US|美国|纽约|波特兰|达拉斯|俄勒|凤凰城|费利蒙|洛杉|圣何塞|圣克拉|西雅|芝加|🇺🇸|United States))(?!.*(排除1|排除2|5x)).*$", policy-priority: '优:2;中:1;备:0.5', icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/xray.png}
-  - {name: 美国-VMess智选,         <<: *BaseSmart, include-all: true, filter: "^(?=.*(?i)(vmess))(?=.*(?i)(广美|US|美国|纽约|波特兰|达拉斯|俄勒|凤凰城|费利蒙|洛杉|圣何塞|圣克拉|西雅|芝加|🇺🇸|United States))(?!.*(排除1|排除2|5x)).*$", policy-priority: '优:2;中:1;备:0.5', icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/v2ray.png}
-  - {name: 美国-Hysteria2智选, <<: *BaseSmart, include-all: true, filter: "^(?=.*(?i)(hysteria2|hy2))(?=.*(?i)(广美|US|美国|纽约|波特兰|达拉斯|俄勒|凤凰城|费利蒙|洛杉|圣何塞|圣克拉|西雅|芝加|🇺🇸|United States))(?!.*(排除1|排除2|5x)).*$", policy-priority: '优:2;中:1;备:0.5', icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/hy2.png}
-  - {name: 美国-TUIC智选,      <<: *BaseSmart, include-all: true, filter: "^(?=.*(?i)(tuic))(?=.*(?i)(广美|US|美国|纽约|波特兰|达拉斯|俄勒|凤凰城|费利蒙|洛杉|圣何塞|圣克拉|西雅|芝加|🇺🇸|United States))(?!.*(排除1|排除2|5x)).*$", policy-priority: '优:2;中:1;备:0.5', icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/tuic.png}
-  - {name: 美国-AnyTLS智选,    <<: *BaseSmart, include-all: true, filter: "^(?=.*(?i)(anytls))(?=.*(?i)(广美|US|美国|纽约|波特兰|达拉斯|俄勒|凤凰城|费利蒙|洛杉|圣何塞|圣克拉|西雅|芝加|🇺🇸|United States))(?!.*(排除1|排除2|5x)).*$", policy-priority: '优:2;中:1;备:0.5', icon : https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/anytls.png }
+  - {name: 美国-VLESS智选,     <<: *BaseSmart, include-all: true, filter: "^(?=.*(?i)(vless|reality|equaldcdn))(?=.*(?i)(广美|US|美国|纽约|波特兰|达拉斯|俄勒|凤凰城|费利蒙|洛杉|圣何塞|圣克拉|西雅|芝加|🇺🇸|United States))(?!.*(排除1|排除2|5x)).*$", policy-priority: "优:2;中:1;备:0.5", icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/xray.png}
+  - {name: 美国-VMess智选,         <<: *BaseSmart, include-all: true, filter: "^(?=.*(?i)(vmess))(?=.*(?i)(广美|US|美国|纽约|波特兰|达拉斯|俄勒|凤凰城|费利蒙|洛杉|圣何塞|圣克拉|西雅|芝加|🇺🇸|United States))(?!.*(排除1|排除2|5x)).*$", policy-priority: "优:2;中:1;备:0.5", icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/v2ray.png}
+  - {name: 美国-Hysteria2智选, <<: *BaseSmart, include-all: true, filter: "^(?=.*(?i)(hysteria2|hy2))(?=.*(?i)(广美|US|美国|纽约|波特兰|达拉斯|俄勒|凤凰城|费利蒙|洛杉|圣何塞|圣克拉|西雅|芝加|🇺🇸|United States))(?!.*(排除1|排除2|5x)).*$", policy-priority: "优:2;中:1;备:0.5", icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/hy2.png}
+  - {name: 美国-TUIC智选,      <<: *BaseSmart, include-all: true, filter: "^(?=.*(?i)(tuic))(?=.*(?i)(广美|US|美国|纽约|波特兰|达拉斯|俄勒|凤凰城|费利蒙|洛杉|圣何塞|圣克拉|西雅|芝加|🇺🇸|United States))(?!.*(排除1|排除2|5x)).*$", policy-priority: "优:2;中:1;备:0.5", icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/tuic.png}
+  - {name: 美国-AnyTLS智选,    <<: *BaseSmart, include-all: true, filter: "^(?=.*(?i)(anytls))(?=.*(?i)(广美|US|美国|纽约|波特兰|达拉斯|俄勒|凤凰城|费利蒙|洛杉|圣何塞|圣克拉|西雅|芝加|🇺🇸|United States))(?!.*(排除1|排除2|5x)).*$", policy-priority: "优:2;中:1;备:0.5", icon : https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/anytls.png }
   # ==================== 协议策略组 ====================
-  - {name: VLESS-智选,        <<: *BaseSmart, filter: *FilterVLESS, include-all: true, policy-priority: '优:2;中:1;备:0.5', icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/xray.png}
-  - {name: VMess-智选,        <<: *BaseSmart, filter: *FilterVMess, include-all: true, policy-priority: '优:2;中:1;备:0.5', icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/v2ray.png}
-  - {name: Hysteria2-智选,    <<: *BaseSmart, filter: *FilterHy2, include-all: true, policy-priority: '优:2;中:1;备:0.5', icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/hy2.png}
-  - {name: TUIC-智选,         <<: *BaseSmart, filter: *FilterTUIC, include-all: true, policy-priority: '优:2;中:1;备:0.5', icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/tuic.png}
-  - {name: AnyTLS-智选,       <<: *BaseSmart, filter: *FilterAnyTLS, include-all: true, policy-priority: '优:2;中:1;备:0.5', icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/anytls.png}
+  - {name: VLESS-智选,        <<: *BaseSmart, filter: *FilterVLESS, include-all: true, policy-priority: "优:2;中:1;备:0.5", icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/xray.png}
+  - {name: VMess-智选,        <<: *BaseSmart, filter: *FilterVMess, include-all: true, policy-priority: "优:2;中:1;备:0.5", icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/v2ray.png}
+  - {name: Hysteria2-智选,    <<: *BaseSmart, filter: *FilterHy2, include-all: true, policy-priority: "优:2;中:1;备:0.5", icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/hy2.png}
+  - {name: TUIC-智选,         <<: *BaseSmart, filter: *FilterTUIC, include-all: true, policy-priority: "优:2;中:1;备:0.5", icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/tuic.png}
+  - {name: AnyTLS-智选,       <<: *BaseSmart, filter: *FilterAnyTLS, include-all: true, policy-priority: "优:2;中:1;备:0.5", icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/anytls.png}
 
 
 # ==================== 规则路由 ====================
