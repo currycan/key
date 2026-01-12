@@ -30,8 +30,6 @@ https://raw.githubusercontent.com/currycan/key/master/docker/sb-xray/sources/ACL
 https://raw.githubusercontent.com/currycan/key/master/docker/sb-xray/sources/ACL4SSR/ACL4SSR_Online_Lite.ini
 https://raw.githubusercontent.com/currycan/key/master/docker/sb-xray/sources/ACL4SSR/ACL4SSR_Online_MT3000.ini
 
-https://raw.githubusercontent.com/currycan/key/master/docker/sb-xray/sources/ACL4SSR/zashboard-20250417.json
-
 ## Sub-store
 
 ```bash
