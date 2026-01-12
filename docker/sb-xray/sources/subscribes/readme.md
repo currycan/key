@@ -14,11 +14,14 @@ https://github.com/qichiyuhub/rule/blob/main/config/mihomo/AI/smart.yaml
 4. 节点重命名：https://github.com/Keywos/rule
 
 
+```url
 #name=Nexitally&fgf=|&blkey=Emby+GPT>OpenAI&nm
 
 https://raw.githubusercontent.com/Keywos/rule/main/rename.js#name=Nexitally&fgf=|&blkey=Emby+GPT>OpenAI&nm
 
 
-https://raw.githubusercontent.com/currycan/key/master/docker/sb-xray/sources/hack/rename.js
+https://hk.gh-proxy.org/https://raw.githubusercontent.com/currycan/key/master/docker/sb-xray/sources/hack/rename.js
+
+```
 
 .*(距离|套餐|国内|剩余|到期).*
