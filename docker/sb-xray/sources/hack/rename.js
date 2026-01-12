@@ -25,7 +25,7 @@ const QC = ['Hong Kong', 'Macao', 'Taiwan', 'Japan', 'Korea', 'Singapore', 'Unit
 // 过滤正则：匹配包含以下关键词的节点名称，这些节点将被移除
 // 移除 "网站" 以防止误删提示节点
 const nameclear =
-  /(❗|套餐|到期|有效|剩余|版本|已用|过期|失联|测试|官方|网址|群|TEST|客服|获取|订阅|流量|机场|下次|官址|联系|邮箱|工单|学术|USE|USED|TOTAL|EXPIRE|EMAIL|更快|更新)/i;
+  /(❗|套餐|到期|有效|剩余|版本|已用|过期|失联|测试|官方|网址|群|TEST|客服|获取|订阅|流量|机场|下次|官址|联系|邮箱|工单|学术|USE|USED|TOTAL|EXPIRE|EMAIL|更快|更新|如果|客户|教程|距离|国内)/i;
 
 // 替换正则数组：用于关键词替换 (regexArray -> valueArray)
 // prettier-ignore
