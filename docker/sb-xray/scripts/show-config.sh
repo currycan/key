@@ -139,7 +139,6 @@ main() {
     envsubst </templates/client_template/clash >${WORKDIR}/subscribe/clash
     envsubst </templates/client_template/stash >${WORKDIR}/subscribe/stash
     envsubst </templates/client_template/surge >${WORKDIR}/subscribe/surge
-    cp -a /templates/ACL4SSR/ ${WORKDIR}/subscribe/
 
     for clinet in /templates/client_template/*.yaml; do
         output="${WORKDIR}/subscribe/$(basename "$clinet")"

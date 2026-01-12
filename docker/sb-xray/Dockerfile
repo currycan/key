@@ -156,6 +156,8 @@ ENV SUPERVISOR_LOG_MAX_BYTES="20MB"
 
 WORKDIR ${WORKDIR}
 
+COPY sources ${WORKDIR}/subscribe
+
 # time zone
 ENV TZ="Asia/Hong_Kong"
 
