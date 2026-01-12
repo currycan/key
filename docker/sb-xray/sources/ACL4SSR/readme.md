@@ -21,15 +21,16 @@
 https://mylink.ansandy.site/sub?
 http://172.18.18.254:25500/sub?
 
-https://raw.githubusercontent.com/currycan/key/master/docker/sb-xray/templates/ACL4SSR/Blacklist-Full.ini
-https://raw.githubusercontent.com/currycan/key/master/docker/sb-xray/templates/ACL4SSR/Blacklist-Lite.ini
+
+https://raw.githubusercontent.com/currycan/key/master/docker/sb-xray/sources/ACL4SSR/Blacklist-Full.ini
+https://raw.githubusercontent.com/currycan/key/master/docker/sb-xray/sources/ACL4SSR/Blacklist-Lite.ini
 
 
-https://raw.githubusercontent.com/currycan/key/master/docker/sb-xray/templates/ACL4SSR/ACL4SSR_Online_Full.ini
-https://raw.githubusercontent.com/currycan/key/master/docker/sb-xray/templates/ACL4SSR/ACL4SSR_Online_Lite.ini
-https://raw.githubusercontent.com/currycan/key/master/docker/sb-xray/templates/ACL4SSR/ACL4SSR_Online_MT3000.ini
+https://raw.githubusercontent.com/currycan/key/master/docker/sb-xray/sources/ACL4SSR/ACL4SSR_Online_Full.ini
+https://raw.githubusercontent.com/currycan/key/master/docker/sb-xray/sources/ACL4SSR/ACL4SSR_Online_Lite.ini
+https://raw.githubusercontent.com/currycan/key/master/docker/sb-xray/sources/ACL4SSR/ACL4SSR_Online_MT3000.ini
 
-https://raw.githubusercontent.com/currycan/key/master/docker/sb-xray/templates/ACL4SSR/zashboard-20250417.json
+https://raw.githubusercontent.com/currycan/key/master/docker/sb-xray/sources/ACL4SSR/zashboard-20250417.json
 
 ## Sub-store
 
