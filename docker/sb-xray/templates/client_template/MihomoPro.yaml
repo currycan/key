@@ -16,10 +16,10 @@
 BaseProvider:   &BaseProvider {type: http, interval: 86400, proxy: DIRECT, health-check: {enable: true, url: "https://www.google.com/generate_204", interval: 300}, filter: "^(?!.*(❗|群|邀请|返利|循环|官网|客服|网站|网址|获取|订阅|流量|到期|机场|下次|版本|官址|备用|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author))"}
 
 # 策略组类型模板 - 定义不同的策略组基础配置
-BaseFB:         &BaseFB {type: fallback,     interval: 200, lazy: true, url: "https://www.google.com/generate_204"}
-BaseCH:         &BaseCH {type: load-balance, interval: 200, lazy: true, url: "https://www.google.com/generate_204", strategy: consistent-hashing, hidden: true}
-BaseCR:         &BaseCR {type: load-balance, interval: 200, lazy: true, url: "https://www.google.com/generate_204", strategy: round-robin, hidden: true}
-BaseUT:         &BaseUT {type: url-test,     interval: 200, lazy: true, url: "https://www.google.com/generate_204", hidden: true}
+BaseFB:         &BaseFB {type: fallback,     interval: 180, tolerance: 100, lazy: true, url: "https://www.google.com/generate_204"}
+BaseCH:         &BaseCH {type: load-balance, interval: 180, tolerance: 100, lazy: true, url: "https://www.google.com/generate_204", strategy: consistent-hashing, hidden: true}
+BaseCR:         &BaseCR {type: load-balance, iinterval: 180, tolerance: 100, lazy: true, url: "https://www.google.com/generate_204", strategy: round-robin, hidden: true}
+BaseUT:         &BaseUT {type: url-test,     interval: 180, tolerance: 100, lazy: true, url: "https://www.google.com/generate_204", hidden: true}
 
 # 全部节点筛选正则表达式 - 所有节点
 FilterALL:      &FilterALL "^(?!.*(❗|DIRECT|直接连接|群|邀请|返利|循环|官网|客服|网站|网址|获取|订阅|流量|到期|机场|下次|版本|官址|备用|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author))"
@@ -43,7 +43,7 @@ FilterNative:   &FilterNative "^(?=.*(?i)(流媒体|SsrDog))(?!.*(排除1|排除
 # 节点筛选正则表达式 - 高速节点
 FilterFAST:     &FilterFAST   "^(?=.*(?i)(高速|优))(?!.*(排除1|排除2|5x)).*$"
 # 节点筛选正则表达式 - 过滤链式代理节点
-FilterDialer:   &FilterDialer "^(?!.*(DIRECT|直接连接|REJECT|isp-dialer))"
+FilterDialer:   &FilterDialer "^(?=.*(?i)(🇭🇰|🇹🇼|🇨🇳))(?!.*(DIRECT|直接连接|REJECT|isp-dialer)).*$"
 
 # 策略组代理列表模板 - 预定义的代理节点优先级排序
 SelectFB:       &SelectFB     {type: select, proxies: [故障转移, ISP-故转, Native-故转, 高速-故转, 香港-故转, 台湾-故转, 日本-故转, 狮城-故转, 韩国-故转, 美国-故转, 其他-故转, 美国-VLESS故转, 美国-VMess故转, 美国-Hysteria2故转, 美国-TUIC故转, 美国-AnyTLS故转, VLESS-故转, VMess-故转, Hysteria2-故转, TUIC-故转, AnyTLS-故转, 全球手动, 直接连接]}
@@ -70,10 +70,10 @@ proxy-providers:
   # # 备用订阅源 - 次优节点集合，使用时请修改
   # 备用服务商: {<<: *BaseProvider, url: "备用订阅源地址", override: {additional-suffix: " [备]"}}
   # # 落地订阅源 - 落地服务连接，使用时请修改
-  # 落地服务商: {<<: *BaseProvider, url: "落地订阅源地址", override: {additional-suffix: " [中]", dialer-proxy: 中转服务}}
+  # 落地服务商: {<<: *BaseProvider, url: "落地订阅源地址", override: {additional-suffix: " [中]", dialer-proxy: 落地节点}}
 
 proxies:
-  # 发往 la-isp-dialer 的流量先经过 链式前置，从而实现指定下一跳代理的效果
+  # 发往 la-isp-dialer 的流量先经过 "链式前置"，从而实现指定下一跳代理的效果
   - name: la-isp-dialer        # 落地节点命名
     type: socks5               # 节点协议
     server: ${ISP_IP}          # 住宅IP 代理地址
@@ -87,6 +87,7 @@ proxies:
 # ==================== 策略组 ====================
 proxy-groups:
   # ==================== 主要策略组 ====================
+  - {name: 落地节点,    <<: *BaseUT, use: ["${NODE_NAME}"], filter: *FilterISP, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Daily.png}
   - {name: 链式前置,    <<: *BaseUT, include-all: true, filter: *FilterDialer, icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Proxy.png}
   - {name: 故障转移,    <<: *BaseFB, proxies: [美国-故转, ISP-故转, Native-故转, 高速-故转, 香港-故转, 台湾-故转, 日本-故转, 狮城-故转, 韩国-故转, 其他-故转, 美国-VLESS故转, 美国-VMess故转, 美国-Hysteria2故转, 美国-TUIC故转, 美国-AnyTLS故转, VLESS-故转, VMess-故转, Hysteria2-故转, TUIC-故转, AnyTLS-故转, 全球手动, 直接连接], icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/ULB.png}
   - {name: 默认代理,    <<: *SelectFB, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Static.png}
@@ -127,6 +128,8 @@ proxy-groups:
   # ==================== 虚拟币 ====================
   - {name: 货币平台,    <<: *SelectSG, icon: https://raw.githubusercontent.com/Orz-3/mini/master/Alpha/Bitcloud.png}
   - {name: 直接连接,    type: select, proxies: [DIRECT], hidden: true, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Direct.png}
+  # ==================== 全球手动策略组 ====================
+  - {name: 全球手动,     type: select, include-all: true, filter: *FilterALL, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Clubhouse.png}
 
   # ==================== 家宽节点策略组 ====================
   - {name: ISP-故转,    <<: *BaseFB,  proxies: [ISP-自动, ISP-手动], icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Area.png}
@@ -168,8 +171,6 @@ proxy-groups:
   - {name: 其他-故转,    <<: *BaseFB, proxies: [其他-自动, 其他-手动], icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Auto.png}
   - {name: 其他-手动,    type: select, include-all: true, filter: *FilterOT, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Auto.png}
   - {name: 其他-自动,    <<: *BaseUT, include-all: true, filter: *FilterOT, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Auto.png}
-  # ==================== 全球手动策略组 ====================
-  - {name: 全球手动,     type: select, include-all: true, filter: *FilterALL, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Clubhouse.png}
   # ==================== 协议策略组 ====================
   - {name: VLESS-故转,   <<: *BaseFB, proxies: [VLESS-手动, VLESS-自动], icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/xray.png}
   - {name: VLESS-手动,   type: select, include-all: true, filter: *FilterVLESS, icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/xray.png}
