@@ -87,21 +87,21 @@ proxies:
 # ==================== 策略组 ====================
 proxy-groups:
   # ==================== 主要策略组 ====================
-  - {name: 落地节点,    <<: *BaseUT, use: ["${NODE_NAME}"], filter: *FilterISP, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Daily.png}
-  - {name: 链式前置,    <<: *BaseUT, include-all: true, filter: *FilterDialer, icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Proxy.png}
-  - {name: 故障转移,    <<: *BaseFB, proxies: [美国-故转, ISP-故转, Native-故转, 高速-故转, 香港-故转, 台湾-故转, 日本-故转, 狮城-故转, 韩国-故转, 其他-故转, 美国-VLESS故转, 美国-VMess故转, 美国-Hysteria2故转, 美国-TUIC故转, 美国-AnyTLS故转, VLESS-故转, VMess-故转, Hysteria2-故转, TUIC-故转, AnyTLS-故转, 全球手动, 直接连接], icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/ULB.png}
-  - {name: 默认代理,    <<: *SelectFB, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Static.png}
-  - {name: 国外流量,    <<: *SelectAll, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Global.png}
-  - {name: 国内流量,    <<: *SelectDC, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/China.png}
-  - {name: 兜底流量,    <<: *SelectAll, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Final.png}
+  - {name: 落地节点,    <<: *BaseUT,     use: ["${NODE_NAME}"], filter: *FilterISP,     icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Daily.png}
+  - {name: 链式前置,    <<: *BaseUT,     include-all: true,     filter: *FilterDialer,  icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Proxy.png}
+  - {name: 故障转移,    <<: *BaseFB,     proxies: [美国-故转, ISP-故转, Native-故转, 高速-故转, 香港-故转, 台湾-故转, 日本-故转, 狮城-故转, 韩国-故转, 其他-故转, 美国-VLESS故转, 美国-VMess故转, 美国-Hysteria2故转, 美国-TUIC故转, 美国-AnyTLS故转, VLESS-故转, VMess-故转, Hysteria2-故转, TUIC-故转, AnyTLS-故转, 全球手动, 直接连接], icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/ULB.png}
+  - {name: 默认代理,    <<: *SelectFB,   icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Static.png}
+  - {name: 国外流量,    <<: *SelectAll,  icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Global.png}
+  - {name: 国内流量,    <<: *SelectDC,   icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/China.png}
+  - {name: 兜底流量,    <<: *SelectAll,  icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Final.png}
   # ==================== 网络测试 ====================
-  - {name: 网络测试,    <<: *SelectAll, include-all: true, filter: *FilterALL, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Speedtest.png}
+  - {name: 网络测试,    <<: *SelectAll,  include-all: true,     filter: *FilterALL,     icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Speedtest.png}
   # ==================== AI 服务 ====================
-  - {name: 人工智能,    <<: *SelectUS, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/AI.png}
+  - {name: 人工智能,    <<: *SelectUS,   icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/AI.png}
   # ==================== 媒体服务 ====================
-  - {name: TikTok,     <<: *SelectISP, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/TikTok.png}
-  - {name: YouTube,    <<: *SelectFAST, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/YouTube.png}
-  - {name: Netflix,     <<: *SelectNative, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Netflix.png}
+  - {name: TikTok,     <<: *SelectISP,   icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/TikTok.png}
+  - {name: YouTube,    <<: *SelectFAST,  icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/YouTube.png}
+  - {name: Netflix,    <<: *SelectNative, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Netflix.png}
   - {name: Disney,     <<: *SelectNative, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Disney.png}
   - {name: HBO,        <<: *SelectNative, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/HBO.png}
   - {name: Spotify,    <<: *SelectNative, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Spotify.png}
@@ -109,88 +109,88 @@ proxy-groups:
   - {name: 国际媒体,    <<: *SelectNative, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/DomesticMedia.png}
   - {name: 新闻媒体,    <<: *SelectNative, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Apple_News.png}
   # ==================== 社交平台 ====================
-  - {name: 推特社交,    <<: *SelectAll, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/X.png}
-  - {name: 电报消息,    <<: *SelectAll, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Telegram_X.png}
-  - {name: WhatsApp,   <<: *SelectAll, icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/whatsapp.png}
-  - {name: Facebook,   <<: *SelectAll, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Facebook.png}
-  - {name: 社交平台,    <<: *SelectAll, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/PBS.png}
+  - {name: 推特社交,    <<: *SelectAll,  icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/X.png}
+  - {name: 电报消息,    <<: *SelectAll,  icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Telegram_X.png}
+  - {name: WhatsApp,   <<: *SelectAll,   icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/whatsapp.png}
+  - {name: Facebook,   <<: *SelectAll,   icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Facebook.png}
+  - {name: 社交平台,    <<: *SelectAll,  icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/PBS.png}
   # ==================== 国外服务 ====================
-  - {name: 谷歌服务,    <<: *SelectAll, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Google_Search.png}
-  - {name: GitHub,     <<: *SelectAll, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/GitHub.png}
+  - {name: 谷歌服务,    <<: *SelectAll,  icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Google_Search.png}
+  - {name: GitHub,     <<: *SelectAll,   icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/GitHub.png}
   - {name: Reddit,     <<: *SelectNative, icon: https://github.com/Semporia/Hand-Painted-icon/raw/master/Social_Media/Reddit.png}
-  - {name: 亚马逊,      <<: *SelectAll, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Amazon.png}
-  - {name: 苹果服务,    <<: *SelectAll, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Apple.png}
-  - {name: 微软服务,    <<: *SelectAll, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Microsoft.png}
+  - {name: 亚马逊,      <<: *SelectAll,  icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Amazon.png}
+  - {name: 苹果服务,    <<: *SelectAll,  icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Apple.png}
+  - {name: 微软服务,    <<: *SelectAll,  icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Microsoft.png}
   - {name: 英伟达,      <<: *SelectNative, icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/nvidia.png}
   # ==================== 游戏 ====================
-  - {name: Steam,      <<: *SelectUS, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Steam.png}
-  - {name: 游戏平台,    <<: *SelectUS, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Game.png}
+  - {name: Steam,      <<: *SelectUS,    icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Steam.png}
+  - {name: 游戏平台,    <<: *SelectUS,   icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Game.png}
   # ==================== 虚拟币 ====================
-  - {name: 货币平台,    <<: *SelectSG, icon: https://raw.githubusercontent.com/Orz-3/mini/master/Alpha/Bitcloud.png}
-  - {name: 直接连接,    type: select, proxies: [DIRECT], hidden: true, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Direct.png}
+  - {name: 货币平台,    <<: *SelectSG,   icon: https://raw.githubusercontent.com/Orz-3/mini/master/Alpha/Bitcloud.png}
+  - {name: 直接连接,    type: select,    proxies: [DIRECT], hidden: true, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Direct.png}
   # ==================== 全球手动策略组 ====================
-  - {name: 全球手动,     type: select, include-all: true, filter: *FilterALL, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Clubhouse.png}
+  - {name: 全球手动,     type: select,    include-all: true, filter: *FilterALL, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Clubhouse.png}
 
   # ==================== 家宽节点策略组 ====================
-  - {name: ISP-故转,    <<: *BaseFB,  proxies: [ISP-自动, ISP-手动], icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Area.png}
-  - {name: ISP-手动,    type: select, include-all: true, filter: *FilterISP, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Area.png}
-  - {name: ISP-自动,    <<: *BaseUT,  include-all: true, filter: *FilterISP, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Area.png}
+  - {name: ISP-故转,    <<: *BaseFB,     proxies: [ISP-自动, ISP-手动], icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Area.png}
+  - {name: ISP-手动,    type: select,    include-all: true, filter: *FilterISP, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Area.png}
+  - {name: ISP-自动,    <<: *BaseUT,     include-all: true, filter: *FilterISP, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Area.png}
   # ==================== 原生节点策略组 ====================
-  - {name: Native-故转, <<: *BaseFB,  proxies: [Native-自动, Native-手动], icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Clubhouse_1.png}
-  - {name: Native-手动, type: select, include-all: true, filter: *FilterNative, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Clubhouse_1.png}
-  - {name: Native-自动, <<: *BaseUT,  include-all: true, filter: *FilterNative, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Clubhouse_1.png}
+  - {name: Native-故转, <<: *BaseFB,     proxies: [Native-自动, Native-手动], icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Clubhouse_1.png}
+  - {name: Native-手动, type: select,    include-all: true, filter: *FilterNative, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Clubhouse_1.png}
+  - {name: Native-自动, <<: *BaseUT,     include-all: true, filter: *FilterNative, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Clubhouse_1.png}
   # ==================== 高速节点策略组 ====================
-  - {name: 高速-故转,    <<: *BaseFB,  proxies: [高速-自动, 高速-手动], icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Rocket.png}
-  - {name: 高速-手动,    type: select, include-all: true, filter: *FilterFAST, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Rocket.png}
-  - {name: 高速-自动,    <<: *BaseUT, include-all: true, filter: *FilterFAST, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Rocket.png}
+  - {name: 高速-故转,    <<: *BaseFB,    proxies: [高速-自动, 高速-手动], icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Rocket.png}
+  - {name: 高速-手动,    type: select,   include-all: true, filter: *FilterFAST, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Rocket.png}
+  - {name: 高速-自动,    <<: *BaseUT,    include-all: true, filter: *FilterFAST, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Rocket.png}
   # ==================== 香港策略组 ====================
-  - {name: 香港-故转,    <<: *BaseFB, proxies: [香港-自动, 香港-手动], icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Hong_Kong.png}
-  - {name: 香港-手动,    type: select, include-all: true, filter: *FilterHK, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Hong_Kong.png}
-  - {name: 香港-自动,    <<: *BaseUT, include-all: true, filter: *FilterHK, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Hong_Kong.png}
+  - {name: 香港-故转,    <<: *BaseFB,    proxies: [香港-自动, 香港-手动], icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Hong_Kong.png}
+  - {name: 香港-手动,    type: select,   include-all: true, filter: *FilterHK, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Hong_Kong.png}
+  - {name: 香港-自动,    <<: *BaseUT,    include-all: true, filter: *FilterHK, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Hong_Kong.png}
   # ==================== 台湾策略组 ====================
-  - {name: 台湾-故转,    <<: *BaseFB, proxies: [台湾-自动, 台湾-手动], icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Taiwan.png}
-  - {name: 台湾-手动,    type: select, include-all: true, filter: *FilterTW, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Taiwan.png}
-  - {name: 台湾-自动,    <<: *BaseUT, include-all: true, filter: *FilterTW, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Taiwan.png}
+  - {name: 台湾-故转,    <<: *BaseFB,    proxies: [台湾-自动, 台湾-手动], icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Taiwan.png}
+  - {name: 台湾-手动,    type: select,   include-all: true, filter: *FilterTW, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Taiwan.png}
+  - {name: 台湾-自动,    <<: *BaseUT,    include-all: true, filter: *FilterTW, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Taiwan.png}
   # =================== 新加坡策略组 ====================
-  - {name: 狮城-故转,    <<: *BaseFB, proxies: [狮城-自动, 狮城-手动], icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Singapore.png}
-  - {name: 狮城-手动,    type: select, include-all: true, filter: *FilterSG, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Singapore.png}
-  - {name: 狮城-自动,    <<: *BaseUT, include-all: true, filter: *FilterSG, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Singapore.png}
+  - {name: 狮城-故转,    <<: *BaseFB,    proxies: [狮城-自动, 狮城-手动], icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Singapore.png}
+  - {name: 狮城-手动,    type: select,   include-all: true, filter: *FilterSG, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Singapore.png}
+  - {name: 狮城-自动,    <<: *BaseUT,    include-all: true, filter: *FilterSG, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Singapore.png}
   # =================== 日本策略组 ====================
-  - {name: 日本-故转,    <<: *BaseFB, proxies: [日本-自动, 日本-手动], icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Japan.png}
-  - {name: 日本-手动,    type: select, include-all: true, filter: *FilterJP, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Japan.png}
-  - {name: 日本-自动,    <<: *BaseUT, include-all: true, filter: *FilterJP, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Japan.png}
+  - {name: 日本-故转,    <<: *BaseFB,    proxies: [日本-自动, 日本-手动], icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Japan.png}
+  - {name: 日本-手动,    type: select,   include-all: true, filter: *FilterJP, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Japan.png}
+  - {name: 日本-自动,    <<: *BaseUT,    include-all: true, filter: *FilterJP, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Japan.png}
   # =================== 韩国策略组 ====================
-  - {name: 韩国-故转,    <<: *BaseFB, proxies: [韩国-自动, 韩国-手动], icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Korea.png}
-  - {name: 韩国-手动,    type: select, include-all: true, filter: *FilterKR, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Korea.png}
-  - {name: 韩国-自动,    <<: *BaseUT, include-all: true, filter: *FilterKR, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Korea.png}
+  - {name: 韩国-故转,    <<: *BaseFB,    proxies: [韩国-自动, 韩国-手动], icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Korea.png}
+  - {name: 韩国-手动,    type: select,   include-all: true, filter: *FilterKR, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Korea.png}
+  - {name: 韩国-自动,    <<: *BaseUT,    include-all: true, filter: *FilterKR, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Korea.png}
   # =================== 美国策略组 ====================
-  - {name: 美国-故转,    <<: *BaseFB, proxies: [美国-手动, 美国-自动, 美国-VLESS故转, 美国-VMess故转, 美国-Hysteria2故转, 美国-TUIC故转, 美国-AnyTLS故转], icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/United_States.png}
-  - {name: 美国-手动,    type: select, include-all: true, filter: *FilterUS, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/United_States.png}
-  - {name: 美国-自动,    <<: *BaseUT, include-all: true, filter: *FilterUS, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/United_States.png}
+  - {name: 美国-故转,    <<: *BaseFB,    proxies: [美国-手动, 美国-自动, 美国-VLESS故转, 美国-VMess故转, 美国-Hysteria2故转, 美国-TUIC故转, 美国-AnyTLS故转], icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/United_States.png}
+  - {name: 美国-手动,    type: select,   include-all: true, filter: *FilterUS, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/United_States.png}
+  - {name: 美国-自动,    <<: *BaseUT,    include-all: true, filter: *FilterUS, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/United_States.png}
   # =================== 其他策略组 ====================
-  - {name: 其他-故转,    <<: *BaseFB, proxies: [其他-自动, 其他-手动], icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Auto.png}
-  - {name: 其他-手动,    type: select, include-all: true, filter: *FilterOT, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Auto.png}
-  - {name: 其他-自动,    <<: *BaseUT, include-all: true, filter: *FilterOT, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Auto.png}
+  - {name: 其他-故转,    <<: *BaseFB,    proxies: [其他-自动, 其他-手动], icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Auto.png}
+  - {name: 其他-手动,    type: select,   include-all: true, filter: *FilterOT, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Auto.png}
+  - {name: 其他-自动,    <<: *BaseUT,    include-all: true, filter: *FilterOT, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Auto.png}
   # ==================== 协议策略组 ====================
-  - {name: VLESS-故转,   <<: *BaseFB, proxies: [VLESS-手动, VLESS-自动], icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/xray.png}
-  - {name: VLESS-手动,   type: select, include-all: true, filter: *FilterVLESS, icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/xray.png}
-  - {name: VLESS-自动,   <<: *BaseUT, include-all: true, filter: *FilterVLESS, icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/xray.png}
+  - {name: VLESS-故转,   <<: *BaseFB,    proxies: [VLESS-手动, VLESS-自动], icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/xray.png}
+  - {name: VLESS-手动,   type: select,   include-all: true, filter: *FilterVLESS, icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/xray.png}
+  - {name: VLESS-自动,   <<: *BaseUT,    include-all: true, filter: *FilterVLESS, icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/xray.png}
 
-  - {name: VMess-故转,   <<: *BaseFB, proxies: [VMess-手动, VMess-自动], icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/v2ray.png}
-  - {name: VMess-手动,   type: select, include-all: true, filter: *FilterVMess, icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/v2ray.png}
-  - {name: VMess-自动,   <<: *BaseUT, include-all: true, filter: *FilterVMess, icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/v2ray.png}
+  - {name: VMess-故转,   <<: *BaseFB,    proxies: [VMess-手动, VMess-自动], icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/v2ray.png}
+  - {name: VMess-手动,   type: select,   include-all: true, filter: *FilterVMess, icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/v2ray.png}
+  - {name: VMess-自动,   <<: *BaseUT,    include-all: true, filter: *FilterVMess, icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/v2ray.png}
 
-  - {name: Hysteria2-故转, <<: *BaseFB, proxies: [Hysteria2-手动, Hysteria2-自动], icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/hy2.png}
+  - {name: Hysteria2-故转, <<: *BaseFB,  proxies: [Hysteria2-手动, Hysteria2-自动], icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/hy2.png}
   - {name: Hysteria2-手动, type: select, include-all: true, filter: *FilterHy2, icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/hy2.png}
-  - {name: Hysteria2-自动, <<: *BaseUT, include-all: true, filter: *FilterHy2, icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/hy2.png}
+  - {name: Hysteria2-自动, <<: *BaseUT,  include-all: true, filter: *FilterHy2, icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/hy2.png}
 
-  - {name: TUIC-故转,      <<: *BaseFB, proxies: [TUIC-手动, TUIC-自动], icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/tuic.png}
+  - {name: TUIC-故转,      <<: *BaseFB,  proxies: [TUIC-手动, TUIC-自动], icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/tuic.png}
   - {name: TUIC-手动,      type: select, include-all: true, filter: *FilterTUIC, icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/tuic.png}
-  - {name: TUIC-自动,      <<: *BaseUT, include-all: true, filter: *FilterTUIC, icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/tuic.png}
+  - {name: TUIC-自动,      <<: *BaseUT,  include-all: true, filter: *FilterTUIC, icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/tuic.png}
 
-  - {name: AnyTLS-故转,    <<: *BaseFB, proxies: [AnyTLS-手动, AnyTLS-自动], icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/anytls.png}
+  - {name: AnyTLS-故转,    <<: *BaseFB,  proxies: [AnyTLS-手动, AnyTLS-自动], icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/anytls.png}
   - {name: AnyTLS-手动,    type: select, include-all: true, filter: *FilterAnyTLS, icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/anytls.png}
-  - {name: AnyTLS-自动,    <<: *BaseUT, include-all: true, filter: *FilterAnyTLS, icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/anytls.png}
+  - {name: AnyTLS-自动,    <<: *BaseUT,  include-all: true, filter: *FilterAnyTLS, icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/anytls.png}
   # ==================== 美国Vless协议故转 ====================
   # 美国
   - {name: 美国-VLESS故转,     <<: *BaseUT, include-all: true, filter: "^(?=.*(?i)(vless|reality))(?=.*(?i)(广美|US|美国|纽约|波特兰|达拉斯|俄勒|凤凰城|费利蒙|洛杉|圣何塞|圣克拉|西雅|芝加|🇺🇸|United States))(?!.*(排除1|排除2|5x)).*$", icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/xray.png}
@@ -311,97 +311,97 @@ rules:
 
 # ==================== 规则集 ====================
 # 规则集行为模板
-BehaviorDN: &BehaviorDN {type: http, behavior: domain, format: mrs, interval: 86400}
-BehaviorIP: &BehaviorIP {type: http, behavior: ipcidr, format: mrs, interval: 86400}
+BehaviorDN:   &BehaviorDN   {type: http, behavior: domain,    format: mrs,  interval: 86400}
+BehaviorIP:   &BehaviorIP   {type: http, behavior: ipcidr,    format: mrs,  interval: 86400}
 BehaviorText: &BehaviorText {type: http, behavior: classical, format: text, interval: 86400}
 
 # 规则提供者
 rule-providers:
   # FakeIP过滤规则
-  fakeipfilter_domain:     {<<: *BehaviorDN, url: "https://raw.githubusercontent.com/wwqgtxx/clash-rules/release/fakeip-filter.mrs"}
+  fakeipfilter_domain:     {<<: *BehaviorDN,   url: "https://raw.githubusercontent.com/wwqgtxx/clash-rules/release/fakeip-filter.mrs"}
   # 拦截规则
-  Tracking / Domain:       {<<: *BehaviorDN, url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/domain/Tracking.mrs}
-  Advertising / Domain:    {<<: *BehaviorDN, url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/domain/Advertising.mrs}
-  AdvertisingIP / IP:      {<<: *BehaviorIP, url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/ip/Advertising.mrs}
+  Tracking / Domain:       {<<: *BehaviorDN,   url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/domain/Tracking.mrs}
+  Advertising / Domain:    {<<: *BehaviorDN,   url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/domain/Advertising.mrs}
+  AdvertisingIP / IP:      {<<: *BehaviorIP,   url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/ip/Advertising.mrs}
   Block / Domain:          {<<: *BehaviorText, url: "https://gh-proxy.com/raw.githubusercontent.com/liandu2024/clash/refs/heads/main/list/Block.list"}
   # 网络测试规则
   TEST / Domain:           {<<: *BehaviorText, url: "https://gh-proxy.com/raw.githubusercontent.com/liandu2024/clash/refs/heads/main/list/Check.list"}
   # 国内流量规则
-  Direct / Domain:         {<<: *BehaviorDN, url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/domain/Direct.mrs}
-  LocationDKS / Domain:    {<<: *BehaviorDN, url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/domain/LocationDKS.mrs}
-  BiliBili / Domain:       {<<: *BehaviorDN,  url: "https://gh-proxy.com/github.com/metacubex/meta-rules-dat/raw/refs/heads/meta/geo/geosite/bilibili.mrs"}
-  Private / Domain:        {<<: *BehaviorDN, url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/domain/Private.mrs}
-  PrivateIP / IP:          {<<: *BehaviorIP, url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/ip/Private.mrs}
-  Download / Domain:       {<<: *BehaviorDN, url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/domain/Download.mrs}
-  XPTV / Domain:           {<<: *BehaviorDN, url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/domain/XPTV.mrs}
-  XPTVIP / IP:             {<<: *BehaviorIP, url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/ip/XPTV.mrs}
-  China / Domain:          {<<: *BehaviorDN, url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/domain/China.mrs}
-  ChinaIP / IP:            {<<: *BehaviorIP, url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/ip/China.mrs}
+  Direct / Domain:         {<<: *BehaviorDN,   url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/domain/Direct.mrs}
+  LocationDKS / Domain:    {<<: *BehaviorDN,   url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/domain/LocationDKS.mrs}
+  BiliBili / Domain:       {<<: *BehaviorDN,   url: "https://gh-proxy.com/github.com/metacubex/meta-rules-dat/raw/refs/heads/meta/geo/geosite/bilibili.mrs"}
+  Private / Domain:        {<<: *BehaviorDN,   url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/domain/Private.mrs}
+  PrivateIP / IP:          {<<: *BehaviorIP,   url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/ip/Private.mrs}
+  Download / Domain:       {<<: *BehaviorDN,   url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/domain/Download.mrs}
+  XPTV / Domain:           {<<: *BehaviorDN,   url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/domain/XPTV.mrs}
+  XPTVIP / IP:             {<<: *BehaviorIP,   url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/ip/XPTV.mrs}
+  China / Domain:          {<<: *BehaviorDN,   url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/domain/China.mrs}
+  ChinaIP / IP:            {<<: *BehaviorIP,   url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/ip/China.mrs}
   # AI规则
-  ChatGPT / Domain:        {<<: *BehaviorDN, url: "https://gh-proxy.com/github.com/metacubex/meta-rules-dat/raw/refs/heads/meta/geo/geosite/openai.mrs"}
+  ChatGPT / Domain:        {<<: *BehaviorDN,   url: "https://gh-proxy.com/github.com/metacubex/meta-rules-dat/raw/refs/heads/meta/geo/geosite/openai.mrs"}
   Claude / Domain:         {<<: *BehaviorText, url: "https://gh-proxy.com/raw.githubusercontent.com/blackmatrix7/ios_rule_script/refs/heads/master/rule/Clash/Claude/Claude.list"}
   Meta AI / Domain:        {<<: *BehaviorText, url: "https://gh-proxy.com/raw.githubusercontent.com/liandu2024/clash/refs/heads/main/list/MetaAi.list"}
-  Perplexity / Domain:     {<<: *BehaviorDN, url: "https://gh-proxy.com/github.com/metacubex/meta-rules-dat/raw/refs/heads/meta/geo/geosite/perplexity.mrs"}
+  Perplexity / Domain:     {<<: *BehaviorDN,   url: "https://gh-proxy.com/github.com/metacubex/meta-rules-dat/raw/refs/heads/meta/geo/geosite/perplexity.mrs"}
   Copilot / Domain:        {<<: *BehaviorText, url: "https://gh-proxy.com/raw.githubusercontent.com/liandu2024/clash/refs/heads/main/list/Copilot.list"}
   Gemini / Domain:         {<<: *BehaviorText, url: "https://gh-proxy.com/raw.githubusercontent.com/liandu2024/clash/refs/heads/main/list/Gemini.list"}
-  Groq / Domain:           {<<: *BehaviorDN, url: "https://gh-proxy.com/github.com/metacubex/meta-rules-dat/raw/refs/heads/meta/geo/geosite/groq.mrs"}
+  Groq / Domain:           {<<: *BehaviorDN,   url: "https://gh-proxy.com/github.com/metacubex/meta-rules-dat/raw/refs/heads/meta/geo/geosite/groq.mrs"}
   Grok / Domain:           {<<: *BehaviorText, url: "https://gh-proxy.com/raw.githubusercontent.com/liandu2024/clash/refs/heads/main/list/Grok.list"}
-  AI / Domain:             {<<: *BehaviorDN, url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/domain/AI.mrs}
-  AIIP / IP:               {<<: *BehaviorIP, url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/ip/AI.mrs}
+  AI / Domain:             {<<: *BehaviorDN,   url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/domain/AI.mrs}
+  AIIP / IP:               {<<: *BehaviorIP,   url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/ip/AI.mrs}
   # 国外媒体规则
-  TikTok / Domain:         {<<: *BehaviorDN, url: "https://gh-proxy.com/github.com/metacubex/meta-rules-dat/raw/refs/heads/meta/geo/geosite/tiktok.mrs"}
-  YouTube / Domain:        {<<: *BehaviorDN, url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/domain/YouTube.mrs}
-  Netflix / Domain:        {<<: *BehaviorDN, url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/domain/Netflix.mrs}
-  NetflixIP / IP:          {<<: *BehaviorIP, url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/ip/Netflix.mrs}
-  Emby / Domain:           {<<: *BehaviorDN, url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/domain/Emby.mrs}
-  EmbyIP / IP:             {<<: *BehaviorIP, url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/ip/Emby.mrs}
-  Disney / Domain:         {<<: *BehaviorDN, url: "https://gh-proxy.com/github.com/metacubex/meta-rules-dat/raw/refs/heads/meta/geo/geosite/disney.mrs"}
-  HBO / Domain:            {<<: *BehaviorDN, url: "https://gh-proxy.com/github.com/metacubex/meta-rules-dat/raw/refs/heads/meta/geo/geosite/hbo.mrs"}
-  Spotify / Domain:        {<<: *BehaviorDN, url: "https://gh-proxy.com/github.com/metacubex/meta-rules-dat/raw/refs/heads/meta/geo/geosite/spotify.mrs"}
-  Streaming / Domain:      {<<: *BehaviorDN, url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/domain/Streaming.mrs}
-  StreamingIP / IP:        {<<: *BehaviorIP, url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/ip/Streaming.mrs}
+  TikTok / Domain:         {<<: *BehaviorDN,   url: "https://gh-proxy.com/github.com/metacubex/meta-rules-dat/raw/refs/heads/meta/geo/geosite/tiktok.mrs"}
+  YouTube / Domain:        {<<: *BehaviorDN,   url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/domain/YouTube.mrs}
+  Netflix / Domain:        {<<: *BehaviorDN,   url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/domain/Netflix.mrs}
+  NetflixIP / IP:          {<<: *BehaviorIP,   url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/ip/Netflix.mrs}
+  Emby / Domain:           {<<: *BehaviorDN,   url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/domain/Emby.mrs}
+  EmbyIP / IP:             {<<: *BehaviorIP,   url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/ip/Emby.mrs}
+  Disney / Domain:         {<<: *BehaviorDN,   url: "https://gh-proxy.com/github.com/metacubex/meta-rules-dat/raw/refs/heads/meta/geo/geosite/disney.mrs"}
+  HBO / Domain:            {<<: *BehaviorDN,   url: "https://gh-proxy.com/github.com/metacubex/meta-rules-dat/raw/refs/heads/meta/geo/geosite/hbo.mrs"}
+  Spotify / Domain:        {<<: *BehaviorDN,   url: "https://gh-proxy.com/github.com/metacubex/meta-rules-dat/raw/refs/heads/meta/geo/geosite/spotify.mrs"}
+  Streaming / Domain:      {<<: *BehaviorDN,   url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/domain/Streaming.mrs}
+  StreamingIP / IP:        {<<: *BehaviorIP,   url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/ip/Streaming.mrs}
   # 社交平台规则
-  Telegram / Domain:       {<<: *BehaviorDN, url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/domain/Telegram.mrs}
-  TelegramIP / IP:         {<<: *BehaviorIP, url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/ip/Telegram.mrs}
-  Twitter / Domain:        {<<: *BehaviorDN, url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/domain/Twitter.mrs}
+  Telegram / Domain:       {<<: *BehaviorDN,   url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/domain/Telegram.mrs}
+  TelegramIP / IP:         {<<: *BehaviorIP,   url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/ip/Telegram.mrs}
+  Twitter / Domain:        {<<: *BehaviorDN,   url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/domain/Twitter.mrs}
   WhatsApp / Domain:       {<<: *BehaviorText, url: "https://gh-proxy.com/raw.githubusercontent.com/blackmatrix7/ios_rule_script/refs/heads/master/rule/Clash/Whatsapp/Whatsapp.list"}
-  Facebook / Domain:       {<<: *BehaviorDN, url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/domain/Facebook.mrs}
-  FacebookIP / IP:         {<<: *BehaviorIP, url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/ip/Facebook.mrs}
-  SocialMedia / Domain:    {<<: *BehaviorDN, url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/domain/SocialMedia.mrs}
-  SocialMediaIP / IP:      {<<: *BehaviorIP, url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/ip/SocialMedia.mrs}
+  Facebook / Domain:       {<<: *BehaviorDN,   url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/domain/Facebook.mrs}
+  FacebookIP / IP:         {<<: *BehaviorIP,   url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/ip/Facebook.mrs}
+  SocialMedia / Domain:    {<<: *BehaviorDN,   url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/domain/SocialMedia.mrs}
+  SocialMediaIP / IP:      {<<: *BehaviorIP,   url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/ip/SocialMedia.mrs}
   # 新闻媒体规则
-  NewsMedia / Domain:      {<<: *BehaviorDN, url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/domain/NewsMedia.mrs}
+  NewsMedia / Domain:      {<<: *BehaviorDN,   url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/domain/NewsMedia.mrs}
   # 国外公司规则
-  Google / Domain:         {<<: *BehaviorDN, url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/domain/Google.mrs}
-  GoogleIP / IP:           {<<: *BehaviorIP, url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/ip/Google.mrs}
-  GitHub / Domain:         {<<: *BehaviorDN, url: https://gh-proxy.com/github.com/metacubex/meta-rules-dat/raw/refs/heads/meta/geo/geosite/github.mrs}
-  Reddit / Domain:         {<<: *BehaviorDN, url: https://gh-proxy.com/github.com/metacubex/meta-rules-dat/raw/refs/heads/meta/geo/geosite/reddit.mrs}
+  Google / Domain:         {<<: *BehaviorDN,   url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/domain/Google.mrs}
+  GoogleIP / IP:           {<<: *BehaviorIP,   url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/ip/Google.mrs}
+  GitHub / Domain:         {<<: *BehaviorDN,   url: "https://gh-proxy.com/github.com/metacubex/meta-rules-dat/raw/refs/heads/meta/geo/geosite/github.mrs"}
+  Reddit / Domain:         {<<: *BehaviorDN,   url: "https://gh-proxy.com/github.com/metacubex/meta-rules-dat/raw/refs/heads/meta/geo/geosite/reddit.mrs"}
 
-  Amazon / Domain:         {<<: *BehaviorDN, url: https://gh-proxy.com/github.com/metacubex/meta-rules-dat/raw/refs/heads/meta/geo/geosite/amazon.mrs}
-  AppleCN / Domain:        {<<: *BehaviorDN, url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/domain/AppleCN.mrs}
-  Apple / Domain:          {<<: *BehaviorDN, url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/domain/Apple.mrs}
+  Amazon / Domain:         {<<: *BehaviorDN,   url: "https://gh-proxy.com/github.com/metacubex/meta-rules-dat/raw/refs/heads/meta/geo/geosite/amazon.mrs"}
+  AppleCN / Domain:        {<<: *BehaviorDN,   url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/domain/AppleCN.mrs}
+  Apple / Domain:          {<<: *BehaviorDN,   url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/domain/Apple.mrs}
   Apple-Custome / Domain:  {<<: *BehaviorText, url: "https://gh-proxy.com/raw.githubusercontent.com/liandu2024/clash/refs/heads/main/list/Apple.list"}
-  Microsoft / Domain:      {<<: *BehaviorDN, url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/domain/Microsoft.mrs}
+  Microsoft / Domain:      {<<: *BehaviorDN,   url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/domain/Microsoft.mrs}
   Nvidia / Domain:         {<<: *BehaviorText, url: "https://gh-proxy.com/raw.githubusercontent.com/blackmatrix7/ios_rule_script/refs/heads/master/rule/Clash/Nvidia/Nvidia.list"}
   # 游戏平台规则
-  Steam / Domain:          {<<: *BehaviorDN, url: "https://gh-proxy.com/github.com/metacubex/meta-rules-dat/raw/refs/heads/meta/geo/geosite/steam.mrs"}
+  Steam / Domain:          {<<: *BehaviorDN,   url: "https://gh-proxy.com/github.com/metacubex/meta-rules-dat/raw/refs/heads/meta/geo/geosite/steam.mrs"}
   Epic / Domain:           {<<: *BehaviorText, url: "https://gh-proxy.com/raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Epic/Epic.list"}
   EA / Domain:             {<<: *BehaviorText, url: "https://gh-proxy.com/raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/EA/EA.list"}
   Blizzard / Domain:       {<<: *BehaviorText, url: "https://gh-proxy.com/raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Blizzard/Blizzard.list"}
   UBI / Domain:            {<<: *BehaviorText, url: "https://gh-proxy.com/raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/UBI/UBI.list"}
   PlayStation / Domain:    {<<: *BehaviorText, url: "https://gh-proxy.com/raw.githubusercontent.com/blackmatrix7/ios_rule_script/refs/heads/master/rule/Clash/PlayStation/PlayStation.list"}
   Nintendo / Domain:       {<<: *BehaviorText, url: "https://gh-proxy.com/raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Nintendo/Nintendo.list"}
-  Games / Domain:          {<<: *BehaviorDN, url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/domain/Games.mrs}
+  Games / Domain:          {<<: *BehaviorDN,   url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/domain/Games.mrs}
   # 加密货币规则
   Crunchyroll / Domain:    {<<: *BehaviorText, url: "https://gh-proxy.com/raw.githubusercontent.com/liandu2024/clash/refs/heads/main/list/Crunchyroll.list"}
   Popcorn / Domain:        {<<: *BehaviorText, url: "https://gh-proxy.com/raw.githubusercontent.com/liandu2024/clash/refs/heads/main/list/Popcorn.list"}
-  OKX / Domain:            {<<: *BehaviorDN, url: "https://gh-proxy.com/github.com/metacubex/meta-rules-dat/raw/refs/heads/meta/geo/geosite/okx.mrs"}
-  Bybit / Domain:          {<<: *BehaviorDN, url: "https://gh-proxy.com/github.com/metacubex/meta-rules-dat/raw/refs/heads/meta/geo/geosite/bybit.mrs"}
-  Binance / Domain:        {<<: *BehaviorDN, url: "https://gh-proxy.com/github.com/metacubex/meta-rules-dat/raw/refs/heads/meta/geo/geosite/binance.mrs"}
-  Crypto / Domain:         {<<: *BehaviorDN, url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/domain/Crypto.mrs}
+  OKX / Domain:            {<<: *BehaviorDN,   url: "https://gh-proxy.com/github.com/metacubex/meta-rules-dat/raw/refs/heads/meta/geo/geosite/okx.mrs"}
+  Bybit / Domain:          {<<: *BehaviorDN,   url: "https://gh-proxy.com/github.com/metacubex/meta-rules-dat/raw/refs/heads/meta/geo/geosite/bybit.mrs"}
+  Binance / Domain:        {<<: *BehaviorDN,   url: "https://gh-proxy.com/github.com/metacubex/meta-rules-dat/raw/refs/heads/meta/geo/geosite/binance.mrs"}
+  Crypto / Domain:         {<<: *BehaviorDN,   url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/domain/Crypto.mrs}
   # 代理规则
-  Proxy / Domain:          {<<: *BehaviorDN, url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/domain/Proxy.mrs}
-  ProxyIP / IP:            {<<: *BehaviorIP, url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/ip/Proxy.mrs}
+  Proxy / Domain:          {<<: *BehaviorDN,   url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/domain/Proxy.mrs}
+  ProxyIP / IP:            {<<: *BehaviorIP,   url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/ip/Proxy.mrs}
   Globe / Domain:          {<<: *BehaviorText, url: "https://gh-proxy.com/raw.githubusercontent.com/blackmatrix7/ios_rule_script/refs/heads/master/rule/Clash/Global/Global.list"}
   # GateFireWall / Domain:   {<<: *BehaviorDN, url: "https://gh-proxy.com/github.com/metacubex/meta-rules-dat/raw/refs/heads/meta/geo/geosite/gfw.mrs"}
 
