@@ -93,7 +93,7 @@ proxies:
 proxy-groups:
   # ==================== 主要策略组 ====================
   - {name: 落地节点,    <<: *BaseLB,     use: ["${NODE_NAME}"], filter: *FilterISP,     icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Daily.png}
-  - {name: 链式前置,    <<: *BaseSmart,  include-all: true,     filter: *FilterDialer,  icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Proxy.png}
+  - {name: 链式前置,    <<: *BaseSmart,  include-all: true,     filter: *FilterDialer, policy-priority: "优:5;中:1;备:0.5",  icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Proxy.png}
   - {name: 一键智选,    <<: *SelectAll,  icon: https://git.imee.me/https://github.com/666OS/YYDS/raw/main/mihomo/image/mihomo.png}
   - {name: 国外流量,    <<: *SelectHQ,   icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Global.png}
   - {name: 国内流量,    <<: *SelectDC,   icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/China.png}
@@ -105,7 +105,7 @@ proxy-groups:
   # ==================== 媒体服务 ====================
   - {name: TikTok,     <<: *SelectISP,   icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/TikTok.png}
   - {name: YouTube,    <<: *SelectAll,   icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/YouTube.png}
-  - {name: Netflix,    <<: *SelectNative, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Netflix.png}
+  - {name: Netflix,     <<: *SelectNative, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Netflix.png}
   - {name: Disney,     <<: *SelectNative, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Disney.png}
   - {name: HBO,        <<: *SelectNative, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/HBO.png}
   - {name: Spotify,    <<: *SelectNative, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Spotify.png}
