@@ -39,9 +39,9 @@ FilterTUIC:     &FilterTUIC   "^(?=.*(?i)(tuic))(?!.*(排除1|排除2|5x)).*$"
 FilterAnyTLS:   &FilterAnyTLS "^(?=.*(?i)(anytls))(?!.*(排除1|排除2|5x)).*$"
 # 节点筛选正则表达式 - 家宽节点
 FilterISP:      &FilterISP    "^(?=.*(?i)(家宽|住宅|isp|ISP))(?!.*(排除1|排除2|5x)).*$"
-FilterNative:   &FilterNative "^(?=.*(?i)(原生|流媒体))(?!.*(排除1|排除2|5x)).*$"
+FilterNative:   &FilterNative "^(?=.*(?i)(流媒体|SsrDog))(?!.*(排除1|排除2|5x)).*$"
 # 节点筛选正则表达式 - 高速节点
-FilterFAST:     &FilterFAST   "^(?=.*(?i)(高速))(?!.*(排除1|排除2|5x)).*$"
+FilterFAST:     &FilterFAST   "^(?=.*(?i)(高速|优))(?!.*(排除1|排除2|5x)).*$"
 # 节点筛选正则表达式 - 过滤链式代理节点
 FilterDialer:   &FilterDialer "^(?!.*(DIRECT|直接连接|REJECT|isp-dialer))"
 
@@ -201,6 +201,18 @@ proxy-groups:
 
 # ==================== 规则路由 ====================
 rules:
+  # Tailscale 组网 IP 段
+  - IP-CIDR,100.64.0.0/10,DIRECT,no-resolve
+  # ZeroTier 虚拟内网 IP 段
+  - IP-CIDR,192.168.192.0/24,DIRECT,no-resolve
+  - IP-CIDR,10.242.0.0/16,DIRECT,no-resolve
+  - IP-CIDR,172.28.0.0/16,DIRECT,no-resolve
+  # 私有网络 IP 段
+  - IP-CIDR, 192.168.0.0/16,DIRECT,no-resolve
+  - IP-CIDR, 172.168.0.0/12,DIRECT,no-resolve
+  - IP-CIDR, 10.0.0.0/8,DIRECT,no-resolve
+  - IP-CIDR, 127.0.0.0/8,DIRECT,no-resolve
+  - IP-CIDR, ::1/128,DIRECT,no-resolve
   # 拦截规则
   - RULE-SET,Tracking / Domain,REJECT
   - RULE-SET,Advertising / Domain,REJECT
