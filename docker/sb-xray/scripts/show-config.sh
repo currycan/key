@@ -135,10 +135,10 @@ main() {
     xui_info
     show_v2rayn_link
     show_all_link
-    envsubst </templates/client_template/proxies >${WORKDIR}/subscribe/proxies
-    envsubst </templates/client_template/clash >${WORKDIR}/subscribe/clash
-    envsubst </templates/client_template/stash >${WORKDIR}/subscribe/stash
-    envsubst </templates/client_template/surge >${WORKDIR}/subscribe/surge
+    envsubst </templates/proxies/all >${WORKDIR}/subscribe/proxies
+    envsubst </templates/proxies/clash >${WORKDIR}/subscribe/clash
+    envsubst </templates/proxies/stash >${WORKDIR}/subscribe/stash
+    envsubst </templates/proxies/surge >${WORKDIR}/subscribe/surge
 
     for clinet in /templates/client_template/*.yaml; do
         output="${WORKDIR}/subscribe/$(basename "$clinet")"

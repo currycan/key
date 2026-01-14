@@ -3,6 +3,10 @@ proxies:
     type: hysteria2
     server: ${DOMAIN}
     port: ${PORT_HYSTERIA2}
+    alpn:
+      - h3
+    up: 2500 Mbps
+    down: 2500 Mbps
     password: ${SB_UUID}
     skip-cert-verify: true
 
@@ -11,10 +15,14 @@ proxies:
     server: ${DOMAIN}
     port: ${PORT_TUIC}
     uuid: ${SB_UUID}
-    sni: ''
     password: ${SB_UUID}
     alpn:
       - h3
+    disable-sni: true
+    reduce-rtt: true
+    request-timeout: 8000
+    udp-relay-mode: native
+    congestion-controller: bbr
     skip-cert-verify: true
     version: 5
 
