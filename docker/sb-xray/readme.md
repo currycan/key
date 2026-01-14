@@ -27,10 +27,10 @@ docker buildx build \
   --platform linux/amd64,linux/arm64 \
   --build-arg DUFS_VERSION="0.45.0" \
   --build-arg CLOUDFLARED_VERSION="2025.11.1" \
-  --build-arg XUI_VERSION="2.8.5" \
-  --build-arg SING_BOX_VERSION="1.12.14" \
-  --build-arg XRAY_VERSION="25.12.8" \
-  --tag currycan/sb-xray:25.12.8 \
+  --build-arg XUI_VERSION="2.8.7" \
+  --build-arg SING_BOX_VERSION="1.12.16" \
+  --build-arg XRAY_VERSION="26.1.13" \
+  --tag currycan/sb-xray:26.1.13 \
   --push .
 ```
 
