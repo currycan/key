@@ -45,8 +45,8 @@ FilterFAST:     &FilterFAST   "^(?=.*(?i)(高速|优))(?!.*(排除1|排除2|5x))
 FilterDialer:   &FilterDialer "^(?=.*(?i)(🇭🇰|🇹🇼|🇨🇳))(?!.*(DIRECT|直接连接|REJECT|isp-dialer)).*$"
 
 # 策略组代理列表模板 - 预定义的代理节点优先级排序
-SelectAll:      &SelectAll    {type: select, proxies: [高质量线路, 低延迟线路, 大带宽线路, 低倍率线路, ISP-智选, Native-智选, 高速-智选, 香港-智选, 台湾-智选, 日本-智选, 狮城-智选, 韩国-智选, 美国-智选, 其他-智选, 美国-VLESS智选, 美国-VMess智选, 美国-Hysteria2智选, 美国-TUIC智选, 美国-AnyTLS智选, VLESS-智选, VMess-智选, Hysteria2-智选, TUIC-智选, AnyTLS-智选, 全球手动, 直接连接]}
-OneSmart:       &OneSmart     {type: select, proxies: [一键智选, 高质量线路, 低延迟线路, 大带宽线路, 低倍率线路, ISP-智选, Native-智选, 高速-智选, 香港-智选, 台湾-智选, 日本-智选, 狮城-智选, 韩国-智选, 美国-智选, 其他-智选, 美国-VLESS智选, 美国-VMess智选, 美国-Hysteria2智选, 美国-TUIC智选, 美国-AnyTLS智选, VLESS-智选, VMess-智选, Hysteria2-智选, TUIC-智选, AnyTLS-智选, 全球手动, 直接连接]}
+OneSmart:       &OneSmart     {type: select, proxies: [高质量线路, 低延迟线路, 大带宽线路, 低倍率线路, ISP-智选, Native-智选, 高速-智选, 香港-智选, 台湾-智选, 日本-智选, 狮城-智选, 韩国-智选, 美国-智选, 其他-智选, 美国-VLESS智选, 美国-VMess智选, 美国-Hysteria2智选, 美国-TUIC智选, 美国-AnyTLS智选, VLESS-智选, VMess-智选, Hysteria2-智选, TUIC-智选, AnyTLS-智选, 全球手动, 直接连接]}
+SelectAll:      &SelectAll    {type: select, proxies: [一键智选, 高质量线路, 低延迟线路, 大带宽线路, 低倍率线路, ISP-智选, Native-智选, 高速-智选, 香港-智选, 台湾-智选, 日本-智选, 狮城-智选, 韩国-智选, 美国-智选, 其他-智选, 美国-VLESS智选, 美国-VMess智选, 美国-Hysteria2智选, 美国-TUIC智选, 美国-AnyTLS智选, VLESS-智选, VMess-智选, Hysteria2-智选, TUIC-智选, AnyTLS-智选, 全球手动, 直接连接]}
 SelectDC:       &SelectDC     {type: select, proxies: [直接连接, 一键智选, 高质量线路, 低延迟线路, 大带宽线路, 低倍率线路, ISP-智选, Native-智选, 高速-智选, 香港-智选, 台湾-智选, 日本-智选, 狮城-智选, 韩国-智选, 美国-智选, 其他-智选, 美国-VLESS智选, 美国-VMess智选, 美国-Hysteria2智选, 美国-TUIC智选, 美国-AnyTLS智选, VLESS-智选, VMess-智选, Hysteria2-智选, TUIC-智选, AnyTLS-智选, 全球手动]}
 SelectHQ:       &SelectHQ     {type: select, proxies: [高质量线路, 一键智选, 低延迟线路, 大带宽线路, 低倍率线路, ISP-智选, Native-智选, 高速-智选, 香港-智选, 台湾-智选, 日本-智选, 狮城-智选, 韩国-智选, 美国-智选, 其他-智选, 美国-VLESS智选, 美国-VMess智选, 美国-Hysteria2智选, 美国-TUIC智选, 美国-AnyTLS智选, VLESS-智选, VMess-智选, Hysteria2-智选, TUIC-智选, AnyTLS-智选, 全球手动, 直接连接]}
 SelectLD:       &SelectLD     {type: select, proxies: [低延迟线路, 一键智选, 高质量线路, 大带宽线路, 低倍率线路, ISP-智选, Native-智选, 高速-智选, 香港-智选, 台湾-智选, 日本-智选, 狮城-智选, 韩国-智选, 美国-智选, 其他-智选, 美国-VLESS智选, 美国-VMess智选, 美国-Hysteria2智选, 美国-TUIC智选, 美国-AnyTLS智选, VLESS-智选, VMess-智选, Hysteria2-智选, TUIC-智选, AnyTLS-智选, 全球手动, 直接连接]}
@@ -94,41 +94,41 @@ proxy-groups:
   # ==================== 主要策略组 ====================
   # - {name: 落地节点,    <<: *BaseLB,     use: ["${NODE_NAME}"], filter: *FilterISP,     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Proxy.png}
   - {name: 链式前置,    <<: *BaseSmart,  include-all: true,     filter: *FilterDialer, policy-priority: "优:5;中:1;备:0.5",  icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Daily.png}
-  - {name: 一键智选,    <<: *SelectAll,  icon: https://git.imee.me/https://github.com/666OS/YYDS/raw/main/mihomo/image/mihomo.png}
-  - {name: 国外流量,    <<: *SelectHQ,   icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Global.png}
+  - {name: 一键智选,    <<: *OneSmart,  icon: https://git.imee.me/https://github.com/666OS/YYDS/raw/main/mihomo/image/mihomo.png}
+  - {name: 国外流量,    <<: *OneSmart,   icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Global.png}
   - {name: 国内流量,    <<: *SelectDC,   icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/China.png}
-  - {name: 兜底流量,    <<: *SelectHQ,   icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Final.png}
+  - {name: 兜底流量,    <<: *OneSmart,   icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Final.png}
   # ==================== 网络测试 ====================
-  - {name: 网络测试,    <<: *SelectAll,  include-all: true,     filter: *FilterALL,     icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Speedtest.png}
+  - {name: 网络测试,    <<: *SelectAll,  include-all: true, filter: *FilterALL, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Speedtest.png}
   # ==================== AI 服务 ====================
-  - {name: 人工智能,    <<: *SelectHQ,   icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/AI.png}
+  - {name: 人工智能,    <<: *SelectUS,   icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/AI.png}
   # ==================== 媒体服务 ====================
   - {name: TikTok,     <<: *SelectISP,   icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/TikTok.png}
-  - {name: YouTube,    <<: *SelectAll,   icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/YouTube.png}
+  - {name: YouTube,    <<: *SelectFAST,   icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/YouTube.png}
   - {name: Netflix,     <<: *SelectNative, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Netflix.png}
   - {name: Disney,     <<: *SelectNative, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Disney.png}
   - {name: HBO,        <<: *SelectNative, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/HBO.png}
   - {name: Spotify,    <<: *SelectNative, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Spotify.png}
   - {name: Emby,       <<: *SelectBW,    icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Emby.png}
-  - {name: 国际媒体,    <<: *SelectBW,    icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/DomesticMedia.png}
+  - {name: 国际媒体,    <<: *SelectHQ,    icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/DomesticMedia.png}
   - {name: 新闻媒体,    <<: *SelectHQ,    icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Apple_News.png}
   # ==================== 社交平台 ====================
-  - {name: 推特社交,    <<: *SelectBW,    icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/X.png}
-  - {name: 电报消息,    <<: *SelectBW,    icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Telegram_X.png}
-  - {name: WhatsApp,   <<: *SelectBW,    icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/whatsapp.png}
-  - {name: Facebook,   <<: *SelectBW,    icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Facebook.png}
-  - {name: 社交平台,    <<: *SelectBW,    icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/PBS.png}
+  - {name: 推特社交,    <<: *SelectUS,    icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/X.png}
+  - {name: 电报消息,    <<: *SelectKR,    icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Telegram_X.png}
+  - {name: WhatsApp,   <<: *SelectTW,    icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/whatsapp.png}
+  - {name: Facebook,   <<: *SelectHK,    icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Facebook.png}
+  - {name: 社交平台,    <<: *SelectJP,    icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/PBS.png}
   # ==================== 国外服务 ====================
-  - {name: 谷歌服务,    <<: *SelectAll,   icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Google_Search.png}
-  - {name: GitHub,     <<: *SelectAll,    icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/GitHub.png}
-  - {name: Reddit,     <<: *SelectNative, icon: https://github.com/Semporia/Hand-Painted-icon/raw/master/Social_Media/Reddit.png}
-  - {name: 亚马逊,      <<: *SelectHQ,    icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Amazon.png}
-  - {name: 苹果服务,    <<: *SelectHQ,    icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Apple.png}
-  - {name: 微软服务,    <<: *SelectHQ,    icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Microsoft.png}
-  - {name: 英伟达,      <<: *SelectNative, icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/nvidia.png}
+  - {name: 谷歌服务,    <<: *OneSmart,   icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Google_Search.png}
+  - {name: GitHub,     <<: *OneSmart,    icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/GitHub.png}
+  - {name: Reddit,     <<: *OneSmart, icon: https://github.com/Semporia/Hand-Painted-icon/raw/master/Social_Media/Reddit.png}
+  - {name: 亚马逊,      <<: *OneSmart,    icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Amazon.png}
+  - {name: 苹果服务,    <<: *OneSmart,    icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Apple.png}
+  - {name: 微软服务,    <<: *OneSmart,    icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Microsoft.png}
+  - {name: 英伟达,      <<: *OneSmart, icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/nvidia.png}
   # ==================== 游戏 ====================
-  - {name: Steam,      <<: *SelectUS,    icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Steam.png}
-  - {name: 游戏平台,    <<: *SelectUS,    icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Game.png}
+  - {name: Steam,      <<: *SelectLD,    icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Steam.png}
+  - {name: 游戏平台,    <<: *SelectLD,    icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Game.png}
   # ==================== 虚拟币 ====================
   - {name: 货币平台,    <<: *SelectSG,    icon: https://raw.githubusercontent.com/Orz-3/mini/master/Alpha/Bitcloud.png}
   - {name: 直接连接,    type: select,     proxies: [DIRECT], hidden: true, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Direct.png}
