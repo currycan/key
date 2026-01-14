@@ -1,6 +1,6 @@
 proxy-providers:
   ${NODE_NAME}:
-    url: https://${DOMAIN}/sb-xray/${CLIENT}
+    url: https://${DOMAIN}/sb-xray/stash
     type: http
     interval: 86400
     health-check:

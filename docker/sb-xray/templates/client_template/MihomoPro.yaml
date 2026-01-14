@@ -64,13 +64,13 @@ SelectDC:       &SelectDC     {type: select, proxies: [直接连接, 默认代�
 # ==================== 代理提供者 ====================
 # 注意：请提供您的机场订阅链接，每个链接一行，并为每个机场命名，末尾的[优][备]为每个节点添加机场名称前缀，可自定义
 proxy-providers:
-  ${NODE_NAME}: {<<: *BaseProvider, url: "https://${DOMAIN}/sb-xray/${CLIENT}", override: {additional-prefix: "[${NODE_NAME}] ", additional-suffix: " [优]"}}
+  ${NODE_NAME}: {<<: *BaseProvider, url: "https://${DOMAIN}/sb-xray/clashsub", override: {additional-prefix: "[${NODE_NAME}] ", additional-suffix: " [优]"}}
   # # 优质订阅源 - 优质节点集合，使用时请修改
   # 优质服务商: {<<: *BaseProvider, url: "优质订阅源地址", override: {additional-suffix: " [优]"}}
   # # 备用订阅源 - 次优节点集合，使用时请修改
   # 备用服务商: {<<: *BaseProvider, url: "备用订阅源地址", override: {additional-suffix: " [备]"}}
   # # 落地订阅源 - 落地服务连接，使用时请修改
-  # 落地服务商: {<<: *BaseProvider, url: "落地订阅源地址", override: {additional-suffix: " [中]", dialer-proxy: 落地节点}}
+  # 落地服务商: {<<: *BaseProvider, url: "落地订阅源地址", override: {additional-suffix: " [中]", dialer-proxy: 链式前置}}
 
 proxies:
   # 发往 la-isp-dialer 的流量先经过 "链式前置"，从而实现指定下一跳代理的效果
@@ -87,8 +87,8 @@ proxies:
 # ==================== 策略组 ====================
 proxy-groups:
   # ==================== 主要策略组 ====================
-  - {name: 落地节点,    <<: *BaseUT,     use: ["${NODE_NAME}"], filter: *FilterISP,     icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Daily.png}
-  - {name: 链式前置,    <<: *BaseUT,     include-all: true,     filter: *FilterDialer,  icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Proxy.png}
+  # - {name: 落地节点,    <<: *BaseUT,     use: ["${NODE_NAME}"], filter: *FilterISP,     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Proxy.png}
+  - {name: 链式前置,    <<: *BaseUT,     include-all: true,     filter: *FilterDialer,  icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Daily.png}
   - {name: 故障转移,    <<: *BaseFB,     proxies: [美国-故转, ISP-故转, Native-故转, 高速-故转, 香港-故转, 台湾-故转, 日本-故转, 狮城-故转, 韩国-故转, 其他-故转, 美国-VLESS故转, 美国-VMess故转, 美国-Hysteria2故转, 美国-TUIC故转, 美国-AnyTLS故转, VLESS-故转, VMess-故转, Hysteria2-故转, TUIC-故转, AnyTLS-故转, 全球手动, 直接连接], icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/ULB.png}
   - {name: 默认代理,    <<: *SelectFB,   icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Static.png}
   - {name: 国外流量,    <<: *SelectAll,  icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Global.png}

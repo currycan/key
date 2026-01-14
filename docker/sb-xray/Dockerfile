@@ -148,6 +148,7 @@ COPY --from=builder --chmod=755 /usr/local/bin/ /usr/local/bin/
 # RUN chown -R nginx:nginx /home/wwwroot
 COPY --chmod=755 scripts /scripts
 COPY templates/ /templates/
+COPY sources /sources
 ADD https://raw.githubusercontent.com/currycan/key/master/vimrc /root/.vimrc
 
 ENV WORKDIR=/sb-xray
@@ -155,8 +156,6 @@ ENV LOGDIR=/var/log/
 ENV SUPERVISOR_LOG_MAX_BYTES="20MB"
 
 WORKDIR ${WORKDIR}
-
-COPY sources ${WORKDIR}/subscribe
 
 # time zone
 ENV TZ="Asia/Hong_Kong"
