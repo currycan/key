@@ -443,12 +443,12 @@ experimental:
 geodata-mode: true
 geodata-loader: standard
 
-# 管理面板配置
-external-controller: 0.0.0.0:9090
-external-ui: ui
-external-ui-name: zashboard
-external-ui-url: https://gh-proxy.com/github.com/Zephyruso/zashboard/archive/refs/heads/gh-pages.zip
-secret: yyds666
+# # 管理面板配置
+# external-controller: 0.0.0.0:9090
+# external-ui: ui
+# external-ui-name: zashboard
+# external-ui-url: https://gh-proxy.com/github.com/Zephyruso/zashboard/archive/refs/heads/gh-pages.zip
+# secret: yyds666
 
 # 配置存储
 profile:
