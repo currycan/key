@@ -37,7 +37,7 @@ proxies:
     idle-session-timeout: 30
     skip-cert-verify: true
 
-  - name: ${REGION_INFO}|${NODE_NAME}|VMess-TLS-WS
+  - name: ${REGION_INFO}|${NODE_NAME}|V2ray-TLS-WS
     type: vmess
     server: ${DOMAIN}
     port: ${LISTENING_PORT}
