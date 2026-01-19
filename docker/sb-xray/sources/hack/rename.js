@@ -287,7 +287,7 @@ const countryData = [
 // 过滤正则：匹配包含以下关键词的节点名称，这些节点将被移除
 // 移除 "网站" 以防止误删提示节点
 const nameclear =
-  /(❗|套餐|到期|有效|剩余|版本|已用|过期|失联|测试|官方|网址|群|TEST|客服|获取|订阅|流量|机场|下次|官址|联系|邮箱|工单|学术|USE|USED|TOTAL|EXPIRE|EMAIL|更快|更新|如果|客户|教程|距离|国内)/i;
+  /(❗|套餐|到期|有效|剩余|版本|已用|过期|失联|测试|官方|网址|群(?!岛)|TEST|客服|获取|订阅|流量|机场|下次|官址|联系|邮箱|工单|学术|USE|USED|TOTAL|EXPIRE|EMAIL|更快|更新|如果|客户|教程|距离|国内)/i;
 
 // 替换正则数组：用于关键词替换 (regexArray -> valueArray)
 // prettier-ignore
@@ -295,12 +295,12 @@ const regexArray = [
   /\|\s*x(\d+(?:\.\d+)?)(?:倍)?/gi, /(\d+(?:\.\d+)?)x/ig, // Multipliers first (preserve |x format)
   /(数据中心|Data\s?Center)/gi,
   /美国(?=多伦多)/gi,
-  /(\[|\]|VS|无|[(\uff08]协议[一二三四五六七八九十\d]+[)\uff09])/gi,
+  /(\[|\]|VS|无|[(\uff08]协议[一二三四五六七八九十\d]+[)\uff09]|✈)/gi,
   /IPv6-/gi,
   /(ipv6|v6)/gi,
   /-?\d+-?\d*TB/gi,
   /原生\s?IP/gi,
-  /[-_|\s]+/g, // Separators (now includes pipe |)
+  /[-_|\s\/]+/g, // Separators (now includes pipe | and slash /)
   /ˣ²/, /ˣ³/, /ˣ⁴/, /ˣ⁵/, /ˣ⁶/, /ˣ⁷/, /ˣ⁸/, /ˣ⁹/, /ˣ¹⁰/, /ˣ²⁰/, /ˣ³⁰/, /ˣ⁴⁰/, /ˣ⁵⁰/,
   /\budp\b/i, /\bgpt\b/i, /udpn\b/
 ];
@@ -630,8 +630,26 @@ const emojiRegexRules = [
   { regex: /((FJI?))/i, emoji: '🇫🇯' },
   { regex: /((中[国國]|[广廣贵貴]州|深圳|北京|上海|[广廣山][东東西]|[河湖][北南]|天津|重[庆慶]|[辽遼][宁寧]|吉林|黑[龙龍]江|江[苏蘇西]|浙江|安徽|福建|[海云雲]南|四川|[陕陝]西|甘[肃肅]|青海|[内內]蒙古|西藏|[宁寧]夏|新疆))/i, emoji: '🇨🇳' },
   { regex: /((CH?N|China))/i, emoji: '🇨🇳' },
-  { regex: /((tg|telegram|t\\.me|qq?|vx?|wx))/i, emoji: 'ℹ️' },
-];;;;
+  { regex: /((tg|telegram|t\\.me|qq|vx|wx))/i, emoji: 'ℹ️' },
+];
+
+// 5. Dynamic Rule Generation (Complete Coverage)
+// Automatically generate regex rules for ALL countries in countryData to prevent missing flags.
+// This ensures that "Senegal", "Mozambique", "Bermuda" etc. are all detected without manual rules.
+countryData.forEach(item => {
+    // Construct a regex that matches the Chinese name OR the English full name (case insensitive)
+    // Using word boundaries for English to avoid partial matches (e.g., 'Male' in 'Maldives') if needed,
+    // but for now simple inclusion is safer for "Canada(Ontario)" style.
+    // Escape special characters in names just in case.
+    const escapeRegExp = (string) => string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const pattern = `(${escapeRegExp(item.name)}|${escapeRegExp(item.full)})`;
+
+    emojiRegexRules.push({
+        regex: new RegExp(pattern, 'i'),
+        emoji: item.flag
+    });
+});
+
 
 /**
  * 主处理函数
