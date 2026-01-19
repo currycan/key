@@ -1,6 +1,6 @@
 # Hysteria2
-${REGION_INFO}|${NODE_NAME}|hysteria2=hysteria2,${DOMAIN},${PORT_HYSTERIA2},password=${SB_UUID},skip-cert-verify=true,download-bandwidth=2500
+${REGION_INFO}|${NODE_NAME}|hysteria2${NODE_SUFFIX}=hysteria2,${DOMAIN},${PORT_HYSTERIA2},password=${SB_UUID},skip-cert-verify=true,download-bandwidth=2500
 # TUICv5
-${REGION_INFO}|${NODE_NAME}|tuic=tuic-v5,${DOMAIN},${PORT_TUIC},uuid=${SB_UUID},password=${SB_UUID},alpn=h3,sni=off,skip-cert-verify=true
+${REGION_INFO}|${NODE_NAME}|tuic${NODE_SUFFIX}=tuic-v5,${DOMAIN},${PORT_TUIC},uuid=${SB_UUID},password=${SB_UUID},alpn=h3,sni=off,skip-cert-verify=true
 # VMESS TLS WS
-${REGION_INFO}|${NODE_NAME}|V2ray-TLS-WS=vmess,${DOMAIN},${LISTENING_PORT},username=${XRAY_UUID},tls=true,sni=${DOMAIN},skip-cert-verify=false,ws=true,ws-path=/${XRAY_URL_PATH}-vmessws,ws-headers=Host:${DOMAIN},vmess-aead=true,udp-relay=true
+${REGION_INFO}|${NODE_NAME}|V2ray-TLS-WS${NODE_SUFFIX}=vmess,${DOMAIN},${LISTENING_PORT},username=${XRAY_UUID},tls=true,sni=${DOMAIN},skip-cert-verify=false,ws=true,ws-path=/${XRAY_URL_PATH}-vmessws,ws-headers=Host:${DOMAIN},vmess-aead=true,udp-relay=true

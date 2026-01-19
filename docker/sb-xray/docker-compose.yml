@@ -1,11 +1,10 @@
 services:
   sb-xray:
-    image: docker.io/currycan/sb-xray:26.1.13
+    image: docker.io/currycan/sb-xray:26.1.18
     container_name: sb-xray
     environment:
       - DOMAIN=$domain
       - CDNDOMAIN=$cdndomain
-      # - XUI_ACCOUNT=$domain
       - DECODE=$code
       - ACMESH_DEBUG=1
       - ACMESH_SERVER_NAME=letsencrypt
