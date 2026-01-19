@@ -23,6 +23,7 @@ services:
       - ./nginx/http:/etc/nginx/conf.d
       - ./nginx/tcp:/etc/nginx/stream.d
       - ./nginx/dhparam:/etc/nginx/dhparam
+      - ./x-ui:/etc/x-ui/
       - ./data:/data
       - ./logs:/var/log
     restart: always
