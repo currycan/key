@@ -1,5 +1,7 @@
 # 说明
 
+[Giveupmoon/OpenClash\_Overwrite: OpenClash覆写模块相关文件](https://github.com/Giveupmoon/OpenClash_Overwrite/tree/main)
+
 https://hk.gh-proxy.org/https://raw.githubusercontent.com/currycan/key/master/docker/sb-xray/sources/hack/anytls_overwrite.sh
 
 https://hk.gh-proxy.org/https://raw.githubusercontent.com/currycan/key/master/docker/sb-xray/sources/hack/rename.js
