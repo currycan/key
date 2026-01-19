@@ -287,7 +287,7 @@ const countryData = [
 // 过滤正则：匹配包含以下关键词的节点名称，这些节点将被移除
 // 移除 "网站" 以防止误删提示节点
 const nameclear =
-  /(❗|套餐|到期|有效|剩余|版本|已用|过期|失联|测试|官方|网址|群(?!岛)|TEST|客服|获取|订阅|流量|机场|下次|官址|联系|邮箱|工单|学术|USE|USED|TOTAL|EXPIRE|EMAIL|更快|更新|如果|客户|教程|距离|国内)/i;
+  /(❗|套餐|到期|有效|剩余|版本|已用|过期|失联|测试|官方|网址|群(?!岛)|TEST|客服|获取|订阅|流量|机场|下次|官址|联系|邮箱|工单|学术|USE|USED|TOTAL|EXPIRE|EMAIL|更快|更新|如果|客户|教程|距离|国内|Traffic|Reset|Days|Left|\d+\s*GB)/i;
 
 // 替换正则数组：用于关键词替换 (regexArray -> valueArray)
 // prettier-ignore
@@ -300,7 +300,7 @@ const regexArray = [
   /(ipv6|v6)/gi,
   /-?\d+-?\d*TB/gi,
   /原生\s?IP/gi,
-  /[-_|\s\/]+/g, // Separators (now includes pipe | and slash /)
+  /[-_|\s\/丨]+/g, // Separators (now includes pipe |, slash /, and CJK pipe 丨)
   /ˣ²/, /ˣ³/, /ˣ⁴/, /ˣ⁵/, /ˣ⁶/, /ˣ⁷/, /ˣ⁸/, /ˣ⁹/, /ˣ¹⁰/, /ˣ²⁰/, /ˣ³⁰/, /ˣ⁴⁰/, /ˣ⁵⁰/,
   /\budp\b/i, /\bgpt\b/i, /udpn\b/
 ];
@@ -322,32 +322,32 @@ const valueArray = [
 // 地名标准化映射 (rurekey): 将各种乱七八糟的地名统一为标准名称
 const rurekey = {
   // --- Asia ---
-  "香港": /((?:\bHK\b)|Hong\s?Kong|HONG\s?KONG|Hongkong|香港|深港|沪港|呼港|京港|广港|杭港)+/gi,
+  "香港": /((?:\bHK\b)|Hong[\s-]?Kong|HONG[\s-]?KONG|Hongkong|香港|深港|沪港|呼港|京港|广港|杭港)+/gi,
   "台湾": /((?:\bTW\b)|Taiwan|Taipei|Kaohsiung|Hsinchu|Taichung|台湾|台北|高雄|新竹|台中|新北|彰化|台|新台)+/g,
   "日本": /((?:\bJP\b)|Japan|Tokyo|Osaka|Saitama|Nagoya|Fukuoka|Hokkaido|Okinawa|Kyoto|Yokohama|日本|东京|大阪|名古屋|埼玉|福冈|北海道|冲绳|京都|横滨|深日|沪日|呼日|京日|广日|杭日)+/gi,
   "新加坡": /((?:\bSG\b)|Singapore|Changi|新加坡|狮城|深新|沪新|呼新|京新|广新|杭新)+/gi,
-  "韩国": /((?:\bKR\b)|Korea|Seoul|Incheon|Busan|Chuncheon|韩国|首尔|仁川|釜山|春川)+/gi,
-  "印度": /((?:\bIN\b)|India|Mumbai|New Delhi|Bangalore|Chennai|Kolkata|Hyderabad|印度|孟买|新德里|班加罗尔|钦奈|加尔各答|海得拉巴)+/gi,
-  "越南": /((?:\bVN\b)|Vietnam|Hanoi|Ho Chi Minh|Da Nang|越南|河内|胡志明市|岘港)+/gi,
-  "泰国": /((?:\bTH\b)|Thailand|Bangkok|Phuket|Chiang Mai|泰国|曼谷|普吉|清迈)+/gi,
+  "韩国": /((?:\bKR\b)|South[\s-]?Korea|Korea|Seoul|Incheon|Busan|Chuncheon|韩国|首尔|仁川|釜山|春川)+/gi,
+  "印度": /((?:\bIN\b)|India|Mumbai|New[\s-]?Delhi|Bangalore|Chennai|Kolkata|Hyderabad|印度|孟买|新德里|班加罗尔|钦奈|加尔各答|海得拉巴)+/gi,
+  "越南": /((?:\bVN\b)|Vietnam|Hanoi|Ho[\s-]?Chi[\s-]?Minh|Da[\s-]?Nang|越南|河内|胡志明市|岘港)+/gi,
+  "泰国": /((?:\bTH\b)|Thailand|Bangkok|Phuket|Chiang[\s-]?Mai|泰国|曼谷|普吉|清迈)+/gi,
   "菲律宾": /((?:\bPH\b)|Philippines|Manila|Cebu|Davao|菲律宾|马尼拉|宿务|达沃)+/gi,
-  "马来西亚": /((?:\bMY\b)|Malaysia|Kuala Lumpur|Johor Bahru|Penang|马来西亚|吉隆坡|新山|槟城)+/gi,
+  "马来西亚": /((?:\bMY\b)|Malaysia|Kuala[\s-]?Lumpur|Johor[\s-]?Bahru|Penang|马来西亚|吉隆坡|新山|槟城)+/gi,
   "印度尼西亚": /((?:\bID\b)|Indonesia|Jakarta|Bali|Surabaya|印尼|印度尼西亚|雅加达|巴厘岛|泗水)+/gi,
 
   // --- Americas ---
-  "美国": /((?:\bUSA?\b)|United States|Los Angeles|San Jose|Silicon Valley|San Francisco|Santa Clara|Seattle|Chicago|New York|Miami|Dallas|Phoenix|Fremont|Atlanta|Boston|Las Vegas|Houston|Ashburn|Buffalo|Washington|D\.C\.|Oregon|Portand|Virginia|Ohio|Texas|Florida|Illinois|Arizona|Orem|Kansas|美国|洛杉矶|圣何塞|硅谷|旧金山|圣克拉拉|西雅图|芝加哥|纽约|迈阿密|达拉斯|凤凰城|弗里蒙特|亚特兰大|波士顿|拉斯维加斯|休斯顿|阿什本|水牛城|华盛顿|俄勒冈|波特兰|弗吉尼亚|俄亥俄|德克萨斯|德州|佛罗里达|伊利诺伊|亚利桑那|奥勒姆|堪萨斯|休斯敦|深美|沪美|呼美|京美|广美|杭美)+/gi,
+  "美国": /((?:\bUSA?\b)|United[\s-_]+States|Los[\s-_]+Angeles|San[\s-_]+Jose|Silicon[\s-_]+Valley|San[\s-_]+Francisco|Santa[\s-_]+Clara|Seattle|Chicago|New[\s-_]+York|Miami|Dallas|Phoenix|Fremont|Atlanta|Boston|Las[\s-_]+Vegas|Houston|Ashburn|Buffalo|Washington|D\.C\.|Oregon|Portland|Virginia|Ohio|Texas|Florida|Illinois|Arizona|Orem|Kansas|美国|洛杉矶|圣何塞|硅谷|旧金山|圣克拉拉|西雅图|芝加哥|纽约|迈阿密|达拉斯|凤凰城|弗里蒙特|亚特兰大|波士顿|拉斯维加斯|休斯顿|阿什本|水牛城|华盛顿|俄勒冈|波特兰|弗吉尼亚|俄亥俄|德克萨斯|德州|佛罗里达|伊利诺伊|亚利桑那|奥勒姆|堪萨斯|休斯敦|深美|沪美|呼美|京美|广美|杭美)+/gi,
   "加拿大": /((?:\bCA\b)|Canada|Toronto|Vancouver|Montreal|Quebec|Ottawa|Calgary|Edmonton|Ontario|加拿大|多伦多|温哥华|蒙特利尔|魁北克|渥太华|卡尔加里|埃德蒙顿|安大略)+/gi,
-  "巴西": /((?:\bBR\b)|Brazil|Sao Paulo|Rio de Janeiro|Brasilia|巴西|圣保罗|里约热内卢|巴西利亚)+/gi,
-  "阿根廷": /((?:\bAR\b)|Argentina|Buenos Aires|阿根廷|布宜诺斯艾利斯)+/gi,
-  "墨西哥": /((?:\bMX\b)|Mexico|Mexico City|Cancun|Guadalajara|墨西哥|墨西哥城|坎昆|瓜达拉哈拉)+/gi,
+  "巴西": /((?:\bBR\b)|Brazil|Sao[\s-_]+Paulo|Rio[\s-_]+de[\s-_]+Janeiro|Brasilia|巴西|圣保罗|里约热内卢|巴西利亚)+/gi,
+  "阿根廷": /((?:\bAR\b)|Argentina|Buenos[\s-_]+Aires|阿根廷|布宜诺斯艾利斯)+/gi,
+  "墨西哥": /((?:\bMX\b)|Mexico|Mexico[\s-_]+City|Cancun|Guadalajara|墨西哥|墨西哥城|坎昆|瓜达拉哈拉)+/gi,
   "智利": /((?:\bCL\b)|Chile|Santiago|智利|圣地亚哥)+/gi,
 
   // --- Europe ---
-  "英国": /((?:\bUK\b)|Great Britain|United Kingdom|London|Manchester|Cardiff|England|Scotland|Wales|Northern Ireland|英国|伦敦|曼彻斯特|加的夫|英格兰|苏格兰|威尔士|北爱尔兰|深英|沪英|呼英|京英|广英|杭英)+/gi,
+  "英国": /((?:\bUK\b)|Great[\s-_]+Britain|United[\s-_]+Kingdom|London|Manchester|Cardiff|England|Scotland|Wales|Northern[\s-_]+Ireland|英国|伦敦|曼彻斯特|加的夫|英格兰|苏格兰|威尔士|北爱尔兰|深英|沪英|呼英|京英|广英|杭英)+/gi,
   "德国": /((?:\bDE\b)|Germany|Deutschland|Frankfurt|Berlin|Dusseldorf|Munich|Hamburg|Cologne|德国|法兰克福|柏林|杜塞尔多夫|慕尼黑|汉堡|科隆|深德|沪德|呼德|京德|广德|杭德)+/gi,
   "法国": /((?:\bFR\b)|France|Paris|Marseille|Lyon|Nice|Toulouse|法国|巴黎|马赛|里昂|尼斯|图卢兹)+/gi,
-  "俄罗斯": /((?:\bRU\b)|Russia|Moscow|St\.? Petersburg|Novosibirsk|Siberia|Khabarovsk|俄罗斯|莫斯科|圣彼得堡|新西伯利亚|西伯利亚|伯力)+/gi,
-  "荷兰": /((?:\bNL\b)|Netherlands|Amsterdam|Rotterdam|The Hague|荷兰|阿姆斯特丹|鹿特丹|海牙)+/gi,
+  "俄罗斯": /((?:\bRU\b)|Russia|Moscow|St\.?[\s-]?Petersburg|Novosibirsk|Siberia|Khabarovsk|俄罗斯|莫斯科|圣彼得堡|新西伯利亚|西伯利亚|伯力)+/gi,
+  "荷兰": /((?:\bNL\b)|Netherlands|Amsterdam|Rotterdam|The[\s-]?Hague|荷兰|阿姆斯特丹|鹿特丹|海牙)+/gi,
   "意大利": /((?:\bIT\b)|Italy|Milan|Rome|Venice|Florence|Naples|意大利|米兰|罗马|威尼斯|佛罗伦萨|那不勒斯)+/gi,
   "土耳其": /((?:\bTR\b)|Turkey|Istanbul|Ankara|土耳其|伊斯坦布尔|安卡拉)+/gi,
   "西班牙": /((?:\bES\b)|Spain|Madrid|Barcelona|Valencia|Seville|西班牙|马德里|巴塞罗那|瓦伦西亚|塞维利亚)+/gi,
@@ -361,12 +361,12 @@ const rurekey = {
 
   // --- Oceania ---
   "澳大利亚": /((?:\bAU\b)|Australia|Sydney|Melbourne|Brisbane|Perth|Adelaide|Canberra|澳大利亚|澳洲|悉尼|墨尔本|布里斯班|珀斯|阿德莱德|堪培拉|深澳|沪澳|呼澳|京澳|广澳|杭澳)+/gi,
-  "新西兰": /((?:\bNZ\b)|New Zealand|Auckland|Wellington|Christchurch|新西兰|奥克兰|惠灵顿|克赖斯特彻奇)+/gi,
+  "新西兰": /((?:\bNZ\b)|New[\s-]?Zealand|Auckland|Wellington|Christchurch|新西兰|奥克兰|惠灵顿|克赖斯特彻奇)+/gi,
 
   // --- Middle East & Africa ---
-  "以色列": /((?:\bIL\b)|Israel|Tel Aviv|Jerusalem|Haifa|以色列|特拉维夫|耶路撒冷|海法)+/gi,
-  "阿联酋": /((?:\bAE\b)|United Arab Emirates|Dubai|Abu Dhabi|阿联酋|迪拜|阿布扎比)+/gi,
-  "南非": /((?:\bZA\b)|South Africa|Johannesburg|Cape Town|南非|约翰内斯堡|开普敦)+/gi,
+  "以色列": /((?:\bIL\b)|Israel|Tel[\s-]?Aviv|Jerusalem|Haifa|以色列|特拉维夫|耶路撒冷|海法)+/gi,
+  "阿联酋": /((?:\bAE\b)|United[\s-]?Arab[\s-]?Emirates|Dubai|Abu[\s-]?Dhabi|阿联酋|迪拜|阿布扎比)+/gi,
+  "南非": /((?:\bZA\b)|South[\s-]?Africa|Johannesburg|Cape[\s-]?Town|南非|约翰内斯堡|开普敦)+/gi,
 };
 
 // 3. 初始化旗帜映射表 (flagMap)
@@ -752,6 +752,10 @@ function operator(proxies) {
 
       // Final trim to remove separators left behind by multiplier removal or previous edits
       name = name.trim().replace(/^[-_\s]+|[-_\s]+$/g, "");
+
+      // 4.5 Compact Trailing Digits (Standardize Format: "Name 01" -> "Name01")
+      // Remove any separators (space/hyphen) before the final number sequence
+      name = name.replace(/[-_\s]+(\d+)$/, "$1");
 
       // --- Step 6: Final Assembly (最终组装) ---
       // Format: [Flag] [Name]|[Multiplier]|[Protocol]
