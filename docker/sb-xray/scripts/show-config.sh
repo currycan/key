@@ -24,7 +24,7 @@ export NODE_IP=${GEOIP_INFO#*|}
 export REGION_INFO=${GEOIP_INFO%%|*}
 
 # 判断是否为优质节点
-if [[ "$DOMAIN" == dmitla* ]] || [[ "$DOMAIN" == dc* ]] || [[ "$DOMAIN" == jp* ]]; then
+if [[ "$DOMAIN" == dmit* ]] || [[ "$DOMAIN" == dc* ]] || [[ "$DOMAIN" == jp* ]]; then
     export NODE_SUFFIX="|优"
 elif [[ "$DOMAIN" == zorocloud* ]]; then
     export NODE_SUFFIX="|中"
