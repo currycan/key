@@ -115,6 +115,45 @@
         {
             "tag": "block",
             "protocol": "blackhole"
+        },
+        {
+            "tag": "hysteria-out",
+            "protocol": "hysteria",
+            "settings": {
+                "version": 2,
+                "address": "${DOMAIN}",
+                "port": 1081
+            },
+            "streamSettings": {
+                "network": "hysteria",
+                "hysteriaSettings": {
+                    "version": 2,
+                    "auth": "${PASSWORD}",
+                    "congestion": "bbr",
+                    "up": "2500mbps",
+                    "down": "2500mbps",
+                    "udphop": {
+                        "port": "20000-50000",
+                        "interval": 30
+                    }
+                },
+                "security": "tls",
+                "tlsSettings": {
+                    "serverName": "${DOMAIN}",
+                    "allowInsecure": true,
+                    "alpn": [
+                        "h3"
+                    ]
+                },
+                "udpmasks": [
+                    {
+                        "type": "salamander",
+                        "settings": {
+                            "password": "${PUBLIC_PASSWORD}"
+                        }
+                    }
+                ]
+            }
         }
     ]
 }
