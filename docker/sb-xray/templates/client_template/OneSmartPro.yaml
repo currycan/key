@@ -13,7 +13,7 @@
 
 # ==================== 锚点配置 ====================
 # 代理提供者模板 - 订阅源基础配置
-BaseProvider:   &BaseProvider {type: http, interval: 86400, proxy: DIRECT, health-check: {enable: true, url: "https://www.google.com/generate_204", interval: 300}, filter: "^(?!.*(❗|群(?!岛)|邀请|返利|循环|官网|客服|网站|网址|获取|订阅|流量|到期|机场|下次|版本|官址|备用|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|套餐|有效|剩余|失联|测试|官方|学术|更快|如果|客户|距离|Traffic|Reset|Days|Left|TEST|USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author|\\d+\\s*GB))"}
+BaseProvider:   &BaseProvider {type: http, interval: 86400, proxy: DIRECT, health-check: {enable: true, url: "https://www.google.com/generate_204", interval: 300}, filter: "^(?!.*(❗|群(?!岛)|邀请|返利|循环|官网|客服|网站|网址|获取|订阅|流量|到期|机场|下次|版本|官址|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|套餐|有效|剩余|失联|测试|官方|学术|更快|如果|客户|距离|Traffic|Reset|Days|Left|TEST|USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author|\\d+\\s*GB))"}
 
 # 策略组类型模板 - 定义不同的策略组基础配置
 BaseFB:         &BaseFB    {type: fallback,     interval: 180, tolerance: 100, lazy: true, url: "https://www.google.com/generate_204"}
@@ -21,7 +21,7 @@ BaseLB:         &BaseLB    {type: load-balance, interval: 180, tolerance: 100, l
 BaseSmart:      &BaseSmart {type: smart,        interval: 180, tolerance: 100, lazy: true, url: "https://www.google.com/generate_204", hidden: true, uselightgbm: true, collectdata: true}
 
 # 全部节点筛选正则表达式 - 所有节点
-FilterALL:      &FilterALL "^(?!.*(❗|DIRECT|直接连接|群(?!岛)|邀请|返利|循环|官网|客服|网站|网址|获取|订阅|流量|到期|机场|下次|版本|官址|备用|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|套餐|有效|剩余|失联|测试|官方|学术|更快|如果|客户|距离|Traffic|Reset|Days|Left|TEST|USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author|\\d+\\s*GB))"
+FilterALL:      &FilterALL "^(?!.*(❗|DIRECT|直接连接|群(?!岛)|邀请|返利|循环|官网|客服|网站|网址|获取|订阅|流量|到期|机场|下次|版本|官址|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|套餐|有效|剩余|失联|测试|官方|学术|更快|如果|客户|距离|Traffic|Reset|Days|Left|TEST|USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author|\\d+\\s*GB))"
 # 节点筛选正则表达式 - 基于地理位置过滤
 FilterUS:       &FilterUS  "^(?=.*(?i)(广美|US|美国|纽约|波特兰|达拉斯|俄勒|凤凰城|费利蒙|洛杉|圣何塞|圣克拉|西雅|芝加|🇺🇸|United States|美[国國]|华盛顿|菲尼克斯|弗里蒙特|硅谷|旧金山|拉斯维加斯|圣荷西|哥伦布|阿什本|纽瓦克|丹佛|加利福尼亚|弗吉尼亚|马纳萨斯|俄亥俄|得克萨斯|[佐乔]治亚|亚特兰大|佛罗里达|迈阿密|United[\\s-_]+States|Los[\\s-_]+Angeles|San[\\s-_]+Jose|Silicon[\\s-_]+Valley|San[\\s-_]+Francisco|Santa[\\s-_]+Clara|Seattle|Chicago|New[\\s-_]+York|Miami|Dallas|Phoenix|Fremont|Atlanta|Boston|Las[\\s-_]+Vegas|Houston|Ashburn|Buffalo|Washington|D\\.C\\.|Oregon|Portland|Virginia|Ohio|Texas|Florida|Illinois|Arizona|Orem|Kansas))(?!.*(排除1|排除2|5x)).*$"
 FilterHK:       &FilterHK  "^(?=.*(?i)(广港|香港|HK|Hong Kong|🇭🇰|HongKong|深港|沪港|呼港|京港|杭港|Hong[\\s-]?Kong|HONG[\\s-]?KONG))(?!.*(排除1|排除2|5x)).*$"
