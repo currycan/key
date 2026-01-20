@@ -48,7 +48,7 @@ const CleaningRules = [
     { desc: "移除 'HY2'", regex: /-?HY2/gi, value: "" },
     { desc: "移除 'VPN' 关键字", regex: /\bVPN\b/gi, value: "" },
     { desc: "移除 'IP' 关键字 (排除 原生IP/IPv6/IPLC)", regex: /\b(?<!原生)IP\b/g, value: "" },
-    { desc: "移除 '节点/GG/read/加州'", regex: /(节点|GG|read|1倍|大学|加州)/gi, value: "" },
+    { desc: "移除 '节点/GG/read/加州'", regex: /(节点|GG|read|1倍|大学|加州|负载均衡)/gi, value: "" },
     { desc: "替换 AI 关键词", regex: /[-_]?\d*(SV|chatgpt|gemini)/gi, value: "AI" }, // AI Replacement
     { desc: "移除流量标识 (TB)", regex: /-?\d+-?\d*TB/gi, value: "" },
     { desc: "保留 '原生IP'", regex: /原生\s?IP/gi, value: "原生IP" },
