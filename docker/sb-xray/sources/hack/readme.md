@@ -13,3 +13,5 @@ https://hk.gh-proxy.org/https://raw.githubusercontent.com/currycan/key/master/do
 name=Nexitally&fgf=|&blkey=Emby+GPT>OpenAI&nm
 
 https://raw.githubusercontent.com/Keywos/rule/main/rename.js#name=Nexitally&fgf=|&blkey=Emby+GPT>OpenAI&nm
+
+现在“高速专线-原生IP-美国SV/chatgpt/gemini/“ 这种命名，变成了“🇺🇸 美国[8]✈高速专线✈原生IP✈AI✈AI|tuic“，需求是变成“🇺🇸 美国[8]✈高速专线✈原生IP✈AI|tuic“，请修复
