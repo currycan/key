@@ -298,6 +298,8 @@ const regexArray = [
   /(\[|\]|VS|无|[(\uff08]协议[一二三四五六七八九十\d]+[)\uff09]|✈)/gi,
   /IPv6-/gi,
   /(ipv6|v6)/gi,
+  /(-?NEW专线|-?香港IEPL)/gi,
+  /-?大水牛/gi,
   /-?\d+-?\d*TB/gi,
   /原生\s?IP/gi,
   /[-_|\s\/丨]+/g, // Separators (now includes pipe |, slash /, and CJK pipe 丨)
@@ -306,7 +308,9 @@ const regexArray = [
 ];
 // prettier-ignore
 const valueArray = [
-  " $1×", "$1×",
+  " $1×",  "", "",
+  "",
+  "",
   "",
   "",
   "-",
@@ -365,7 +369,7 @@ const rurekey = {
 
   // --- Middle East & Africa ---
   "以色列": /((?:\bIL\b)|Israel|Tel[\s-]?Aviv|Jerusalem|Haifa|以色列|特拉维夫|耶路撒冷|海法)+/gi,
-  "阿联酋": /((?:\bAE\b)|United[\s-]?Arab[\s-]?Emirates|Dubai|Abu[\s-]?Dhabi|阿联酋|迪拜|阿布扎比)+/gi,
+  "阿联酋": /((?:\bAE\b)|United[\s-]?Arab[\s-]?Emirates|Dubai|Abu[\s-]?Dhabi|阿联酋|迪拜|阿布扎比|阿拉伯联合酋长国)+/gi,
   "南非": /((?:\bZA\b)|South[\s-]?Africa|Johannesburg|Cape[\s-]?Town|南非|约翰内斯堡|开普敦)+/gi,
 };
 
@@ -691,8 +695,29 @@ function operator(proxies) {
       // 解决多重映射导致的名字重复 (如 "Japan-Japan" -> "Japan")
       // Split by hyphen, remove duplicates, rejoin
       const uniqueParts = name.split('-').filter((item, index, self) => {
-        // Keep non-empty items that haven't appeared before
-        return item.trim() !== "" && self.indexOf(item) === index;
+        // 1. Basic empty check
+        if (item.trim() === "") return false;
+
+        // 2. Duplicate Check
+        if (self.indexOf(item) !== index) return false;
+
+        // 3. Substring Containment Check (Advanced Dedup)
+        // Remove item if it is contained in another part AND meets safety criteria
+        // Safety Criteria: Item is non-ASCII (e.g. Chinese), numeric, or long (>3 chars)
+        // This avoids removing "US" from "Plus" or "HK" from "NHK".
+        const isRedundant = self.some((other, otherIndex) => {
+            if (index === otherIndex) return false;
+            if (!other.includes(item)) return false;
+
+            // Safety Checks:
+            const isNonAscii = /[^\x00-\x7F]/.test(item);
+            const isNumeric = /^\d+$/.test(item);
+            const isLong = item.length > 3;
+
+            return isNonAscii || isNumeric || isLong;
+        });
+
+        return !isRedundant;
       });
       name = uniqueParts.join('-');
 
