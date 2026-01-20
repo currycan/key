@@ -48,7 +48,7 @@ const CleaningRules = [
     { desc: "移除 'HY2'", regex: /-?HY2/gi, value: "" },
     { desc: "移除 'VPN' 关键字", regex: /\bVPN\b/gi, value: "" },
     { desc: "移除 'IP' 关键字 (排除 原生IP/IPv6/IPLC)", regex: /\b(?<!原生)IP\b/g, value: "" },
-    { desc: "移除 '节点/GG/read/加州'", regex: /(节点|GG|read|1倍|大学|加州|负载均衡)/gi, value: "" },
+    { desc: "移除 'GG/read/大学/加州/负载均衡'", regex: /(GG|read|大学|加州|负载均衡)/gi, value: "" },
     { desc: "替换 AI 关键词", regex: /[-_]?\d*(SV|chatgpt|gemini)/gi, value: "AI" }, // AI Replacement
     { desc: "移除流量标识 (TB)", regex: /-?\d+-?\d*TB/gi, value: "" },
     { desc: "保留 '原生IP'", regex: /原生\s?IP/gi, value: "原生IP" },
@@ -71,12 +71,12 @@ const RegionMap = {
     "日本": /((?:\bJP\b)|Japan|Tokyo|Osaka|Saitama|Nagoya|Fukuoka|Hokkaido|Okinawa|Kyoto|Yokohama|日本|东京|大阪|名古屋|埼玉|福冈|北海道|冲绳|京都|横滨|深日|沪日|呼日|京日|广日|杭日)+/gi,
     "新加坡": /((?:\bSG\b)|Singapore|Changi|新加坡|狮城|深新|沪新|呼新|京新|广新|杭新)+/gi,
     "韩国": /((?:\bKR\b)|South[\s-]?Korea|Korea|Seoul|Incheon|Busan|Chuncheon|韩国|首尔|仁川|釜山|春川)+/gi,
+    "印尼": /((?:\bID\b)|Indonesia|Jakarta|Bali|Surabaya|印尼|印度尼西亚|雅加达|巴厘岛|泗水)+/gi,
     "印度": /((?:\bIN\b)|India|Mumbai|New[\s-]?Delhi|Bangalore|Chennai|Kolkata|Hyderabad|印度|孟买|新德里|班加罗尔|钦奈|加尔各答|海得拉巴)+/gi,
     "越南": /((?:\bVN\b)|Vietnam|Hanoi|Ho[\s-]?Chi[\s-]?Minh|Da[\s-]?Nang|越南|河内|胡志明市|岘港)+/gi,
     "泰国": /((?:\bTH\b)|Thailand|Bangkok|Phuket|Chiang[\s-]?Mai|泰国|曼谷|普吉|清迈)+/gi,
     "菲律宾": /((?:\bPH\b)|Philippines|Manila|Cebu|Davao|菲律宾|马尼拉|宿务|达沃)+/gi,
     "马来西亚": /((?:\bMY\b)|Malaysia|Kuala[\s-]?Lumpur|Johor[\s-]?Bahru|Penang|马来西亚|吉隆坡|新山|槟城)+/gi,
-    "印度尼西亚": /((?:\bID\b)|Indonesia|Jakarta|Bali|Surabaya|印尼|印度尼西亚|雅加达|巴厘岛|泗水)+/gi,
 
     // 美洲
     "美国": /((?:\bUSA?\b)|United[\s-_]+States|Los[\s-_]+Angeles|San[\s-_]+Jose|Silicon[\s-_]+Valley|San[\s-_]+Francisco|Santa[\s-_]+Clara|Seattle|Chicago|New[\s-_]+York|Miami|Dallas|Phoenix|Fremont|Atlanta|Boston|Las[\s-_]+Vegas|Houston|Ashburn|Buffalo|Washington|D\.C\.|Oregon|Portland|Virginia|Ohio|Texas|Florida|Illinois|Arizona|Orem|Kansas|美国|洛杉矶|圣何塞|硅谷|旧金山|圣克拉拉|西雅图|芝加哥|纽约|迈阿密|达拉斯|凤凰城|弗里蒙特|亚特兰大|波士顿|拉斯维加斯|休斯顿|阿什本|水牛城|华盛顿|俄勒冈|波特兰|弗吉尼亚|俄亥俄|德克萨斯|德州|佛罗里达|伊利诺伊|亚利桑那|奥勒姆|堪萨斯|休斯敦|深美|沪美|呼美|京美|广美|杭美)+/gi,
