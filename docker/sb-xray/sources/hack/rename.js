@@ -29,8 +29,10 @@ const CleaningRules = [
     { desc: "移除残留序号 [N]", regex: /\[\d+\]/g, value: "" },
     { desc: "提取倍率 (x2 -> 2x)", regex: /\|\s*x(\d+(?:\.\d+)?)(?:倍)?/gi, value: " $1×" },
     { desc: "提取倍率 (2x -> 2x)", regex: /(\d+(?:\.\d+)?)x/ig, value: "$1×" },
+    { desc: "提取倍率 (2倍 -> 2x)", regex: /(\d+(?:\.\d+)?)倍/gi, value: "$1×" },
     { desc: "修正地名 (美国多伦多 -> 多伦多)", regex: /美国(?=多伦多)/gi, value: "" },
-    { desc: "移除干扰字符 (VS/无/协议)", regex: /(VS|无|[(\uff08]协议[一二三四五六七八九十\d]+[)\uff09])/gi, value: "" },
+    { desc: "移除干扰字符 (VS/协议)", regex: /(VS|[(\uff08]协议[一二三四五六七八九十\d]+[)\uff09])/gi, value: "" },
+    { desc: "移除孤立的 '无' 字符", regex: /(^|[-_\s丨✈\/])无(?=($|[-_\s丨✈\/]))/g, value: "$1" },
     { desc: "移除 IPv6- 前缀", regex: /IPv6-/gi, value: "" },
 
     // [Critical] 括号清理逻辑
@@ -44,8 +46,10 @@ const CleaningRules = [
     { desc: "移除IEPL主体后缀", regex: /-?(香港|深港|沪港|呼港|京港|广港|杭港)\s?IEPL/gi, value: "$1" },
     { desc: "移除 '水牛'", regex: /-?大?水牛/gi, value: "" },
     { desc: "移除 'HY2'", regex: /-?HY2/gi, value: "" },
+    { desc: "移除 'VPN' 关键字", regex: /\bVPN\b/gi, value: "" },
+    { desc: "移除 'IP' 关键字 (排除 原生IP/IPv6/IPLC)", regex: /\b(?<!原生)IP\b/g, value: "" },
     { desc: "移除 '节点/GG/read/加州'", regex: /(节点|GG|read|1倍|大学|加州)/gi, value: "" },
-    { desc: "替换 AI 关键词", regex: /(SV|chatgpt|gemini)/gi, value: "AI" }, // AI Replacement
+    { desc: "替换 AI 关键词", regex: /[-_]?\d*(SV|chatgpt|gemini)/gi, value: "AI" }, // AI Replacement
     { desc: "移除流量标识 (TB)", regex: /-?\d+-?\d*TB/gi, value: "" },
     { desc: "保留 '原生IP'", regex: /原生\s?IP/gi, value: "原生IP" },
 
@@ -62,7 +66,7 @@ const CleaningRules = [
 // 用于标准化地名 (如 'HK' -> '香港')
 const RegionMap = {
     // 亚洲
-    "香港": /((?:\bHK\b)|Hong[\s-]?Kong|HONG[\s-]?KONG|Hongkong|香港|深港|沪港|呼港|京港|广港|杭港)+/gi,
+    "香港": /((?:\bHK\b)|Hong[\s-]?Kong|HONG[\s-]?KONG|Hongkong|香港|深港|沪港|呼港|京港|广港|杭港|HKT)+/gi,
     "台湾": /((?:\bTW\b)|Taiwan|Taipei|Kaohsiung|Hsinchu|Taichung|台湾|台北|高雄|新竹|台中|新北|彰化|台|新台)+/g,
     "日本": /((?:\bJP\b)|Japan|Tokyo|Osaka|Saitama|Nagoya|Fukuoka|Hokkaido|Okinawa|Kyoto|Yokohama|日本|东京|大阪|名古屋|埼玉|福冈|北海道|冲绳|京都|横滨|深日|沪日|呼日|京日|广日|杭日)+/gi,
     "新加坡": /((?:\bSG\b)|Singapore|Changi|新加坡|狮城|深新|沪新|呼新|京新|广新|杭新)+/gi,
@@ -380,7 +384,7 @@ const CountryDB = [
 // 初始化时自动填充
 const FlagRules = [
     // 优先匹配的手动规则 (Manual Overrides)
-    { regex: /(专属纯净住宅节点)/i, emoji: '🇺🇸' },
+    { regex: /(专属纯净住宅)/i, emoji: '🇺🇸' },
     { regex: /((美[国國]|华盛顿|波特兰|达拉斯|俄勒冈|凤凰城|菲尼克斯|费利蒙|弗里蒙特|硅谷|旧金山|拉斯维加斯|洛杉|圣何塞|圣荷西|圣塔?克拉拉|西雅图|芝加哥|哥伦布|纽约|阿什本|纽瓦克|丹佛|加利福尼亚|弗吉尼亚|马纳萨斯|俄亥俄|得克萨斯|[佐乔]治亚|亚特兰大|佛罗里达|迈阿密))/i, emoji: '🇺🇸' },
     { regex: /((日本|东京|大阪|名古屋|埼玉|福冈))/i, emoji: '🇯🇵' },
     { regex: /((新加坡|[狮獅]城))/i, emoji: '🇸🇬' },
@@ -662,6 +666,17 @@ function operator(proxies) {
             suffixPart = contentWithoutIPv6.substring(planeIndex + 1).replace(new RegExp(`^${Constants.SEPARATOR}+|${Constants.SEPARATOR}+$`, 'g'), '').trim();
         }
 
+        // Check for IPv6 in key or suffix
+        let isIPv6 = content.startsWith("IPv6");
+        if (/IPv6/i.test(keyPart)) {
+            isIPv6 = true;
+            keyPart = keyPart.replace(/IPv6/ig, "").trim();
+        }
+        if (/IPv6/i.test(suffixPart)) {
+            isIPv6 = true;
+            suffixPart = suffixPart.replace(/IPv6/ig, "").replace(new RegExp(`^${Constants.SEPARATOR}+|${Constants.SEPARATOR}+$`, 'g'), '').trim();
+        }
+
         // 清理 Key (移除末尾数字或括号)
         const cleanKey = keyPart.replace(/(\[\s*\d*\s*\]|\d+)$/g, '').trim();
 
@@ -671,13 +686,14 @@ function operator(proxies) {
         const index = nameCounts[cleanKey];
 
         // 重组
-        // 如果有 IPv6 前缀，需加回去
-        const prefix = content.startsWith("IPv6") ? "IPv6 " : "";
+        const prefix = isIPv6 ? "IPv6 " : "";
         let newName = `${p.flag} ${prefix}${cleanKey}[${index}]`;
 
-        if (suffixPart) {
+        // Check if suffixPart is numeric (redundant with index [N])
+        if (suffixPart && !/^\d+$/.test(suffixPart)) {
             newName += `${Constants.SEPARATOR}${suffixPart}`;
         }
+
 
         // Final output string
         const extras = [];
