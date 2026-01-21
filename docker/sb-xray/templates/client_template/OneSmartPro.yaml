@@ -47,8 +47,8 @@ FilterFAST:     &FilterFAST   "^(?=.*(?i)(高速|优))(?!.*(排除1|排除2|5x))
 FilterDialer:   &FilterDialer "^(?=.*(?i)(🇭🇰|🇹🇼|🇨🇳))(?!.*(DIRECT|直接连接|REJECT|isp-dialer)).*$"
 
 # 策略组代理列表模板 - 预定义的代理节点优先级排序
-OneSmart:       &OneSmart     {type: select, proxies: [低延迟线路, 家宽线路, 高速线路, 媒体线路, AI线路, 香港-智选, 台湾-智选, 日本-智选, 狮城-智选, 韩国-智选, 美国-智选, 其他-智选, ShadowSocks-智选, VLESS-智选, VMess-智选, Trojan-智选, Hysteria2-智选, TUIC-智选, AnyTLS-智选, 全球手动, 直接连接]}
-SelectAll:      &SelectAll    {type: select, proxies: [一键智选, 低延迟线路, 家宽线路, 高速线路, 媒体线路, AI线路, 香港-智选, 台湾-智选, 日本-智选, 狮城-智选, 韩国-智选, 美国-智选, 其他-智选, ShadowSocks-智选, VLESS-智选, VMess-智选, Trojan-智选, Hysteria2-智选, TUIC-智选, AnyTLS-智选, 全球手动, 直接连接]}
+DEFAULT:        &DEFAULT     {type: select, proxies: [低延迟线路, 家宽线路, 高速线路, 媒体线路, AI线路, 香港-智选, 台湾-智选, 日本-智选, 狮城-智选, 韩国-智选, 美国-智选, 其他-智选, ShadowSocks-智选, VLESS-智选, VMess-智选, Trojan-智选, Hysteria2-智选, TUIC-智选, AnyTLS-智选, 全球手动, 直接连接]}
+OneSmart:       &OneSmart     {type: select, proxies: [默认代理, 低延迟线路, 家宽线路, 高速线路, 媒体线路, AI线路, 香港-智选, 台湾-智选, 日本-智选, 狮城-智选, 韩国-智选, 美国-智选, 其他-智选, ShadowSocks-智选, VLESS-智选, VMess-智选, Trojan-智选, Hysteria2-智选, TUIC-智选, AnyTLS-智选, 全球手动, 直接连接]}
 SelectDC:       &SelectDC     {type: select, proxies: [直接连接, 香港-智选, 台湾-智选, 日本-智选, 狮城-智选, 韩国-智选, 美国-智选, 其他-智选, ShadowSocks-智选, VLESS-智选, VMess-智选, Trojan-智选, Hysteria2-智选, TUIC-智选, AnyTLS-智选, 全球手动]}
 
 SelectLD:       &SelectLD     {type: select, proxies: [低延迟线路, 香港-智选, 台湾-智选, 日本-智选, 狮城-智选, 韩国-智选, 美国-智选, 其他-智选, ShadowSocks-智选, VLESS-智选, VMess-智选, Trojan-智选, Hysteria2-智选, TUIC-智选, AnyTLS-智选, 全球手动, 直接连接]}
@@ -86,12 +86,13 @@ proxy-groups:
   # ==================== 主要策略组 ====================
   # - {name: 落地节点,    <<: *BaseLB,     use: ["${NODE_NAME}"], filter: *FilterISP,     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Proxy.png}
   - {name: 链式前置,    <<: *BaseSmart,  include-all: true,     filter: *FilterDialer, policy-priority: "优:5;中:1;备:0.5",  icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Daily.png}
-  - {name: 一键智选,    <<: *OneSmart,  icon: https://git.imee.me/https://github.com/666OS/YYDS/raw/main/mihomo/image/mihomo.png}
+  - {name: 默认代理,    <<: *DEFAULT,    icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Static.png}
+  - {name: 一键智选,    <<: *OneSmart,   icon: https://git.imee.me/https://github.com/666OS/YYDS/raw/main/mihomo/image/mihomo.png}
   - {name: 国外流量,    <<: *OneSmart,   icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Global.png}
   - {name: 国内流量,    <<: *SelectDC,   icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/China.png}
   - {name: 兜底流量,    <<: *OneSmart,   icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Final.png}
   # ==================== 网络测试 ====================
-  - {name: 网络测试,    <<: *SelectAll,  include-all: true, filter: *FilterALL, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Speedtest.png}
+  - {name: 网络测试,    <<: *OneSmart,  include-all: true, filter: *FilterALL, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Speedtest.png}
   # ==================== AI 服务 ====================
   - {name: 人工智能,    <<: *SelectAI,   icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/AI.png}
   # ==================== 媒体服务 ====================
