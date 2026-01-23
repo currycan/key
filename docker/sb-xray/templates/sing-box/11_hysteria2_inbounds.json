@@ -11,10 +11,6 @@
                 }
             ],
             "ignore_client_bandwidth": false,
-            "obfs": {
-                "type": "salamander",
-                "password": "${PASSWORD}"
-            },
             "tls": {
                 "enabled": true,
                 "server_name": "",

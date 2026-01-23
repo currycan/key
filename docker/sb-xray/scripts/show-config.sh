@@ -60,7 +60,7 @@ show_v2rayn_link() {
     # 生成 V2rayN 订阅文件
     # hysteria2
     V2RAYN_SUBSCRIBE+="
-hysteria2://${SB_UUID}@${DOMAIN}:${PORT_HYSTERIA2}/?alpn=h3&insecure=1&mport=20000-50000&obfs=salamander&obfs-password=${PASSWORD}#${REGION_INFO}|${NODE_NAME}|hysteria2${NODE_SUFFIX}
+hysteria2://${SB_UUID}@${DOMAIN}:${PORT_HYSTERIA2}/?alpn=h3&insecure=1#${REGION_INFO}|${NODE_NAME}|hysteria2${NODE_SUFFIX}
 "
     # tuic
     V2RAYN_SUBSCRIBE+="
