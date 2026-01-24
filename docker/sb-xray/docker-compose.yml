@@ -1,6 +1,6 @@
 services:
   sb-xray:
-    image: docker.io/currycan/sb-xray:26.1.18
+    image: docker.io/currycan/sb-xray:26.1.23
     container_name: sb-xray
     environment:
       - DOMAIN=$domain
@@ -20,6 +20,8 @@ services:
       - ./acmecerts:/acmecerts
       - ./.envs:/.env
       - ./sb-xray:/sb-xray
+      - ./x-ui:/x-ui/db
+      - ./s-ui:/s-ui/db
       - ./nginx/http:/etc/nginx/conf.d
       - ./nginx/tcp:/etc/nginx/stream.d
       - ./nginx/dhparam:/etc/nginx/dhparam

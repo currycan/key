@@ -20,17 +20,20 @@ https://github.com/v2raya/v2raya-openwrt
 https://v2raya.org/docs/prologue/installation/openwrt/
 https://pengtech.net/network/v2rayA_install.html
 
+https://github.com/konstpic/3x-ui-new
+
 ## 镜像制作
 
 ```bash
 docker buildx build \
   --platform linux/amd64,linux/arm64 \
   --build-arg DUFS_VERSION="0.45.0" \
-  --build-arg CLOUDFLARED_VERSION="2025.11.1" \
+  --build-arg CLOUDFLARED_VERSION="2026.1.1" \
   --build-arg XUI_VERSION="2.8.8" \
+  --build-arg SUI_VERSION="1.3.7" \
   --build-arg SING_BOX_VERSION="1.12.17" \
-  --build-arg XRAY_VERSION="26.1.18" \
-  --tag currycan/sb-xray:26.1.18 \
+  --build-arg XRAY_VERSION="26.1.23" \
+  --tag currycan/sb-xray:26.1.23 \
   --push .
 ```
 

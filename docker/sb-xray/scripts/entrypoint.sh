@@ -353,7 +353,8 @@ function issueCertificate() {
 
 # 主执行流程
 if [ "${1#-}" = 'supervisord' ] && [ "$(id -u)" = '0' ]; then
-    mkdir -p ${LOGDIR}/{supervisor,xray,sing-box,dufs,nginx,x-ui}
+    mkdir -p ${LOGDIR}/{supervisor,xray,sing-box,dufs,nginx,x-ui,s-ui}
+    mkdir -p "${SUI_DB_FOLDER}"
 
     decryptSecretsEnv
     generateEnv
@@ -376,6 +377,11 @@ if [ "${1#-}" = 'supervisord' ] && [ "$(id -u)" = '0' ]; then
     # 配置 x-ui
     log INFO "Initializing X-UI..."
     x-ui setting -username "${PUBLIC_USER}" -password "${PUBLIC_PASSWORD}" -port "${XUI_LOCAL_PORT}" -webBasePath "${XUI_WEBBASEPATH}"
+
+    # 配置 s-ui
+    log INFO "Initializing S-UI..."
+    sui setting -port "${SUI_PORT}" -subPort "${SUI_SUB_PORT}" -path "/${SUI_WEBBASEPATH}"
+    sui admin -password "${PUBLIC_PASSWORD}" -username "${PUBLIC_USER}"
 
     log INFO "Starting fail2ban..."
     fail2ban-client -x start
