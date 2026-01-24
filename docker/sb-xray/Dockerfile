@@ -197,6 +197,10 @@ ENV ACMESH_SERVER_NAME="letsencrypt"
 # certs path
 ENV SSL_PATH=/pki
 
+# ISP proxy
+ENV ENABLE_ISP_PROXY="false"
+ENV DEFAULT_ISP="LA_ISP"
+
 # x-ui
 ENV XUI_LOG_LEVEL="info"
 ENV XUI_DEBUG="false"

@@ -269,6 +269,70 @@ function createConfig() {
     envsubst <"/templates/dufs/conf.yml" >"${WORKDIR}/dufs/conf.yml"
 }
 
+# 动态生成 ISP SOCKS5 出站配置
+function generateIspSocks5Config() {
+    export SB_SOCKS5_OUTBOUND_CONFIG="" # Ensure empty var is exported for template safety
+
+    # 检查开关是否开启 (默认关闭)
+    if [[ "${ENABLE_ISP_PROXY}" != "true" ]]; then
+        log INFO "ISP Proxy feature disabled (ENABLE_ISP_PROXY=${ENABLE_ISP_PROXY}), skipping ISP SOCKS5 generation."
+        export CUSTOM_OUTBOUNDS=""
+        export SB_CUSTOM_OUTBOUNDS=""
+        return
+    fi
+
+    local default_outbound=""
+    local default_sb_outbound=""
+    local other_outbounds=""
+    local other_sb_outbounds=""
+
+    # 获取所有以 _ISP_IP 结尾的变量名
+    for var in $(compgen -v | grep "_ISP_IP$"); do
+        prefix=${var%_IP} # 获取前缀，如 LA_ISP
+
+        # 读取对应变量值
+        s5_ip="${!var}"
+        s5_port_var="${prefix}_PORT"
+        s5_user_var="${prefix}_USER"
+        s5_pass_var="${prefix}_SECRET"
+
+        s5_port="${!s5_port_var}"
+        s5_user="${!s5_user_var}"
+        s5_pass="${!s5_pass_var}"
+
+        if [ -n "$s5_ip" ] && [ -n "$s5_port" ]; then
+            log INFO "Found Custom Proxy: ${prefix} -> $s5_ip:$s5_port"
+
+            # 使用 lower case prefix 作为 tag 的一部分
+            tag_suffix=$(echo "${prefix}" | tr '[:upper:]' '[:lower:]' | tr '_' '-')
+            tag_name="proxy-${tag_suffix}"
+
+            # 构建 JSON 对象 (Xray)
+            proxy_json="{\"tag\": \"${tag_name}\", \"protocol\": \"socks\", \"settings\": {\"servers\": [{\"address\": \"$s5_ip\", \"port\": $s5_port, \"users\": [{\"user\": \"$s5_user\", \"pass\": \"$s5_pass\"}]}]}},"
+
+            # 构建 JSON 对象 (Sing-box)
+            # Sing-box tag naming: use same tag for consistency? Yes.
+            sb_proxy_json="{\"type\": \"socks\", \"tag\": \"${tag_name}\", \"server\": \"$s5_ip\", \"server_port\": $s5_port, \"username\": \"$s5_user\", \"password\": \"$s5_pass\"},"
+
+            # 检查是否为默认出站
+            if [ -n "${DEFAULT_ISP:-}" ] && [ "$prefix" == "$DEFAULT_ISP" ]; then
+                log INFO "Setting ${prefix} as DEFAULT outbound."
+                default_outbound="${proxy_json}"
+                default_sb_outbound="${sb_proxy_json}"
+            else
+                other_outbounds="${other_outbounds}${proxy_json}"
+                other_sb_outbounds="${other_sb_outbounds}${sb_proxy_json}"
+            fi
+        else
+            log WARN "Incomplete config for ${prefix}, skipping..."
+        fi
+    done
+
+    # 将默认出站放入最前
+    export CUSTOM_OUTBOUNDS="${default_outbound}${other_outbounds}"
+    export SB_CUSTOM_OUTBOUNDS="${default_sb_outbound}${other_sb_outbounds}"
+}
+
 # 配置 nginx dhparam 证书
 function setupDhParam() {
     local dhparam_path="/etc/nginx/dhparam/dhparam.pem"
@@ -370,6 +434,10 @@ if [ "${1#-}" = 'supervisord' ] && [ "$(id -u)" = '0' ]; then
 
     log INFO "Updating GeoIP and GeoSite databases..."
     /scripts/geo_update.sh
+
+    # 动态生成 ISP SOCKS5 出站配置
+    log INFO "Generating ISP SOCKS5 outbounds..."
+    generateIspSocks5Config
 
     # 生成配置文件
     createConfig

@@ -1,8 +1,10 @@
 {
-    "outbounds":[
+    "outbounds": [
+        ${SB_SOCKS5_OUTBOUND_CONFIG}
+        ${SB_CUSTOM_OUTBOUNDS}
         {
-            "type":"direct",
-            "tag":"direct"
+            "type": "direct",
+            "tag": "direct"
         }
     ]
 }

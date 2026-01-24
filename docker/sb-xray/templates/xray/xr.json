@@ -108,6 +108,7 @@
         }
     ],
     "outbounds": [
+        ${CUSTOM_OUTBOUNDS}
         {
             "tag": "direct",
             "protocol": "freedom"
