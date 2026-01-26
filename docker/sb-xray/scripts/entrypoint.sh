@@ -448,8 +448,16 @@ if [ "${1#-}" = 'supervisord' ] && [ "$(id -u)" = '0' ]; then
 
     # 配置 s-ui
     log INFO "Initializing S-UI..."
-    sui setting -port "${SUI_PORT}" -subPort "${SUI_SUB_PORT}" -path "/${SUI_WEBBASEPATH}"
+    sui setting -port "${SUI_PORT}" -subPort "${SUI_SUB_PORT}" -path "/${SUI_WEBBASEPATH}" -subPath "/sub"
     sui admin -password "${PUBLIC_PASSWORD}" -username "${PUBLIC_USER}"
+
+    # 强制更新 s-ui 数据库中的 subDomain，确保订阅链接使用域名而非 IP
+    # s-uiCLI 不支持 -subDomain 参数，因此直接操作数据库
+    if [ -f "${SUI_DB_FOLDER}/s-ui.db" ]; then
+        log INFO "Updating s-ui subDomain to: ${DOMAIN}"
+        # 强制设置 subURI 以覆盖默认生成的带端口 URL
+        sqlite3 "${SUI_DB_FOLDER}/s-ui.db" "UPDATE settings SET value='https://${DOMAIN}/sub/' WHERE key='subURI';"
+    fi
 
     log INFO "Starting fail2ban..."
     fail2ban-client -x start

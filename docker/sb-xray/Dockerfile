@@ -140,7 +140,7 @@ RUN set -ex; \
 
 # 安装基础组件
 RUN set -ex; \
-  runtime_pkgs="curl bash iproute2 net-tools tzdata bash-completion ca-certificates python3 py3-pip gettext libc6-compat gcompat vim libqrencode-tools socat logrotate nftables jq"; \
+  runtime_pkgs="curl bash iproute2 net-tools tzdata bash-completion ca-certificates python3 py3-pip gettext libc6-compat gcompat vim libqrencode-tools socat logrotate nftables jq sqlite"; \
   apk add -U --no-cache --virtual .runtime-deps ${runtime_pkgs}; \
   echo -e "[global]\nbreak-system-packages = true" > /etc/pip.conf; \
   pip install --no-cache-dir -U pip supervisor; \
