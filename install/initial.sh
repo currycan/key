@@ -226,7 +226,7 @@ initial() {
     mkdir -p ~/sb-xray
     DOMAIN=$(hostname)
     echo domain=$(hostname) >~/sb-xray/.env
-    echo cdndomain=${DOMAIN%%.*}.ansandy.site >>~/sb-xray/.env
+    echo cdndomain=${DOMAIN%%.*}.ansandy.top >>~/sb-xray/.env
     echo code="Mthgh@001" >>~/sb-xray/.env
     curl -o ~/sb-xray/docker-compose.yml https://raw.githubusercontent.com/currycan/key/refs/heads/master/docker/sb-xray/docker-compose.yml
 
