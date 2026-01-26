@@ -177,7 +177,6 @@ WORKDIR ${WORKDIR}
 
 COPY --from=builder --chmod=755 /usr/local/bin/ /usr/local/bin/
 COPY --from=substore /opt/app /sub-store
-COPY --from=builder /app/s-ui/web /s-ui/web
 # ADD web.tgz /home/wwwroot/
 # RUN chown -R nginx:nginx /home/wwwroot
 COPY --chmod=755 scripts /scripts
