@@ -75,6 +75,8 @@
     - `/supervisor/` → `unix:/var/run/supervisor.sock`
     - `${DUFS_PATH_PREFIX}/` → `127.0.0.1:${DUFS_PORT}`
     - `/${XUI_WEBBASEPATH}/` → `127.0.0.1:${XUI_LOCAL_PORT}`
+    - `/${SUI_WEBBASEPATH}/` → `127.0.0.1:${SUI_PORT}`
+    - `/${SUB_STORE_WEBBASEPATH}/` → `127.0.0.1:${SUB_STORE_BACKEND_API_PORT}`
     - `/sb-xray/` → `alias ${WORKDIR}/subscribe/`（无认证，直接访问）
 - **Stream/TCP 分流（`tcp.conf`）**：
   - `ssl_preread on`：基于 SNI 分流
@@ -133,6 +135,6 @@ flowchart TD
 - 证书通过 `acme.sh` 自动申请并挂载到 Nginx。
 
 ## 运行与监控
-- **Supervisord**：管理 Xray, Nginx, Sing-box, X-UI, Dufs, Fail2ban。
+- **Supervisord**：管理 Xray, Nginx, Sing-box, X-UI, S-UI, Sub-Store, Dufs, Fail2ban。
 - **Fail2ban**：监控 SSH 与 Nginx 登录失败。
 - **Show Config**：`show` 命令输出当前配置链接。

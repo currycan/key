@@ -1,3 +1,6 @@
+# ===== sub-store =====
+FROM xream/sub-store:2.21.15-http-meta AS substore
+
 # ===== s-ui frontend builder =====
 FROM node:alpine AS s-ui-front-builder
 
@@ -140,7 +143,7 @@ RUN set -ex; \
 
 # 安装基础组件
 RUN set -ex; \
-  runtime_pkgs="curl bash iproute2 net-tools tzdata bash-completion ca-certificates python3 py3-pip gettext libc6-compat gcompat vim libqrencode-tools socat logrotate nftables jq sqlite"; \
+  runtime_pkgs="curl bash iproute2 net-tools tzdata bash-completion ca-certificates python3 py3-pip gettext libc6-compat gcompat vim libqrencode-tools socat logrotate nftables jq sqlite nodejs"; \
   apk add -U --no-cache --virtual .runtime-deps ${runtime_pkgs}; \
   echo -e "[global]\nbreak-system-packages = true" > /etc/pip.conf; \
   pip install --no-cache-dir -U pip supervisor; \
@@ -173,7 +176,8 @@ ENV SUPERVISOR_LOG_MAX_BYTES="20MB"
 WORKDIR ${WORKDIR}
 
 COPY --from=builder --chmod=755 /usr/local/bin/ /usr/local/bin/
-COPY --from=builder /app/s-ui/web ${WORKDIR}/s-ui/web
+COPY --from=substore /opt/app /sub-store
+COPY --from=builder /app/s-ui/web /s-ui/web
 # ADD web.tgz /home/wwwroot/
 # RUN chown -R nginx:nginx /home/wwwroot
 COPY --chmod=755 scripts /scripts
@@ -216,6 +220,21 @@ ENV SUI_PORT="3095"
 ENV SUI_SUB_PORT="3096"
 ENV SUI_DB_FOLDER="/s-ui/db"
 ENV SUI_WEBBASEPATH="sui"
+ENV SUI_SUB_PATH="sub"
+
+# sub-store
+ENV SUB_STORE_META_FOLDER="/sub-store/http-meta/"
+ENV SUB_STORE_DOCKER=true
+ENV SUB_STORE_FRONTEND_PATH="/sub-store/frontend/"
+ENV SUB_STORE_DATA_BASE_PATH="/sub-store/data"
+ENV SUB_STORE_BACKEND_API_PORT="3000"
+ENV SUB_STORE_BACKEND_API_HOST="127.0.0.1"
+ENV SUB_STORE_FRONTEND_PORT="3001"
+ENV SUB_STORE_FRONTEND_HOST="127.0.0.1"
+ENV SUB_STORE_BACKENDPATH="app/v1"
+ENV SUB_STORE_WEBBASEPATH="sub-store"
+ENV SUB_STORE_FRONTEND_BACKEND_PATH="/2cXaAxRGfddmGz2yx1wA"
+ENV SUB_STORE_BACKEND_SYNC_CRON="55 23 * * *"
 
 # dufs
 ENV DUFS_SERVE_PATH="/data"
@@ -240,7 +259,7 @@ HEALTHCHECK --interval=30s --timeout=30s --start-period=15s --retries=3 \
 
 EXPOSE 80 443
 
-VOLUME ${DUFS_SERVE_PATH} ${WORKDIR} ${LOGDIR} /etc/nginx/conf.d /etc/nginx/stream.d /etc/nginx/dhparam
+VOLUME ${DUFS_SERVE_PATH} ${WORKDIR} ${SUB_STORE_DATA_BASE_PATH} ${LOGDIR} /etc/nginx/conf.d /etc/nginx/stream.d /etc/nginx/dhparam
 
 STOPSIGNAL SIGTERM
 

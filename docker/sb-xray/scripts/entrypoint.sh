@@ -211,6 +211,7 @@ function generateEnv() {
             ["PORT_HYSTERIA2"]=$(generateRandomStr port)
             ["PORT_TUIC"]=$(generateRandomStr port)
             ["PORT_ANYTLS"]=$(generateRandomStr port)
+            ["SUB_STORE_FRONTEND_BACKEND_PATH"]="/$(generateRandomStr path 16)"
         )
 
         # 写入文件
@@ -419,6 +420,7 @@ function issueCertificate() {
 if [ "${1#-}" = 'supervisord' ] && [ "$(id -u)" = '0' ]; then
     mkdir -p ${LOGDIR}/{supervisor,xray,sing-box,dufs,nginx,x-ui,s-ui}
     mkdir -p "${SUI_DB_FOLDER}"
+    mkdir -p "${SUB_STORE_DATA_BASE_PATH}"
 
     decryptSecretsEnv
     generateEnv
@@ -448,7 +450,7 @@ if [ "${1#-}" = 'supervisord' ] && [ "$(id -u)" = '0' ]; then
 
     # 配置 s-ui
     log INFO "Initializing S-UI..."
-    sui setting -port "${SUI_PORT}" -subPort "${SUI_SUB_PORT}" -path "/${SUI_WEBBASEPATH}" -subPath "/sub"
+    sui setting -port "${SUI_PORT}" -subPort "${SUI_SUB_PORT}" -path "/${SUI_WEBBASEPATH}" -subPath "/${SUI_SUB_PATH}"
     sui admin -password "${PUBLIC_PASSWORD}" -username "${PUBLIC_USER}"
 
     # 强制更新 s-ui 数据库中的 subDomain，确保订阅链接使用域名而非 IP
@@ -456,8 +458,12 @@ if [ "${1#-}" = 'supervisord' ] && [ "$(id -u)" = '0' ]; then
     if [ -f "${SUI_DB_FOLDER}/s-ui.db" ]; then
         log INFO "Updating s-ui subDomain to: ${DOMAIN}"
         # 强制设置 subURI 以覆盖默认生成的带端口 URL
-        sqlite3 "${SUI_DB_FOLDER}/s-ui.db" "UPDATE settings SET value='https://${DOMAIN}/sub/' WHERE key='subURI';"
+        sqlite3 "${SUI_DB_FOLDER}/s-ui.db" "UPDATE settings SET value='https://${DOMAIN}/${SUI_SUB_PATH}/' WHERE key='subURI';"
     fi
+
+    # 配置 sub-store
+    log INFO "Initializing Sub-Store..."
+    log INFO "Sub-Store API Path: ${SUB_STORE_FRONTEND_BACKEND_PATH}"
 
     log INFO "Starting fail2ban..."
     fail2ban-client -x start
