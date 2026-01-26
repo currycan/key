@@ -1,5 +1,28 @@
 # ===== sub-store =====
-FROM xream/sub-store:2.21.15-http-meta AS substore
+# https://github.com/sub-store-org/Sub-Store
+ARG SUB_STORE_BACKEND_VERSION="2.21.15"
+FROM xream/sub-store:${SUB_STORE_BACKEND_VERSION}-http-meta AS substore
+
+FROM node:alpine AS sub-store-front-builder
+
+RUN apk add --no-cache git
+
+WORKDIR /app/sub-store-frontend
+
+ENV SUB_STORE_WEBBASEPATH="sub-store"
+
+ARG SUB_STORE_FRONTEND_VERSION="2.16.11"
+COPY --from=substore /opt/app /sub-store
+RUN set -ex; \
+    if [ -z "$SUB_STORE_FRONTEND_VERSION" ]; then \
+        SUI_VERSION=$(curl -sSf https://api.github.com/repos/sub-store-org/Sub-Store-Front-End/releases/latest | grep '"tag_name":' | sed -E 's/.*"v?([^"]+)".*/\1/'); \
+    fi; \
+    git clone --depth 1 --branch ${SUB_STORE_FRONTEND_VERSION} https://github.com/sub-store-org/Sub-Store-Front-End /app/sub-store-frontend; \
+    npm install -g pnpm; \
+    pnpm install --frozen-lockfile; \
+    VITE_PUBLIC_PATH="/${SUB_STORE_WEBBASEPATH}/" pnpm run build; \
+    rm -rf /sub-store/frontend; \
+    mv /app/sub-store-frontend/dist /sub-store/frontend
 
 # ===== s-ui frontend builder =====
 FROM node:alpine AS s-ui-front-builder
@@ -176,7 +199,7 @@ ENV SUPERVISOR_LOG_MAX_BYTES="20MB"
 WORKDIR ${WORKDIR}
 
 COPY --from=builder --chmod=755 /usr/local/bin/ /usr/local/bin/
-COPY --from=substore /opt/app /sub-store
+COPY --from=sub-store-front-builder /sub-store /sub-store
 # ADD web.tgz /home/wwwroot/
 # RUN chown -R nginx:nginx /home/wwwroot
 COPY --chmod=755 scripts /scripts
@@ -230,7 +253,6 @@ ENV SUB_STORE_BACKEND_API_PORT="3000"
 ENV SUB_STORE_BACKEND_API_HOST="127.0.0.1"
 ENV SUB_STORE_FRONTEND_PORT="3001"
 ENV SUB_STORE_FRONTEND_HOST="127.0.0.1"
-ENV SUB_STORE_BACKENDPATH="app/v1"
 ENV SUB_STORE_WEBBASEPATH="sub-store"
 ENV SUB_STORE_FRONTEND_BACKEND_PATH="/2cXaAxRGfddmGz2yx1wA"
 ENV SUB_STORE_BACKEND_SYNC_CRON="55 23 * * *"

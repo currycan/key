@@ -21,12 +21,13 @@ services:
       - ./acmecerts:/acmecerts
       - ./.envs:/.env
       - ./sb-xray:/sb-xray
+      - ./x-ui:/etc/x-ui/
       - ./x-ui:/x-ui/db
       - ./s-ui:/s-ui/db
+      - ./sub-store:/sub-store/data
       - ./nginx/http:/etc/nginx/conf.d
       - ./nginx/tcp:/etc/nginx/stream.d
       - ./nginx/dhparam:/etc/nginx/dhparam
-      - ./x-ui:/etc/x-ui/
       - ./data:/data
       - ./logs:/var/log
     restart: always

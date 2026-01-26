@@ -211,7 +211,7 @@ function generateEnv() {
             ["PORT_HYSTERIA2"]=$(generateRandomStr port)
             ["PORT_TUIC"]=$(generateRandomStr port)
             ["PORT_ANYTLS"]=$(generateRandomStr port)
-            ["SUB_STORE_FRONTEND_BACKEND_PATH"]="/$(generateRandomStr path 16)"
+            ["SUB_STORE_FRONTEND_BACKEND_PATH"]="/$(generateRandomStr path 32)"
         )
 
         # 写入文件
