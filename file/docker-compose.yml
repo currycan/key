@@ -12,7 +12,7 @@ services:
     container_name: substore
     restart: always
     environment:
-    - SUB_STORE_CRON=55 23 * * *
+    - SUB_STORE_BACKEND_SYNC_CRON=55 23 * * *
     # http://127.0.0.1:3010/sDFye2FvHNJwheeCkXQpGaGRQBtupYGS
     - SUB_STORE_FRONTEND_BACKEND_PATH=/sDFye2FvHNJwheeCkXQpGaGRQBtupYGS
     ports:
