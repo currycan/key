@@ -150,75 +150,114 @@ function decryptSecretsEnv() {
     fi
 }
 
+get_geo_info() {
+    curl -fsSL --max-time 10 --retry 2 https://ip111.cn/ | grep '这是您访问国内网站所使用的IP' -B 2 | head -n 1 | awk -F' ' '{print $2$3"|"$1}' | tr -d '</p>'
+}
+
+check_brutal_status() {
+    if [ -d "/sys/module/brutal" ]; then echo "true"; else echo "false"; fi
+}
+
 # 生成环境变量
 function generateEnv() {
     local env_file="/.env/xray"
     mkdir -p "$(dirname "${env_file}")"
+    touch "${env_file}"
 
-    if [ ! -f "${env_file}" ]; then
-        log INFO "Generating environment variables..."
+    # 1. 加载现有环境变量
+    # 临时关闭 unset 检查，防止加载空文件或访问未定义变量报错
+    set +u
+    source "${env_file}"
+    set -u
 
-        # 生成X25519密钥
-        gen_x25519_key() {
-            log DEBUG "Generating Xray x25519 key"
-            local x25519_reality_xhttp_secret=$(xray x25519)
-            echo "$(echo "${x25519_reality_xhttp_secret}" | sed -n '1p' | awk -F': ' '{print $2}') $(echo "${x25519_reality_xhttp_secret}" | sed -n '2p' | awk -F': ' '{print $2}')"
-        }
+    # 辅助函数：生成 sub-store 路径
+    gen_sub_store_path() {
+        echo "/$(generateRandomStr path 32)"
+    }
 
-        local reality_private_key reality_public_key
-        read -r reality_private_key reality_public_key <<<$(gen_x25519_key)
+    # 辅助函数：校验并生成变量
+    # 逻辑：如果变量在持久化文件(.env/xray)中不存在，则强制生成（覆盖 Dockerfile 默认值或内存中的值）
+    # 用法: ensure_var "VAR_NAME" "COMMAND" [ARGS...]
+    ensure_var() {
+        local var_name="$1"
+        shift
+        local cmd="$@"
 
-        # 生成mlkem768加密密钥
-        gen_mlkem768_secret() {
-            log DEBUG "Generating Xray mlkem768 key"
-            local mlkem768_secret=$(xray mlkem768)
-            echo "$(echo "${mlkem768_secret}" | sed -n '1p' | awk -F': ' '{print $2}') $(echo "${mlkem768_secret}" | sed -n '2p' | awk -F': ' '{print $2}')"
-        }
+        # 使用 grep 检查文件内容，确保只有未被持久化的变量才会被生成
+        if ! grep -q "^export ${var_name}=" "${env_file}"; then
+            log INFO "Generating ${var_name}..."
+            local value
+            value=$($cmd)
 
-        local mlkem768_seed mlkem768_client
-        read -r mlkem768_seed mlkem768_client <<<$(gen_mlkem768_secret)
+            # 导出到当前 Shell
+            export "${var_name}=${value}"
 
-        # # 获取地理位置信息
-        log DEBUG "Generating geographical location information"
-        local geo_output=$(curl -fsSL --max-time 10 --retry 2 https://ip111.cn/ | grep '这是您访问国内网站所使用的IP' -B 2 | head -n 1 | awk -F' ' '{print $2$3"|"$1}' | tr -d '</p>')
-
-        # 检查系统是否已经安装 tcp-brutal
-        log DEBUG "Checking brutal module"
-        is_brutal=false
-        if [ -d "/sys/module/brutal" ]; then
-            is_brutal=true
-        else
-            log WARN "brutal module not detected, Xray XTLS Brutal will not be available"
+            # 追加到 env 文件
+            # 即使文件中没有 export 语句，保险起见还是先删后加（防止如果有残留的脏数据）
+            sed -i "/^export ${var_name}=/d" "${env_file}"
+            echo "export ${var_name}='${value}'" >> "${env_file}"
         fi
+    }
 
-        # 生成随机参数
-        declare -A config=(
-            ["XUI_LOCAL_PORT"]=$(generateRandomStr port)
-            ["DUFS_PORT"]=$(generateRandomStr port)
-            ["PASSWORD"]=$(generateRandomStr password 16)
-            ["XRAY_UUID"]=$(generateRandomStr uuid)
-            ["XRAY_MLKEM768_SEED"]=${mlkem768_seed}
-            ["XRAY_MLKEM768_CLIENT"]=${mlkem768_client}
-            ["XRAY_REALITY_PRIVATE_KEY"]=${reality_private_key}
-            ["XRAY_REALITY_PUBLIC_KEY"]=${reality_public_key}
-            ["XRAY_REALITY_SHORTID"]=$(openssl rand -hex 8)
-            ["XRAY_URL_PATH"]=$(generateRandomStr path 32)
-            ["GEOIP_INFO"]=${geo_output}
-            ["IS_BRUTAL"]=${is_brutal}
-            ["CHATGPT_OUT"]=$(check_chatgpt_access)
-            ["STRATEGY"]=$(detect_ip_strategy_api)
-            ["SB_UUID"]=$(generateRandomStr uuid)
-            ["PORT_HYSTERIA2"]=$(generateRandomStr port)
-            ["PORT_TUIC"]=$(generateRandomStr port)
-            ["PORT_ANYTLS"]=$(generateRandomStr port)
-            ["SUB_STORE_FRONTEND_BACKEND_PATH"]="/$(generateRandomStr path 32)"
-        )
+    # 2. 定义标准变量及其生成命令
+    local -a standard_vars=(
+        "XUI_LOCAL_PORT|generateRandomStr port"
+        "DUFS_PORT|generateRandomStr port"
+        "PASSWORD|generateRandomStr password 16"
+        "XRAY_UUID|generateRandomStr uuid"
+        "SB_UUID|generateRandomStr uuid"
+        "XRAY_REALITY_SHORTID|openssl rand -hex 8"
+        "XRAY_URL_PATH|generateRandomStr path 32"
+        "PORT_HYSTERIA2|generateRandomStr port"
+        "PORT_TUIC|generateRandomStr port"
+        "PORT_ANYTLS|generateRandomStr port"
+        "CHATGPT_OUT|check_chatgpt_access"
+        "STRATEGY|detect_ip_strategy_api"
+        "GEOIP_INFO|get_geo_info"
+        "IS_BRUTAL|check_brutal_status"
+        "SUB_STORE_FRONTEND_BACKEND_PATH|gen_sub_store_path"
+    )
 
-        # 写入文件
-        log INFO "Environment file generated"
-        for key in "${!config[@]}"; do
-            echo "export $key='${config[$key]}'" >>"${env_file}"
-        done
+    # 3. 处理标准变量
+    for entry in "${standard_vars[@]}"; do
+        IFS='|' read -r key cmd <<< "$entry"
+        ensure_var "$key" $cmd
+    done
+
+    # 4. 处理复杂的成对密钥 (Xray Reality & MLKEM)
+    # 这里的生成命令一次产生两个值，需要特殊处理
+
+    # Reality KEYS
+    # 只要文件中缺任意一个 Key，就重新生成一对并覆盖
+    if ! grep -q "^export XRAY_REALITY_PRIVATE_KEY=" "${env_file}" || ! grep -q "^export XRAY_REALITY_PUBLIC_KEY=" "${env_file}"; then
+        log INFO "Generating Xray Reality keys..."
+        local keypair=$(xray x25519)
+        local priv=$(echo "$keypair" | sed -n '1p' | awk -F': ' '{print $2}')
+        local pub=$(echo "$keypair" | sed -n '2p' | awk -F': ' '{print $2}')
+
+        export XRAY_REALITY_PRIVATE_KEY="$priv"
+        export XRAY_REALITY_PUBLIC_KEY="$pub"
+
+        sed -i "/^export XRAY_REALITY_PRIVATE_KEY=/d" "${env_file}"
+        sed -i "/^export XRAY_REALITY_PUBLIC_KEY=/d" "${env_file}"
+        echo "export XRAY_REALITY_PRIVATE_KEY='$priv'" >> "$env_file"
+        echo "export XRAY_REALITY_PUBLIC_KEY='$pub'" >> "$env_file"
+    fi
+
+    # MLKEM768 KEYS
+    if ! grep -q "^export XRAY_MLKEM768_SEED=" "${env_file}" || ! grep -q "^export XRAY_MLKEM768_CLIENT=" "${env_file}"; then
+        log INFO "Generating Xray MLKEM768 keys..."
+        local keypair=$(xray mlkem768)
+        local seed=$(echo "$keypair" | sed -n '1p' | awk -F': ' '{print $2}')
+        local client=$(echo "$keypair" | sed -n '2p' | awk -F': ' '{print $2}')
+
+        export XRAY_MLKEM768_SEED="$seed"
+        export XRAY_MLKEM768_CLIENT="$client"
+
+        sed -i "/^export XRAY_MLKEM768_SEED=/d" "${env_file}"
+        sed -i "/^export XRAY_MLKEM768_CLIENT=/d" "${env_file}"
+        echo "export XRAY_MLKEM768_SEED='$seed'" >> "$env_file"
+        echo "export XRAY_MLKEM768_CLIENT='$client'" >> "$env_file"
     fi
 }
 
