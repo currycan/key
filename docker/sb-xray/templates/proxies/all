@@ -39,7 +39,7 @@ proxies:
 
   - name: ${REGION_INFO}|${NODE_NAME}|V2ray-TLS-WS${NODE_SUFFIX}
     type: vmess
-    server: ${DOMAIN}
+    server: ${CDNDOMAIN}
     port: ${LISTENING_PORT}
     uuid: ${XRAY_UUID}
     alterId: 0
@@ -52,9 +52,9 @@ proxies:
     network: ws
     ws-opts:
       headers:
-        Host: ${DOMAIN}
+        Host: ${CDNDOMAIN}
       path: /${XRAY_URL_PATH}-vmessws
-    servername: ${DOMAIN}
+    servername: ${CDNDOMAIN}
 
   - name: ${REGION_INFO}|${NODE_NAME}|XTLS(Vision)+Reality直连${NODE_SUFFIX}
     type: vless
@@ -70,7 +70,7 @@ proxies:
       short-id: ${XRAY_REALITY_SHORTID}
       _spider-x: /
     network: tcp
-    servername: ${DOMAIN}
+    servername: ${DEST_HOST}
 
   - name: ${REGION_INFO}|${NODE_NAME}|Xhttp+Reality直连${NODE_SUFFIX}
     type: vless
@@ -91,7 +91,7 @@ proxies:
         host: ""
         path: /${XRAY_URL_PATH}-xhttp
         mode: auto
-    servername: ${DOMAIN}
+    servername: ${DEST_HOST}
     encryption: mlkem768x25519plus.native.0rtt.${XRAY_MLKEM768_CLIENT}
 
   - name: ${REGION_INFO}|${NODE_NAME}|上行Xhttp+TLS+CDN|下行Xhttp+Reality${NODE_SUFFIX}
@@ -117,7 +117,7 @@ proxies:
           security: reality
           realitySettings:
             show: false
-            serverName: ${DOMAIN}
+            serverName: ${DEST_HOST}
             fingerprint: chrome
             publicKey: ${XRAY_REALITY_PUBLIC_KEY}
             shortId: ${XRAY_REALITY_SHORTID}
@@ -153,7 +153,7 @@ proxies:
           network: xhttp
           security: tls
           tlsSettings:
-            serverName: ${DOMAIN}
+            serverName: ${DEST_HOST}
             allowInsecure: false
             alpn:
               - h2
@@ -162,7 +162,7 @@ proxies:
             host: ${DOMAIN}
             path: /${XRAY_URL_PATH}-xhttp
             mode: auto
-    servername: ${DOMAIN}
+    servername: ${DEST_HOST}
     encryption: mlkem768x25519plus.native.0rtt.${XRAY_MLKEM768_CLIENT}
 
   - name: ${REGION_INFO}|${NODE_NAME}|Xhttp+TLS+CDN上下行不分离${NODE_SUFFIX}

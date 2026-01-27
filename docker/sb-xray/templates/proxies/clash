@@ -70,4 +70,4 @@ proxies:
       short-id: ${XRAY_REALITY_SHORTID}
       _spider-x: /
     network: tcp
-    servername: ${DOMAIN}
+    servername: ${DEST_HOST}

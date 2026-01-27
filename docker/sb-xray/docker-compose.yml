@@ -8,7 +8,7 @@ services:
       - DECODE=$code
       - ACMESH_DEBUG=1
       - ACMESH_SERVER_NAME=letsencrypt
-      - DEST_HOST=harvard.edu
+      - DEST_HOST=speed.cloudflare.com
       - LISTENING_PORT=443
       - DUFS_PATH_PREFIX=/myfiles
       - XUI_WEBBASEPATH=3xadmin

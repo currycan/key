@@ -26,10 +26,10 @@
                 "security": "reality",
                 "realitySettings": {
                     "show": false,
-                    "target": "/dev/shm/nginx.sock",
-                    "xver": 1,
+                    "target": "${DEST_HOST}:443",
+                    "xver": 0,
                     "serverNames": [
-                        "${DOMAIN}"
+                        "${DEST_HOST}"
                     ],
                     "privateKey": "${XRAY_REALITY_PRIVATE_KEY}",
                     "shortIds": [
