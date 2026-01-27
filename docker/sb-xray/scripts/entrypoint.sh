@@ -1,152 +1,50 @@
 #!/usr/bin/env bash
-
 set -eou pipefail
 
-# 颜色定义（仅在终端生效）
+# 颜色定义
 if [ -t 1 ]; then
-    RED='\033[1;31m'
-    GREEN='\033[1;32m'
-    YELLOW='\033[1;33m'
-    CYAN='\033[1;36m'
-    NC='\033[0m'
+    RED='\033[1;31m'; GREEN='\033[1;32m'; YELLOW='\033[1;33m'; CYAN='\033[1;36m'; NC='\033[0m'
 else
-    RED='' GREEN='' YELLOW='' CYAN='' NC=''
+    RED=''; GREEN=''; YELLOW=''; CYAN=''; NC=''
 fi
 
-# 日志记录函数
-function log() {
-    local level=$1
-    shift
-    local msg=$*
-    local timestamp=$(date +"%Y-%m-%d %H:%M:%S")
-    local color=""
+ENV_FILE="/.env/xray"
 
-    case $level in
-    INFO) color="${GREEN}" ;;
-    WARN) color="${YELLOW}" ;;
-    ERROR) color="${RED}" ;;
-    DEBUG) color="${CYAN}" ;;
-    *) color="${NC}" ;;
-    esac
-
-    echo -e "${color}[${timestamp}] [${level}] ${msg}${NC}" >&2
+log() {
+    local level=$1; shift
+    local color="${NC}"; case $level in INFO) color="${GREEN}";; WARN) color="${YELLOW}";; ERROR) color="${RED}";; DEBUG) color="${CYAN}";; esac
+    echo -e "${color}[$(date +"%Y-%m-%d %H:%M:%S")] [${level}] $*${NC}" >&2
 }
 
-# 检查必要环境变量
-function checkRequiredEnv() {
-    local missing_vars=()
-
-    # 遍历所有传入的参数作为变量名
-    for var in "$@"; do
-        if [ -z "${!var:-}" ]; then
-            missing_vars+=("$var")
-        fi
-    done
-
-    if [ ${#missing_vars[@]} -gt 0 ]; then
-        log ERROR "Missing required environment variables: ${missing_vars[*]}"
-        exit 1
-    fi
+checkRequiredEnv() {
+    local missing=()
+    for var in "$@"; do [ -z "${!var:-}" ] && missing+=("$var"); done
+    [ ${#missing[@]} -eq 0 ] || { log ERROR "Missing required env: ${missing[*]}"; exit 1; }
 }
+
+# ===== 功能函数 =====
 
 detect_ip_strategy_api() {
     log DEBUG "Getting IP strategy..."
-    local IS_IPV4=""
-    local IS_IPV6=""
-
-    # IPv4 检测
-    if curl -4 --connect-timeout 2 -s https://api.ip.sb/ip >/dev/null; then
-        IS_IPV4="yes"
-    fi
-    # IPv6 检测
-    if curl -6 --connect-timeout 2 -s https://api.ip.sb/ip >/dev/null; then
-        IS_IPV6="yes"
-    fi
-
-    if [[ "$IS_IPV4" == "yes" && "$IS_IPV6" == "yes" ]]; then
-        echo prefer_ipv4
-    elif [[ "$IS_IPV6" == "yes" ]]; then
-        echo ipv6_only
-    else
-        echo ipv4_only
-    fi
+    local v4="" v6=""
+    curl -4 -s --connect-timeout 2 https://api.ip.sb/ip >/dev/null && v4="yes"
+    curl -6 -s --connect-timeout 2 https://api.ip.sb/ip >/dev/null && v6="yes"
+    [[ "$v4" == "yes" && "$v6" == "yes" ]] && echo prefer_ipv4 && return
+    [[ "$v6" == "yes" ]] && echo ipv6_only && return
+    echo ipv4_only
 }
 
-# 检测 ChatGPT 可用性函数
-# 返回值：
-#   direct   -> 直连可用
-#   warp-ep  -> 需要代理
 check_chatgpt_access() {
-    log DEBUG "Checking chatgpt accessibility..."
-    local CURL_OPTS=(
-        --max-time 2
-        --retry 2
-        --retry-delay 1
-        --retry-connrefused
-        -sSL
-        -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36"
-    )
-
-    # ===== API 检测 =====
-    local API_URL="https://api.openai.com/compliance/cookie_requirements"
-    local API_HEADERS=(
-        -H "Authorization: Bearer null"
-        -H "Accept: */*"
-        -H "Origin: https://platform.openai.com"
-        -H "Referer: https://platform.openai.com/"
-    )
-    local CHECK_RESULT
-    CHECK_RESULT=$(curl "${CURL_OPTS[@]}" "${API_HEADERS[@]}" "$API_URL")
-
-    if [[ -z "$CHECK_RESULT" ]] || grep -qi "unsupported_country" <<< "$CHECK_RESULT"; then
-        log WARN "ChatGPT access requires proxy (warp-ep)"
+    log DEBUG "Checking ChatGPT..."
+    local check_rs
+    check_rs=$(curl -sSL --max-time 2 --retry 2 -A "Mozilla/5.0" \
+        -H "Authorization: Bearer null" -H "Referer: https://platform.openai.com/" \
+        "https://api.openai.com/compliance/cookie_requirements")
+    if [[ -z "$check_rs" ]] || grep -qi "unsupported_country" <<< "$check_rs"; then
+        log WARN "ChatGPT access requires proxy"
         echo "warp-ep"
     else
         echo "direct"
-    fi
-}
-
-# 生成随机字符串
-function generateRandomStr() {
-    local type=$1
-    local length=${2:-12}
-    local charset
-
-    case $type in
-        "port") shuf -i 32000-38000 -n 1 ;;
-        "uuid") xray uuid ;;
-        "password")
-            # charset='A-Za-z0-9!@#%^&*()_+{}|:<>?='
-            charset='A-Za-z0-9'
-            LC_ALL=C tr -dc "$charset" </dev/urandom | head -c "$length"
-            ;;
-        "path")
-            charset='a-z0-9'
-            LC_ALL=C tr -dc "$charset" </dev/urandom | head -c "$length"
-            ;;
-    esac
-}
-
-function decryptSecretsEnv() {
-    # 解密密钥文件
-    local secret_file="/.env/secret"
-    mkdir -p "$(dirname "${secret_file}")"
-
-    if [ ! -f "$secret_file" ]; then
-        checkRequiredEnv DECODE
-        log INFO "Downloading encrypted secrets..."
-
-        if ! curl -fsSLo /tmp/tmp.bin "https://raw.githubusercontent.com/currycan/key/master/tmp.bin"; then
-            log ERROR "Failed to download secret file"
-            exit 1
-        fi
-
-        if ! crypctl decrypt -i /tmp/tmp.bin -o "$secret_file" -k "${DECODE}"; then
-            log ERROR "Secret decryption failed, check DECODE environment variable"
-            exit 1
-        fi
-        rm -f /tmp/tmp.bin
-        log INFO "Secrets decrypted successfully"
     fi
 }
 
@@ -158,49 +56,63 @@ check_brutal_status() {
     if [ -d "/sys/module/brutal" ]; then echo "true"; else echo "false"; fi
 }
 
-# 生成环境变量
-function generateEnv() {
-    local env_file="/.env/xray"
-    mkdir -p "$(dirname "${env_file}")"
-    touch "${env_file}"
+generateRandomStr() {
+    local type=$1 length=${2:-12}
+    case $type in
+        "port") shuf -i 32000-38000 -n 1 ;;
+        "uuid") xray uuid ;;
+        "password"|"path")
+            local charset='A-Za-z0-9'; [[ "$type" == "path" ]] && charset='a-z0-9'
+            LC_ALL=C tr -dc "$charset" </dev/urandom | head -c "$length" ;;
+    esac
+}
 
-    # 1. 加载现有环境变量
-    # 临时关闭 unset 检查，防止加载空文件或访问未定义变量报错
-    set +u
-    source "${env_file}"
-    set -u
+# ===== 环境变量处理 =====
 
-    # 辅助函数：生成 sub-store 路径
-    gen_sub_store_path() {
-        echo "/$(generateRandomStr path 32)"
-    }
+ensure_var() {
+    local key=$1; shift; local cmd="$@"
+    if ! grep -q "^export ${key}=" "${ENV_FILE}"; then
+        log INFO "Generating ${key}..."
+        local val=$($cmd)
+        export "${key}=${val}"
+        sed -i "/^export ${key}=/d" "${ENV_FILE}"
+        echo "export ${key}='${val}'" >> "${ENV_FILE}"
+    fi
+}
 
-    # 辅助函数：校验并生成变量
-    # 逻辑：如果变量在持久化文件(.env/xray)中不存在，则强制生成（覆盖 Dockerfile 默认值或内存中的值）
-    # 用法: ensure_var "VAR_NAME" "COMMAND" [ARGS...]
-    ensure_var() {
-        local var_name="$1"
-        shift
-        local cmd="$@"
+ensure_key_pair() {
+    local name=$1 cmd=$2 key1=$3 key2=$4
+    if ! grep -q "^export ${key1}=" "${ENV_FILE}" || ! grep -q "^export ${key2}=" "${ENV_FILE}"; then
+        log INFO "Generating ${name} keys..."
+        local out pair_v1 pair_v2
+        out=$($cmd)
+        pair_v1=$(echo "$out" | sed -n '1p' | awk -F': ' '{print $2}')
+        pair_v2=$(echo "$out" | sed -n '2p' | awk -F': ' '{print $2}')
 
-        # 使用 grep 检查文件内容，确保只有未被持久化的变量才会被生成
-        if ! grep -q "^export ${var_name}=" "${env_file}"; then
-            log INFO "Generating ${var_name}..."
-            local value
-            value=$($cmd)
+        export "${key1}=${pair_v1}"
+        export "${key2}=${pair_v2}"
+        sed -i "/^export ${key1}=/d" "${ENV_FILE}"; echo "export ${key1}='${pair_v1}'" >> "${ENV_FILE}"
+        sed -i "/^export ${key2}=/d" "${ENV_FILE}"; echo "export ${key2}='${pair_v2}'" >> "${ENV_FILE}"
+    fi
+}
 
-            # 导出到当前 Shell
-            export "${var_name}=${value}"
+decryptSecretsEnv() {
+    local sec_file="/.env/secret"
+    [ -f "$sec_file" ] && return
+    mkdir -p "$(dirname "$sec_file")"
+    checkRequiredEnv DECODE
+    log INFO "Downloading encrypted secrets..."
+    curl -fsSLo /tmp/tmp.bin "https://raw.githubusercontent.com/currycan/key/master/tmp.bin" || { log ERROR "Download failed"; exit 1; }
+    crypctl decrypt -i /tmp/tmp.bin -o "$sec_file" -k "${DECODE}" || { log ERROR "Decryption failed"; exit 1; }
+    rm -f /tmp/tmp.bin
+    log INFO "Secrets decrypted"
+}
 
-            # 追加到 env 文件
-            # 即使文件中没有 export 语句，保险起见还是先删后加（防止如果有残留的脏数据）
-            sed -i "/^export ${var_name}=/d" "${env_file}"
-            echo "export ${var_name}='${value}'" >> "${env_file}"
-        fi
-    }
+generateEnv() {
+    mkdir -p "$(dirname "${ENV_FILE}")" && touch "${ENV_FILE}"
+    set +u; source "${ENV_FILE}"; set -u
 
-    # 2. 定义标准变量及其生成命令
-    local -a standard_vars=(
+    local -a vars=(
         "XUI_LOCAL_PORT|generateRandomStr port"
         "DUFS_PORT|generateRandomStr port"
         "PASSWORD|generateRandomStr password 16"
@@ -215,251 +127,128 @@ function generateEnv() {
         "STRATEGY|detect_ip_strategy_api"
         "GEOIP_INFO|get_geo_info"
         "IS_BRUTAL|check_brutal_status"
-        "SUB_STORE_FRONTEND_BACKEND_PATH|gen_sub_store_path"
+        "SUB_STORE_FRONTEND_BACKEND_PATH|echo /$(generateRandomStr path 32)"
     )
 
-    # 3. 处理标准变量
-    for entry in "${standard_vars[@]}"; do
+    for entry in "${vars[@]}"; do
         IFS='|' read -r key cmd <<< "$entry"
         ensure_var "$key" $cmd
     done
 
-    # 4. 处理复杂的成对密钥 (Xray Reality & MLKEM)
-    # 这里的生成命令一次产生两个值，需要特殊处理
-
-    # Reality KEYS
-    # 只要文件中缺任意一个 Key，就重新生成一对并覆盖
-    if ! grep -q "^export XRAY_REALITY_PRIVATE_KEY=" "${env_file}" || ! grep -q "^export XRAY_REALITY_PUBLIC_KEY=" "${env_file}"; then
-        log INFO "Generating Xray Reality keys..."
-        local keypair=$(xray x25519)
-        local priv=$(echo "$keypair" | sed -n '1p' | awk -F': ' '{print $2}')
-        local pub=$(echo "$keypair" | sed -n '2p' | awk -F': ' '{print $2}')
-
-        export XRAY_REALITY_PRIVATE_KEY="$priv"
-        export XRAY_REALITY_PUBLIC_KEY="$pub"
-
-        sed -i "/^export XRAY_REALITY_PRIVATE_KEY=/d" "${env_file}"
-        sed -i "/^export XRAY_REALITY_PUBLIC_KEY=/d" "${env_file}"
-        echo "export XRAY_REALITY_PRIVATE_KEY='$priv'" >> "$env_file"
-        echo "export XRAY_REALITY_PUBLIC_KEY='$pub'" >> "$env_file"
-    fi
-
-    # MLKEM768 KEYS
-    if ! grep -q "^export XRAY_MLKEM768_SEED=" "${env_file}" || ! grep -q "^export XRAY_MLKEM768_CLIENT=" "${env_file}"; then
-        log INFO "Generating Xray MLKEM768 keys..."
-        local keypair=$(xray mlkem768)
-        local seed=$(echo "$keypair" | sed -n '1p' | awk -F': ' '{print $2}')
-        local client=$(echo "$keypair" | sed -n '2p' | awk -F': ' '{print $2}')
-
-        export XRAY_MLKEM768_SEED="$seed"
-        export XRAY_MLKEM768_CLIENT="$client"
-
-        sed -i "/^export XRAY_MLKEM768_SEED=/d" "${env_file}"
-        sed -i "/^export XRAY_MLKEM768_CLIENT=/d" "${env_file}"
-        echo "export XRAY_MLKEM768_SEED='$seed'" >> "$env_file"
-        echo "export XRAY_MLKEM768_CLIENT='$client'" >> "$env_file"
-    fi
+    ensure_key_pair "Reality" "xray x25519" "XRAY_REALITY_PRIVATE_KEY" "XRAY_REALITY_PUBLIC_KEY"
+    ensure_key_pair "MLKEM768" "xray mlkem768" "XRAY_MLKEM768_SEED" "XRAY_MLKEM768_CLIENT"
+    log INFO "Environment ready"
 }
 
-# 生成配置文件
-function createConfig() {
-    log INFO "Creating configurations..."
+generateIspSocks5Config() {
+    export SB_SOCKS5_OUTBOUND_CONFIG="" CUSTOM_OUTBOUNDS="" SB_CUSTOM_OUTBOUNDS=""
+    [[ "${ENABLE_ISP_PROXY}" != "true" ]] && return
 
-    # 提取所有环境变量名，生成用于envsubst的变量列表
-    ENV_LIST=$(env | grep -v '^_' | cut -d= -f1 | sed 's/^/${/;s/$/}/' | xargs)
+    log INFO "Generating ISP SOCKS5 outbounds..."
+    local def_out="" def_sb_out="" oth_out="" oth_sb_out=""
 
-    # 生成Supervisord配置
-    log DEBUG "Generating supervisord /etc/supervisord.conf"
-    envsubst </templates/supervisord/supervisord.conf >/etc/supervisord.conf
-    mkdir -p /etc/supervisor.d/
-    log DEBUG "Generating supervisord /etc/supervisor.d/daemon.ini"
-    envsubst </templates/supervisord/daemon.ini >/etc/supervisor.d/daemon.ini
-
-    # 生成Nginx配置
-    log DEBUG "Generating Nginx nginx.conf"
-    envsubst "${ENV_LIST}" </templates/nginx/nginx.conf >/etc/nginx/nginx.conf
-    cp -f /templates/nginx/network_internal.conf /etc/nginx/network_internal.conf
-    mkdir -p /etc/nginx/conf.d/
-    log DEBUG "Generating Nginx http.conf"
-    export RANDOM_NUM=$(shuf -i 0-9 -n 1)
-    envsubst "${ENV_LIST} \${RANDOM_NUM}" </templates/nginx/http.conf >/etc/nginx/conf.d/http.conf
-    mkdir -p /etc/nginx/stream.d/
-    log DEBUG "Generating Nginx tcp.conf"
-    envsubst "${ENV_LIST}" </templates/nginx/tcp.conf >/etc/nginx/stream.d/tcp.conf
-
-    # 生成Xray配置
-    mkdir -p "${WORKDIR}/xray/"
-    for template in /templates/xray/*.json; do
-        output="${WORKDIR}/xray/$(basename "$template")"
-        log DEBUG "Generating $output"
-        envsubst <"$template" >"$output"
-    done
-
-    # 生成Sing-box配置
-    mkdir -p "${WORKDIR}/sing-box/"
-    for template in /templates/sing-box/*.json; do
-        local output="${WORKDIR}/sing-box/$(basename "$template")"
-        log DEBUG "Generating $output"
-        envsubst <"$template" >"$output"
-    done
-
-    # 生成Dufs配置
-    mkdir -p "${WORKDIR}/dufs"
-    log DEBUG "Generating Dufs config"
-    envsubst <"/templates/dufs/conf.yml" >"${WORKDIR}/dufs/conf.yml"
-}
-
-# 动态生成 ISP SOCKS5 出站配置
-function generateIspSocks5Config() {
-    export SB_SOCKS5_OUTBOUND_CONFIG="" # Ensure empty var is exported for template safety
-
-    # 检查开关是否开启 (默认关闭)
-    if [[ "${ENABLE_ISP_PROXY}" != "true" ]]; then
-        log INFO "ISP Proxy feature disabled (ENABLE_ISP_PROXY=${ENABLE_ISP_PROXY}), skipping ISP SOCKS5 generation."
-        export CUSTOM_OUTBOUNDS=""
-        export SB_CUSTOM_OUTBOUNDS=""
-        return
-    fi
-
-    local default_outbound=""
-    local default_sb_outbound=""
-    local other_outbounds=""
-    local other_sb_outbounds=""
-
-    # 获取所有以 _ISP_IP 结尾的变量名
     for var in $(compgen -v | grep "_ISP_IP$"); do
-        prefix=${var%_IP} # 获取前缀，如 LA_ISP
+        local prefix=${var%_IP} ip="${!var}"
+        local port_v="${prefix}_PORT" user_v="${prefix}_USER" pass_v="${prefix}_SECRET"
+        local port="${!port_v}" user="${!user_v}" pass="${!pass_v}"
 
-        # 读取对应变量值
-        s5_ip="${!var}"
-        s5_port_var="${prefix}_PORT"
-        s5_user_var="${prefix}_USER"
-        s5_pass_var="${prefix}_SECRET"
+        if [[ -n "$ip" && -n "$port" ]]; then
+            log INFO "Proxy: ${prefix} -> $ip:$port"
+            local tag="proxy-$(echo "${prefix}" | tr '[:upper:]_ ' '[:lower:]-')"
+            local x_json="{\"tag\": \"${tag}\", \"protocol\": \"socks\", \"settings\": {\"servers\": [{\"address\": \"$ip\", \"port\": $port, \"users\": [{\"user\": \"$user\", \"pass\": \"$pass\"}]}]}},"
+            local s_json="{\"type\": \"socks\", \"tag\": \"${tag}\", \"server\": \"$ip\", \"server_port\": $port, \"username\": \"$user\", \"password\": \"$pass\"},"
 
-        s5_port="${!s5_port_var}"
-        s5_user="${!s5_user_var}"
-        s5_pass="${!s5_pass_var}"
-
-        if [ -n "$s5_ip" ] && [ -n "$s5_port" ]; then
-            log INFO "Found Custom Proxy: ${prefix} -> $s5_ip:$s5_port"
-
-            # 使用 lower case prefix 作为 tag 的一部分
-            tag_suffix=$(echo "${prefix}" | tr '[:upper:]' '[:lower:]' | tr '_' '-')
-            tag_name="proxy-${tag_suffix}"
-
-            # 构建 JSON 对象 (Xray)
-            proxy_json="{\"tag\": \"${tag_name}\", \"protocol\": \"socks\", \"settings\": {\"servers\": [{\"address\": \"$s5_ip\", \"port\": $s5_port, \"users\": [{\"user\": \"$s5_user\", \"pass\": \"$s5_pass\"}]}]}},"
-
-            # 构建 JSON 对象 (Sing-box)
-            # Sing-box tag naming: use same tag for consistency? Yes.
-            sb_proxy_json="{\"type\": \"socks\", \"tag\": \"${tag_name}\", \"server\": \"$s5_ip\", \"server_port\": $s5_port, \"username\": \"$s5_user\", \"password\": \"$s5_pass\"},"
-
-            # 检查是否为默认出站
-            if [ -n "${DEFAULT_ISP:-}" ] && [ "$prefix" == "$DEFAULT_ISP" ]; then
-                log INFO "Setting ${prefix} as DEFAULT outbound."
-                default_outbound="${proxy_json}"
-                default_sb_outbound="${sb_proxy_json}"
+            if [[ -n "${DEFAULT_ISP:-}" && "$prefix" == "$DEFAULT_ISP" ]]; then
+                def_out="${x_json}"; def_sb_out="${s_json}"
             else
-                other_outbounds="${other_outbounds}${proxy_json}"
-                other_sb_outbounds="${other_sb_outbounds}${sb_proxy_json}"
+                oth_out="${oth_out}${x_json}"; oth_sb_out="${oth_sb_out}${s_json}"
             fi
-        else
-            log WARN "Incomplete config for ${prefix}, skipping..."
         fi
     done
-
-    # 将默认出站放入最前
-    export CUSTOM_OUTBOUNDS="${default_outbound}${other_outbounds}"
-    export SB_CUSTOM_OUTBOUNDS="${default_sb_outbound}${other_sb_outbounds}"
+    export CUSTOM_OUTBOUNDS="${def_out}${oth_out}"
+    export SB_CUSTOM_OUTBOUNDS="${def_sb_out}${oth_sb_out}"
 }
 
-# 配置 nginx dhparam 证书
-function setupDhParam() {
-    local dhparam_path="/etc/nginx/dhparam/dhparam.pem"
+createConfig() {
+    log INFO "Creating configurations..."
+    local env_list; env_list=$(env | grep -v '^_' | cut -d= -f1 | sed 's/^/${/;s/$/}/' | xargs)
+    export RANDOM_NUM=$(shuf -i 0-9 -n 1) # used in http.conf
 
-    if [ ! -f "$dhparam_path" ]; then
-        log INFO "Generating DH parameters..."
-        mkdir -p "$(dirname "$dhparam_path")"
+    # Templating helper
+    apply_tpl() {
+        local src="$1" dest="$2"
+        local extra_env="${3:-}" # Optional extra vars
+        log DEBUG "Gen $dest"
+        mkdir -p "$(dirname "$dest")"
 
-        if ! openssl dhparam -dsaparam -out "$dhparam_path" 4096; then
-            log ERROR "Failed to generate DH parameters"
-            exit 1
+        local temp_out
+        temp_out=$(mktemp)
+
+        if [ -n "$extra_env" ]; then
+            envsubst "$env_list $extra_env" < "$src" > "$temp_out"
+        else
+            envsubst < "$src" > "$temp_out"
         fi
-        log INFO "DH parameters generated successfully"
-    fi
-}
 
-# https://github.com/acmesh-official/acme.sh/wiki/dnsapi#dns_cf
-function issueCertificate() {
-
-    local cert_name="$1"      # 参数 1: 证书任务标识名 (如: my_sites_bundle)
-    local domain_params=$2    # 配置字符串 (如: "example.com:dns_ali|example.io:dns_cf")
-
-    # 1. 提取第一个域名作为 acme.sh 的内部索引 ID
-    local first_domain="${domain_params%%:*}"
-
-    # 2. 定义基于 cert_name 的标准路径
-    local cert_file="${SSL_PATH}/${cert_name}.crt"
-    local key_file="${SSL_PATH}/${cert_name}.key"
-    local ca_file="${SSL_PATH}/${cert_name}-ca.crt"
-
-    # 3. 检查证书是否已存在
-    if [[ -f "${cert_file}" && -f "${key_file}" && -f "${ca_file}" ]];then
-        log INFO "证书任务 [$cert_name] 已存在，跳过申请阶段。"
-        return 0
-    fi
-
-    # 4. 检查 acme.sh 内部数据库缓存
-    if ! acme.sh --list | grep -q "${first_domain}"; then
-        log INFO "未检测到缓存，开始执行任务 [$cert_name] 的新证书申请..."
-        checkRequiredEnv "ACMESH_SERVER_NAME" "ACMESH_REGISTER_EMAIL" "ALI_KEY" "ALI_SECRET" "CF_TOKEN" "CF_ZONE_ID" "CF_ACCOUNT_ID"
-        # 配置调试模式
-        export DEBUG=${ACMESH_DEBUG:-0}
-        # 导出 API 密钥环境
-        export Ali_Key="${ALI_KEY}" Ali_Secret="${ALI_SECRET}" CF_Token="${CF_TOKEN}" CF_Zone_ID="${CF_ZONE_ID}" CF_Account_ID="${CF_ACCOUNT_ID}"
-        log INFO "Set default server: ${ACMESH_SERVER_NAME}"
-        acme.sh --set-default-ca --server "${ACMESH_SERVER_NAME}"
-        log INFO "Registering account: ${ACMESH_REGISTER_EMAIL}"
-        acme.sh --register-account -m "${ACMESH_REGISTER_EMAIL}"
-        # 动态构建 acme.sh 参数数组
-        local _args=("--issue" "--ecc" "--server" "${ACMESH_SERVER_NAME:-letsencrypt}")
-        # 解析 domain_params
-        IFS='|' read -ra ENTRIES <<< "$domain_params"
-        for entry in "${ENTRIES[@]}"; do
-            local _dom="${entry%%:*}"
-            local _prov="${entry#*:}"
-            # 添加域名本身
-            _args+=("-d" "${_dom}" "--dns" "${_prov}")
-            # 自动添加通配符 (仅限 LetsEncrypt 且排除 IP 格式)
-            if [[ "${ACMESH_SERVER_NAME}" == "letsencrypt" && ! "${_dom}" =~ ^[0-9.]+$ ]]; then
-                _args+=("-d" "*.${_dom}" "--dns" "${_prov}")
+        # 如果是 json 文件，尝试格式化
+        if [[ "$dest" == *.json ]]; then
+            if jq . "$temp_out" > "$dest" 2>/dev/null; then
+                log DEBUG "Formatted JSON: $dest"
+                rm -f "$temp_out"
+                return
             fi
-        done
-        # 执行申请
-        log DEBUG "执行命令: acme.sh ${_args[*]}"
-        acme.sh "${_args[@]}" || { log ERROR "任务 [$cert_name] 申请失败"; return 1; }
-    fi
+            log WARN "JSON format failed (comments?), using raw: $dest"
+        fi
 
-    # 5. 安装/部署阶段
-    log WARN "正在清理旧 Nginx 配置并安装证书文件: ${cert_name}"
-    # 清理现有的 Nginx 配置目录，防止路径报错
-    rm -f /etc/nginx/conf.d/* /etc/nginx/stream.d/*
-    # 安装证书并配置 Nginx 重启逻辑
-    acme.sh --upgrade
-    acme.sh --install-cert --ecc -d "${first_domain}" \
-        --key-file       "${key_file}" \
-        --fullchain-file "${cert_file}" \
-        --ca-file        "${ca_file}" \
-        --reloadcmd "/usr/sbin/nginx"
-    /usr/sbin/nginx -s quit && rm -f var/run/nginx/nginx.pid
-    log INFO "证书任务 [$cert_name] 部署成功。"
+        mv "$temp_out" "$dest"
+    }
+
+    apply_tpl "/templates/supervisord/supervisord.conf" "/etc/supervisord.conf"
+    apply_tpl "/templates/supervisord/daemon.ini"      "/etc/supervisor.d/daemon.ini"
+    apply_tpl "/templates/nginx/nginx.conf"            "/etc/nginx/nginx.conf" "$env_list"
+    cp -f /templates/nginx/network_internal.conf       /etc/nginx/network_internal.conf
+    apply_tpl "/templates/nginx/http.conf"             "/etc/nginx/conf.d/http.conf" "$env_list \${RANDOM_NUM}"
+    apply_tpl "/templates/nginx/tcp.conf"              "/etc/nginx/stream.d/tcp.conf" "$env_list"
+    apply_tpl "/templates/dufs/conf.yml"               "${WORKDIR}/dufs/conf.yml"
+
+    for t in /templates/xray/*.json; do apply_tpl "$t" "${WORKDIR}/xray/$(basename "$t")"; done
+    for t in /templates/sing-box/*.json; do apply_tpl "$t" "${WORKDIR}/sing-box/$(basename "$t")"; done
 }
 
-# 主执行流程
+issueCertificate() {
+    local name="$1" params="$2"
+    local first_dom="${params%%:*}"
+    local cert="${SSL_PATH}/${name}.crt" key="${SSL_PATH}/${name}.key" ca="${SSL_PATH}/${name}-ca.crt"
+
+    [[ -f "$cert" && -f "$key" && -f "$ca" ]] && { log INFO "Cert [$name] exists."; return 0; }
+
+    if ! acme.sh --list | grep -q "${first_dom}"; then
+        checkRequiredEnv "ACMESH_SERVER_NAME" "ACMESH_REGISTER_EMAIL" "ALI_KEY" "ALI_SECRET" "CF_TOKEN" "CF_ZONE_ID" "CF_ACCOUNT_ID"
+        export Ali_Key="${ALI_KEY}" Ali_Secret="${ALI_SECRET}" CF_Token="${CF_TOKEN}" CF_Zone_ID="${CF_ZONE_ID}" CF_Account_ID="${CF_ACCOUNT_ID}"
+
+        log INFO "Requesting cert for $name..."
+        acme.sh --register-account -m "${ACMESH_REGISTER_EMAIL}" --server "${ACMESH_SERVER_NAME}" >/dev/null 2>&1
+
+        local args=("--issue" "--ecc" "--server" "${ACMESH_SERVER_NAME}")
+        IFS='|' read -ra ENTRIES <<< "$params"
+        for e in "${ENTRIES[@]}"; do
+            local d="${e%%:*}" p="${e#*:}"
+            args+=("-d" "$d" "--dns" "$p")
+            [[ "${ACMESH_SERVER_NAME}" == "letsencrypt" && ! "$d" =~ ^[0-9.]+$ ]] && args+=("-d" "*.$d" "--dns" "$p")
+        done
+        acme.sh "${args[@]}" || { log ERROR "Cert issue failed"; return 1; }
+    fi
+
+    log INFO "Installing cert $name..."
+    rm -f /etc/nginx/conf.d/* /etc/nginx/stream.d/*
+    acme.sh --install-cert --ecc -d "${first_dom}" --key-file "$key" --fullchain-file "$cert" --ca-file "$ca" --reloadcmd "/usr/sbin/nginx"
+    /usr/sbin/nginx -s quit 2>/dev/null && rm -f /var/run/nginx/nginx.pid || true
+}
+
+# ===== 主流程 =====
+
 if [ "${1#-}" = 'supervisord' ] && [ "$(id -u)" = '0' ]; then
-    mkdir -p ${LOGDIR}/{supervisor,xray,sing-box,dufs,nginx,x-ui,s-ui}
-    mkdir -p "${SUI_DB_FOLDER}"
-    mkdir -p "${SUB_STORE_DATA_BASE_PATH}"
+    mkdir -p ${LOGDIR}/{supervisor,xray,sing-box,dufs,nginx,x-ui,s-ui} "${SUI_DB_FOLDER}" "${SUB_STORE_DATA_BASE_PATH}"
 
     decryptSecretsEnv
     generateEnv
@@ -467,58 +256,38 @@ if [ "${1#-}" = 'supervisord' ] && [ "$(id -u)" = '0' ]; then
     source "/.env/xray"
     cat "/.env/xray"
 
-    log INFO "Obtaining SSL certificate..."
-    # 生成证书
     issueCertificate "sb_xray_bundle" "${DOMAIN}:dns_ali|${CDNDOMAIN}:dns_cf"
-    # 创建 nginx dhparam 证书
-    setupDhParam
 
-    log INFO "Updating GeoIP and GeoSite databases..."
+    # Nginx DHParam
+    dh_file="/etc/nginx/dhparam/dhparam.pem"
+    if [ ! -f "$dh_file" ]; then
+        mkdir -p "$(dirname "$dh_file")"
+        openssl dhparam -dsaparam -out "$dh_file" 4096 && log INFO "DH generated"
+    fi
+
     /scripts/geo_update.sh
-
-    # 动态生成 ISP SOCKS5 出站配置
-    log INFO "Generating ISP SOCKS5 outbounds..."
     generateIspSocks5Config
-
-    # 生成配置文件
     createConfig
 
-    # 配置 x-ui
-    log INFO "Initializing X-UI..."
-    x-ui setting -username "${PUBLIC_USER}" -password "${PUBLIC_PASSWORD}" -port "${XUI_LOCAL_PORT}" -webBasePath "${XUI_WEBBASEPATH}"
+    log INFO "Init X-UI..."
+    x-ui setting -username "${PUBLIC_USER}" -password "${PUBLIC_PASSWORD}" -port "${XUI_LOCAL_PORT}" -webBasePath "${XUI_WEBBASEPATH}" >/dev/null
 
-    # 配置 s-ui
-    log INFO "Initializing S-UI..."
-    sui setting -port "${SUI_PORT}" -subPort "${SUI_SUB_PORT}" -path "/${SUI_WEBBASEPATH}" -subPath "/${SUI_SUB_PATH}"
-    sui admin -password "${PUBLIC_PASSWORD}" -username "${PUBLIC_USER}"
-
-    # 强制更新 s-ui 数据库中的 subDomain，确保订阅链接使用域名而非 IP
-    # s-uiCLI 不支持 -subDomain 参数，因此直接操作数据库
+    log INFO "Init S-UI..."
+    sui setting -port "${SUI_PORT}" -subPort "${SUI_SUB_PORT}" -path "/${SUI_WEBBASEPATH}" -subPath "/${SUI_SUB_PATH}" >/dev/null
+    sui admin -password "${PUBLIC_PASSWORD}" -username "${PUBLIC_USER}" >/dev/null
     if [ -f "${SUI_DB_FOLDER}/s-ui.db" ]; then
-        log INFO "Updating s-ui subDomain to: ${DOMAIN}"
-        # 强制设置 subURI 以覆盖默认生成的带端口 URL
         sqlite3 "${SUI_DB_FOLDER}/s-ui.db" "UPDATE settings SET value='https://${DOMAIN}/${SUI_SUB_PATH}/' WHERE key='subURI';"
     fi
 
-    # 配置 sub-store
-    log INFO "Initializing Sub-Store..."
-    log INFO "Sub-Store API Path: ${SUB_STORE_FRONTEND_BACKEND_PATH}"
+    log INFO "Starting fail2ban..." && fail2ban-client -x start >/dev/null
 
-    log INFO "Starting fail2ban..."
-    fail2ban-client -x start
+    # Cron setup
+    cron_file="/var/spool/cron/crontabs/root"
+    touch "$cron_file"
+    sed -i '/geo_update.sh/d' "$cron_file"
+    echo "0 3 * * * /scripts/geo_update.sh >> /var/log/geo_update.log 2>&1" >> "$cron_file"
+    chmod 0600 "$cron_file"
 
-    # 配置定时任务
-    log INFO "Setting up cron job for geo update..."
-    CRON_FILE="/var/spool/cron/crontabs/root"
-    # 确保文件存在
-    touch "$CRON_FILE"
-    # 删除旧的 geo_update 任务（如果存在），避免重复
-    sed -i '/geo_update.sh/d' "$CRON_FILE"
-    # 追加新任务
-    echo "0 3 * * * /scripts/geo_update.sh >> /var/log/geo_update.log 2>&1" >> "$CRON_FILE"
-    chmod 0600 "$CRON_FILE"
-
-    # 显示访问信息
     [[ ! -f "/usr/local/bin/show" ]] && ln -sf "/scripts/show-config.sh" "/usr/local/bin/show"
     /usr/local/bin/show
 
