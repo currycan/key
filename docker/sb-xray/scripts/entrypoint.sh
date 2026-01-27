@@ -147,10 +147,12 @@ generateIspSocks5Config() {
     log INFO "Generating ISP SOCKS5 outbounds..."
     local def_out="" def_sb_out="" oth_out="" oth_sb_out=""
 
-    for var in $(compgen -v | grep "_ISP_IP$"); do
+    for var in $(env | grep "_ISP_IP=" | cut -d= -f1); do
         local prefix=${var%_IP} ip="${!var}"
         local port_v="${prefix}_PORT" user_v="${prefix}_USER" pass_v="${prefix}_SECRET"
         local port="${!port_v}" user="${!user_v}" pass="${!pass_v}"
+
+        log DEBUG "Checking ISP Var: $var | Prefix: $prefix | IP: $ip | PortVar: $port_v | Port: $port"
 
         if [[ -n "$ip" && -n "$port" ]]; then
             log INFO "Proxy: ${prefix} -> $ip:$port"
