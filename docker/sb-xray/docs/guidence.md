@@ -153,3 +153,54 @@ environment:
     }
     ```
     这样，带着 Cloudflare 域名的流量才能被 Nginx 正确放行并交给 Xray Reality 处理。
+
+---
+
+## 8. 常见问题解答 (FAQ)
+
+### 8.1 是否需要配置 CDN 优选 IP？
+
+*   **服务端 (本项目)**: **不需要**。
+    *   服务端只需要正确响应来自 Cloudflare 任意边缘节点的请求即可。在服务端配置优选 IP 脚本不仅无用，反而可能因 DNS 变动导致连接不稳定。
+*   **客户端 (V2RayN / Sing-box)**: **推荐**。
+    *   对于 **VMess** 或 **XHTTP (上行 CDN)** 模式，在客户端将地址 (`address`) 修改为您本地网络测试出的 Cloudflare 优选 IP（或优选域名），可以显著提升连接速度和稳定性。
+
+### 8.2 DEST_HOST 的选择会影响速度吗？
+
+*   **速度 (带宽)**: **完全不影响**。
+    *   Reality 建立连接后，流量是直连的 (Direct)，不经过 `DEST_HOST`。
+*   **延迟 (握手)**: **几乎无影响**。
+    *   Xray 只需要转发第一个 Hello 包，大厂域名（如 Cloudflare, Microsoft）全球响应都极快，延迟损耗可忽略不计。
+*   **稳定性**: **有影响**。
+    *   选择大厂域名（如 `speed.cloudflare.com`, `www.microsoft.com`）可以利用其流量特征白名单，降低被 GFW 阻断的概率。
+    *   **建议**: 默认使用 `speed.cloudflare.com` 即可，它是目前最稳健的选择。
+
+    **推荐的 DEST_HOST 列表**:
+    *   **Cloudflare 系** (推荐，支持 H2/H3): `speed.cloudflare.com`, `www.cloudflare.com`, `dash.cloudflare.com`
+    *   **Microsoft 系**: `www.microsoft.com`, `azure.microsoft.com`
+    *   **Apple 系**: `www.apple.com`, `itunes.apple.com`
+    *   **Google 系** (需 VPS 能流畅访问 Google): `dl.google.com`, `www.google.com`
+    *   **Amazon 系**: `s3.amazonaws.com`, `aws.amazon.com`
+
+### 8.3 Nginx 伪装 (CDN 域名) 可以与 Reality 伪装 (DEST_HOST) 不同吗？
+
+*   **技术层面**: **完全可以**。
+    *   `DEST_HOST` 是给 Reality 协议用的（为了隐匿流量）。
+    *   `nginx/http.conf` 里的 `proxy_pass` 是给访问 CDN 网站的人用的（为了显示一个正常的网页）。
+    *   这两者在物理上是隔离的。你可以让 Reality 伪装成 `microsoft.com`，而让 Nginx 反代一个不知名的博客。
+*   **浏览异常 (Feature, not bug)**:
+    *   **主域名打不开**: 这是**正常且积极**的。因为 Reality 限制了 SNI 必须为伪装域名，所以直接访问你的主域名会被断开。这有效防止了主动探测。
+    *   **CDN 域名渲染异常**: 也是正常的。这通常是因为反代目标（如 Cloudflare 测速页）是一个复杂的动态应用，资源路径不匹配导致。只要 HTTP 200 OK，就能骗过自动化审查。如果您介意，可以将 Nginx 反代目标改为一个简单的静态站点。
+
+### 8.4 VLESS-Vision-Reality vs VMess-WS-TLS: 如何选择？
+
+| 特性 | VLESS + Vision + Reality | VMess + WS + TLS |
+| :--- | :--- | :--- |
+| **定位** | **主力战车 (推荐)** | **救护车 (备用)** |
+| **原理** | 模拟 HTTPS，无状态，直连 | 传统加密隧道，WebSocket，可走 CDN |
+| **性能** | ⭐⭐⭐⭐⭐ (极致，无重复加密) | ⭐⭐⭐⭐ (额外加密，损耗微小) |
+| **抗封锁** | ⭐⭐⭐⭐⭐ (目前最强，无 SNI 特征) | ⭐⭐⭐⭐ (依赖 TLS 伪装) |
+| **CDN支持** | ❌ (只能直连) | ✅ (完美支持 Cloudflare) |
+| **适用场景** | 日常使用，追求速度和低延迟 | **当 IP 被墙时**，或者用于某些极其特殊的网络环境 |
+
+**结论**: 请默认使用 **Reality**。只有当你的 Reality 连不上了（或者需要配合 CDN 拯救被墙 IP）的时候，再切换到 **VMess**。

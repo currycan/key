@@ -34,7 +34,7 @@ graph LR
 *   **连接方式**: TCP / 443 端口
 *   **URL 示例**:
     ```
-    vless://${XRAY_UUID}@${DOMAIN}:${LISTENING_PORT}?encryption=none&flow=xtls-rprx-vision&security=reality&sni=${DEST_HOST}&fp=chrome&pbk=${XRAY_REALITY_PUBLIC_KEY}&sid=${XRAY_REALITY_SHORTID}&type=tcp&headerType=none#${NODE_NAME}|XTLS+Reality
+    vless://${XRAY_UUID}@${DOMAIN}:${LISTENING_PORT}?encryption=none&flow=xtls-rprx-vision&security=reality&sni=${DEST_HOST}&fp=chrome&pbk=${XRAY_REALITY_PUBLIC_KEY}&sid=${XRAY_REALITY_SHORTID}&type=tcp&headerType=none#${NODE_NAME}✈XTLS-Reality✈优${NODE_SUFFIX}
     ```
 *   **核心参数**:
     *   `flow`: `xtls-rprx-vision` (必须)
@@ -71,7 +71,7 @@ graph LR
 *   **连接方式**: UDP / 独立高位端口 (例如 30000+)
 *   **URL 示例**:
     ```
-    hysteria2://${SB_UUID}@${DOMAIN}:${PORT_HYSTERIA2}/?alpn=h3&insecure=1#${NODE_NAME}|Hysteria2
+    hysteria2://${SB_UUID}@${DOMAIN}:${PORT_HYSTERIA2}/?alpn=h3&insecure=1#${NODE_NAME}✈Hysteria2✈优${NODE_SUFFIX}
     ```
 *   **核心参数**:
     *   `insecure`: `1` (或 `true`)，因为我们使用的是自签名/自动管理的证书，且 Hysteria2 此处对证书验证较严格，建议开启跳过验证或正确配置 CA。
@@ -106,7 +106,7 @@ graph LR
 *   **连接方式**: UDP / 独立高位端口
 *   **URL 示例**:
     ```
-    tuic://${SB_UUID}:${SB_UUID}@${DOMAIN}:${PORT_TUIC}?alpn=h3&insecure=1&congestion_control=bbr#${NODE_NAME}|TUIC
+    tuic://${SB_UUID}:${SB_UUID}@${DOMAIN}:${PORT_TUIC}?alpn=h3&insecure=1&congestion_control=bbr#${NODE_NAME}✈TUIC✈中${NODE_SUFFIX}
     ```
 *   **核心参数**:
     *   `congestion_control`: `bbr`
@@ -141,7 +141,7 @@ graph LR
 *   **连接方式**: TCP / 独立高位端口
 *   **URL 示例**:
     ```
-    anytls://${SB_UUID}@${DOMAIN}:${PORT_ANYTLS}?security=tls&allowInsecure=1&type=tcp#${NODE_NAME}|AnyTLS
+    anytls://${SB_UUID}@${DOMAIN}:${PORT_ANYTLS}?security=tls&allowInsecure=1&type=tcp#${NODE_NAME}✈AnyTLS✈中${NODE_SUFFIX}
     ```
 
 ### 服务端入站 (Server Inbound)
@@ -178,7 +178,7 @@ graph LR
     ```json
     {
       "v": "2",
-      "ps": "${NODE_NAME}|V2ray-TLS-WS",
+      "ps": "${NODE_NAME}✈V2ray-TLS-WS✈备${NODE_SUFFIX}",
       "add": "${CDNDOMAIN}",  // 必须使用 CDN 域名
       "port": "${LISTENING_PORT}",
       "id": "${XRAY_UUID}",
@@ -226,7 +226,7 @@ graph LR
 *   **URL 标识**: `Xhttp+Reality直连`
 *   **配置示例**:
     ```text
-    vless://${XRAY_UUID}@${DOMAIN}:${LISTENING_PORT}?encryption=mlkem768x25519plus.native.0rtt.${XRAY_MLKEM768_CLIENT}&security=reality&sni=${DEST_HOST}&fp=chrome&pbk=${XRAY_REALITY_PUBLIC_KEY}&sid=${XRAY_REALITY_SHORTID}&type=xhttp&path=/${XRAY_URL_PATH}-xhttp&mode=auto#${NODE_NAME}|Xhttp+Reality直连
+    vless://${XRAY_UUID}@${DOMAIN}:${LISTENING_PORT}?encryption=mlkem768x25519plus.native.0rtt.${XRAY_MLKEM768_CLIENT}&security=reality&sni=${DEST_HOST}&fp=chrome&pbk=${XRAY_REALITY_PUBLIC_KEY}&sid=${XRAY_REALITY_SHORTID}&type=xhttp&path=/${XRAY_URL_PATH}-xhttp&mode=auto#${NODE_NAME}✈Xhttp+Reality直连✈优${NODE_SUFFIX}
     ```
 *   **流量图解**:
     ```mermaid
@@ -249,7 +249,7 @@ graph LR
 *   **URL 标识**: `上行Xhttp+TLS+CDN|下行Xhttp+Reality`
 *   **配置示例**:
     ```text
-    vless://${XRAY_UUID}@${CDNDOMAIN}:${LISTENING_PORT}?encryption=mlkem768x25519plus.native.0rtt.${XRAY_MLKEM768_CLIENT}&security=tls&sni=${CDNDOMAIN}&alpn=h2&fp=chrome&type=xhttp&host=${CDNDOMAIN}&path=/${XRAY_URL_PATH}-xhttp&mode=auto&extra={"downloadSettings":{"address":"${DOMAIN}","port":${LISTENING_PORT},"network":"xhttp","security":"reality","realitySettings":{"show":false,"serverName":"${DEST_HOST}","fingerprint":"chrome","publicKey":"${XRAY_REALITY_PUBLIC_KEY}","shortId":"${XRAY_REALITY_SHORTID}","spiderX":"/"},"xhttpSettings":{"host":"","path":"/${XRAY_URL_PATH}-xhttp","mode":"auto"}}}#${NODE_NAME}|上行Xhttp+TLS+CDN|下行Xhttp+Reality
+    vless://${XRAY_UUID}@${CDNDOMAIN}:${LISTENING_PORT}?encryption=mlkem768x25519plus.native.0rtt.${XRAY_MLKEM768_CLIENT}&security=tls&sni=${CDNDOMAIN}&alpn=h2&fp=chrome&type=xhttp&host=${CDNDOMAIN}&path=/${XRAY_URL_PATH}-xhttp&mode=auto&extra={"downloadSettings":{"address":"${DOMAIN}","port":${LISTENING_PORT},"network":"xhttp","security":"reality","realitySettings":{"show":false,"serverName":"${DEST_HOST}","fingerprint":"chrome","publicKey":"${XRAY_REALITY_PUBLIC_KEY}","shortId":"${XRAY_REALITY_SHORTID}","spiderX":"/"},"xhttpSettings":{"host":"","path":"/${XRAY_URL_PATH}-xhttp","mode":"auto"}}}#${NODE_NAME}✈上行Xhttp+TLS+CDN✈下行Xhttp+Reality✈优${NODE_SUFFIX}
     ```
 *   **流量图解**:
     ```mermaid
@@ -278,7 +278,7 @@ graph LR
 *   **URL 标识**: `上行Xhttp+Reality|下行 Xhttp+TLS+CDN`
 *   **配置示例**:
     ```text
-    vless://${XRAY_UUID}@${DOMAIN}:${LISTENING_PORT}?encryption=mlkem768x25519plus.native.0rtt.${XRAY_MLKEM768_CLIENT}&security=reality&sni=${DEST_HOST}&fp=chrome&pbk=${XRAY_REALITY_PUBLIC_KEY}&sid=${XRAY_REALITY_SHORTID}&type=xhttp&path=/${XRAY_URL_PATH}-xhttp&mode=auto&extra={"downloadSettings":{"address":"${DOMAIN}","port":${LISTENING_PORT},"network":"xhttp","security":"tls","tlsSettings":{"serverName":"${CDNDOMAIN}","allowInsecure":false,"alpn":["h2"],"fingerprint":"chrome"},"xhttpSettings":{"host":"${CDNDOMAIN}","path":"/${XRAY_URL_PATH}-xhttp","mode":"auto"}}}#${NODE_NAME}|上行Xhttp+Reality|下行Xhttp+TLS+CDN
+    vless://${XRAY_UUID}@${DOMAIN}:${LISTENING_PORT}?encryption=mlkem768x25519plus.native.0rtt.${XRAY_MLKEM768_CLIENT}&security=reality&sni=${DEST_HOST}&fp=chrome&pbk=${XRAY_REALITY_PUBLIC_KEY}&sid=${XRAY_REALITY_SHORTID}&type=xhttp&path=/${XRAY_URL_PATH}-xhttp&mode=auto&extra={"downloadSettings":{"address":"${DOMAIN}","port":${LISTENING_PORT},"network":"xhttp","security":"tls","tlsSettings":{"serverName":"${CDNDOMAIN}","allowInsecure":false,"alpn":["h2"],"fingerprint":"chrome"},"xhttpSettings":{"host":"${CDNDOMAIN}","path":"/${XRAY_URL_PATH}-xhttp","mode":"auto"}}}#${NODE_NAME}✈上行Xhttp+Reality✈下行Xhttp+TLS+CDN✈优${NODE_SUFFIX}
     ```
 *   **流量图解**:
     ```mermaid
@@ -306,7 +306,7 @@ graph LR
 *   **URL 标识**: `Xhttp+TLS+CDN上下行不分离`
 *   **配置示例**:
     ```text
-    vless://${XRAY_UUID}@${CDNDOMAIN}:${LISTENING_PORT}?encryption=mlkem768x25519plus.native.0rtt.${XRAY_MLKEM768_CLIENT}&security=tls&sni=${CDNDOMAIN}&alpn=h2&fp=chrome&type=xhttp&host=${CDNDOMAIN}&path=/${XRAY_URL_PATH}-xhttp&mode=auto#${NODE_NAME}|Xhttp+TLS+CDN上下行不分离
+    vless://${XRAY_UUID}@${CDNDOMAIN}:${LISTENING_PORT}?encryption=mlkem768x25519plus.native.0rtt.${XRAY_MLKEM768_CLIENT}&security=tls&sni=${CDNDOMAIN}&alpn=h2&fp=chrome&type=xhttp&host=${CDNDOMAIN}&path=/${XRAY_URL_PATH}-xhttp&mode=auto#${NODE_NAME}✈Xhttp+TLS+CDN上下行不分离✈优${NODE_SUFFIX}
     ```
 *   **流量图解**:
     ```mermaid
@@ -388,12 +388,12 @@ XHTTP 的服务端配置由三个组件协同工作，以同时支持直连和 C
 
 | 序号 | 协议/模式 | 关键技术 | 适用场景 |
 | :--- | :--- | :--- | :--- |
-| 1 | **Hysteria2** | UDP, 拥塞控制 | 移动/弱网环境，暴力竞速 |
-| 2 | **TUIC V5** | UDP, QUIC | Hysteria2 的备选 |
-| 3 | **AnyTLS** | TCP, 指纹伪装 | 企业级防火墙，TCP 伪装 |
-| 4 | **VMess-WS-TLS** | WebSocket, CDN | 传统兼容，救火备用 |
-| 5 | **VLESS-Vision-Reality** | XTLS, Vision | **日常主力**，极速稳定 |
-| 6 | **XHTTP-Reality** | XHTTP, Reality | 探索性主力协议 |
-| 7 | **XHTTP (上CDN下直连)** | XHTTP, 混合路由 | 隐藏上行 IP，防止探测 |
-| 8 | **XHTTP (上直连下CDN)** | XHTTP, 混合路由 | 优化下行线路 |
-| 9 | **XHTTP (全CDN)** | XHTTP, TLS | 最终保底 |
+| 1 | **Hysteria2 (优)** | UDP, 拥塞控制 | 移动/弱网环境，暴力竞速 |
+| 2 | **TUIC V5 (中)** | UDP, QUIC | Hysteria2 的备选 |
+| 3 | **AnyTLS (中)** | TCP, 指纹伪装 | 企业级防火墙，TCP 伪装 |
+| 4 | **VMess-WS-TLS (备)** | WebSocket, CDN | 传统兼容，救火备用 |
+| 5 | **VLESS-Vision-Reality (优)** | XTLS, Vision | **日常主力**，极速稳定 |
+| 6 | **XHTTP-Reality (优)** | XHTTP, Reality | 探索性主力协议 |
+| 7 | **XHTTP (上CDN下直连) (优)** | XHTTP, 混合路由 | 隐藏上行 IP，防止探测 |
+| 8 | **XHTTP (上直连下CDN) (优)** | XHTTP, 混合路由 | 优化下行线路 |
+| 9 | **XHTTP (全CDN) (优)** | XHTTP, TLS | 最终保底 |

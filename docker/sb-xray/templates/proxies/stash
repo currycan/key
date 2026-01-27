@@ -1,5 +1,5 @@
 proxies:
-  - name: ${REGION_INFO}|${NODE_NAME}|hysteria2${NODE_SUFFIX}
+  - name: ${REGION_INFO}✈${NODE_NAME}✈Hysteria2✈优${NODE_SUFFIX}
     type: hysteria2
     server: ${DOMAIN}
     port: ${PORT_HYSTERIA2}
@@ -10,7 +10,7 @@ proxies:
     password: ${SB_UUID}
     skip-cert-verify: true
 
-  - name: ${REGION_INFO}|${NODE_NAME}|tuic${NODE_SUFFIX}
+  - name: ${REGION_INFO}✈${NODE_NAME}✈TUIC✈中${NODE_SUFFIX}
     type: tuic
     server: ${DOMAIN}
     port: ${PORT_TUIC}
@@ -26,9 +26,9 @@ proxies:
     skip-cert-verify: true
     version: 5
 
-  - name: ${REGION_INFO}|${NODE_NAME}|V2ray-TLS-WS${NODE_SUFFIX}
+  - name: ${REGION_INFO}✈${NODE_NAME}✈V2ray-TLS-WS✈备${NODE_SUFFIX}
     type: vmess
-    server: ${DOMAIN}
+    server: ${CDNDOMAIN}
     port: ${LISTENING_PORT}
     uuid: ${XRAY_UUID}
     alterId: 0
@@ -41,11 +41,11 @@ proxies:
     network: ws
     ws-opts:
       headers:
-        Host: ${DOMAIN}
+        Host: ${CDNDOMAIN}
       path: /${XRAY_URL_PATH}-vmessws
-    servername: ${DOMAIN}
+    servername: ${CDNDOMAIN}
 
-  - name: ${REGION_INFO}|${NODE_NAME}|XTLS(Vision)+Reality直连${NODE_SUFFIX}
+  - name: ${REGION_INFO}✈${NODE_NAME}✈XTLS-Reality✈优${NODE_SUFFIX}
     type: vless
     server: ${DOMAIN}
     port: ${LISTENING_PORT}
