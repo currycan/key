@@ -31,31 +31,24 @@ FilterSG:       &FilterSG  "^(?=.*(?i)(广新|新加坡|SG|坡|狮城|🇸🇬|S
 FilterJP:       &FilterJP  "^(?=.*(?i)(广日|日本|JP|川日|东京|大阪|泉日|埼玉|沪日|深日|🇯🇵|Japan|名古屋|福冈|Tokyo|Osaka|Saitama|Nagoya|Fukuoka|Hokkaido|Okinawa|Kyoto|Yokohama))(?!.*(排除1|排除2|5x)).*$"
 FilterKR:       &FilterKR  "^(?=.*(?i)(广韩|韩国|韓國|KR|首尔|春川|🇰🇷|Korea|[韩韓][国國]|South[\\s-]?Korea|Seoul|Incheon|Busan|Chuncheon))(?!.*(排除1|排除2|5x)).*$"
 FilterOT:       &FilterOT  "^(?!.*(DIRECT|REJECT|直接连接|住宅|isp|ISP|广港|香港|HK|Hong Kong|🇭🇰|HongKong|深港|沪港|呼港|京港|杭港|Hong[\\s-]?Kong|HONG[\\s-]?KONG|广台|台湾|台灣|TW|Tai Wan|🇹🇼|🇨🇳|TaiWan|Taiwan|新[北竹]|彰化|高雄|[台臺][湾灣北]|Taipei|Kaohsiung|Hsinchu|Taichung|广日|日本|JP|川日|东京|大阪|泉日|埼玉|沪日|深日|🇯🇵|Japan|名古屋|福冈|Tokyo|Osaka|Saitama|Nagoya|Fukuoka|Hokkaido|Okinawa|Kyoto|Yokohama|广新|新加坡|SG|坡|狮城|🇸🇬|Singapore|[狮獅]城|Changi|广韩|韩国|韓國|KR|首尔|春川|🇰🇷|Korea|[韩韓][国國]|South[\\s-]?Korea|Seoul|Incheon|Busan|Chuncheon|广美|US|美国|纽约|波特兰|达拉斯|俄勒|凤凰城|费利蒙|洛杉|圣何塞|圣克拉|西雅|芝加|🇺🇸|United States|美[国國]|华盛顿|菲尼克斯|弗里蒙特|硅谷|旧金山|拉斯维加斯|圣荷西|哥伦布|阿什本|纽瓦克|丹佛|加利福尼亚|弗吉尼亚|马纳萨斯|俄亥俄|得克萨斯|[佐乔]治亚|亚特兰大|佛罗里达|迈阿密|United[\\s-_]+States|Los[\\s-_]+Angeles|San[\\s-_]+Jose|Silicon[\\s-_]+Valley|San[\\s-_]+Francisco|Santa[\\s-_]+Clara|Seattle|Chicago|New[\\s-_]+York|Miami|Dallas|Phoenix|Fremont|Atlanta|Boston|Las[\\s-_]+Vegas|Houston|Ashburn|Buffalo|Washington|D\\.C\\.|Oregon|Portland|Virginia|Ohio|Texas|Florida|Illinois|Arizona|Orem|Kansas))(?!.*(排除1|排除2|5x)).*$"
-# 节点筛选正则表达式 - 基于协议过滤
-FilterVLESS:    &FilterVLESS  "^(?=.*(?i)(vless|reality))(?!.*(排除1|排除2|5x)).*$"
-FilterVMess:    &FilterVMess  "^(?=.*(?i)(vmess|V2ray))(?!.*(排除1|排除2|5x)).*$"
-FilterHy2:      &FilterHy2    "^(?=.*(?i)(hysteria2|hy2))(?!.*(排除1|排除2|5x)).*$"
-FilterSS:       &FilterSS     "^(?=.*(?i)(ss|shadow))(?!.*(排除1|排除2|5x)).*$"
-FilterTrojan:   &FilterTrojan "^(?=.*(?i)(trojan))(?!.*(排除1|排除2|5x)).*$"
-FilterTUIC:     &FilterTUIC   "^(?=.*(?i)(tuic))(?!.*(排除1|排除2|5x)).*$"
-FilterAnyTLS:   &FilterAnyTLS "^(?=.*(?i)(anytls))(?!.*(排除1|排除2|5x)).*$"
+
 # 节点筛选正则表达式 - 家宽节点
 FilterISP:      &FilterISP    "^(?=.*(?i)(住宅|isp|ISP))(?!.*(排除1|排除2|5x)).*$"
 FilterMedia:    &FilterMedia  "^(?=.*(?i)(流媒体|SsrDog))(?!.*(排除1|排除2|5x)).*$"
 # 节点筛选正则表达式 - 高速节点
-FilterFAST:     &FilterFAST   "^(?=.*(?i)(高速|优))(?!.*(排除1|排除2|5x)).*$"
+FilterFAST:     &FilterFAST   "^(?=.*(?i)(高速|[优]))(?!.*(排除1|排除2|5x)).*$"
 # 节点筛选正则表达式 - 过滤链式代理节点
 FilterDialer:   &FilterDialer "^(?=.*(?i)(🇭🇰|🇹🇼|🇨🇳))(?!.*(DIRECT|直接连接|REJECT|isp-dialer)).*$"
 
 # 策略组代理列表模板 - 预定义的代理节点优先级排序
-DEFAULT:        &DEFAULT     {type: select, proxies: [低延迟线路, 家宽线路, 高速线路, 媒体线路, AI线路, 香港-故转, 台湾-故转, 日本-故转, 狮城-故转, 韩国-故转, 美国-故转, 其他-故转, ShadowSocks-故转, VLESS-故转, VMess-故转, Trojan-故转, Hysteria2-故转, TUIC-故转, AnyTLS-故转, 全球手动, 直接连接]}
-FallBack:       &FallBack    {type: select, proxies: [默认代理, 低延迟线路, 家宽线路, 高速线路, 媒体线路, AI线路, 香港-故转, 台湾-故转, 日本-故转, 狮城-故转, 韩国-故转, 美国-故转, 其他-故转, ShadowSocks-故转, VLESS-故转, VMess-故转, Trojan-故转, Hysteria2-故转, TUIC-故转, AnyTLS-故转, 全球手动, 直接连接]}
-SelectDC:       &SelectDC     {type: select, proxies: [直接连接, 香港-故转, 台湾-故转, 日本-故转, 狮城-故转, 韩国-故转, 美国-故转, 其他-故转, ShadowSocks-故转, VLESS-故转, VMess-故转, Trojan-故转, Hysteria2-故转, TUIC-故转, AnyTLS-故转, 全球手动]}
-SelectLD:       &SelectLD     {type: select, proxies: [低延迟线路, 香港-故转, 台湾-故转, 日本-故转, 狮城-故转, 韩国-故转, 美国-故转, 其他-故转, ShadowSocks-故转, VLESS-故转, VMess-故转, Trojan-故转, Hysteria2-故转, TUIC-故转, AnyTLS-故转, 全球手动, 直接连接]}
-SelectISP:      &SelectISP    {type: select, proxies: [家宽线路, 香港-故转, 台湾-故转, 日本-故转, 狮城-故转, 韩国-故转, 美国-故转, 其他-故转, ShadowSocks-故转, VLESS-故转, VMess-故转, Trojan-故转, Hysteria2-故转, TUIC-故转, AnyTLS-故转, 全球手动, 直接连接]}
-SelectMedia:    &SelectMedia  {type: select, proxies: [媒体线路, 香港-故转, 台湾-故转, 日本-故转, 狮城-故转, 韩国-故转, 美国-故转, 其他-故转, ShadowSocks-故转, VLESS-故转, VMess-故转, Trojan-故转, Hysteria2-故转, TUIC-故转, AnyTLS-故转, 全球手动, 直接连接]}
-SelectFAST:     &SelectFAST   {type: select, proxies: [高速线路, 香港-故转, 台湾-故转, 日本-故转, 狮城-故转, 韩国-故转, 美国-故转, 其他-故转, ShadowSocks-故转, VLESS-故转, VMess-故转, Trojan-故转, Hysteria2-故转, TUIC-故转, AnyTLS-故转, 全球手动, 直接连接]}
-SelectAI:       &SelectAI     {type: select, proxies: [AI线路, 香港-故转, 台湾-故转, 日本-故转, 狮城-故转, 韩国-故转, 美国-故转, 其他-故转, ShadowSocks-故转, VLESS-故转, VMess-故转, Trojan-故转, Hysteria2-故转, TUIC-故转, AnyTLS-故转, 全球手动, 直接连接]}
+DEFAULT:        &DEFAULT     {type: select, proxies: [低延迟线路, 家宽线路, 高速线路, 媒体线路, AI线路, 香港-故转, 台湾-故转, 日本-故转, 狮城-故转, 韩国-故转, 美国-故转, 其他-故转, 全球手动, 直接连接]}
+FallBack:       &FallBack    {type: select, proxies: [默认代理, 低延迟线路, 家宽线路, 高速线路, 媒体线路, AI线路, 香港-故转, 台湾-故转, 日本-故转, 狮城-故转, 韩国-故转, 美国-故转, 其他-故转, 全球手动, 直接连接]}
+SelectDC:       &SelectDC     {type: select, proxies: [直接连接, 香港-故转, 台湾-故转, 日本-故转, 狮城-故转, 韩国-故转, 美国-故转, 其他-故转, 全球手动]}
+SelectLD:       &SelectLD     {type: select, proxies: [低延迟线路, 香港-故转, 台湾-故转, 日本-故转, 狮城-故转, 韩国-故转, 美国-故转, 其他-故转, 全球手动, 直接连接]}
+SelectISP:      &SelectISP    {type: select, proxies: [家宽线路, 香港-故转, 台湾-故转, 日本-故转, 狮城-故转, 韩国-故转, 美国-故转, 其他-故转, 全球手动, 直接连接]}
+SelectMedia:    &SelectMedia  {type: select, proxies: [媒体线路, 香港-故转, 台湾-故转, 日本-故转, 狮城-故转, 韩国-故转, 美国-故转, 其他-故转, 全球手动, 直接连接]}
+SelectFAST:     &SelectFAST   {type: select, proxies: [高速线路, 香港-故转, 台湾-故转, 日本-故转, 狮城-故转, 韩国-故转, 美国-故转, 其他-故转, 全球手动, 直接连接]}
+SelectAI:       &SelectAI     {type: select, proxies: [AI线路, 香港-故转, 台湾-故转, 日本-故转, 狮城-故转, 韩国-故转, 美国-故转, 其他-故转, 全球手动, 直接连接]}
 
 
 # ==================== 代理提供者 ====================
@@ -129,11 +122,11 @@ proxy-groups:
   - {name: 全球手动,     type: select,    include-all: true, filter: *FilterALL, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Clubhouse.png}
 
   # ==================== 线路策略组 ====================
-  - {name: 低延迟线路,   <<: *BaseFB,    proxies: [香港-故转, 台湾-故转, 日本-故转, 狮城-故转, 韩国-故转, 美国-故转, 其他-故转, 家宽-故转, 媒体-故转, 高速-故转, ShadowSocks-故转, 全球手动, 直接连接], icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Round_Robin_1.png}
-  - {name: 家宽线路,     <<: *BaseFB,    proxies: [家宽-故转, 媒体-故转, 美国-故转, 香港-故转, 台湾-故转, 日本-故转, 狮城-故转, 韩国-故转, 其他-故转, 高速-故转, ShadowSocks-故转, 全球手动, 直接连接], icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Area.png}
-  - {name: 高速线路,     <<: *BaseFB,    proxies: [高速-故转, 美国-故转, 日本-故转, 香港-故转, 台湾-故转, 狮城-故转, 韩国-故转, 其他-故转, 家宽-故转, 媒体-故转, ShadowSocks-故转, 全球手动, 直接连接], icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Rocket.png}
-  - {name: 媒体线路,     <<: *BaseFB,    proxies: [媒体-故转, 家宽-故转, 香港-故转, 台湾-故转, 日本-故转, 狮城-故转, 韩国-故转, 美国-故转, 其他-故转, 高速-故转, ShadowSocks-故转, 全球手动, 直接连接], icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Clubhouse_1.png}
-  - {name: AI线路,     <<: *BaseFB,     proxies: [美国-故转, 家宽-故转, 日本-故转, 狮城-故转, 韩国-故转, 其他-故转, 香港-故转, 台湾-故转, 媒体-故转, 高速-故转, ShadowSocks-故转, 全球手动, 直接连接], icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Clubhouse_1.png}
+  - {name: 低延迟线路,   <<: *BaseFB,    proxies: [香港-故转, 台湾-故转, 日本-故转, 狮城-故转, 韩国-故转, 美国-故转, 其他-故转, 家宽-故转, 媒体-故转, 高速-故转, 全球手动, 直接连接], icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Round_Robin_1.png}
+  - {name: 家宽线路,     <<: *BaseFB,    proxies: [家宽-故转, 媒体-故转, 美国-故转, 香港-故转, 台湾-故转, 日本-故转, 狮城-故转, 韩国-故转, 其他-故转, 高速-故转, 全球手动, 直接连接], icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Area.png}
+  - {name: 高速线路,     <<: *BaseFB,    proxies: [高速-故转, 美国-故转, 日本-故转, 香港-故转, 台湾-故转, 狮城-故转, 韩国-故转, 其他-故转, 家宽-故转, 媒体-故转, 全球手动, 直接连接], icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Rocket.png}
+  - {name: 媒体线路,     <<: *BaseFB,    proxies: [媒体-故转, 家宽-故转, 香港-故转, 台湾-故转, 日本-故转, 狮城-故转, 韩国-故转, 美国-故转, 其他-故转, 高速-故转, 全球手动, 直接连接], icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Clubhouse_1.png}
+  - {name: AI线路,     <<: *BaseFB,     proxies: [美国-故转, 家宽-故转, 日本-故转, 狮城-故转, 韩国-故转, 其他-故转, 香港-故转, 台湾-故转, 媒体-故转, 高速-故转, 全球手动, 直接连接], icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Clubhouse_1.png}
 
   # ==================== 家宽节点策略组 ====================
   - {name: 家宽-故转,    <<: *BaseFB,     proxies: [家宽-自动, 家宽-手动], icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Area.png}
@@ -175,34 +168,6 @@ proxy-groups:
   - {name: 其他-故转,    <<: *BaseFB,    proxies: [其他-自动, 其他-手动], icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Auto.png}
   - {name: 其他-手动,    type: select,   include-all: true, filter: *FilterOT, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Auto.png}
   - {name: 其他-自动,    <<: *BaseUT,    include-all: true, filter: *FilterOT, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Auto.png}
-  # ==================== 协议策略组 ====================
-  - {name: ShadowSocks-故转, <<: *BaseFB,  proxies: [ShadowSocks-手动, ShadowSocks-自动], icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/shadowsocks.png}
-  - {name: ShadowSocks-手动, type: select, include-all: true, filter: *FilterSS, icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/shadowsocks.png}
-  - {name: ShadowSocks-自动, <<: *BaseUT,  include-all: true, filter: *FilterSS, icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/shadowsocks.png}
-
-  - {name: VLESS-故转,   <<: *BaseFB,    proxies: [VLESS-手动, VLESS-自动], icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/xray.png}
-  - {name: VLESS-手动,   type: select,   include-all: true, filter: *FilterVLESS, icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/xray.png}
-  - {name: VLESS-自动,   <<: *BaseUT,    include-all: true, filter: *FilterVLESS, icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/xray.png}
-
-  - {name: VMess-故转,   <<: *BaseFB,    proxies: [VMess-手动, VMess-自动], icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/v2ray.png}
-  - {name: VMess-手动,   type: select,   include-all: true, filter: *FilterVMess, icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/v2ray.png}
-  - {name: VMess-自动,   <<: *BaseUT,    include-all: true, filter: *FilterVMess, icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/v2ray.png}
-
-  - {name: Trojan-故转,  <<: *BaseFB,    proxies: [Trojan-手动, Trojan-自动], icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/trojan.png}
-  - {name: Trojan-手动,  type: select,   include-all: true, filter: *FilterTrojan, icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/trojan.png}
-  - {name: Trojan-自动,  <<: *BaseUT,    include-all: true, filter: *FilterTrojan, icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/trojan.png}
-
-  - {name: Hysteria2-故转, <<: *BaseFB,  proxies: [Hysteria2-手动, Hysteria2-自动], icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/hy2.png}
-  - {name: Hysteria2-手动, type: select, include-all: true, filter: *FilterHy2, icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/hy2.png}
-  - {name: Hysteria2-自动, <<: *BaseUT,  include-all: true, filter: *FilterHy2, icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/hy2.png}
-
-  - {name: TUIC-故转,      <<: *BaseFB,  proxies: [TUIC-手动, TUIC-自动], icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/tuic.png}
-  - {name: TUIC-手动,      type: select, include-all: true, filter: *FilterTUIC, icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/tuic.png}
-  - {name: TUIC-自动,      <<: *BaseUT,  include-all: true, filter: *FilterTUIC, icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/tuic.png}
-
-  - {name: AnyTLS-故转,    <<: *BaseFB,  proxies: [AnyTLS-手动, AnyTLS-自动], icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/anytls.png}
-  - {name: AnyTLS-手动,    type: select, include-all: true, filter: *FilterAnyTLS, icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/anytls.png}
-  - {name: AnyTLS-自动,    <<: *BaseUT,  include-all: true, filter: *FilterAnyTLS, icon: https://hk.gh-proxy.org/https://github.com/currycan/key/raw/master/icons/anytls.png}
 
 
 # ==================== 规则路由 ====================
