@@ -9,6 +9,9 @@ ENV_FILE="/.env/xray"
 [ -f "$ENV_FILE" ] || { echo -e "${RED}Error: $ENV_FILE missing${RESET}"; exit 1; }
 source "$ENV_FILE"
 
+# Ensure output directory exists immediately
+mkdir -p "${WORKDIR}/subscribe"
+
 # Node Info
 export NODE_NAME="${DOMAIN%%.*}"
 export NODE_IP="${GEOIP_INFO#*|}"
