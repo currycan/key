@@ -179,17 +179,17 @@ graph LR
     {
       "v": "2",
       "ps": "${NODE_NAME}|V2ray-TLS-WS",
-      "add": "${DOMAIN}",  // 或 CDN 域名/IP
+      "add": "${CDNDOMAIN}",  // 必须使用 CDN 域名
       "port": "${LISTENING_PORT}",
       "id": "${XRAY_UUID}",
       "aid": "0",
       "scy": "auto",
       "net": "ws",
       "type": "none",
-      "host": "${DOMAIN}", // 或 CDN 域名
+      "host": "${CDNDOMAIN}", // 必须使用 CDN 域名
       "path": "/${XRAY_URL_PATH}-vmessws",
       "tls": "tls",
-      "sni": "${DOMAIN}",  // 或 CDN 域名
+      "sni": "${CDNDOMAIN}",  // 必须使用 CDN 域名
       "alpn": "h2",
       "fp": "chrome"
     }
@@ -197,9 +197,10 @@ graph LR
     *   **通用链接**: `vmess://eyZnLi4ufQ==` (base64 字符串)
 *   **核心参数**:
     *   `net`: `ws` (WebSocket)
-    *   `host`: `${DOMAIN}` (或 CDN 域名)
+    *   `host`: `${CDNDOMAIN}` (必须)
     *   `path`: `/${XRAY_URL_PATH}-vmessws` (必须与服务端一致)
     *   `tls`: `tls`
+    *   `sni`: `${CDNDOMAIN}` (必须)
 
 ### 服务端入站 (Server Inbound)
 *   **配置文件**: `templates/xray/03_vmess_ws_inbounds.json`
@@ -350,37 +351,33 @@ XHTTP 的服务端配置由三个组件协同工作，以同时支持直连和 C
         *   进行 **MLKEM** 解密和 **VLESS** 身份验证。
         *   流量被路由到目标网站。
 
-### 6.6 进阶示例：伪装为 speed.cloudflare.com
+### 6.6 深度伪装机制 (Deep Masquerading)
 
-如果你希望将流量伪装成访问 `speed.cloudflare.com`（常用于测速，流量特征白名单），需要同时修改服务端和客户端配置。
+本项目默认启用了深度伪装机制，将流量伪装成访问 `speed.cloudflare.com`（或您配置的 `DEST_HOST`）。
 
-#### 1. 服务端配置 (`templates/xray/01_reality_inbounds.json`)
-需要修改 `serverNames`（允许的 SNI）和 `target`（回落目标）。
+#### 1. 服务端配置机制
+在 `templates/xray/01_reality_inbounds.json` 中，我们配置了：
 
 ```json
 "realitySettings": {
     "show": false,
-    "target": "speed.cloudflare.com:443",  // 将回落流量指向真实的 speed.cloudflare.com
-    "xver": 0,                             // 连接外部网站不能发送 verify protocol，改为 0
+    "target": "${DEST_HOST}:443",  // 默认透传至 speed.cloudflare.com
+    "xver": 0,
     "serverNames": [
-        "speed.cloudflare.com"             // 建议只保留伪装域名，删除 "${DOMAIN}"
+        "${DEST_HOST}"             // 仅响应伪装域名的 SNI，拒绝主域名 SNI
     ],
     ...
 }
 ```
 
-> **问：`${DOMAIN}` 是否完全不需要？**
-> **答：是的，建议删除。**
-> *   **隐匿性提升**: 如果在 `serverNames` 中删除了 `${DOMAIN}`，那么客户端**必须**使用 `speed.cloudflare.com` 作为 SNI 才能连接成功。
-> *   **防探测**: 此时，即便有人知道了你的服务器域名或 IP，尝试用它来进行 Reality 握手也会失败。只有完全模拟成 Cloudflare 测速流量的请求才能“敲开”代理的大门。
+*   **隐匿性提升**: 因为只允许 `serverNames` 中的伪装域名，所以客户端**必须**使用 `speed.cloudflare.com` (即 `${DEST_HOST}`) 作为 SNI 才能连接成功。
+*   **防探测**: 此时，验证失败的流量（如直接访问 IP 或使用主域名 SNI）会被透传给真实的目标网站。浏览器访问会看到真实的 Cloudflare 测速页面，完美伪装。
 
-#### 2. 客户端配置 (URL 参数)
-在生成的链接中，找到 `extra` 参数里的 `downloadSettings` 部分，将 `serverName` 改为目标域名。
+#### 2. 客户端配置注意
+所有生成的 Reality 类型链接（Vision-Reality, XHTTP-Reality）均已自动配置了正确的 SNI。
 
-*   **修改前**: `"realitySettings":{..., "serverName":"${DOMAIN}", ...}`
-*   **修改后**: `"realitySettings":{..., "serverName":"speed.cloudflare.com", ...}`
-
-> **提示**: 这样配置后，如果直接用浏览器访问你的 IP (HTTPS)，将会看到 Cloudflare 的测速页面，完美伪装。
+*   **SNI / ServerName**: 必须为 `${DEST_HOST}` (默认 `speed.cloudflare.com`)。
+*   **Address / Server**: 填入您的 VPS IP 或主域名。
 
 ---
 
