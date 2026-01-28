@@ -36,7 +36,7 @@ FilterOT:       &FilterOT  "^(?!.*(DIRECT|REJECT|直接连接|住宅|isp|ISP|广
 FilterISP:      &FilterISP    "^(?=.*(?i)(住宅|isp|ISP))(?!.*(排除1|排除2|5x)).*$"
 FilterMedia:    &FilterMedia  "^(?=.*(?i)(流媒体|SsrDog))(?!.*(排除1|排除2|5x)).*$"
 # 节点筛选正则表达式 - 高速节点
-FilterFAST:     &FilterFAST   "^(?=.*(?i)(高速|[优]))(?!.*(排除1|排除2|5x)).*$"
+FilterFAST:     &FilterFAST   "^(?=.*(?i)(高速|\\[优\\]))(?!.*(排除1|排除2|5x)).*$"
 # 节点筛选正则表达式 - 过滤链式代理节点
 FilterDialer:   &FilterDialer "^(?=.*(?i)(🇭🇰|🇹🇼|🇨🇳))(?!.*(DIRECT|直接连接|REJECT|isp-dialer)).*$"
 
