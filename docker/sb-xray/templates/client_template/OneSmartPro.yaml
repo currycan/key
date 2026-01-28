@@ -54,28 +54,7 @@ SelectAI:       &SelectAI     {type: select, proxies: [AI线路, 香港-智选, 
 # ==================== 代理提供者 ====================
 # 注意：请提供您的机场订阅链接，每个链接一行，并为每个机场命名，末尾的[优][备]为每个节点添加机场名称前缀，可自定义
 proxy-providers:
-  equaldcdn: {<<: *BaseProvider, url: "https://gist.githubusercontent.com/currycan/552f07420c62901d68de3564299881f2/raw/equaldcdn", override: {additional-prefix: "[equaldcdn] ", additional-suffix: " [优]"}}
-
-  AllOne:    {<<: *BaseProvider, url: "https://gist.githubusercontent.com/currycan/552f07420c62901d68de3564299881f2/raw/AllOne-Common", override: {additional-prefix: "[AllOne] ", skip-cert-verify: false, udp: true, up: 2500 Mbps, down: 2500 Mbps}}
-
-  Nice云:    {<<: *BaseProvider, url: "https://gist.githubusercontent.com/currycan/552f07420c62901d68de3564299881f2/raw/NiceYun", override: {additional-prefix: "[Nice云] ", additional-suffix: " [优]"}}
-
-  优速通:     {<<: *BaseProvider, url: "https://gist.githubusercontent.com/currycan/552f07420c62901d68de3564299881f2/raw/YouSuTong", override: {additional-prefix: "[优速通] ", additional-suffix: " [优]"}}
-
-  SsrDog:    {<<: *BaseProvider, url: "https://gist.githubusercontent.com/currycan/552f07420c62901d68de3564299881f2/raw/ssrdog", override: {additional-prefix: "[SsrDog] ", additional-suffix: " [优]"}}
-
-  NiceCloud: {<<: *BaseProvider, url: "https://gist.githubusercontent.com/currycan/552f07420c62901d68de3564299881f2/raw/NiceCloud", override: {additional-prefix: "[NiceCloud] ", additional-suffix: " [优]"}}
-
-  星链:       {<<: *BaseProvider, url: "https://gist.githubusercontent.com/currycan/552f07420c62901d68de3564299881f2/raw/XingLian", override: {additional-prefix: "[星链] ", additional-suffix: " [备]", dialer-proxy: 链式前置}}
-
-  牛逼:       {<<: *BaseProvider, url: "https://gist.githubusercontent.com/currycan/552f07420c62901d68de3564299881f2/raw/NiuBi", override: {additional-prefix: "[牛逼] ", additional-suffix: " [备]"}}
-
-  火烧云:     {<<: *BaseProvider, url: "https://gist.githubusercontent.com/currycan/552f07420c62901d68de3564299881f2/raw/HuoShaoYun", override: {additional-prefix: "[火烧云] ", additional-suffix: " [中]"}}
-
-  多宝:       {<<: *BaseProvider, url: "https://gist.githubusercontent.com/currycan/552f07420c62901d68de3564299881f2/raw/DuoBao", override: {additional-prefix: "[多宝] ", additional-suffix: " [备]"}}
-
-  光速云:     {<<: *BaseProvider, url: "https://web01.lightspeed.club/api/v1/client/subscribe?token=c02d1e8f9cd19dcae0f146c4ed71541a&flag=clash.meta", override: {additional-prefix: "[光速云] ", additional-suffix: " [中]"}}
-
+  ${NODE_NAME}: {<<: *BaseProvider, url: "https://${DOMAIN}/sb-xray/clashsub", override: {additional-prefix: "[${NODE_NAME}] ", additional-suffix: " [优]"}}
   # # 优质订阅源 - 优质节点集合，使用时请修改
   # 优质服务商: {<<: *BaseProvider, url: "优质订阅源地址", override: {additional-suffix: " [优]"}}
   # # 备用订阅源 - 次优节点集合，使用时请修改
@@ -84,31 +63,20 @@ proxy-providers:
   # 落地服务商: {<<: *BaseProvider, url: "落地订阅源地址", override: {additional-suffix: " [中]", dialer-proxy: 链式前置}}
 
 proxies:
-  # 发往 la-isp-dialer 的流量先经过 链式前置，从而实现指定下一跳代理的效果
-  - name: la-isp-dialer       # 落地节点命名
-    type: socks5              # 节点协议
-    server: 167.148.160.72    # 住宅IP 代理地址
-    port: 8820                # 端口号
-    username: v9X5j3M5O9K1    # 用户名
-    password: p8P4D0j2V8P2    # 密码
+  # 发往 la-isp-dialer 的流量先经过 "链式前置"，从而实现指定下一跳代理的效果
+  - name: la-isp-dialer        # 落地节点命名
+    type: socks5               # 节点协议
+    server: ${ISP_IP}          # 住宅IP 代理地址
+    port: ${ISP_PORT}          # 端口号
+    username: ${ISP_USER}      # 用户名
+    password: ${ISP_SECRET}    # 密码
     udp: true
-    dialer-proxy: 链式前置     # 指定前置代理节点组
-
-  - name: kr-isp-dialer       # 落地节点命名
-    type: socks5              # 节点协议
-    server: 203.231.108.178   # 住宅IP 代理地址
-    port: 8826                # 端口号
-    username: J3X3A8p2I6e5    # 用户名
-    password: G9M8E0v8g0w3    # 密码
-    udp: true
-    dialer-proxy: 链式前置     # 指定前置代理节点组
+    dialer-proxy: 链式前置      # 指定前置代理节点组
 
 
 # ==================== 策略组 ====================
 proxy-groups:
   # ==================== 主要策略组 ====================
-  # - {name: 落地节点,    <<: *BaseLB,     use: ["${NODE_NAME}"], filter: *FilterISP,     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Proxy.png}
-  - {name: 链式前置,    <<: *BaseSmart,  include-all: true,     filter: *FilterDialer, policy-priority: "优:5;中:1;备:0.5",  icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Daily.png}
   - {name: 默认代理,    <<: *DEFAULT,    icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Static.png}
   - {name: 一键智选,    <<: *OneSmart,   icon: https://git.imee.me/https://github.com/666OS/YYDS/raw/main/mihomo/image/mihomo.png}
   - {name: 国外流量,    <<: *OneSmart,   icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Global.png}
@@ -116,6 +84,22 @@ proxy-groups:
   - {name: 兜底流量,    <<: *OneSmart,   icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Final.png}
   # ==================== 网络测试 ====================
   - {name: 网络测试,    <<: *OneSmart,  include-all: true, filter: *FilterALL, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Speedtest.png}
+  # 线路特性层 - Fallback故障转移，按特性优化线路选择，建议修改位置顺序发挥线路优势
+  - {name: 低延迟线路,   <<: *BaseFB,    proxies: [香港-智选, 台湾-智选, 日本-智选, 狮城-智选, 韩国-智选, 美国-智选, 其他-智选, 家宽-智选, 媒体-智选, 高速-智选, 全球手动, 直接连接], icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Round_Robin_1.png}
+  - {name: 家宽线路,     <<: *BaseFB,    proxies: [家宽-智选, 媒体-智选, 美国-智选, 香港-智选, 台湾-智选, 日本-智选, 狮城-智选, 韩国-智选, 其他-智选, 高速-智选, 全球手动, 直接连接], icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Area.png}
+  - {name: 高速线路,     <<: *BaseFB,    proxies: [高速-智选, 美国-智选, 日本-智选, 香港-智选, 台湾-智选, 狮城-智选, 韩国-智选, 其他-智选, 家宽-智选, 媒体-智选, 全球手动, 直接连接], icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Rocket.png}
+  - {name: 媒体线路,     <<: *BaseFB,    proxies: [媒体-智选, 家宽-智选, 香港-智选, 台湾-智选, 日本-智选, 狮城-智选, 韩国-智选, 美国-智选, 其他-智选, 高速-智选, 全球手动, 直接连接], icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Clubhouse_1.png}
+  - {name: AI线路,     <<: *BaseFB,     proxies: [美国-智选, 家宽-智选, 日本-智选, 狮城-智选, 韩国-智选, 其他-智选, 香港-智选, 台湾-智选, 媒体-智选, 高速-智选, 全球手动, 直接连接], icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Clubhouse_1.png}
+
+  # ==================== 家宽节点策略组 ====================
+  - {name: 家宽-智选,           <<: *BaseSmart, filter: *FilterISP,    include-all: true, policy-priority: "优:2;中:1;备:0.5", icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Area.png}
+  # ==================== 媒体节点策略组 ====================
+  - {name: 媒体-智选,        <<: *BaseSmart, filter: *FilterMedia,  include-all: true, policy-priority: "优:2;中:1;备:0.5", icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Clubhouse_1.png}
+  # ==================== 高速节点策略组 ====================
+  - {name: 高速-智选,          <<: *BaseSmart, filter: *FilterFAST,   include-all: true, policy-priority: "优:2;中:1;备:0.5", icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Rocket.png}
+  # ==================== 全球手动策略组 ====================
+  - {name: 全球手动,    <<: *BaseSmart,   include-all: true, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Static.png}
+
   # ==================== AI 服务 ====================
   - {name: 人工智能,    <<: *SelectAI,   icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/AI.png}
   # ==================== 媒体服务 ====================
@@ -148,22 +132,9 @@ proxy-groups:
   # ==================== 虚拟币 ====================
   - {name: 货币平台,    <<: *OneSmart,    icon: https://raw.githubusercontent.com/Orz-3/mini/master/Alpha/Bitcloud.png}
   - {name: 直接连接,    type: select,     proxies: [DIRECT], hidden: true, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Direct.png}
-  # ==================== 全球手动策略组 ====================
-  - {name: 全球手动,    <<: *BaseSmart,   include-all: true, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Static.png}
-
-  # 线路特性层 - Fallback故障转移，按特性优化线路选择，建议修改位置顺序发挥线路优势
-  - {name: 低延迟线路,   <<: *BaseFB,    proxies: [香港-智选, 台湾-智选, 日本-智选, 狮城-智选, 韩国-智选, 美国-智选, 其他-智选, 家宽-智选, 媒体-智选, 高速-智选, 全球手动, 直接连接], icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Round_Robin_1.png}
-  - {name: 家宽线路,     <<: *BaseFB,    proxies: [家宽-智选, 媒体-智选, 美国-智选, 香港-智选, 台湾-智选, 日本-智选, 狮城-智选, 韩国-智选, 其他-智选, 高速-智选, 全球手动, 直接连接], icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Area.png}
-  - {name: 高速线路,     <<: *BaseFB,    proxies: [高速-智选, 美国-智选, 日本-智选, 香港-智选, 台湾-智选, 狮城-智选, 韩国-智选, 其他-智选, 家宽-智选, 媒体-智选, 全球手动, 直接连接], icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Rocket.png}
-  - {name: 媒体线路,     <<: *BaseFB,    proxies: [媒体-智选, 家宽-智选, 香港-智选, 台湾-智选, 日本-智选, 狮城-智选, 韩国-智选, 美国-智选, 其他-智选, 高速-智选, 全球手动, 直接连接], icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Clubhouse_1.png}
-  - {name: AI线路,     <<: *BaseFB,     proxies: [美国-智选, 家宽-智选, 日本-智选, 狮城-智选, 韩国-智选, 其他-智选, 香港-智选, 台湾-智选, 媒体-智选, 高速-智选, 全球手动, 直接连接], icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Clubhouse_1.png}
-
-  # ==================== 家宽节点策略组 ====================
-  - {name: 家宽-智选,           <<: *BaseSmart, filter: *FilterISP,    include-all: true, policy-priority: "优:2;中:1;备:0.5", icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Area.png}
-  # ==================== 媒体节点策略组 ====================
-  - {name: 媒体-智选,        <<: *BaseSmart, filter: *FilterMedia,  include-all: true, policy-priority: "优:2;中:1;备:0.5", icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Clubhouse_1.png}
-  # ==================== 高速节点策略组 ====================
-  - {name: 高速-智选,          <<: *BaseSmart, filter: *FilterFAST,   include-all: true, policy-priority: "优:2;中:1;备:0.5", icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Rocket.png}
+  # - {name: 落地节点,    <<: *BaseLB,     use: ["${NODE_NAME}"], filter: *FilterISP,     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Proxy.png}
+  - {name: 链式前置,    <<: *BaseSmart,  include-all: true,     filter: *FilterDialer, policy-priority: "优:5;中:1;备:0.5",  icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Daily.png}
+  # ==================== 智选节点 ====================
   # 地理策略层 - Smart智选选择，政策权重数值越大优先级越高，修改为关键词节点，比如 优:2;中:1;备:0.5，默认为1，优>中>备，使用时请修改
   - {name: 香港-智选,          <<: *BaseSmart, filter: *FilterHK,     include-all: true, policy-priority: "优:2;中:1;备:0.5", icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Hong_Kong.png}
   - {name: 台湾-智选,          <<: *BaseSmart, filter: *FilterTW,     include-all: true, policy-priority: "优:2;中:1;备:0.5", icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Taiwan.png}
