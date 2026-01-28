@@ -16,8 +16,8 @@
                 "decryption": "none",
                 "fallbacks": [
                     {
-                        "dest": "/dev/shm/udsxhttp.sock",
-                        "xver": 0
+                        "dest": "/dev/shm/nginx.sock",
+                        "xver": 1
                     }
                 ]
             },
