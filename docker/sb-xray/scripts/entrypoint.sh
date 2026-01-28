@@ -162,6 +162,10 @@ generateIspSocks5Config() {
 
             if [[ -n "${DEFAULT_ISP:-}" && "$prefix" == "$DEFAULT_ISP" ]]; then
                 def_out="${x_json}"; def_sb_out="${s_json}"
+                export ISP_IP="$ip"
+                export ISP_PORT="$port"
+                export ISP_USER="$user"
+                export ISP_SECRET="$pass"
             else
                 oth_out="${oth_out}${x_json}"; oth_sb_out="${oth_sb_out}${s_json}"
             fi
