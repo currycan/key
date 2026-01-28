@@ -13,7 +13,7 @@ services:
       - DUFS_PATH_PREFIX=/myfiles
       - XUI_WEBBASEPATH=3xadmin
       # racknerd/hostdare/zorocloud
-      - ENABLE_ISP_PROXY=false
+      - ENABLE_ISP_PROXY=true
       - DEFAULT_ISP=LA_ISP
 
     ports:
