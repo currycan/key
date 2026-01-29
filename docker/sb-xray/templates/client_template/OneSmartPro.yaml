@@ -41,17 +41,6 @@ FilterAI:       &FilterAI     "^(?=.*(?i)(AI|AllOne))(?!.*(排除1|排除2|5x|ra
 # 节点筛选正则表达式 - 过滤链式代理节点
 FilterDialer:   &FilterDialer "^(?=.*(?i)(🇭🇰|🇹🇼|🇨🇳))(?!.*(DIRECT|直接连接|REJECT|isp-dialer)).*$"
 
-# 策略组代理列表模板 - 预定义的代理节点优先级排序
-DEFAULT:        &DEFAULT     {type: select, proxies: [低延迟线路, 家宽线路, 高速线路, 媒体线路, AI线路, 香港-智选, 台湾-智选, 日本-智选, 狮城-智选, 韩国-智选, 美国-智选, 其他-智选, 全球手动, 直接连接]}
-OneSmart:       &OneSmart     {type: select, proxies: [默认代理, 低延迟线路, 家宽线路, 高速线路, 媒体线路, AI线路, 香港-智选, 台湾-智选, 日本-智选, 狮城-智选, 韩国-智选, 美国-智选, 其他-智选, 全球手动, 直接连接]}
-SelectDC:       &SelectDC     {type: select, proxies: [直接连接, 香港-智选, 台湾-智选, 日本-智选, 狮城-智选, 韩国-智选, 美国-智选, 其他-智选, 全球手动]}
-
-SelectLD:       &SelectLD     {type: select, proxies: [低延迟线路, 香港-智选, 台湾-智选, 日本-智选, 狮城-智选, 韩国-智选, 美国-智选, 其他-智选, 全球手动, 直接连接]}
-SelectISP:      &SelectISP    {type: select, proxies: [家宽线路, 香港-智选, 台湾-智选, 日本-智选, 狮城-智选, 韩国-智选, 美国-智选, 其他-智选, 全球手动, 直接连接]}
-SelectMedia:    &SelectMedia  {type: select, proxies: [媒体线路, 香港-智选, 台湾-智选, 日本-智选, 狮城-智选, 韩国-智选, 美国-智选, 其他-智选, 全球手动, 直接连接]}
-SelectFAST:     &SelectFAST   {type: select, proxies: [高速线路, 香港-智选, 台湾-智选, 日本-智选, 狮城-智选, 韩国-智选, 美国-智选, 其他-智选, 全球手动, 直接连接]}
-SelectAI:       &SelectAI     {type: select, proxies: [AI线路, 香港-智选, 台湾-智选, 日本-智选, 狮城-智选, 韩国-智选, 美国-智选, 其他-智选, 全球手动, 直接连接]}
-
 # Policy-Priority 模板 - 智能节点选择权重配置
 # 设计理念: filter 负责筛选节点范围, policy-priority 负责在筛选结果中进行多维度排序
 # 权重维度: 机场标识(10) + 特性标签(10) + 协议性能(2-10) + 地区偏好(2-10) + 质量后缀(1-5)
@@ -64,6 +53,18 @@ PolicyMedia:    &PolicyMedia    "AllOne:10;高速:10;Reality:10;vless:10;hysteri
 PolicyFast:     &PolicyFast     "AllOne:10;高速:10;Reality:10;vless:10;hysteria2:8;V2ray:6;vmess:6;tuic:4;TUIC:4;anytls:2;优:5;中:2;备:1;🇺🇸:10;🇯🇵:6;🇰🇷:8;🇸🇬:4;🇭🇹:2"
 PolicyAI:       &PolicyAI       "AllOne:10;高速:10;Reality:10;vless:10;hysteria2:8;V2ray:6;vmess:6;tuic:4;TUIC:4;anytls:2;优:5;中:2;备:1;🇺🇸:10;🇯🇵:6;🇰🇷:6;🇸🇬:4;🇭🇹:2"
 PolicyDialer:   &PolicyDialer   "🇭🇰:10;🇹🇼:5:🇨🇳:5"
+
+# 策略组代理列表模板 - 预定义的代理节点优先级排序
+DEFAULT:        &DEFAULT     {type: select, proxies: [低延迟线路, 家宽线路, 高速线路, 媒体线路, AI线路, 香港-智选, 台湾-智选, 日本-智选, 狮城-智选, 韩国-智选, 美国-智选, 其他-智选, 全球手动, 直接连接]}
+OneSmart:       &OneSmart     {type: select, proxies: [默认代理, 低延迟线路, 家宽线路, 高速线路, 媒体线路, AI线路, 香港-智选, 台湾-智选, 日本-智选, 狮城-智选, 韩国-智选, 美国-智选, 其他-智选, 全球手动, 直接连接]}
+SelectDC:       &SelectDC     {type: select, proxies: [直接连接, 香港-智选, 台湾-智选, 日本-智选, 狮城-智选, 韩国-智选, 美国-智选, 其他-智选, 全球手动]}
+
+SelectLD:       &SelectLD     {type: select, proxies: [低延迟线路, 香港-智选, 台湾-智选, 日本-智选, 狮城-智选, 韩国-智选, 美国-智选, 其他-智选, 全球手动, 直接连接]}
+SelectISP:      &SelectISP    {type: select, proxies: [家宽线路, 香港-智选, 台湾-智选, 日本-智选, 狮城-智选, 韩国-智选, 美国-智选, 其他-智选, 全球手动, 直接连接]}
+SelectMedia:    &SelectMedia  {type: select, proxies: [媒体线路, 香港-智选, 台湾-智选, 日本-智选, 狮城-智选, 韩国-智选, 美国-智选, 其他-智选, 全球手动, 直接连接]}
+SelectFAST:     &SelectFAST   {type: select, proxies: [高速线路, 香港-智选, 台湾-智选, 日本-智选, 狮城-智选, 韩国-智选, 美国-智选, 其他-智选, 全球手动, 直接连接]}
+SelectAI:       &SelectAI     {type: select, proxies: [AI线路, 香港-智选, 台湾-智选, 日本-智选, 狮城-智选, 韩国-智选, 美国-智选, 其他-智选, 全球手动, 直接连接]}
+
 
 # ==================== 代理提供者 ====================
 # 注意：请提供您的机场订阅链接，每个链接一行，并为每个机场命名，末尾的[优][备]为每个节点添加机场名称前缀，可自定义
@@ -100,15 +101,13 @@ proxy-groups:
   - {name: 网络测试,    <<: *OneSmart,  include-all: true, filter: *FilterALL, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Speedtest.png}
 
   # ==================== 家宽节点策略组 ====================
-  - {name: 家宽-智选,           <<: *BaseSmart, filter: *FilterISP,    include-all: true, policy-priority: *PolicyISP, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Area.png}
+  - {name: 家宽-智选,    <<: *BaseSmart, filter: *FilterISP,    include-all: true, policy-priority: *PolicyISP, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Area.png}
   # ==================== 媒体节点策略组 ====================
-  - {name: 媒体-智选,        <<: *BaseSmart, filter: *FilterMedia,  include-all: true, policy-priority: *PolicyMedia, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Clubhouse_1.png}
+  - {name: 媒体-智选,    <<: *BaseSmart, filter: *FilterMedia,  include-all: true, policy-priority: *PolicyMedia, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Clubhouse_1.png}
   # ==================== 高速节点策略组 ====================
-  - {name: 高速-智选,          <<: *BaseSmart, filter: *FilterFAST,   include-all: true, policy-priority: *PolicyFast, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Rocket.png}
+  - {name: 高速-智选,    <<: *BaseSmart, filter: *FilterFAST,   include-all: true, policy-priority: *PolicyFast, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Rocket.png}
   # ==================== AI节点策略组 ====================
-  - {name: AI-智选,            <<: *BaseSmart, filter: *FilterAI,     include-all: true, policy-priority: *PolicyAI, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/AI.png}
-  # ==================== 全球手动策略组 ====================
-  - {name: 全球手动,    <<: *BaseSmart,   include-all: true, policy-priority: *PolicyDefault, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Static.png}
+  - {name: AI-智选,     <<: *BaseSmart, filter: *FilterAI,     include-all: true, policy-priority: *PolicyAI, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/AI.png}
 
   # 线路特性层 - Fallback故障转移，按特性优化线路选择，建议修改位置顺序发挥线路优势
   - {name: 低延迟线路,   <<: *BaseFB,    proxies: [香港-智选, 台湾-智选, 日本-智选, 狮城-智选, 韩国-智选, 美国-智选, 其他-智选, 家宽-智选, 媒体-智选, 高速-智选, 全球手动, 直接连接], icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Round_Robin_1.png}
@@ -116,19 +115,21 @@ proxy-groups:
   - {name: 高速线路,     <<: *BaseFB,    proxies: [高速-智选, 美国-智选, 日本-智选, 香港-智选, 台湾-智选, 狮城-智选, 韩国-智选, 其他-智选, 家宽-智选, 媒体-智选, 全球手动, 直接连接], icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Rocket.png}
   - {name: 媒体线路,     <<: *BaseFB,    proxies: [媒体-智选, 家宽-智选, 香港-智选, 台湾-智选, 日本-智选, 狮城-智选, 韩国-智选, 美国-智选, 其他-智选, 高速-智选, 全球手动, 直接连接], icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Clubhouse_1.png}
   - {name: AI线路,     <<: *BaseFB,     proxies: [AI-智选, 美国-智选, 家宽-智选, 日本-智选, 狮城-智选, 韩国-智选, 其他-智选, 香港-智选, 台湾-智选, 媒体-智选, 高速-智选, 全球手动, 直接连接], icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Clubhouse_1.png}
+  # ==================== 全球手动策略组 ====================
+  - {name: 全球手动,    <<: *BaseSmart,  include-all: true, policy-priority: *PolicyDefault, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Static.png}
 
   # ==================== AI 服务 ====================
-  - {name: 人工智能,    <<: *SelectAI,   icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/AI.png}
+  - {name: 人工智能,    <<: *SelectAI,    icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/AI.png}
   # ==================== 媒体服务 ====================
   - {name: TikTok,     <<: *SelectISP,   icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/TikTok.png}
-  - {name: YouTube,    <<: *SelectFAST,   icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/YouTube.png}
+  - {name: YouTube,    <<: *SelectFAST,  icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/YouTube.png}
   - {name: Netflix,     <<: *SelectMedia, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Netflix.png}
   - {name: Disney,     <<: *SelectMedia, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Disney.png}
   - {name: HBO,        <<: *SelectMedia, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/HBO.png}
   - {name: Spotify,    <<: *SelectMedia, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Spotify.png}
-  - {name: Emby,       <<: *SelectMedia,    icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Emby.png}
-  - {name: 国际媒体,    <<: *SelectMedia,    icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/DomesticMedia.png}
-  - {name: 新闻媒体,    <<: *SelectMedia,    icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Apple_News.png}
+  - {name: Emby,       <<: *SelectMedia, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Emby.png}
+  - {name: 国际媒体,    <<: *SelectMedia, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/DomesticMedia.png}
+  - {name: 新闻媒体,    <<: *SelectMedia, icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Apple_News.png}
   # ==================== 社交平台 ====================
   - {name: 推特社交,    <<: *SelectISP,    icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/X.png}
   - {name: 电报消息,    <<: *SelectISP,    icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Telegram_X.png}
@@ -136,9 +137,9 @@ proxy-groups:
   - {name: Facebook,   <<: *SelectISP,    icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Facebook.png}
   - {name: 社交平台,    <<: *SelectISP,    icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/PBS.png}
   # ==================== 国外服务 ====================
-  - {name: 谷歌服务,    <<: *OneSmart,   icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Google_Search.png}
+  - {name: 谷歌服务,    <<: *OneSmart,    icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Google_Search.png}
   - {name: GitHub,     <<: *OneSmart,    icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/GitHub.png}
-  - {name: Reddit,     <<: *OneSmart, icon: https://github.com/Semporia/Hand-Painted-icon/raw/master/Social_Media/Reddit.png}
+  - {name: Reddit,     <<: *OneSmart,    icon: https://github.com/Semporia/Hand-Painted-icon/raw/master/Social_Media/Reddit.png}
   - {name: 亚马逊,      <<: *OneSmart,    icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Amazon.png}
   - {name: 苹果服务,    <<: *OneSmart,    icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Apple.png}
   - {name: 微软服务,    <<: *OneSmart,    icon: https://git.imee.me/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Microsoft.png}
