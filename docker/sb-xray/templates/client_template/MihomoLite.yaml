@@ -207,10 +207,6 @@ rules:
   - RULE-SET,Private / Domain,直接连接
   - RULE-SET,PrivateIP / IP,直接连接,no-resolve
   - RULE-SET,Direct / Domain,直接连接
-  - RULE-SET,XPTV / Domain,直接连接
-  - RULE-SET,XPTVIP / IP,直接连接,no-resolve
-  - RULE-SET,Download / Domain,直接连接
-  - RULE-SET,AppleCN / Domain,直接连接
   - RULE-SET,China / Domain,直接连接
   - RULE-SET,ChinaIP / IP,直接连接,no-resolve
   # AI
@@ -227,52 +223,10 @@ rules:
   # 国外媒体
   - RULE-SET,TikTok / Domain,TikTok
   - RULE-SET,YouTube / Domain,YouTube
-  - RULE-SET,Netflix / Domain,Netflix
-  - RULE-SET,NetflixIP / IP,Netflix,no-resolve
-  - RULE-SET,Disney / Domain,Disney
-  - RULE-SET,HBO / Domain,HBO
-  - RULE-SET,Spotify / Domain,Spotify
-  - RULE-SET,Emby / Domain,Emby
-  - RULE-SET,EmbyIP / IP,Emby,no-resolve
-  - RULE-SET,Streaming / Domain,国际媒体
-  - RULE-SET,StreamingIP / IP,国际媒体,no-resolve
-  # 新闻媒体
-  - RULE-SET,NewsMedia / Domain,新闻媒体
-  # 社交平台
-  - RULE-SET,Twitter / Domain,推特社交
-  - RULE-SET,Telegram / Domain,电报消息
-  - RULE-SET,TelegramIP / IP,电报消息,no-resolve
-  - RULE-SET,WhatsApp / Domain,WhatsApp
-  - RULE-SET,Facebook / Domain,Facebook
-  - RULE-SET,FacebookIP / IP,Facebook,no-resolve
-  - RULE-SET,SocialMedia / Domain,社交平台
-  - RULE-SET,SocialMediaIP / IP,社交平台,no-resolve
   # 国外公司
   - RULE-SET,Google / Domain,谷歌服务
   - RULE-SET,GoogleIP / IP,谷歌服务,no-resolve
   - RULE-SET,GitHub / Domain,GitHub
-  - RULE-SET,Reddit / Domain,Reddit
-  - RULE-SET,Amazon / Domain,亚马逊
-  - RULE-SET,Apple / Domain,苹果服务
-  - RULE-SET,Apple-Custome / Domain,苹果服务
-  - RULE-SET,Microsoft / Domain,微软服务
-  - RULE-SET,Nvidia / Domain,英伟达
-  # 游戏平台
-  - RULE-SET,Steam / Domain,Steam
-  - RULE-SET,Epic / Domain,游戏平台
-  - RULE-SET,EA / Domain,游戏平台
-  - RULE-SET,Blizzard / Domain,游戏平台
-  - RULE-SET,UBI / Domain,游戏平台
-  - RULE-SET,PlayStation / Domain,游戏平台
-  - RULE-SET,Nintendo / Domain,游戏平台
-  - RULE-SET,Games / Domain,游戏平台
-  # 货币平台
-  - RULE-SET,Crunchyroll / Domain,货币平台
-  - RULE-SET,Popcorn / Domain,货币平台
-  - RULE-SET,OKX / Domain,货币平台
-  - RULE-SET,Bybit / Domain,货币平台
-  - RULE-SET,Binance / Domain,货币平台
-  - RULE-SET,Crypto / Domain,货币平台
   # Fallback / General
   - RULE-SET,Proxy / Domain,国外流量
   - RULE-SET,ProxyIP / IP,国外流量,no-resolve
@@ -310,8 +264,6 @@ rule-providers:
   Private / Domain:        {<<: *BehaviorDN,   url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/domain/Private.mrs}
   PrivateIP / IP:          {<<: *BehaviorIP,   url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/ip/Private.mrs}
   Download / Domain:       {<<: *BehaviorDN,   url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/domain/Download.mrs}
-  XPTV / Domain:           {<<: *BehaviorDN,   url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/domain/XPTV.mrs}
-  XPTVIP / IP:             {<<: *BehaviorIP,   url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/ip/XPTV.mrs}
   China / Domain:          {<<: *BehaviorDN,   url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/domain/China.mrs}
   ChinaIP / IP:            {<<: *BehaviorIP,   url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/ip/China.mrs}
   # AI规则
@@ -328,54 +280,10 @@ rule-providers:
   # 国外媒体规则
   TikTok / Domain:         {<<: *BehaviorDN,   url: https://gh-proxy.com/github.com/metacubex/meta-rules-dat/raw/refs/heads/meta/geo/geosite/tiktok.mrs}
   YouTube / Domain:        {<<: *BehaviorDN,   url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/domain/YouTube.mrs}
-  Netflix / Domain:        {<<: *BehaviorDN,   url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/domain/Netflix.mrs}
-  NetflixIP / IP:          {<<: *BehaviorIP,   url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/ip/Netflix.mrs}
-  Emby / Domain:           {<<: *BehaviorDN,   url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/domain/Emby.mrs}
-  EmbyIP / IP:             {<<: *BehaviorIP,   url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/ip/Emby.mrs}
-  Disney / Domain:         {<<: *BehaviorDN,   url: https://gh-proxy.com/github.com/metacubex/meta-rules-dat/raw/refs/heads/meta/geo/geosite/disney.mrs}
-  HBO / Domain:            {<<: *BehaviorDN,   url: https://gh-proxy.com/github.com/metacubex/meta-rules-dat/raw/refs/heads/meta/geo/geosite/hbo.mrs}
-  Spotify / Domain:        {<<: *BehaviorDN,   url: https://gh-proxy.com/github.com/metacubex/meta-rules-dat/raw/refs/heads/meta/geo/geosite/spotify.mrs}
-  Streaming / Domain:      {<<: *BehaviorDN,   url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/domain/Streaming.mrs}
-  StreamingIP / IP:        {<<: *BehaviorIP,   url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/ip/Streaming.mrs}
-  # 社交平台规则
-  Telegram / Domain:       {<<: *BehaviorDN,   url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/domain/Telegram.mrs}
-  TelegramIP / IP:         {<<: *BehaviorIP,   url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/ip/Telegram.mrs}
-  Twitter / Domain:        {<<: *BehaviorDN,   url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/domain/Twitter.mrs}
-  WhatsApp / Domain:       {<<: *BehaviorText, url: https://gh-proxy.com/raw.githubusercontent.com/blackmatrix7/ios_rule_script/refs/heads/master/rule/Clash/Whatsapp/Whatsapp.list}
-  Facebook / Domain:       {<<: *BehaviorDN,   url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/domain/Facebook.mrs}
-  FacebookIP / IP:         {<<: *BehaviorIP,   url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/ip/Facebook.mrs}
-  SocialMedia / Domain:    {<<: *BehaviorDN,   url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/domain/SocialMedia.mrs}
-  SocialMediaIP / IP:      {<<: *BehaviorIP,   url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/ip/SocialMedia.mrs}
-  # 新闻媒体规则
-  NewsMedia / Domain:      {<<: *BehaviorDN,   url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/domain/NewsMedia.mrs}
   # 国外公司规则
   Google / Domain:         {<<: *BehaviorDN,   url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/domain/Google.mrs}
   GoogleIP / IP:           {<<: *BehaviorIP,   url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/ip/Google.mrs}
   GitHub / Domain:         {<<: *BehaviorDN,   url: https://gh-proxy.com/github.com/metacubex/meta-rules-dat/raw/refs/heads/meta/geo/geosite/github.mrs}
-  Reddit / Domain:         {<<: *BehaviorDN,   url: https://gh-proxy.com/github.com/metacubex/meta-rules-dat/raw/refs/heads/meta/geo/geosite/reddit.mrs}
-
-  Amazon / Domain:         {<<: *BehaviorDN,   url: https://gh-proxy.com/github.com/metacubex/meta-rules-dat/raw/refs/heads/meta/geo/geosite/amazon.mrs}
-  AppleCN / Domain:        {<<: *BehaviorDN,   url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/domain/AppleCN.mrs}
-  Apple / Domain:          {<<: *BehaviorDN,   url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/domain/Apple.mrs}
-  Apple-Custome / Domain:  {<<: *BehaviorText, url: https://gh-proxy.com/raw.githubusercontent.com/liandu2024/clash/refs/heads/main/list/Apple.list}
-  Microsoft / Domain:      {<<: *BehaviorDN,   url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/domain/Microsoft.mrs}
-  Nvidia / Domain:         {<<: *BehaviorText, url: https://gh-proxy.com/raw.githubusercontent.com/blackmatrix7/ios_rule_script/refs/heads/master/rule/Clash/Nvidia/Nvidia.list}
-  # 游戏平台规则
-  Steam / Domain:          {<<: *BehaviorDN,   url: https://gh-proxy.com/github.com/metacubex/meta-rules-dat/raw/refs/heads/meta/geo/geosite/steam.mrs}
-  Epic / Domain:           {<<: *BehaviorText, url: https://gh-proxy.com/raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Epic/Epic.list}
-  EA / Domain:             {<<: *BehaviorText, url: https://gh-proxy.com/raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/EA/EA.list}
-  Blizzard / Domain:       {<<: *BehaviorText, url: https://gh-proxy.com/raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Blizzard/Blizzard.list}
-  UBI / Domain:            {<<: *BehaviorText, url: https://gh-proxy.com/raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/UBI/UBI.list}
-  PlayStation / Domain:    {<<: *BehaviorText, url: https://gh-proxy.com/raw.githubusercontent.com/blackmatrix7/ios_rule_script/refs/heads/master/rule/Clash/PlayStation/PlayStation.list}
-  Nintendo / Domain:       {<<: *BehaviorText, url: https://gh-proxy.com/raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Nintendo/Nintendo.list}
-  Games / Domain:          {<<: *BehaviorDN,   url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/domain/Games.mrs}
-  # 加密货币规则
-  Crunchyroll / Domain:    {<<: *BehaviorText, url: https://gh-proxy.com/raw.githubusercontent.com/liandu2024/clash/refs/heads/main/list/Crunchyroll.list}
-  Popcorn / Domain:        {<<: *BehaviorText, url: https://gh-proxy.com/raw.githubusercontent.com/liandu2024/clash/refs/heads/main/list/Popcorn.list}
-  OKX / Domain:            {<<: *BehaviorDN,   url: https://gh-proxy.com/github.com/metacubex/meta-rules-dat/raw/refs/heads/meta/geo/geosite/okx.mrs}
-  Bybit / Domain:          {<<: *BehaviorDN,   url: https://gh-proxy.com/github.com/metacubex/meta-rules-dat/raw/refs/heads/meta/geo/geosite/bybit.mrs}
-  Binance / Domain:        {<<: *BehaviorDN,   url: https://gh-proxy.com/github.com/metacubex/meta-rules-dat/raw/refs/heads/meta/geo/geosite/binance.mrs}
-  Crypto / Domain:         {<<: *BehaviorDN,   url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/domain/Crypto.mrs}
   # 代理规则
   Proxy / Domain:          {<<: *BehaviorDN,   url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/domain/Proxy.mrs}
   ProxyIP / IP:            {<<: *BehaviorIP,   url: https://git.imee.me/https://github.com/666OS/rules/raw/release/mihomo/ip/Proxy.mrs}
