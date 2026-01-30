@@ -18,11 +18,11 @@ BaseProvider:   &BaseProvider {type: http, interval: 86400, proxy: DIRECT, healt
 # 策略组类型模板 - 定义不同的策略组基础配置
 BaseFB:         &BaseFB {type: fallback,     interval: 180, tolerance: 100, lazy: true, url: "https://www.google.com/generate_204"}
 BaseCH:         &BaseCH {type: load-balance, interval: 180, tolerance: 100, lazy: true, url: "https://www.google.com/generate_204", strategy: consistent-hashing, hidden: true}
-BaseCR:         &BaseCR {type: load-balance, iinterval: 180, tolerance: 100, lazy: true, url: "https://www.google.com/generate_204", strategy: round-robin, hidden: true}
+BaseCR:         &BaseCR {type: load-balance, interval: 180, tolerance: 100, lazy: true, url: "https://www.google.com/generate_204", strategy: round-robin, hidden: true}
 BaseUT:         &BaseUT {type: url-test,     interval: 180, tolerance: 100, lazy: true, url: "https://www.google.com/generate_204", hidden: true}
 
 # 全部节点筛选正则表达式 - 所有节点
-FilterALL:      &FilterALL "^(?!.*(❗|DIRECT|直接连接|群(?!岛)|邀请|返利|循环|官网|客服|网站|网址|获取|订阅|流量|到期|机场|下次|版本|官址|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|套餐|有效|剩余|失联|测试|官方|学术|更快|如果|客户|距离|Traffic|Reset|Days|Left|TEST|USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author|\\d+\\s*GB))"
+FilterALL:      &FilterALL "^(?!.*(❗|群(?!岛)|邀请|返利|循环|官网|客服|网站|网址|获取|订阅|流量|到期|机场|下次|版本|官址|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|套餐|有效|剩余|失联|测试|官方|学术|更快|如果|客户|距离|Traffic|Reset|Days|Left|TEST|USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author|\\d+\\s*GB))"
 # 节点筛选正则表达式 - 基于地理位置过滤
 FilterUS:       &FilterUS  "^(?=.*(?i)(广美|US|美国|纽约|波特兰|达拉斯|俄勒|凤凰城|费利蒙|洛杉|圣何塞|圣克拉|西雅|芝加|🇺🇸|United States|美[国國]|华盛顿|菲尼克斯|弗里蒙特|硅谷|旧金山|拉斯维加斯|圣荷西|哥伦布|阿什本|纽瓦克|丹佛|加利福尼亚|弗吉尼亚|马纳萨斯|俄亥俄|得克萨斯|[佐乔]治亚|亚特兰大|佛罗里达|迈阿密|United[\\s-_]+States|Los[\\s-_]+Angeles|San[\\s-_]+Jose|Silicon[\\s-_]+Valley|San[\\s-_]+Francisco|Santa[\\s-_]+Clara|Seattle|Chicago|New[\\s-_]+York|Miami|Dallas|Phoenix|Fremont|Atlanta|Boston|Las[\\s-_]+Vegas|Houston|Ashburn|Buffalo|Washington|D\\.C\\.|Oregon|Portland|Virginia|Ohio|Texas|Florida|Illinois|Arizona|Orem|Kansas))(?!.*(5x)).*$"
 FilterHK:       &FilterHK  "^(?=.*(?i)(广港|香港|HK|Hong Kong|🇭🇰|HongKong|深港|沪港|呼港|京港|杭港|Hong[\\s-]?Kong|HONG[\\s-]?KONG))(?!.*(5x)).*$"
@@ -45,7 +45,6 @@ FilterDialer:   &FilterDialer "^(?=.*(?i)(🇭🇰|🇹🇼|🇨🇳))(?!.*(DIRE
 # 策略组代理列表模板 - 预定义的代理节点优先级排序
 DEFAULT:        &DEFAULT      {type: select, proxies: [高速-故转, AI-故转, 媒体-故转, 家宽-故转, 链式前置, 香港-故转, 台湾-故转, 日本-故转, 狮城-故转, 韩国-故转, 美国-故转, 其他-故转, 全球手动, 直接连接]}
 FallBack:       &FallBack     {type: select, proxies: [默认代理, 高速-故转, AI-故转, 媒体-故转, 家宽-故转, 链式前置, 香港-故转, 台湾-故转, 日本-故转, 狮城-故转, 韩国-故转, 美国-故转, 其他-故转, 全球手动, 直接连接]}
-Global:         &Global       {type: select, proxies: [高速-故转, AI-故转, 媒体-故转, 家宽-故转, 链式前置, 香港-故转, 台湾-故转, 日本-故转, 狮城-故转, 韩国-故转, 美国-故转, 其他-故转, 直接连接]}
 SelectDC:       &SelectDC     {type: select, proxies: [直接连接, 默认代理, 高速-故转, AI-故转, 媒体-故转, 家宽-故转, 链式前置, 香港-故转, 台湾-故转, 日本-故转, 狮城-故转, 韩国-故转, 美国-故转, 其他-故转, 全球手动]}
 SelectLD:       &SelectLD     {type: select, proxies: [链式前置, 默认代理, 高速-故转, AI-故转, 媒体-故转, 家宽-故转, 香港-故转, 台湾-故转, 日本-故转, 狮城-故转, 韩国-故转, 美国-故转, 其他-故转, 全球手动, 直接连接]}
 SelectISP:      &SelectISP    {type: select, proxies: [家宽-故转, 默认代理, 高速-故转, AI-故转, 媒体-故转, 链式前置, 香港-故转, 台湾-故转, 日本-故转, 狮城-故转, 韩国-故转, 美国-故转, 其他-故转, 全球手动, 直接连接]}
@@ -83,7 +82,7 @@ proxy-groups:
   - {name: 链式前置,    <<: *BaseUT,     filter: *FilterDialer, include-all: true, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Daily.png}
   - {name: 默认代理,    <<: *DEFAULT,    icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Static.png}
   - {name: 故障转移,    <<: *FallBack,   icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/ULB.png}
-  - {name: 全球手动,    <<: *Global,     icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Static.png}
+  - {name: 全球手动,    <<: *BaseFB,     include-all: true, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Static.png}
   - {name: 国外流量,    <<: *FallBack,   icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Global.png}
   - {name: 国内流量,    <<: *SelectDC,   icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/China.png}
   - {name: 兜底流量,    <<: *FallBack,   icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Final.png}

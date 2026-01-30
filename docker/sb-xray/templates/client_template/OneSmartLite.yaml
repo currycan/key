@@ -91,8 +91,10 @@ proxies:
 # ==================== 策略组 ====================
 proxy-groups:
   # ==================== 主要策略组 ====================
+  - {name: 链式前置,    <<: *BaseSmart,  include-all: true,     filter: *FilterDialer, policy-priority: *PolicyDialer,  icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Daily.png}
   - {name: 默认代理,    <<: *DEFAULT,    icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Static.png}
   - {name: 一键智选,    <<: *OneSmart,   icon: https://gh-proxy.com/raw.githubusercontent.com/666OS/YYDS/main/mihomo/image/mihomo.png}
+  - {name: 全球手动,    <<: *BaseSmart,  include-all: true, policy-priority: *PolicyDefault, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Static.png}
   - {name: 国外流量,    <<: *OneSmart,   icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Global.png}
   - {name: 国内流量,    <<: *SelectDC,   icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/China.png}
   - {name: 兜底流量,    <<: *OneSmart,   icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Final.png}
@@ -105,7 +107,6 @@ proxy-groups:
   - {name: 高速-智选,   <<: *BaseSmart, filter: *FilterFAST,  include-all: true, policy-priority: *PolicyFast,  icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Rocket.png}
   - {name: AI-智选,    <<: *BaseSmart, filter: *FilterAI,    include-all: true, policy-priority: *PolicyAI,    icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/AI.png}
   - {name: LD-智选,    <<: *BaseSmart,  include-all: true, policy-priority: *PolicyDialer, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Round_Robin_1.png}
-  - {name: 全球手动,    <<: *BaseSmart,  include-all: true, policy-priority: *PolicyDefault, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Static.png}
   # ==================== AI 服务 ====================
   - {name: 人工智能,    <<: *SelectAI,    icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/AI.png}
   # ==================== 媒体服务 ====================
@@ -138,8 +139,6 @@ proxy-groups:
   # ==================== 虚拟币 ====================
   - {name: 货币平台,    <<: *OneSmart,    icon: https://raw.githubusercontent.com/Orz-3/mini/master/Alpha/Bitcloud.png}
   - {name: 直接连接,    type: select,     proxies: [DIRECT], hidden: true, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Direct.png}
-  # - {name: 落地节点,    <<: *BaseLB,     use: ["${NODE_NAME}"], filter: *FilterISP,     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Proxy.png}
-  - {name: 链式前置,    <<: *BaseSmart,  include-all: true,     filter: *FilterDialer, policy-priority: *PolicyDialer,  icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Daily.png}
   # ==================== 智选节点 ====================
   # 地理策略层 - Smart智选选择，使用锚点模板实现多维度权重: 特性(15) + 机场(10) + 协议(5-10) + 质量(1-5)
   - {name: 香港-智选,          <<: *BaseSmart, filter: *FilterHK,     include-all: true, policy-priority: *PolicyDefault, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Hong_Kong.png}
