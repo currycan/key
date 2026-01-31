@@ -240,6 +240,54 @@ ${content}"
         log WARN "providers.yaml not found in ${WORKDIR}/providers/!"
     fi
 
+    if [ -n "$PROVIDERS" ]; then
+        log DEBUG "Processing PROVIDERS env var..."
+        # Process env var: Format "Name|URL|Suffix" per line
+        # If input is single line with multiple records, user typically uses newlines in YAML string
+
+        local env_content=""
+        # Use simple loop with IFS to parse lines
+        while IFS= read -r line || [ -n "$line" ]; do
+            # Skip empty lines
+            [ -z "$line" ] && continue
+
+            # Extract fields delimited by '|'
+            # Field 1: Name, Field 2: URL, Field 3: Suffix
+            local name url suffix
+            name=$(echo "$line" | cut -d'|' -f1 | sed 's/^[ \t]*//;s/[ \t]*$//')
+            url=$(echo "$line" | cut -d'|' -f2 | sed 's/^[ \t]*//;s/[ \t]*$//')
+            suffix=$(echo "$line" | cut -d'|' -f3 | sed 's/^[ \t]*//;s/[ \t]*$//')
+
+            if [ -n "$name" ] && [ -n "$url" ]; then
+                # Default suffix format if provided
+                local suffix_str=""
+                if [ -n "$suffix" ]; then
+                    suffix_str=" [${suffix}]"
+                fi
+
+                # Generate YAML line
+                local yaml_line="  ${name}: {<<: *BaseProvider, url: \"${url}\", override: {additional-prefix: \"[${name}] \", additional-suffix: \"${suffix_str}\"}}"
+
+                if [ -z "$env_content" ]; then
+                    env_content="${yaml_line}"
+                else
+                    env_content="${env_content}
+${yaml_line}"
+                fi
+            fi
+        done <<< "$PROVIDERS"
+
+        if [ -n "$env_content" ]; then
+             if [ -n "$clash_providers" ]; then
+                clash_providers="${clash_providers}
+${env_content}"
+            else
+                clash_providers="${env_content}"
+            fi
+            log DEBUG "Appended parsed PROVIDERS."
+        fi
+    fi
+
     export CLASH_PROXY_PROVIDERS="${clash_providers}"
 }
 

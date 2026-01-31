@@ -1,4 +1,4 @@
-# ===== sub-store =====
+  # ===== sub-store =====
 # https://github.com/sub-store-org/Sub-Store
 ARG SUB_STORE_BACKEND_VERSION="2.21.15"
 FROM xream/sub-store:${SUB_STORE_BACKEND_VERSION}-http-meta AS substore
@@ -229,6 +229,9 @@ ENV NODE_SUFFIX=""
 # ISP proxy
 ENV ENABLE_ISP_PROXY="false"
 ENV DEFAULT_ISP="LA_ISP"
+
+# 新增provider
+ENV PROVIDERS=""
 
 # x-ui
 ENV XUI_LOG_LEVEL="info"
