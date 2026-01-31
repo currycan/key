@@ -160,7 +160,7 @@ generateIspSocks5Config() {
             local x_json="{\"tag\": \"${tag}\", \"protocol\": \"socks\", \"settings\": {\"servers\": [{\"address\": \"$ip\", \"port\": $port, \"users\": [{\"user\": \"$user\", \"pass\": \"$pass\"}]}]}},"
             local s_json="{\"type\": \"socks\", \"tag\": \"${tag}\", \"server\": \"$ip\", \"server_port\": $port, \"username\": \"$user\", \"password\": \"$pass\"},"
 
-            if [[ -n "${DEFAULT_ISP:-}" && "$prefix" == "$DEFAULT_ISP" ]]; then
+            if [[ -n "${DEFAULT_ISP:-}" && ("$prefix" == "$DEFAULT_ISP" || "$prefix" == "${DEFAULT_ISP}_ISP") ]]; then
                 def_out="${x_json}"; def_sb_out="${s_json}"
                 export ISP_IP="$ip"
                 export ISP_PORT="$port"
@@ -173,6 +173,40 @@ generateIspSocks5Config() {
     done
     export CUSTOM_OUTBOUNDS="${def_out}${oth_out}"
     export SB_CUSTOM_OUTBOUNDS="${def_sb_out}${oth_sb_out}"
+}
+
+generateClientTemplateConfig() {
+    export CLASH_ISP_PROXIES=""
+
+    log INFO "Generating Client Template Config..."
+    local clash_proxies=""
+
+    for var in $(env | grep "_ISP_IP=" | cut -d= -f1); do
+        local prefix=${var%_IP} ip="${!var}"
+        local port_v="${prefix}_PORT" user_v="${prefix}_USER" pass_v="${prefix}_SECRET"
+        local port="${!port_v}" user="${!user_v}" pass="${!pass_v}"
+
+        if [[ -n "$ip" && -n "$port" ]]; then
+            # Clash / Mihomo YAML format
+            local c_yaml="  - name: ${prefix}-dialer
+    type: socks5
+    server: ${ip}
+    port: ${port}
+    username: ${user}
+    password: ${pass}
+    udp: true
+    dialer-proxy: 链式前置"
+            if [ -z "$clash_proxies" ]; then
+                clash_proxies="${c_yaml}"
+            else
+                clash_proxies="${clash_proxies}
+${c_yaml}"
+            fi
+        fi
+    done
+
+    export CLASH_ISP_PROXIES="${clash_proxies}"
+    log DEBUG "CLASH_ISP_PROXIES:\n${CLASH_ISP_PROXIES}"
 }
 
 createConfig() {
@@ -273,6 +307,7 @@ if [ "${1#-}" = 'supervisord' ] && [ "$(id -u)" = '0' ]; then
 
     /scripts/geo_update.sh
     generateIspSocks5Config
+    generateClientTemplateConfig
     createConfig
 
     log INFO "Init X-UI..."
