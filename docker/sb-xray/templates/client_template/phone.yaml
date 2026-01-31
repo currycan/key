@@ -56,47 +56,24 @@ SelectAI:       &SelectAI     {type: select, proxies: [AI-故转, 默认代理, 
 # ==================== 代理提供者 ====================
 # 注意：请提供您的机场订阅链接，每个链接一行，并为每个机场命名，末尾的[优][备]为每个节点添加机场名称前缀，可自定义
 proxy-providers:
-  equaldcdn: {<<: *BaseProvider, url: "https://gist.githubusercontent.com/currycan/a60836f66335a94f44e28a1d570a7148/raw/equaldcdn", override: {additional-prefix: "[equaldcdn] ", additional-suffix: " [优]"}}
-
-  AllOne:    {<<: *BaseProvider, url: "https://gist.githubusercontent.com/currycan/a60836f66335a94f44e28a1d570a7148/raw/AllOne-Common", override: {additional-prefix: "[AllOne] ", skip-cert-verify: false, udp: true, up: 2500 Mbps, down: 2500 Mbps}}
-
-  Nice云:    {<<: *BaseProvider, url: "https://gist.githubusercontent.com/currycan/a60836f66335a94f44e28a1d570a7148/raw/NiceYun", override: {additional-prefix: "[Nice云] ", additional-suffix: " [优]"}}
-
-  优速通:     {<<: *BaseProvider, url: "https://gist.githubusercontent.com/currycan/a60836f66335a94f44e28a1d570a7148/raw/YouSuTong", override: {additional-prefix: "[优速通] ", additional-suffix: " [优]"}}
-
-  SsrDog:    {<<: *BaseProvider, url: "https://gist.githubusercontent.com/currycan/a60836f66335a94f44e28a1d570a7148/raw/ssrdog", override: {additional-prefix: "[SsrDog] ", additional-suffix: " [优]"}}
-
-  NiceCloud: {<<: *BaseProvider, url: "https://gist.githubusercontent.com/currycan/a60836f66335a94f44e28a1d570a7148/raw/NiceCloud", override: {additional-prefix: "[NiceCloud] ", additional-suffix: " [优]"}}
-
-  星链:       {<<: *BaseProvider, url: "https://gist.githubusercontent.com/currycan/a60836f66335a94f44e28a1d570a7148/raw/XingLian", override: {additional-prefix: "[星链] ", additional-suffix: " [备]", dialer-proxy: 链式前置}}
-
-  牛逼:       {<<: *BaseProvider, url: "https://gist.githubusercontent.com/currycan/a60836f66335a94f44e28a1d570a7148/raw/NiuBi", override: {additional-prefix: "[牛逼] ", additional-suffix: " [备]"}}
-
-  火烧云:     {<<: *BaseProvider, url: "https://gist.githubusercontent.com/currycan/a60836f66335a94f44e28a1d570a7148/raw/HuoShaoYun", override: {additional-prefix: "[火烧云] ", additional-suffix: " [中]"}}
-
-  多宝:       {<<: *BaseProvider, url: "https://gist.githubusercontent.com/currycan/a60836f66335a94f44e28a1d570a7148/raw/DuoBao", override: {additional-prefix: "[多宝] ", additional-suffix: " [备]"}}
-
-  光速云:     {<<: *BaseProvider, url: "https://web01.lightspeed.club/api/v1/client/subscribe?token=c02d1e8f9cd19dcae0f146c4ed71541a&flag=clash.meta", override: {additional-prefix: "[光速云] ", additional-suffix: " [中]"}}
+  ${NODE_NAME}: {<<: *BaseProvider, url: "https://${DOMAIN}/sb-xray/clashsub", override: {additional-prefix: "[${NODE_NAME}] ", additional-suffix: " [优]"}}
+  # # 优质订阅源 - 优质节点集合，使用时请修改
+  # 优质服务商: {<<: *BaseProvider, url: "优质订阅源地址", override: {additional-suffix: " [优]"}}
+  # # 备用订阅源 - 次优节点集合，使用时请修改
+  # 备用服务商: {<<: *BaseProvider, url: "备用订阅源地址", override: {additional-suffix: " [备]"}}
+  # # 落地订阅源 - 落地服务连接，使用时请修改
+  # 落地服务商: {<<: *BaseProvider, url: "落地订阅源地址", override: {additional-suffix: " [中]", dialer-proxy: 链式前置}}
 
 proxies:
-  # 发往 la-isp-dialer 的流量先经过 链式前置，从而实现指定下一跳代理的效果
-  - name: la-isp-dialer       # 落地节点命名
-    type: socks5              # 节点协议
-    server: 167.148.160.72    # 住宅IP 代理地址
-    port: 8820                # 端口号
-    username: v9X5j3M5O9K1    # 用户名
-    password: p8P4D0j2V8P2    # 密码
+  # 发往 ${DEFAULT_ISP}-dialer 的流量先经过 "链式前置"，从而实现指定下一跳代理的效果
+  - name: ${DEFAULT_ISP}-dialer    # 落地节点命名
+    type: socks5                   # 节点协议
+    server: ${ISP_IP}              # 住宅IP 代理地址
+    port: ${ISP_PORT}              # 端口号
+    username: ${ISP_USER}          # 用户名
+    password: ${ISP_SECRET}        # 密码
     udp: true
-    dialer-proxy: 链式前置     # 指定前置代理节点组
-
-  - name: kr-isp-dialer       # 落地节点命名
-    type: socks5              # 节点协议
-    server: 203.231.108.178   # 住宅IP 代理地址
-    port: 8826                # 端口号
-    username: J3X3A8p2I6e5    # 用户名
-    password: G9M8E0v8g0w3    # 密码
-    udp: true
-    dialer-proxy: 链式前置     # 指定前置代理节点组
+    dialer-proxy: 链式前置          # 指定前置代理节点组
 
 
 # ==================== 策略组 ====================

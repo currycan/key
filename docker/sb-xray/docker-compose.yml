@@ -14,7 +14,7 @@ services:
       - XUI_WEBBASEPATH=3xadmin
       # racknerd/hostdare/zorocloud
       - ENABLE_ISP_PROXY=false
-      - DEFAULT_ISP=LA_ISP
+      - DEFAULT_ISP=LA
 
     ports:
       - '443:443/tcp'

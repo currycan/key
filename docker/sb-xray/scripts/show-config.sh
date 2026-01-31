@@ -18,7 +18,7 @@ export NODE_IP="${GEOIP_INFO#*|}"
 export REGION_INFO="${GEOIP_INFO%%|*}"
 export NODE_SUFFIX=""
 [[ "$DOMAIN" =~ ^(dmit|dc|jp) ]] && export NODE_SUFFIX="✈高速"
-[[ "$DOMAIN" =~ ^(zorocloud2|colocrossing|hostdare|racknerd) ]] && export NODE_SUFFIX="✈isp"
+[[ "$DOMAIN" =~ ^(colocrossing|hostdare|racknerd) ]] && export NODE_SUFFIX="✈isp"
 
 # Helpers
 print_colored() { echo -e "$1$2${RESET}\n"; }
