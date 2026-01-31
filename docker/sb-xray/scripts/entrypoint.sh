@@ -53,7 +53,7 @@ get_geo_info() {
 }
 
 check_brutal_status() {
-    if [ -d "/sys/module/brutal" ]; then echo "true"; else echo "false"; fi
+    [ -d "/sys/module/brutal" ] && echo "true" || echo "false"
 }
 
 generateRandomStr() {
@@ -146,54 +146,38 @@ generateEnv() {
     log INFO "Environment ready"
 }
 
-generateIspSocks5Config() {
-    export SB_SOCKS5_OUTBOUND_CONFIG="" CUSTOM_OUTBOUNDS="" SB_CUSTOM_OUTBOUNDS=""
-    [[ "${ENABLE_ISP_PROXY}" != "true" ]] && return
+# 合并 ISP 配置生成 (Server & Client)
+generateIspConfigs() {
+    export SB_SOCKS5_OUTBOUND_CONFIG="" CUSTOM_OUTBOUNDS="" SB_CUSTOM_OUTBOUNDS="" CLASH_ISP_PROXIES=""
 
-    log INFO "Generating ISP SOCKS5 outbounds..."
-    local def_out="" def_sb_out="" oth_out="" oth_sb_out=""
+    # 仅遍历一次环境变量
+    local def_out="" def_sb_out="" oth_out="" oth_sb_out="" clash_proxies=""
 
     for var in $(env | grep "_ISP_IP=" | cut -d= -f1); do
         local prefix=${var%_IP} ip="${!var}"
         local port_v="${prefix}_PORT" user_v="${prefix}_USER" pass_v="${prefix}_SECRET"
         local port="${!port_v}" user="${!user_v}" pass="${!pass_v}"
 
-        log DEBUG "Checking ISP Var: $var | Prefix: $prefix | IP: $ip | PortVar: $port_v | Port: $port"
-
         if [[ -n "$ip" && -n "$port" ]]; then
+            log DEBUG "Checking ISP Var: $var | Prefix: $prefix | IP: $ip | PortVar: $port_v | Port: $port"
             log INFO "Proxy: ${prefix} -> $ip:$port"
-            local tag="proxy-$(echo "${prefix}" | tr '[:upper:]_ ' '[:lower:]-')"
-            local x_json="{\"tag\": \"${tag}\", \"protocol\": \"socks\", \"settings\": {\"servers\": [{\"address\": \"$ip\", \"port\": $port, \"users\": [{\"user\": \"$user\", \"pass\": \"$pass\"}]}]}},"
-            local s_json="{\"type\": \"socks\", \"tag\": \"${tag}\", \"server\": \"$ip\", \"server_port\": $port, \"username\": \"$user\", \"password\": \"$pass\"},"
 
-            if [[ -n "${DEFAULT_ISP:-}" && ("$prefix" == "$DEFAULT_ISP" || "$prefix" == "${DEFAULT_ISP}_ISP") ]]; then
-                def_out="${x_json}"; def_sb_out="${s_json}"
-                export ISP_IP="$ip"
-                export ISP_PORT="$port"
-                export ISP_USER="$user"
-                export ISP_SECRET="$pass"
-            else
-                oth_out="${oth_out}${x_json}"; oth_sb_out="${oth_sb_out}${s_json}"
+            # 1. Server Configs (Logic from generateIspSocks5Config)
+            if [[ "${ENABLE_ISP_PROXY}" == "true" ]]; then
+                local tag="proxy-$(echo "${prefix}" | tr '[:upper:]_ ' '[:lower:]-')"
+                local x_json="{\"tag\": \"${tag}\", \"protocol\": \"socks\", \"settings\": {\"servers\": [{\"address\": \"$ip\", \"port\": $port, \"users\": [{\"user\": \"$user\", \"pass\": \"$pass\"}]}]}},"
+                local s_json="{\"type\": \"socks\", \"tag\": \"${tag}\", \"server\": \"$ip\", \"server_port\": $port, \"username\": \"$user\", \"password\": \"$pass\"},"
+
+                if [[ -n "${DEFAULT_ISP:-}" && ("$prefix" == "$DEFAULT_ISP" || "$prefix" == "${DEFAULT_ISP}_ISP") ]]; then
+                    def_out="${x_json}"; def_sb_out="${s_json}"
+                    export ISP_IP="$ip" ISP_PORT="$port" ISP_USER="$user" ISP_SECRET="$pass"
+                else
+                    oth_out="${oth_out}${x_json}"; oth_sb_out="${oth_sb_out}${s_json}"
+                fi
             fi
-        fi
-    done
-    export CUSTOM_OUTBOUNDS="${def_out}${oth_out}"
-    export SB_CUSTOM_OUTBOUNDS="${def_sb_out}${oth_sb_out}"
-}
 
-generateClientTemplateConfig() {
-    export CLASH_ISP_PROXIES=""
-
-    log INFO "Generating Client Template Config..."
-    local clash_proxies=""
-
-    for var in $(env | grep "_ISP_IP=" | cut -d= -f1); do
-        local prefix=${var%_IP} ip="${!var}"
-        local port_v="${prefix}_PORT" user_v="${prefix}_USER" pass_v="${prefix}_SECRET"
-        local port="${!port_v}" user="${!user_v}" pass="${!pass_v}"
-
-        if [[ -n "$ip" && -n "$port" ]]; then
-            # Clash / Mihomo YAML format
+            # 2. Client Configs (Logic from generateClientTemplateConfig)
+            # Remove _ISP suffix for cleaner display name
             local name_prefix="${prefix%_ISP}"
             local c_yaml="  - name: ${name_prefix}-dialer
     type: socks5
@@ -203,6 +187,7 @@ generateClientTemplateConfig() {
     password: ${pass}
     udp: true
     dialer-proxy: 链式前置"
+
             if [ -z "$clash_proxies" ]; then
                 clash_proxies="${c_yaml}"
             else
@@ -212,8 +197,10 @@ ${c_yaml}"
         fi
     done
 
+    export CUSTOM_OUTBOUNDS="${def_out}${oth_out}"
+    export SB_CUSTOM_OUTBOUNDS="${def_sb_out}${oth_sb_out}"
     export CLASH_ISP_PROXIES="${clash_proxies}"
-    log DEBUG "CLASH_ISP_PROXIES:\n${CLASH_ISP_PROXIES}"
+    log DEBUG "ISP Configs Generated"
 }
 
 generateProxyProvidersConfig() {
@@ -221,70 +208,38 @@ generateProxyProvidersConfig() {
     local provider_config="${WORKDIR}/providers"
     local clash_providers=""
 
+    # 1. Process File Config
     if [ -f "$provider_config" ]; then
-
         local content
-        content=$(sed \
-            -e '/^[[:space:]]*#/d' \
-            -e '/^[[:space:]]*$/d' \
-            -e '/^providers:/d' \
-            -e '/^proxy-providers:/d' \
-            "$provider_config")
-
-        if [ -n "$content" ]; then
-            clash_providers="${clash_providers}
-${content}"
-        fi
-        log DEBUG "CLASH_PROXY_PROVIDERS generated from $provider_config."
+        content=$(sed -e '/^[[:space:]]*#/d' -e '/^[[:space:]]*$/d' -e '/^providers:/d' -e '/^proxy-providers:/d' "$provider_config")
+        [ -n "$content" ] && clash_providers="${content}"
+        log DEBUG "Loaded file config from $provider_config"
     else
         log WARN "providers.yaml not found in ${WORKDIR}/providers/!"
     fi
 
-    if [ -n "$PROVIDERS" ]; then
+    # 2. Process Env Config (PROVIDERS)
+    if [ -n "${PROVIDERS:-}" ]; then
         log DEBUG "Processing PROVIDERS env var..."
-        # Process env var: Format "Name|URL|Suffix" per line
-        # If input is single line with multiple records, user typically uses newlines in YAML string
-
-        local env_content=""
-        # Use simple loop with IFS to parse lines
-        while IFS= read -r line || [ -n "$line" ]; do
-            # Skip empty lines
-            [ -z "$line" ] && continue
-
-            # Extract fields delimited by '|'
-            # Field 1: Name, Field 2: URL, Field 3: Suffix
-            local name url suffix
-            name=$(echo "$line" | cut -d'|' -f1 | sed 's/^[ \t]*//;s/[ \t]*$//')
-            url=$(echo "$line" | cut -d'|' -f2 | sed 's/^[ \t]*//;s/[ \t]*$//')
-            suffix=$(echo "$line" | cut -d'|' -f3 | sed 's/^[ \t]*//;s/[ \t]*$//')
-
-            if [ -n "$name" ] && [ -n "$url" ]; then
-                # Default suffix format if provided
-                local suffix_str=""
-                if [ -n "$suffix" ]; then
-                    suffix_str=" [${suffix}]"
-                fi
-
-                # Generate YAML line
-                local yaml_line="  ${name}: {<<: *BaseProvider, url: \"${url}\", override: {additional-prefix: \"[${name}] \", additional-suffix: \"${suffix_str}\"}}"
-
-                if [ -z "$env_content" ]; then
-                    env_content="${yaml_line}"
-                else
-                    env_content="${env_content}
-${yaml_line}"
-                fi
-            fi
-        done <<< "$PROVIDERS"
+        local env_content
+        # Use awk for efficient parsing of "Name|URL|Suffix" format
+        env_content=$(echo "$PROVIDERS" | awk -F'|' '
+            NF>=2 && $1!="" && $2!="" {
+                suffix = ""
+                if ($3 != "") suffix = " [" $3 "]"
+                # Print formatted YAML line
+                printf "  %s: {<<: *BaseProvider, url: \"%s\", override: {additional-prefix: \"[%s] \", additional-suffix: \"%s\"}}\n", $1, $2, $1, suffix
+            }
+        ')
 
         if [ -n "$env_content" ]; then
-             if [ -n "$clash_providers" ]; then
+            if [ -n "$clash_providers" ]; then
                 clash_providers="${clash_providers}
 ${env_content}"
             else
                 clash_providers="${env_content}"
             fi
-            log DEBUG "Appended parsed PROVIDERS."
+            log DEBUG "Appended parsed PROVIDERS"
         fi
     fi
 
@@ -294,17 +249,13 @@ ${env_content}"
 createConfig() {
     log INFO "Creating configurations..."
     local env_list; env_list=$(env | grep -v '^_' | cut -d= -f1 | sed 's/^/${/;s/$/}/' | xargs)
-    export RANDOM_NUM=$(shuf -i 0-9 -n 1) # used in http.conf
+    export RANDOM_NUM=$(shuf -i 0-9 -n 1)
 
-    # Templating helper
     apply_tpl() {
-        local src="$1" dest="$2"
-        local extra_env="${3:-}" # Optional extra vars
+        local src="$1" dest="$2" extra_env="${3:-}"
         log DEBUG "Gen $dest"
         mkdir -p "$(dirname "$dest")"
-
-        local temp_out
-        temp_out=$(mktemp)
+        local temp_out; temp_out=$(mktemp)
 
         if [ -n "$extra_env" ]; then
             envsubst "$env_list $extra_env" < "$src" > "$temp_out"
@@ -312,16 +263,12 @@ createConfig() {
             envsubst < "$src" > "$temp_out"
         fi
 
-        # 如果是 json 文件，尝试格式化
         if [[ "$dest" == *.json ]]; then
             if jq . "$temp_out" > "$dest" 2>/dev/null; then
-                log DEBUG "Formatted JSON: $dest"
-                rm -f "$temp_out"
-                return
+                rm -f "$temp_out"; return
             fi
-            log WARN "JSON format failed (comments?), using raw: $dest"
+            log WARN "JSON format failed, using raw: $dest"
         fi
-
         mv "$temp_out" "$dest"
     }
 
@@ -374,9 +321,10 @@ if [ "${1#-}" = 'supervisord' ] && [ "$(id -u)" = '0' ]; then
 
     decryptSecretsEnv
     generateEnv
-    source "/.env/secret"
-    source "/.env/xray"
-    cat "/.env/xray"
+    set +u; source "/.env/secret"; source "/.env/xray"; set -u
+    while IFS= read -r line; do
+        log DEBUG "${line}"
+    done < "/.env/xray"
 
     issueCertificate "sb_xray_bundle" "${DOMAIN}:dns_ali|${CDNDOMAIN}:dns_cf"
 
@@ -388,8 +336,9 @@ if [ "${1#-}" = 'supervisord' ] && [ "$(id -u)" = '0' ]; then
     fi
 
     /scripts/geo_update.sh
-    generateIspSocks5Config
-    generateClientTemplateConfig
+
+    # Combined ISP Config Generation
+    generateIspConfigs
     generateProxyProvidersConfig
     createConfig
 
@@ -399,9 +348,7 @@ if [ "${1#-}" = 'supervisord' ] && [ "$(id -u)" = '0' ]; then
     log INFO "Init S-UI..."
     sui setting -port "${SUI_PORT}" -subPort "${SUI_SUB_PORT}" -path "/${SUI_WEBBASEPATH}" -subPath "/${SUI_SUB_PATH}" >/dev/null
     sui admin -password "${PUBLIC_PASSWORD}" -username "${PUBLIC_USER}" >/dev/null
-    if [ -f "${SUI_DB_FOLDER}/s-ui.db" ]; then
-        sqlite3 "${SUI_DB_FOLDER}/s-ui.db" "UPDATE settings SET value='https://${DOMAIN}/${SUI_SUB_PATH}/' WHERE key='subURI';"
-    fi
+    [ -f "${SUI_DB_FOLDER}/s-ui.db" ] && sqlite3 "${SUI_DB_FOLDER}/s-ui.db" "UPDATE settings SET value='https://${DOMAIN}/${SUI_SUB_PATH}/' WHERE key='subURI';"
 
     log INFO "Starting fail2ban..." && fail2ban-client -x start >/dev/null
 
