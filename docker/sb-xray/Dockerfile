@@ -223,6 +223,9 @@ ENV ACMESH_SERVER_NAME="letsencrypt"
 # certs path
 ENV SSL_PATH=/pki
 
+# 节点特性后缀
+ENV NODE_SUFFIX=""
+
 # ISP proxy
 ENV ENABLE_ISP_PROXY="false"
 ENV DEFAULT_ISP="LA_ISP"

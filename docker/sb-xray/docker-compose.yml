@@ -12,7 +12,8 @@ services:
       - LISTENING_PORT=443
       - DUFS_PATH_PREFIX=/myfiles
       - XUI_WEBBASEPATH=3xadmin
-      # racknerd/hostdare/zorocloud
+      # ✈高速
+      - NODE_SUFFIX=""
       - ENABLE_ISP_PROXY=false
       - DEFAULT_ISP=LA
 

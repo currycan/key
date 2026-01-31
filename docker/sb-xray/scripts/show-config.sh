@@ -16,9 +16,14 @@ mkdir -p "${WORKDIR}/subscribe"
 export NODE_NAME="${DOMAIN%%.*}"
 export NODE_IP="${GEOIP_INFO#*|}"
 export REGION_INFO="${GEOIP_INFO%%|*}"
-export NODE_SUFFIX=""
-[[ "$DOMAIN" =~ ^(dmit|dc|jp) ]] && export NODE_SUFFIX="✈高速"
-[[ "$DOMAIN" =~ ^(colocrossing|hostdare|racknerd) ]] && export NODE_SUFFIX="✈isp"
+# Preserve NODE_SUFFIX from env, default to empty if not set
+: "${NODE_SUFFIX:=}"
+
+# Auto-detect suffix only if not manually set
+if [ -z "$NODE_SUFFIX" ]; then
+    [[ "$DOMAIN" =~ ^(dmit|dc|jp) ]] && export NODE_SUFFIX="✈高速"
+    [[ "$DOMAIN" =~ ^(colocrossing|hostdare|racknerd) && "${ENABLE_ISP_PROXY}" == "true" ]] && export NODE_SUFFIX="✈isp"
+fi
 
 # Helpers
 print_colored() { echo -e "$1$2${RESET}\n"; }
