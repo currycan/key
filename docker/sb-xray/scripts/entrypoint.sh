@@ -97,15 +97,21 @@ ensure_key_pair() {
 }
 
 decryptSecretsEnv() {
-    local sec_file="/.env/secret"
-    [ -f "$sec_file" ] && return
-    mkdir -p "$(dirname "$sec_file")"
+    local base_url="https://raw.githubusercontent.com/currycan/key/master"
+    local items=( "tmp.bin:/.env/secret" "ptmp.bin:${WORKDIR}/providers" )
+
     checkRequiredEnv DECODE
-    log INFO "Downloading encrypted secrets..."
-    curl -fsSLo /tmp/tmp.bin "https://raw.githubusercontent.com/currycan/key/master/tmp.bin" || { log ERROR "Download failed"; exit 1; }
-    crypctl decrypt -i /tmp/tmp.bin -o "$sec_file" -k "${DECODE}" || { log ERROR "Decryption failed"; exit 1; }
-    rm -f /tmp/tmp.bin
-    log INFO "Secrets decrypted"
+
+    for item in "${items[@]}"; do
+        local file="${item#*:}"
+        [ -f "$file" ] && continue
+        mkdir -p "$(dirname "$file")"
+        log INFO "Downloading and decrypting ${file}..."
+        curl -fsSLo /tmp/tmp.bin "${base_url}/${item%%:*}" || { log ERROR "Download failed"; exit 1; }
+        crypctl decrypt -i /tmp/tmp.bin -o "$file" -k "${DECODE}" || { log ERROR "Decryption failed"; exit 1; }
+        rm -f /tmp/tmp.bin
+    done
+    log INFO "Secrets initialized"
 }
 
 generateEnv() {
@@ -188,7 +194,8 @@ generateClientTemplateConfig() {
 
         if [[ -n "$ip" && -n "$port" ]]; then
             # Clash / Mihomo YAML format
-            local c_yaml="  - name: ${prefix}-dialer
+            local name_prefix="${prefix%_ISP}"
+            local c_yaml="  - name: ${name_prefix}-dialer
     type: socks5
     server: ${ip}
     port: ${port}
@@ -207,6 +214,33 @@ ${c_yaml}"
 
     export CLASH_ISP_PROXIES="${clash_proxies}"
     log DEBUG "CLASH_ISP_PROXIES:\n${CLASH_ISP_PROXIES}"
+}
+
+generateProxyProvidersConfig() {
+    log INFO "Generating Proxy Providers..."
+    local provider_config="${WORKDIR}/providers"
+    local clash_providers=""
+
+    if [ -f "$provider_config" ]; then
+
+        local content
+        content=$(sed \
+            -e '/^[[:space:]]*#/d' \
+            -e '/^[[:space:]]*$/d' \
+            -e '/^providers:/d' \
+            -e '/^proxy-providers:/d' \
+            "$provider_config")
+
+        if [ -n "$content" ]; then
+            clash_providers="${clash_providers}
+${content}"
+        fi
+        log DEBUG "CLASH_PROXY_PROVIDERS generated from $provider_config."
+    else
+        log WARN "providers.yaml not found in ${WORKDIR}/providers/!"
+    fi
+
+    export CLASH_PROXY_PROVIDERS="${clash_providers}"
 }
 
 createConfig() {
@@ -308,6 +342,7 @@ if [ "${1#-}" = 'supervisord' ] && [ "$(id -u)" = '0' ]; then
     /scripts/geo_update.sh
     generateIspSocks5Config
     generateClientTemplateConfig
+    generateProxyProvidersConfig
     createConfig
 
     log INFO "Init X-UI..."

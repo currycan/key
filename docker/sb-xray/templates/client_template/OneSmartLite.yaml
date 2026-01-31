@@ -68,13 +68,7 @@ SelectAI:       &SelectAI     {type: select, proxies: [AI-智选, 默认代理, 
 # ==================== 代理提供者 ====================
 # 注意：请提供您的机场订阅链接，每个链接一行，并为每个机场命名，末尾的[优][备]为每个节点添加机场名称前缀，可自定义
 proxy-providers:
-  ${NODE_NAME}: {<<: *BaseProvider, url: "https://${DOMAIN}/sb-xray/clashsub", override: {additional-prefix: "[${NODE_NAME}] ", additional-suffix: " [优]"}}
-  # # 优质订阅源 - 优质节点集合，使用时请修改
-  # 优质服务商: {<<: *BaseProvider, url: "优质订阅源地址", override: {additional-suffix: " [优]"}}
-  # # 备用订阅源 - 次优节点集合，使用时请修改
-  # 备用服务商: {<<: *BaseProvider, url: "备用订阅源地址", override: {additional-suffix: " [备]"}}
-  # # 落地订阅源 - 落地服务连接，使用时请修改
-  # 落地服务商: {<<: *BaseProvider, url: "落地订阅源地址", override: {additional-suffix: " [中]", dialer-proxy: 链式前置}}
+${CLASH_PROXY_PROVIDERS}
 
 proxies:
   # 发往 ${DEFAULT_ISP}-dialer 的流量先经过 "链式前置"，从而实现指定下一跳代理的效果
