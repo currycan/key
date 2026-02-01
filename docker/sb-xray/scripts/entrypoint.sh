@@ -289,21 +289,41 @@ issueCertificate() {
     local first_dom="${params%%:*}"
     local cert="${SSL_PATH}/${name}.crt" key="${SSL_PATH}/${name}.key" ca="${SSL_PATH}/${name}-ca.crt"
 
-    [[ -f "$cert" && -f "$key" && -f "$ca" ]] && { log INFO "Cert [$name] exists."; return 0; }
+    # 检查证书是否存在且未过期 (提前7天)
+    if [[ -f "$cert" && -f "$key" && -f "$ca" ]]; then
+        if openssl x509 -checkend 604800 -noout -in "$cert" >/dev/null 2>&1; then
+            log INFO "Cert [$name] exists and is valid for >7 days."
+            return 0
+        else
+            log WARN "Cert [$name] is expiring within 7 days. Forcing renewal..."
+            # 如果 acme.sh 配置丢失,下面的逻辑会重新注册并签发
+        fi
+    fi
 
     if ! acme.sh --list | grep -q "${first_dom}"; then
         checkRequiredEnv "ACMESH_SERVER_NAME" "ACMESH_REGISTER_EMAIL" "ALI_KEY" "ALI_SECRET" "CF_TOKEN" "CF_ZONE_ID" "CF_ACCOUNT_ID"
         export Ali_Key="${ALI_KEY}" Ali_Secret="${ALI_SECRET}" CF_Token="${CF_TOKEN}" CF_Zone_ID="${CF_ZONE_ID}" CF_Account_ID="${CF_ACCOUNT_ID}"
 
         log INFO "Requesting cert for $name..."
-        acme.sh --register-account -m "${ACMESH_REGISTER_EMAIL}" --server "${ACMESH_SERVER_NAME}" >/dev/null 2>&1
+        local reg_args=("-m" "${ACMESH_REGISTER_EMAIL}" "--server" "${ACMESH_SERVER_NAME}")
+
+        # Google CA 特殊处理：强制检查 EAB
+        if [[ "${ACMESH_SERVER_NAME}" == "google" ]]; then
+            if [[ -z "${ACMESH_EAB_KID:-}" || -z "${ACMESH_EAB_HMAC_KEY:-}" ]]; then
+                log ERROR "Google CA requires EAB credentials (ACMESH_EAB_KID & ACMESH_EAB_HMAC_KEY)!"
+                return 1
+            fi
+        fi
+        [[ -n "${ACMESH_EAB_KID:-}" && -n "${ACMESH_EAB_HMAC_KEY:-}" ]] && reg_args+=("--eab-kid" "${ACMESH_EAB_KID}" "--eab-hmac-key" "${ACMESH_EAB_HMAC_KEY}")
+
+        acme.sh --register-account "${reg_args[@]}" >/dev/null 2>&1
 
         local args=("--issue" "--ecc" "--server" "${ACMESH_SERVER_NAME}")
         IFS='|' read -ra ENTRIES <<< "$params"
         for e in "${ENTRIES[@]}"; do
             local d="${e%%:*}" p="${e#*:}"
             args+=("-d" "$d" "--dns" "$p")
-            [[ "${ACMESH_SERVER_NAME}" == "letsencrypt" && ! "$d" =~ ^[0-9.]+$ ]] && args+=("-d" "*.$d" "--dns" "$p")
+            [[ ! "$d" =~ ^[0-9.]+$ ]] && args+=("-d" "*.$d" "--dns" "$p")
         done
         acme.sh "${args[@]}" || { log ERROR "Cert issue failed"; return 1; }
     fi

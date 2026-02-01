@@ -7,7 +7,10 @@ services:
       - CDNDOMAIN=$cdndomain
       - DECODE=$code
       - ACMESH_DEBUG=1
-      - ACMESH_SERVER_NAME=letsencrypt
+      # zerossl/google
+      - ACMESH_SERVER_NAME=zerossl
+      - ACMESH_EAB_KID=$eab_kid  # 填入 Google EAB keyId
+      - ACMESH_EAB_HMAC_KEY=$eab_hmac_key # 填入 Google EAB b64MacKey
       - DEST_HOST=speed.cloudflare.com
       - LISTENING_PORT=443
       - DUFS_PATH_PREFIX=/myfiles

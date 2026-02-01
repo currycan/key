@@ -218,8 +218,8 @@ ENV LISTENING_PORT="433"
 
 # acme.sh
 ENV ACMESH_REGISTER_EMAIL=""
-# buypass/zerossl/letsencrypt
-ENV ACMESH_SERVER_NAME="letsencrypt"
+# zerossl/google
+ENV ACMESH_SERVER_NAME="zerossl"
 # certs path
 ENV SSL_PATH=/pki
 
