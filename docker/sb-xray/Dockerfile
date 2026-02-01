@@ -1,6 +1,6 @@
   # ===== sub-store =====
 # https://github.com/sub-store-org/Sub-Store
-ARG SUB_STORE_BACKEND_VERSION="2.21.15"
+ARG SUB_STORE_BACKEND_VERSION="2.21.19"
 FROM xream/sub-store:${SUB_STORE_BACKEND_VERSION}-http-meta AS substore
 
 FROM node:alpine AS sub-store-front-builder
@@ -11,7 +11,7 @@ WORKDIR /app/sub-store-frontend
 
 ENV SUB_STORE_WEBBASEPATH="sub-store"
 
-ARG SUB_STORE_FRONTEND_VERSION="2.16.11"
+ARG SUB_STORE_FRONTEND_VERSION="2.16.12"
 COPY --from=substore /opt/app /sub-store
 RUN set -ex; \
     if [ -z "$SUB_STORE_FRONTEND_VERSION" ]; then \
@@ -85,7 +85,7 @@ RUN set -ex; \
     mv /tmp/dufs /usr/local/bin/
 
 # ===== 安装 cloudflared =====
-ARG CLOUDFLARED_VERSION="2026.1.1"
+ARG CLOUDFLARED_VERSION="2026.1.2"
 RUN set -ex; \
     if [ -z "$CLOUDFLARED_VERSION" ]; then \
         CLOUDFLARED_VERSION=$(curl -sSf https://github.com/cloudflare/cloudflared/tags \
@@ -98,7 +98,7 @@ RUN set -ex; \
     mv /tmp/cloudflared /usr/local/bin/
 
 # ===== 安装 x-ui =====
-ARG XUI_VERSION="2.8.8"
+ARG XUI_VERSION="2.8.9"
 RUN set -ex; \
     if [ -z "$XUI_VERSION" ]; then \
         XUI_VERSION=$(curl -sSf https://github.com/MHSanaei/3x-ui/tags \
@@ -119,7 +119,7 @@ RUN set -ex; \
     mv sui /usr/local/bin/
 
 # ===== 安装 Sing-box =====
-ARG SING_BOX_VERSION="1.12.17"
+ARG SING_BOX_VERSION="1.12.19"
 RUN set -ex; \
     if [ -z "$SING_BOX_VERSION" ]; then \
         SING_BOX_VERSION=$(curl -sSf https://github.com/SagerNet/sing-box/tags \
@@ -131,7 +131,7 @@ RUN set -ex; \
     mv /tmp/sing-box /usr/local/bin/
 
 # ===== 安装 Xray =====
-ARG XRAY_VERSION="26.1.23"
+ARG XRAY_VERSION="26.1.31"
 RUN set -ex; \
     if [ -z "$XRAY_VERSION" ]; then \
         XRAY_VERSION=$(curl -sSf https://github.com/XTLS/Xray-core/tags \
@@ -153,7 +153,7 @@ RUN set -ex; \
     mv xray /usr/local/bin/bin/xray-linux-${TARGETARCH}; \
     ln -sf /usr/local/bin/bin/xray* /usr/local/bin/xray;
 
-FROM docker.io/currycan/nginx:1.29.3
+FROM docker.io/currycan/nginx:1.29.4
 
 # Create a non-root user and group
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
