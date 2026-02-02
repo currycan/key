@@ -2,202 +2,632 @@
 
 ## 1. 项目简介
 
-本容器集成了 **Xray**、**Sing-box**、**Dufs**、**Cloudflared** 等多个网络工具，不仅作为一个强大的后端代理/分流网关，同时还提供自动化的客户端配置生成功能。
+本容器集成了 **Xray**、**Sing-box**、**X-UI**、**S-UI**、**Sub-Store**、**Dufs**、**Cloudflared** 等多个网络工具，构建了一个全自动化的代理服务平台。
 
-### 核心功能
+### 核心特性
 
-*   **多协议支持**：支持 VLESS (Reality, Hysteria2, Tuic) 等前沿协议。
-*   **客户端配置生成**：自动根据服务器配置和环境变量，生成适配 Clash/Mihomo/OneSmart 的客户端配置文件（`.yaml`）。
-*   **多 ISP 落地支持**：支持同时配置多个 ISP Socks5 代理，实现多出口分流。
-*   **GitOps 配置管理**：通过 YAML 文件管理此项目，简化运维。
+*   **多协议支持**：VLESS-Reality、Hysteria2、TUIC、VMess-WS、XHTTP 等前沿协议
+*   **双核心架构**：Xray + Sing-box 并行运行，各司其职
+*   **自动化证书**：集成 `acme.sh`，支持 ZeroSSL/Google CA，自动申请泛域名证书
+*   **客户端配置生成**：自动生成 Clash/Mihomo/Stash/Surge 等客户端配置
+*   **多 ISP 落地**：支持配置多个 Socks5 代理实现多出口分流
+*   **Web 管理面板**：X-UI (Xray) + S-UI (Sing-box) 双面板管理
 
-### 架构一览
+---
+
+## 2. 配置管理架构
+
+### 2.1 整体流程图
 
 ```mermaid
-graph TD
-    subgraph Container [Docker Container]
-        Env["环境变量 / .env"] --> Entry[entrypoint.sh]
-        Providers["config/providers.yaml"] --> PyScript[render_providers.py]
-
-        PyScript -->|生成| EnvVar_Providers["Env: CLASH_PROXY_PROVIDERS"]
-        Env -->|生成| EnvVar_ISP["Env: CLASH_ISP_PROXIES"]
-
-        Entry -->|调用| EnvVar_Providers
-        Entry -->|调用| EnvVar_ISP
-
-        Templates["Templates: MihomoPro.yaml etc."] -->|envsubst 渲染| FinalConf["最终配置: subscribe/*.yaml"]
+graph TB
+    subgraph Input[配置输入层]
+        EnvFile[.env 文件]
+        Secrets[加密配置 secret]
+        Providers[providers 文件]
     end
 
-    User[用户] -->|编辑| Env
-    User -->|编辑| Providers
-    FinalConf -->|HTTP| Client["客户端 (Clash/Mihomo)"]
+    subgraph Scripts[脚本处理层]
+        Entrypoint[entrypoint.sh]
+        GeoUpdate[geo_update.sh]
+        ShowConfig[show-config.sh]
+    end
+
+    subgraph Templates[模板层]
+        ServerXray[Xray 服务端模板]
+        ServerSB[Sing-box 服务端模板]
+        ClientTemplate[客户端模板]
+        ProxyTemplate[代理模板]
+        Nginx[Nginx 配置模板]
+    end
+
+    subgraph Runtime[运行时]
+        XrayCore[Xray 核心]
+        SBCore[Sing-box 核心]
+        NginxSrv[Nginx 服务]
+        XUI[X-UI 面板]
+        SUI[S-UI 面板]
+    end
+
+    subgraph Output[输出层]
+        Subscribe[订阅配置 /subscribe]
+        Proxies[代理链接 /proxies]
+        Logs[日志 /var/log]
+    end
+
+    EnvFile --> Entrypoint
+    Secrets --> Entrypoint
+    Providers --> Entrypoint
+
+    Entrypoint -->|envsubst 渲染| ServerXray
+    Entrypoint -->|envsubst 渲染| ServerSB
+    Entrypoint -->|envsubst 渲染| ClientTemplate
+    Entrypoint -->|envsubst 渲染| ProxyTemplate
+    Entrypoint -->|envsubst 渲染| Nginx
+
+    ServerXray --> XrayCore
+    ServerSB --> SBCore
+    Nginx --> NginxSrv
+
+    ShowConfig -->|生成| Subscribe
+    ShowConfig -->|生成| Proxies
+
+    XrayCore --> Output
+    SBCore --> Output
+```
+
+### 2.2 目录结构详解
+
+```text
+/sb-xray/
+├── scripts/                    # 核心脚本
+│   ├── entrypoint.sh          # 容器启动入口（环境变量生成、配置渲染）
+│   ├── show-config.sh         # 客户端配置/订阅生成脚本
+│   ├── geo_update.sh          # GeoIP/GeoSite 数据更新
+│   └── stop-supervisor.sh     # 优雅停止脚本
+│
+├── templates/                  # 配置模板
+│   ├── xray/                  # Xray 服务端入站配置
+│   │   ├── 01_reality_inbounds.json    # Reality 入站
+│   │   ├── 02_xhttp_inbounds.json      # XHTTP 入站
+│   │   ├── 03_vmess_ws_inbounds.json   # VMess-WS 入站
+│   │   └── xr.json                     # Xray 主配置
+│   │
+│   ├── sing-box/              # Sing-box 服务端配置
+│   │   ├── 00_log.json        # 日志配置
+│   │   ├── 01_outbounds.json  # 出站配置
+│   │   ├── 02_endpoints.json  # 端点配置
+│   │   ├── 03_route.json      # 路由规则
+│   │   ├── 11_hysteria2_inbounds.json  # Hysteria2 入站
+│   │   ├── 12_tuic_inbounds.json       # TUIC 入站
+│   │   └── 13_anytls_inbounds.json     # AnyTLS 入站
+│   │
+│   ├── client_template/       # 客户端配置模板
+│   │   ├── MihomoPro.yaml     # Mihomo 完整版
+│   │   ├── MihomoLite.yaml    # Mihomo 精简版
+│   │   ├── OneSmartPro.yaml   # OneSmart 完整版
+│   │   ├── OneSmartLite.yaml  # OneSmart 精简版
+│   │   ├── phone.yaml         # 移动端优化版
+│   │   ├── stash-full.yaml    # Stash 完整版
+│   │   ├── stash-lite.yaml    # Stash 精简版
+│   │   └── surge.conf         # Surge 配置
+│   │
+│   ├── proxies/               # 代理链接模板
+│   │   ├── all                # 所有协议
+│   │   ├── clash              # Clash 格式
+│   │   ├── stash              # Stash 格式
+│   │   └── surge              # Surge 格式
+│   │
+│   ├── nginx/                 # Nginx 配置模板
+│   │   ├── nginx.conf         # 主配置
+│   │   ├── http.conf          # HTTP 虚拟主机
+│   │   └── tcp.conf           # Stream 分流
+│   │
+│   ├── supervisord/           # Supervisor 配置
+│   └── dufs/                  # Dufs 文件服务器配置
+│
+├── /sb-xray/                  # 运行时目录（容器内）
+│   ├── xray/                  # Xray 渲染后配置
+│   ├── sing-box/              # Sing-box 渲染后配置
+│   └── subscribe/             # 客户端订阅文件
+│
+└── /pki/                      # 证书存储（挂载）
+    ├── *.crt                  # 证书文件
+    ├── *.key                  # 私钥文件
+    └── *-ca.crt               # CA 证书
 ```
 
 ---
 
-## 2. 部署指南
+## 3. 核心脚本详解
 
-该项目通常通过 Docker Compose 部署。
+### 3.1 entrypoint.sh - 启动入口
 
-### 目录结构
+**功能**：容器启动时的主控脚本，负责环境初始化、配置生成和服务启动。
 
-建议的宿主机目录结构：
+**核心流程**：
 
-```text
-/
-├── docker-compose.yml   # 核心编排文件
-├── .envs/               # 环境变量文件夹
-│   └── xray             # Xray/脚本相关环境变量
-├── config/              # 用户自定义配置
-│   └── providers.yaml   # 代理订阅源配置 (新增)
-├── scripts/             # 自定义脚本 (如果你挂载了)
-└── templates/           # 客户端模板 (如果你需要自定义)
+```mermaid
+graph LR
+    Start[容器启动] --> Decrypt[解密 Secrets]
+    Decrypt --> GenEnv[生成环境变量]
+    GenEnv --> IssueCert[申请/续期证书]
+    IssueCert --> GenISP[生成 ISP 配置]
+    GenISP --> GenProviders[生成 Providers]
+    GenProviders --> RenderTemplates[渲染所有模板]
+    RenderTemplates --> InitUI[初始化 X-UI/S-UI]
+    InitUI --> StartSupervisor[启动 Supervisor]
 ```
 
-### Docker Compose 配置示例
+**关键函数**：
+
+1.  **`generateEnv()`**：自动生成以下环境变量
+    *   `XRAY_UUID`、`SB_UUID`：随机 UUID
+    *   `XRAY_REALITY_PRIVATE_KEY/PUBLIC_KEY`：Reality 密钥对
+    *   `XRAY_MLKEM768_SEED/CLIENT`：抗量子加密密钥
+    *   `PORT_HYSTERIA2`、`PORT_TUIC`、`PORT_ANYTLS`：随机端口
+    *   `STRATEGY`：IP 策略（IPv4/IPv6）
+    *   `CHATGPT_OUT`：ChatGPT 访问检测
+
+2.  **`generateIspConfigs()`**：扫描环境变量中的 `*_ISP_IP` 模式
+    *   生成 Xray/Sing-box 的 Socks5 出站配置
+    *   生成客户端的 ISP 代理节点配置
+
+3.  **`generateProxyProvidersConfig()`**：处理 `providers` 文件
+    *   解析订阅源配置
+    *   生成 `${CLASH_PROXY_PROVIDERS}` 环境变量
+
+4.  **`issueCertificate()`**：证书管理
+    *   检查证书有效期（<7天触发续期）
+    *   使用 `acme.sh` 申请泛域名证书
+    *   支持 ZeroSSL/Google CA/Let's Encrypt
+    *   自动配置 EAB 凭据（Google CA）
+
+5.  **`createConfig()`**：模板渲染
+    *   使用 `envsubst` 替换所有模板中的 `${变量}`
+    *   生成 Xray/Sing-box/Nginx 最终配置
+
+### 3.2 show-config.sh - 配置展示
+
+**功能**：生成客户端订阅链接和代理配置文件。
+
+**输出内容**：
+
+```text
+=== 节点信息 ===
+节点名称: HK-Premium
+地区: 香港 | 电信
+IP策略: prefer_ipv4
+
+=== 订阅链接 ===
+Mihomo Pro:  https://domain.com/subscribe/MihomoPro.yaml
+Clash:       https://domain.com/subscribe/clash.yaml
+Stash:       https://domain.com/subscribe/stash.yaml
+
+=== 代理链接 ===
+所有协议:    https://domain.com/proxies/all
+Clash格式:   https://domain.com/proxies/clash
+```
+
+**生成逻辑**：
+1.  读取环境变量（`DOMAIN`、`XRAY_UUID`、`PORT_*` 等）
+2.  使用 `templates/proxies/*` 模板
+3.  通过 `envsubst` 替换变量
+4.  输出到 `/sb-xray/subscribe/` 和 `/data/proxies/`
+
+### 3.3 geo_update.sh - 地理数据更新
+
+**功能**：定期更新服务端的 GeoIP 和 GeoSite 数据库，确保路由规则的准确性。
+
+**更新数据**：
+
+| 文件 | 来源 | 用途 |
+| :--- | :--- | :--- |
+| `geoip.dat` | Loyalsoldier/v2ray-rules-dat | 全球 IP 地址归属数据库 |
+| `geosite.dat` | Loyalsoldier/v2ray-rules-dat | 全球域名分类数据库 |
+| `geoip_IR.dat` | chocolate4u/Iran-v2ray-rules | 伊朗专用 IP 数据库 |
+| `geosite_IR.dat` | chocolate4u/Iran-v2ray-rules | 伊朗专用域名数据库 |
+| `geoip_RU.dat` | runetfreedom/russia-v2ray-rules-dat | 俄罗斯专用 IP 数据库 |
+| `geosite_RU.dat` | runetfreedom/russia-v2ray-rules-dat | 俄罗斯专用域名数据库 |
+
+**工作流程**：
+
+```mermaid
+graph LR
+    Start[定时触发] --> Download[并行下载 6 个文件]
+    Download --> Wait[等待下载完成]
+    Wait --> Link[更新软链接]
+    Link --> Check{Supervisor 运行?}
+    Check -->|是| Restart[重启 Xray 服务]
+    Check -->|否| Skip[跳过重启]
+    Restart --> Clean[清理 Socket 文件]
+    Clean --> End[完成]
+    Skip --> End
+```
+
+**核心特性**：
+
+1.  **并行下载**：使用后台任务 (`&`) 同时下载多个文件，提升效率
+2.  **失败重试**：`curl --retry 3 --retry-delay 2` 确保网络波动时的可靠性
+3.  **优雅重启**：
+    *   停止 Xray 服务
+    *   清理旧的 Unix Socket 文件（`/dev/shm/uds*`）
+    *   重新启动 Xray 和 X-UI
+4.  **日志记录**：所有操作记录到 `/var/log/geo_update.log`
+
+**调度配置**：
+
+脚本通过 `entrypoint.sh` 添加到 crontab：
+
+```bash
+# 每天凌晨 3 点执行
+0 3 * * * /scripts/geo_update.sh >> /var/log/geo_update.log 2>&1
+```
+
+**手动执行**：
+
+```bash
+# 进入容器
+docker exec -it sb-xray bash
+
+# 手动更新
+/scripts/geo_update.sh
+
+# 查看日志
+tail -f /var/log/geo_update.log
+```
+
+**数据用途**：
+
+这些 GeoIP/GeoSite 数据被 Xray 和 Sing-box 用于：
+*   **国内直连**：`GEOIP,CN,DIRECT` - 中国 IP 直连
+*   **域名分流**：`GEOSITE,CN,DIRECT` - 中国域名直连
+*   **广告拦截**：`GEOSITE,category-ads-all,REJECT` - 拦截广告域名
+*   **特定地区优化**：伊朗/俄罗斯用户的专用路由规则
+
+---
+
+## 4. 服务端模板详解
+
+### 4.1 Xray 入站配置
+
+#### 01_reality_inbounds.json - Reality 入站
+
+**监听方式**：Unix Domain Socket (`/dev/shm/udsreality.sock`)
+
+**核心参数**：
+*   `serverNames`: 仅响应伪装域名（`${DEST_HOST}`）
+*   `privateKey`: Reality 私钥
+*   `shortIds`: 短 ID 列表
+*   `dest`: Fallback 目标（`nginx.sock`）
+
+**Fallback 机制**：
+```json
+{
+  "name": "http-fallback",
+  "dest": "unix:/dev/shm/nginx.sock",
+  "xver": 1
+}
+```
+
+#### 02_xhttp_inbounds.json - XHTTP 入站
+
+**监听方式**：Unix Domain Socket (`/dev/shm/udsxhttp.sock`)
+
+**特性**：
+*   支持 MLKEM768 抗量子加密
+*   通过 gRPC (H2) 接收流量
+*   支持 Reality 和 TLS 双通道
+
+#### 03_vmess_ws_inbounds.json - VMess-WS 入站
+
+**监听方式**：Unix Domain Socket (`/dev/shm/udsvmessws.sock`)
+
+**用途**：CDN 友好，支持 Cloudflare 中转
+
+### 4.2 Sing-box 入站配置
+
+#### 11_hysteria2_inbounds.json
+
+**监听方式**：UDP 直接监听（`::`）
+
+**核心参数**：
+*   `up_mbps` / `down_mbps`：带宽限制
+*   `obfs`: 混淆配置
+*   `tls`: 自签名证书
+
+#### 12_tuic_inbounds.json
+
+**监听方式**：UDP 直接监听
+
+**拥塞控制**：BBR / Cubic
+
+#### 13_anytls_inbounds.json
+
+**监听方式**：TCP 直接监听
+
+**伪装**：模拟 TLS 握手
+
+---
+
+## 5. 客户端模板详解
+
+### 5.1 模板类型对比
+
+| 模板 | 定位 | 规则数 | 策略组数 | 适用场景 |
+| :--- | :--- | :--- | :--- | :--- |
+| **MihomoPro.yaml** | 完整版 | ~15000 | 50+ | 桌面端，追求极致分流 |
+| **MihomoLite.yaml** | 精简版 | ~5000 | 20+ | 移动端，节省内存 |
+| **OneSmartPro.yaml** | 智能完整版 | ~15000 | 40+ | 自动选择最优节点 |
+| **OneSmartLite.yaml** | 智能精简版 | ~5000 | 15+ | 移动端智能分流 |
+| **phone.yaml** | 移动优化 | ~3000 | 10+ | 手机专用 |
+| **stash-full.yaml** | Stash 完整 | ~12000 | 45+ | iOS Stash 客户端 |
+| **surge.conf** | Surge | ~8000 | 30+ | macOS/iOS Surge |
+
+### 5.2 核心变量说明
+
+所有客户端模板都支持以下环境变量替换：
+
+| 变量 | 说明 | 示例值 |
+| :--- | :--- | :--- |
+| `${DOMAIN}` | 服务器主域名 | `example.com` |
+| `${CDNDOMAIN}` | CDN 域名 | `cdn.example.com` |
+| `${LISTENING_PORT}` | 监听端口 | `443` |
+| `${XRAY_UUID}` | Xray UUID | `xxxx-xxxx-xxxx` |
+| `${SB_UUID}` | Sing-box UUID | `yyyy-yyyy-yyyy` |
+| `${PORT_HYSTERIA2}` | Hysteria2 端口 | `30001` |
+| `${PORT_TUIC}` | TUIC 端口 | `30002` |
+| `${XRAY_REALITY_PUBLIC_KEY}` | Reality 公钥 | `abcd1234...` |
+| `${XRAY_URL_PATH}` | WebSocket 路径 | `random32chars` |
+| `${CLASH_PROXY_PROVIDERS}` | 订阅源配置 | YAML 格式字符串 |
+| `${CLASH_ISP_PROXIES}` | ISP 代理配置 | YAML 格式字符串 |
+
+### 5.3 模板结构
+
+以 `MihomoPro.yaml` 为例：
+
+```yaml
+# 1. 锚点定义（复用配置）
+BaseProvider: &BaseProvider
+  type: http
+  interval: 86400
+  health-check:
+    enable: true
+    url: https://www.gstatic.com/generate_204
+
+# 2. 代理订阅源（动态注入）
+proxy-providers:
+  ${CLASH_PROXY_PROVIDERS}  # 由 entrypoint.sh 生成
+
+# 3. 代理节点（动态注入）
+proxies:
+  ${CLASH_ISP_PROXIES}      # ISP 代理节点
+
+# 4. 策略组
+proxy-groups:
+  - name: 🚀 节点选择
+    type: select
+    proxies:
+      - ♻️ 自动选择
+      - 🔯 故障转移
+      - 🔮 负载均衡
+
+# 5. 规则集
+rules:
+  - GEOIP,CN,DIRECT
+  - MATCH,🚀 节点选择
+```
+
+---
+
+## 6. 多 ISP 落地配置
+
+### 6.1 配置方法
+
+在环境变量中定义 ISP 信息（支持多个）：
+
+```bash
+# ISP 1: 洛杉矶家宽
+LA_ISP_IP=1.2.3.4
+LA_ISP_PORT=2000
+LA_ISP_USER=user1
+LA_ISP_SECRET=pass1
+
+# ISP 2: 韩国家宽
+KR_ISP_IP=5.6.7.8
+KR_ISP_PORT=3000
+KR_ISP_USER=user2
+KR_ISP_SECRET=pass2
+
+# 默认 ISP（用于模板引用）
+DEFAULT_ISP=LA
+ENABLE_ISP_PROXY=true
+```
+
+### 6.2 生成结果
+
+**服务端（Xray）**：
+```json
+{
+  "tag": "proxy-la",
+  "protocol": "socks",
+  "settings": {
+    "servers": [{
+      "address": "1.2.3.4",
+      "port": 2000,
+      "users": [{"user": "user1", "pass": "pass1"}]
+    }]
+  }
+}
+```
+
+**客户端（Clash）**：
+```yaml
+proxies:
+  - name: LA-dialer
+    type: socks5
+    server: 1.2.3.4
+    port: 2000
+    username: user1
+    password: pass1
+    udp: true
+    dialer-proxy: 链式前置
+```
+
+---
+
+## 7. 代理订阅源管理
+
+### 7.1 配置文件
+
+在 `providers` 文件中定义订阅源（支持环境变量或文件）：
+
+**方式 1：环境变量**
+```bash
+PROVIDERS="第一个|https://example.com/sub1|优
+第二个|https://example.com/sub2|中"
+```
+
+**方式 2：文件**（推荐）
+创建 `/sb-xray/providers` 文件：
+```text
+第一个|https://example.com/sub1|优
+第二个|https://example.com/sub2|中
+```
+
+### 7.2 生成逻辑
+
+`entrypoint.sh` 会解析格式 `Name|URL|Suffix`，生成：
+
+```yaml
+proxy-providers:
+  第一个:
+    <<: *BaseProvider
+    url: "https://example.com/sub1"
+    override:
+      additional-prefix: "[第一个] "
+      additional-suffix: " [优]"
+  第二个:
+    <<: *BaseProvider
+    url: "https://example.com/sub2"
+    override:
+      additional-prefix: "[第二个] "
+      additional-suffix: " [中]"
+```
+
+---
+
+## 8. 部署与使用
+
+### 8.1 Docker Compose 配置
 
 ```yaml
 services:
   sb-xray:
-    image: currycan/sb-xray:latest
+    image: currycan/sb-xray:26.1.31
     container_name: sb-xray
     environment:
-      - DOMAIN=example.com        # 你的域名
-      - ENABLE_ISP_PROXY=false    # 后端是否启用 ISP 代理
+      - DOMAIN=example.com
+      - CDNDOMAIN=cdn.example.com
+      - DECODE=your_decrypt_key
+      - ACMESH_SERVER_NAME=zerossl
+      - ACMESH_EAB_KID=  # Google CA 可选
+      - ACMESH_EAB_HMAC_KEY=
+      - ENABLE_ISP_PROXY=false
+    ports:
+      - '443:443/tcp'
+      - '443:443/udp'
     volumes:
-      - ./config:/sb-xray/config  # [重要] 挂载配置目录
-      - ./.envs:/.env             # 挂载环境变量
+      - ./pki:/pki
+      - ./acmecerts:/acmecerts
+      - ./.envs:/.env
+      - ./sb-xray:/sb-xray
+      - ./data:/data
+    restart: always
+    network_mode: host
 ```
 
----
-
-## 3. 代理提供商管理 (Proxy Providers)
-
-为了方便管理大量的机场订阅源，本项目引入了 **Proxy Provider Management Tool**。您不再需要手动编辑复杂的 `yaml` 模板，只需维护一个简单的 `providers.yaml` 文件。
-
-### 配置文件: `config/providers.yaml`
-
-在挂载的 `config` 目录下创建 `providers.yaml`：
-
-```yaml
-providers:
-  # 订阅源名称
-  第一个:
-    # 订阅地址 (支持 <host> 占位符，会自动替换为 DOMAIN)
-    url: "<host>/raw/第一个"
-    # 覆盖配置 (Override)
-    override:
-      additional-prefix: "[第一个] "  # 节点前缀
-      additional-suffix: " [优]"      # 节点后缀
-      skip-cert-verify: false
-      udp: true
-
-  # 另一个订阅源
-  第二个:
-    url: "https://example.com/sub/123" # 支持完整 URL
-    override:
-      additional-prefix: "[第二个] "
-```
-
-### 工作原理
-
-1.  容器启动时，`scripts/render_providers.py` 读取此文件。
-2.  脚本将其转换为 Clash/Mihomo 兼容的 YAML 格式字符串。
-3.  该字符串被注入到环境变量 `${CLASH_PROXY_PROVIDERS}`。
-4.  最终渲染到 `MihomoPro.yaml` 等模板中，替换原有的 `${CLASH_PROXY_PROVIDERS}` 占位符。
-
----
-
-## 4. 多 ISP 落地支持
-
-如果您的后端服务器连接了多个 Socks5 代理（例如多个不同地区的家庭宽带代理），系统可以自动识别并将它们添加到客户端配置中。
-
-### 配置方法
-
-在环境变量中定义 ISP 信息。支持两种命名格式：
-
-1.  **完整格式**：`Prefix_ISP_IP`, `Prefix_ISP_PORT`... (例如 `LA_ISP_IP`)
-2.  **简写引用**：在 `DEFAULT_ISP` 中使用简写。
-
-**环境变量示例：**
+### 8.2 首次启动
 
 ```bash
-# 1. 洛杉矶 ISP
-LA_ISP_IP=1.2.3.4
-LA_ISP_PORT=2000
-LA_ISP_USER=user1
-LA_ISP_PASS=pass1
+# 1. 启动容器
+docker compose up -d
 
-# 2. 韩国 ISP
-KR_ISP_IP=5.6.7.8
-KR_ISP_PORT=3000
-KR_ISP_USER=user2
-KR_ISP_PASS=pass2
+# 2. 查看日志
+docker logs -f sb-xray
 
-# 3. 默认 ISP (用于模板中 ${DEFAULT_ISP}-dialer 的引用)
-DEFAULT_ISP=LA  # 系统会自动匹配到 LA_ISP_* 变量
+# 3. 查看生成的配置
+docker exec sb-xray show
+
+# 4. 访问订阅链接
+curl https://example.com/subscribe/MihomoPro.yaml
 ```
 
-### 生成结果
+### 8.3 配置更新
 
-系统会自动生成如下的 Proxy 配置（YAML）：
+```bash
+# 修改环境变量后重启
+docker compose restart
 
-```yaml
-proxies:
-  - name: LA_ISP-dialer
-    server: 1.2.3.4
-    port: 2000
-    ...
-  - name: KR_ISP-dialer
-    server: 5.6.7.8
-    port: 3000
-    ...
+# 强制重新生成证书
+rm -rf ./pki/* ./acmecerts/*
+docker compose restart
 ```
-
-这些代理会被注入到环境变量 `${CLASH_ISP_PROXIES}` 中，供模板使用。
 
 ---
 
-## 5. 客户端模板渲染
+## 9. 故障排查
 
-容器启动时会处理 `/templates/client_template/` 下的所有模板文件。
+### 9.1 日志位置
 
-### 核心变量
+```bash
+# 容器日志
+docker logs sb-xray
 
-以下变量会在渲染时被替换：
+# Supervisor 日志
+docker exec sb-xray tail -f /var/log/supervisor/supervisord.log
 
-| 变量名 | 描述 | 来源 |
-| :--- | :--- | :--- |
-| `${NODE_NAME}` | 节点名称 | 自动生成或环境变量 |
-| `${DOMAIN}` | 服务器域名 | 环境变量 |
-| `${CLASH_PROXY_PROVIDERS}` | 代理订阅源列表 | 由 `config/providers.yaml` 生成 |
-| `${CLASH_ISP_PROXIES}` | ISP 代理列表 | 由 `*_ISP_*` 环境变量生成 |
+# Xray 日志
+docker exec sb-xray tail -f /var/log/xray/access.log
 
-### 自定义模板
+# Nginx 日志
+docker exec sb-xray tail -f /var/log/nginx/access.log
+```
 
-如果您需要修改分流规则或策略组：
-1.  修改 `templates/client_template/MihomoPro.yaml` (或其他文件)。
-2.  保留关键变量 `${CLASH_PROXY_PROVIDERS}` 和 `${CLASH_ISP_PROXIES}`。
-3.  重启容器生效。
+### 9.2 常见问题
+
+**Q: 证书申请失败？**
+A: 检查 DNS 配置，确保 `DOMAIN` 和 `CDNDOMAIN` 都正确解析到服务器。
+
+**Q: 客户端配置为空？**
+A: 检查 `CLASH_PROXY_PROVIDERS` 和 `CLASH_ISP_PROXIES` 环境变量是否正确生成。
+
+**Q: ISP 代理不生效？**
+A: 确保 `ENABLE_ISP_PROXY=true` 且 ISP 变量成组出现（IP、PORT、USER、SECRET）。
 
 ---
 
-## 6. 排查指南
+## 10. 进阶配置
 
-如果生成的配置不符合预期，请检查以下几点：
+### 10.1 自定义客户端模板
 
-1.  **日志检查**：
-    查看容器日志，确认脚本是否报错：
+1.  复制模板到宿主机：
     ```bash
-    docker logs sb-xray
+    docker cp sb-xray:/templates/client_template ./custom_templates
     ```
-    关注 `Generating Proxy Providers...` 和 `Generating Client Template Config...` 部分的日志。
 
-2.  **验证 providers.yaml**：
-    确保 YAML 缩进正确（通常是 2 或 4 个空格）。
+2.  修改模板（保留关键变量）
 
-3.  **验证 ISP 变量**：
-    确保 ISP 变量名以 `_ISP_IP`, `_ISP_PORT` 等结尾，且成组出现。
+3.  挂载自定义模板：
+    ```yaml
+    volumes:
+      - ./custom_templates:/templates/client_template
+    ```
 
-4.  **调试输出**：
-    容器日志中会以 `DEBUG` 级别打印生成的 `${CLASH_ISP_PROXIES}` 内容，可用于核对格式。
+### 10.2 自定义服务端配置
+
+修改 `templates/xray/*.json` 或 `templates/sing-box/*.json`，重启容器生效。
+
+### 10.3 证书高级配置
+
+参考 [`docs/certificate-guide.md`](file:///Users/andrew/Documents/GitHub/key/docker/sb-xray/docs/certificate-guide.md) 了解 Google CA、ZeroSSL 的详细配置。
