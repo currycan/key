@@ -40,7 +40,7 @@ FilterFAST:     &FilterFAST   "^(?=.*(?i)(高速))(?!.*(DIRECT|直接连接|5x))
 # 节点筛选正则表达式 - AI节点
 FilterAI:       &FilterAI     "^(?=.*(?i)(AI|AllOne))(?!.*(DIRECT|直接连接|5x|racknerd|hostdare|zorocloud)).*$"
 # 节点筛选正则表达式 - 过滤链式代理节点
-FilterDialer:   &FilterDialer "^(?=.*(?i)(🇭🇰|🇹🇼|🇨🇳))(?!.*(DIRECT|直接连接|REJECT|isp-dialer)).*$"
+FilterDialer:   &FilterDialer "^(?=.*(?i)(🇭🇰|🇹🇼|🇨🇳))(?!.*(DIRECT|直接连接|REJECT|-dialer)).*$"
 
 # 策略组代理列表模板 - 预定义的代理节点优先级排序
 DEFAULT:        &DEFAULT      {type: select, proxies: [高速-故转, AI-故转, 媒体-故转, 家宽-故转, 链式前置, 香港-故转, 台湾-故转, 日本-故转, 狮城-故转, 韩国-故转, 美国-故转, 其他-故转, 全球手动, 直接连接]}

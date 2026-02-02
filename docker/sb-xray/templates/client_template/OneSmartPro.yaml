@@ -39,7 +39,7 @@ FilterFAST:     &FilterFAST   "^(?=.*(?i)(高速))(?!.*(DIRECT|直接连接|5x))
 # 节点筛选正则表达式 - AI节点
 FilterAI:       &FilterAI     "^(?=.*(?i)(AI|AllOne))(?!.*(DIRECT|直接连接|5x|racknerd|hostdare|zorocloud)).*$"
 # 节点筛选正则表达式 - 过滤链式代理节点
-FilterDialer:   &FilterDialer "^(?=.*(?i)(🇭🇰|🇹🇼|🇨🇳))(?!.*(DIRECT|直接连接|REJECT|isp-dialer)).*$"
+FilterDialer:   &FilterDialer "^(?=.*(?i)(🇭🇰|🇹🇼|🇨🇳))(?!.*(DIRECT|直接连接|REJECT|-dialer)).*$"
 
 # Policy-Priority 模板 - 智能节点选择权重配置
 # 设计理念: filter 负责筛选节点范围, policy-priority 负责在筛选结果中进行多维度排序
