@@ -129,6 +129,7 @@ generateEnv() {
         "PORT_HYSTERIA2|generateRandomStr port"
         "PORT_TUIC|generateRandomStr port"
         "PORT_ANYTLS|generateRandomStr port"
+        "SUBSCRIBE_TOKEN|generateRandomStr path 32"
         "CHATGPT_OUT|check_chatgpt_access"
         "STRATEGY|detect_ip_strategy_api"
         "GEOIP_INFO|get_geo_info"
@@ -369,6 +370,20 @@ if [ "${1#-}" = 'supervisord' ] && [ "$(id -u)" = '0' ]; then
     sui setting -port "${SUI_PORT}" -subPort "${SUI_SUB_PORT}" -path "/${SUI_WEBBASEPATH}" -subPath "/${SUI_SUB_PATH}" >/dev/null
     sui admin -password "${PUBLIC_PASSWORD}" -username "${PUBLIC_USER}" >/dev/null
     [ -f "${SUI_DB_FOLDER}/s-ui.db" ] && sqlite3 "${SUI_DB_FOLDER}/s-ui.db" "UPDATE settings SET value='https://${DOMAIN}/${SUI_SUB_PATH}/' WHERE key='subURI';"
+
+    # Generate .htpasswd for subscription endpoint authentication
+    log INFO "Generating .htpasswd for subscription endpoint..."
+    HTPASSWD_FILE="/etc/nginx/.htpasswd"
+    if [ -n "${PUBLIC_USER}" ] && [ -n "${PUBLIC_PASSWORD}" ]; then
+        # Use openssl to generate bcrypt password hash (more secure than MD5)
+        # Note: nginx supports bcrypt, MD5, SHA, and crypt formats
+        ENCRYPTED_PASS=$(openssl passwd -apr1 "${PUBLIC_PASSWORD}")
+        echo "${PUBLIC_USER}:${ENCRYPTED_PASS}" > "${HTPASSWD_FILE}"
+        chmod 644 "${HTPASSWD_FILE}"
+        log INFO "HTTP Basic Auth enabled for user: ${PUBLIC_USER}"
+    else
+        log WARN "PUBLIC_USER or PUBLIC_PASSWORD not set, skipping .htpasswd generation"
+    fi
 
     log INFO "Starting fail2ban..." && fail2ban-client -x start >/dev/null
 

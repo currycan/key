@@ -36,6 +36,7 @@ docker buildx build \
   --build-arg SING_BOX_VERSION="1.12.19" \
   --build-arg XRAY_VERSION="26.2.2" \
   --tag currycan/sb-xray:26.2.2 \
+  --tag currycan/sb-xray:latest \
   --push .
 ```
 
