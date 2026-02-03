@@ -131,7 +131,7 @@ RUN set -ex; \
     mv /tmp/sing-box /usr/local/bin/
 
 # ===== 安装 Xray =====
-ARG XRAY_VERSION="26.1.31"
+ARG XRAY_VERSION="26.2.2"
 RUN set -ex; \
     if [ -z "$XRAY_VERSION" ]; then \
         XRAY_VERSION=$(curl -sSf https://github.com/XTLS/Xray-core/tags \
