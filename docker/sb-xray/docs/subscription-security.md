@@ -11,7 +11,7 @@
 1.  **双重认证系统**：支持 **Token**（推荐）或 **HTTP 基础认证**，灵活且安全。
 2.  **防扫描设计**：所有非法请求（文件不存在、认证失败、格式错误）统一返回 `404 Not Found`，彻底隐藏服务端点。
 3.  **严格的访问控制**：
-    *   **路径验证**：仅允许访问符合 `[a-zA-Z0-9_-]+\.yaml` 格式的文件。
+    *   **路径验证**：仅允许访问符合允许字符（字母、数字等）的文件名，支持无后缀文件。
     *   **禁止目录浏览**：防止列出所有订阅文件。
 4.  **安全加固**：
     *   **速率限制**：防止暴力破解和 CC 攻击。
@@ -87,10 +87,12 @@ environment:
 ## 🛡️ 安全加固细节
 
 ### 1. 严格的路径验证
-仅允许访问特定的 YAML 文件名。
+仅允许访问合法的文件名（支持 .yaml 或无后缀）。
 
 *   ✅ `https://domain.com/sb-xray/MihomoPro.yaml` (通过)
-*   ❌ `https://domain.com/sb-xray/secret.txt` (404 - 扩展名错误)
+*   ✅ `https://domain.com/sb-xray/MihomoPro.yaml` (通过)
+*   ✅ `https://domain.com/sb-xray/v2rayn` (通过 - 无后缀)
+*   ❌ `https://domain.com/sb-xray/secret.txt` (404 - 扩展名/文件不存在)
 *   ❌ `https://domain.com/sb-xray/../etc/passwd` (404 - 路径遍历攻击)
 *   ❌ `https://domain.com/sb-xray/` (404 - 目录访问)
 
@@ -138,7 +140,7 @@ docker exec sb-xray awk '{print $1}' /var/log/nginx/subscribe_scan.log | sort | 
 A: 请检查以下几点：
 1. **Token 错误**：URL 中的 Token 与 `.env` 中的不一致。
 2. **认证失败**：如果没用 Token，输入的用户名/密码错误。
-3. **文件名错误**：文件名大小写敏感，且必须以 `.yaml` 结尾。
+3. **文件名错误**：文件名大小写敏感。
 4. **触发限流**：请求过于频繁，请稍等一分钟再试。
 
 **Q: 如何更换 Token 或密码？**

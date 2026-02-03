@@ -84,11 +84,23 @@ ${link_mix}
 }
 
 show_info_links() {
+    local token_param=""
+    if [ -n "${SUBSCRIBE_TOKEN:-}" ]; then
+        token_param="?token=${SUBSCRIBE_TOKEN}"
+    fi
+
     print_colored ${GREEN} "\n******************************************************************\n  *        Sing-box / Xray 多协议多传输客户端配置文件汇总         *\n"
-    print_colored ${RED} "Index:\nhttps://${CDNDOMAIN}/sb-xray/"
-    print_colored ${YELLOW} "全部订阅:\nhttps://${CDNDOMAIN}/sb-xray/proxies"
-    print_colored ${MAGENTA} "Clash 订阅:\nhttps://${CDNDOMAIN}/sb-xray/clashsub"
-    print_colored ${CYAN} "V2rayN 订阅:\nhttps://${CDNDOMAIN}/sb-xray/v2rayn"
+    print_colored ${RED} "Index:\nhttps://${CDNDOMAIN}/sb-xray/${token_param}"
+    print_colored ${YELLOW} "全部订阅:\nhttps://${CDNDOMAIN}/sb-xray/proxies${token_param}"
+    print_colored ${MAGENTA} "Clash 订阅:\nhttps://${CDNDOMAIN}/sb-xray/clashsub${token_param}"
+    print_colored ${CYAN} "V2rayN 订阅:\nhttps://${CDNDOMAIN}/sb-xray/v2rayn${token_param}"
+
+    # 提示用户
+    if [ -n "$token_param" ]; then
+         echo -e "💡 \033[33m已自动附加安全认证 Token，可直接导入客户端使用。\033[0m"
+         echo -e "🔒 \033[33m基础认证用户: ${PUBLIC_USER} / ${PUBLIC_PASSWORD}\033[0m"
+    fi
+
     print_colored ${GREEN} "\n*                                                                *\n *        Sing-box / Xray 多协议多传输客户端配置文件汇总         *\n******************************************************************"
 }
 
