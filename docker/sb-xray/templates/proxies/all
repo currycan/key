@@ -91,6 +91,7 @@ proxies:
         host: ""
         path: /${XRAY_URL_PATH}-xhttp
         mode: auto
+        xPaddingBytes: "100-1000"
     servername: ${DEST_HOST}
     encryption: mlkem768x25519plus.native.0rtt.${XRAY_MLKEM768_CLIENT}
 
@@ -110,6 +111,7 @@ proxies:
       path: /${XRAY_URL_PATH}-xhttp
       mode: auto
       extra-opts:
+        xPaddingBytes: "100-1000"
         downloadSettings:
           address: ${DOMAIN}
           port: ${LISTENING_PORT}
@@ -147,6 +149,7 @@ proxies:
       path: /${XRAY_URL_PATH}-xhttp
       mode: auto
       extra-opts:
+        xPaddingBytes: "100-1000"
         downloadSettings:
           address: ${DOMAIN}
           port: ${LISTENING_PORT}
@@ -181,5 +184,7 @@ proxies:
     xhttp-opts:
       path: /${XRAY_URL_PATH}-xhttp
       mode: auto
+      extra-opts:
+        xPaddingBytes: "100-1000"
     servername: ${CDNDOMAIN}
     encryption: mlkem768x25519plus.native.0rtt.${XRAY_MLKEM768_CLIENT}

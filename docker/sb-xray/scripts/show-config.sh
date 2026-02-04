@@ -48,16 +48,7 @@ generate_links() {
     local link_vmess="vmess://$(echo -n "$vmes_json" | base64 -w0)"
     local link_vless_vision="vless://${XRAY_UUID}@${DOMAIN}:${LISTENING_PORT}?encryption=none&flow=xtls-rprx-vision&security=reality&sni=${DEST_HOST}&fp=chrome&pbk=${XRAY_REALITY_PUBLIC_KEY}&sid=${XRAY_REALITY_SHORTID}&spx=%2F&type=tcp&headerType=none#${region_name}✈XTLS-Reality${NODE_SUFFIX}"
 
-    # 加上注释 (保留原样格式)
-    local part1="${link_hysteria2}
-${link_tuic}
-${link_anytls}
-${link_vmess}
-${link_vless_vision}"
-
-    CLASH_SUBSCRIBE="${part1}"
-
-    # 高级/Xhttp 链接 (仅 V2rayN/Sing-box 支持)
+    # 高级/Xhttp 链接 (Mihomo / V2rayN / Sing-box 支持)
     local xhttp_base="encryption=mlkem768x25519plus.native.0rtt.${XRAY_MLKEM768_CLIENT}&security=reality&sni=${DEST_HOST}&fp=chrome&pbk=${XRAY_REALITY_PUBLIC_KEY}&sid=${XRAY_REALITY_SHORTID}&type=xhttp&path=%2F${XRAY_URL_PATH}-xhttp&mode=auto"
     local link_xhttp_reality="vless://${XRAY_UUID}@${DOMAIN}:${LISTENING_PORT}?${xhttp_base}&extra=%22host%22%3A%20%22%22%2C%22path%22%3A%20%22%2F${XRAY_URL_PATH}-xhttp%22%2C%22mode%22%3A%20%22auto%22#${region_name}✈Xhttp+Reality直连${NODE_SUFFIX}"
 
@@ -72,12 +63,23 @@ ${link_vless_vision}"
 
     local link_mix="vless://${XRAY_UUID}@${CDNDOMAIN}:${LISTENING_PORT}?encryption=mlkem768x25519plus.native.0rtt.${XRAY_MLKEM768_CLIENT}&security=tls&sni=${CDNDOMAIN}&alpn=h2&fp=chrome&pbk=${XRAY_REALITY_PUBLIC_KEY}&sid=${XRAY_REALITY_SHORTID}&type=xhttp&host=${CDNDOMAIN}&path=%2F${XRAY_URL_PATH}-xhttp&mode=auto#${region_name}✈Xhttp+TLS+CDN上下行不分离${NODE_SUFFIX}"
 
-    V2RAYN_SUBSCRIBE="${part1}
-${link_xhttp_reality}
+    # 加上注释 (保留原样格式)
+    local part1="${link_hysteria2}
+${link_tuic}
+${link_anytls}
+${link_vmess}
+${link_vless_vision}"
+
+    local part2="${link_xhttp_reality}
 ${link_up_cdn_down_reality}
 ${link_up_reality_down_cdn}
-${link_mix}
-"
+${link_mix}"
+
+    CLASH_SUBSCRIBE="${part1}
+${part2}"
+
+    V2RAYN_SUBSCRIBE="${part1}
+${part2}"
     print_colored ${PURPLE} "V2RAYN 订阅链接内容如下:\n${V2RAYN_SUBSCRIBE}"
     echo -n "$V2RAYN_SUBSCRIBE" | sed '/^# 需把 tls 里的 inSecure 设置为 true$/d' | base64 -w0 > ${WORKDIR}/subscribe/v2rayn
     echo -n "$CLASH_SUBSCRIBE" | sed '/^# 需把 tls 里的 inSecure 设置为 true$/d' | base64 -w0 > ${WORKDIR}/subscribe/clashsub
