@@ -1,6 +1,6 @@
-  # ===== sub-store =====
+# ===== sub-store =====
 # https://github.com/sub-store-org/Sub-Store
-ARG SUB_STORE_BACKEND_VERSION="2.21.19"
+ARG SUB_STORE_BACKEND_VERSION="2.21.21"
 FROM xream/sub-store:${SUB_STORE_BACKEND_VERSION}-http-meta AS substore
 
 FROM node:alpine AS sub-store-front-builder
@@ -11,33 +11,33 @@ WORKDIR /app/sub-store-frontend
 
 ENV SUB_STORE_WEBBASEPATH="sub-store"
 
-ARG SUB_STORE_FRONTEND_VERSION="2.16.12"
+ARG SUB_STORE_FRONTEND_VERSION="2.16.13"
 COPY --from=substore /opt/app /sub-store
 RUN set -ex; \
-    if [ -z "$SUB_STORE_FRONTEND_VERSION" ]; then \
-        SUI_VERSION=$(curl -sSf https://api.github.com/repos/sub-store-org/Sub-Store-Front-End/releases/latest | grep '"tag_name":' | sed -E 's/.*"v?([^"]+)".*/\1/'); \
-    fi; \
-    git clone --depth 1 --branch ${SUB_STORE_FRONTEND_VERSION} https://github.com/sub-store-org/Sub-Store-Front-End /app/sub-store-frontend; \
-    npm install -g pnpm; \
-    pnpm install --frozen-lockfile; \
-    VITE_PUBLIC_PATH="/${SUB_STORE_WEBBASEPATH}/" pnpm run build; \
-    rm -rf /sub-store/frontend; \
-    mv /app/sub-store-frontend/dist /sub-store/frontend
+  if [ -z "$SUB_STORE_FRONTEND_VERSION" ]; then \
+      SUI_VERSION=$(curl -sSf https://api.github.com/repos/sub-store-org/Sub-Store-Front-End/releases/latest | grep '"tag_name":' | sed -E 's/.*"v?([^"]+)".*/\1/'); \
+  fi; \
+  git clone --depth 1 --branch ${SUB_STORE_FRONTEND_VERSION} https://github.com/sub-store-org/Sub-Store-Front-End /app/sub-store-frontend; \
+  npm install -g pnpm; \
+  pnpm install --frozen-lockfile; \
+  VITE_PUBLIC_PATH="/${SUB_STORE_WEBBASEPATH}/" pnpm run build; \
+  rm -rf /sub-store/frontend; \
+  mv /app/sub-store-frontend/dist /sub-store/frontend
 
 # ===== s-ui frontend builder =====
 FROM node:alpine AS s-ui-front-builder
 
 RUN apk add --no-cache git
 
-ARG SUI_VERSION="1.3.7"
+ARG SUI_VERSION="1.3.9"
 RUN set -ex; \
-    if [ -z "$SUI_VERSION" ]; then \
-        SUI_VERSION=$(curl -sSf https://api.github.com/repos/alireza0/s-ui/releases/latest | grep '"tag_name":' | sed -E 's/.*"v?([^"]+)".*/\1/'); \
-    fi; \
-    git clone --depth 1 --branch v${SUI_VERSION} https://github.com/alireza0/s-ui /app/s-ui; \
-    git clone --depth 1 --branch main https://github.com/alireza0/s-ui-frontend /app/s-ui-frontend; \
-    cd /app/s-ui-frontend && npm install && npm run build; \
-    mv /app/s-ui-frontend/dist /app/s-ui/web/html
+  if [ -z "$SUI_VERSION" ]; then \
+      SUI_VERSION=$(curl -sSf https://api.github.com/repos/alireza0/s-ui/releases/latest | grep '"tag_name":' | sed -E 's/.*"v?([^"]+)".*/\1/'); \
+  fi; \
+  git clone --depth 1 --branch v${SUI_VERSION} https://github.com/alireza0/s-ui /app/s-ui; \
+  git clone --depth 1 --branch main https://github.com/alireza0/s-ui-frontend /app/s-ui-frontend; \
+  cd /app/s-ui-frontend && npm install && npm run build; \
+  mv /app/s-ui-frontend/dist /app/s-ui/web/html
 
 FROM golang:1-alpine AS builder
 
@@ -70,41 +70,41 @@ RUN set -ex; \
 # ===== 安装 Dufs =====
 ARG DUFS_VERSION="0.45.0"
 RUN set -ex; \
-    if [ -z "$DUFS_VERSION" ]; then \
-        DUFS_VERSION=$(curl -sSf https://github.com/sigoden/dufs/tags \
-          | grep "releases/tag/" | grep -Ev "rc|alpha|beta" \
-          | grep -o "[0-9]\+\.[0-9]\+\.[0-9]\+" | head -n 1); \
-    fi; \
-    case "${TARGETARCH}" in \
-      amd64)   BINARY_FILE="dufs-v${DUFS_VERSION}-x86_64-unknown-linux-musl.tar.gz";; \
-      arm64)   BINARY_FILE="dufs-v${DUFS_VERSION}-arm-unknown-linux-musleabihf.tar.gz";; \
-      *)       echo "Unsupported architecture: ${TARGETARCH}"; exit 1 ;; \
-    esac; \
-    curl -fsSL "https://github.com/sigoden/dufs/releases/download/v${DUFS_VERSION}/${BINARY_FILE}" | tar -xzC /tmp/; \
-    upx --lzma --best /tmp/dufs; \
-    mv /tmp/dufs /usr/local/bin/
+  if [ -z "$DUFS_VERSION" ]; then \
+      DUFS_VERSION=$(curl -sSf https://github.com/sigoden/dufs/tags \
+        | grep "releases/tag/" | grep -Ev "rc|alpha|beta" \
+        | grep -o "[0-9]\+\.[0-9]\+\.[0-9]\+" | head -n 1); \
+  fi; \
+  case "${TARGETARCH}" in \
+    amd64)   BINARY_FILE="dufs-v${DUFS_VERSION}-x86_64-unknown-linux-musl.tar.gz";; \
+    arm64)   BINARY_FILE="dufs-v${DUFS_VERSION}-arm-unknown-linux-musleabihf.tar.gz";; \
+    *)       echo "Unsupported architecture: ${TARGETARCH}"; exit 1 ;; \
+  esac; \
+  curl -fsSL "https://github.com/sigoden/dufs/releases/download/v${DUFS_VERSION}/${BINARY_FILE}" | tar -xzC /tmp/; \
+  upx --lzma --best /tmp/dufs; \
+  mv /tmp/dufs /usr/local/bin/
 
 # ===== 安装 cloudflared =====
-ARG CLOUDFLARED_VERSION="2026.1.2"
+ARG CLOUDFLARED_VERSION="2026.2.0"
 RUN set -ex; \
-    if [ -z "$CLOUDFLARED_VERSION" ]; then \
-        CLOUDFLARED_VERSION=$(curl -sSf https://github.com/cloudflare/cloudflared/tags \
-            | grep "releases/tag/" | grep -Ev "rc|alpha|beta" \
-            | grep -o "[0-9]\+\.[0-9]\+\.[0-9]\+" | head -n 1); \
-    fi; \
-    curl -fsSL "https://github.com/cloudflare/cloudflared/releases/download/${CLOUDFLARED_VERSION}/cloudflared-linux-${TARGETARCH}" -o /tmp/cloudflared; \
-    chmod +x /tmp/cloudflared; \
-    upx --lzma --best /tmp/cloudflared; \
-    mv /tmp/cloudflared /usr/local/bin/
+  if [ -z "$CLOUDFLARED_VERSION" ]; then \
+      CLOUDFLARED_VERSION=$(curl -sSf https://github.com/cloudflare/cloudflared/tags \
+          | grep "releases/tag/" | grep -Ev "rc|alpha|beta" \
+          | grep -o "[0-9]\+\.[0-9]\+\.[0-9]\+" | head -n 1); \
+  fi; \
+  curl -fsSL "https://github.com/cloudflare/cloudflared/releases/download/${CLOUDFLARED_VERSION}/cloudflared-linux-${TARGETARCH}" -o /tmp/cloudflared; \
+  chmod +x /tmp/cloudflared; \
+  upx --lzma --best /tmp/cloudflared; \
+  mv /tmp/cloudflared /usr/local/bin/
 
 # ===== 安装 x-ui =====
 ARG XUI_VERSION="2.8.9"
 RUN set -ex; \
-    if [ -z "$XUI_VERSION" ]; then \
-        XUI_VERSION=$(curl -sSf https://github.com/MHSanaei/3x-ui/tags \
-            | grep "releases/tag/" | grep -Ev "rc|alpha|beta" \
-            | grep -o "[0-9]\+\.[0-9]\+\.[0-9]\+" | head -n 1); \
-    fi; \
+  if [ -z "$XUI_VERSION" ]; then \
+      XUI_VERSION=$(curl -sSf https://github.com/MHSanaei/3x-ui/tags \
+          | grep "releases/tag/" | grep -Ev "rc|alpha|beta" \
+          | grep -o "[0-9]\+\.[0-9]\+\.[0-9]\+" | head -n 1); \
+  fi; \
   git clone --recursive --depth 1 --shallow-submodules --branch v${XUI_VERSION} https://github.com/MHSanaei/3x-ui /app/xui; \
   cd /app/xui && go build -ldflags="-s -w" -trimpath -o x-ui main.go; \
   upx --lzma --best x-ui; \
@@ -113,45 +113,45 @@ RUN set -ex; \
 # ===== 安装 s-ui backend =====
 COPY --from=s-ui-front-builder /app/s-ui /app/s-ui
 RUN set -ex; \
-    cd /app/s-ui; \
-    go build -ldflags="-s -w" -trimpath -tags "with_quic,with_grpc,with_utls,with_acme,with_gvisor" -o sui main.go; \
-    upx --lzma --best sui; \
-    mv sui /usr/local/bin/
+  cd /app/s-ui; \
+  go build -ldflags="-s -w" -trimpath -tags "with_quic,with_grpc,with_utls,with_acme,with_gvisor" -o sui main.go; \
+  upx --lzma --best sui; \
+  mv sui /usr/local/bin/
 
 # ===== 安装 Sing-box =====
-ARG SING_BOX_VERSION="1.12.19"
+ARG SING_BOX_VERSION="1.12.21"
 RUN set -ex; \
-    if [ -z "$SING_BOX_VERSION" ]; then \
-        SING_BOX_VERSION=$(curl -sSf https://github.com/SagerNet/sing-box/tags \
-            | grep "releases/tag/" | grep -Ev "rc|alpha|beta" \
-            | grep -o "[0-9]\+\.[0-9]\+\.[0-9]\+" | head -n 1); \
-    fi; \
-    curl -fsSL "https://github.com/SagerNet/sing-box/releases/download/v${SING_BOX_VERSION}/sing-box-${SING_BOX_VERSION}-linux-${TARGETARCH}.tar.gz" | tar --strip-components=1 -xzC /tmp/; \
-    upx --lzma --best /tmp/sing-box; \
-    mv /tmp/sing-box /usr/local/bin/
+  if [ -z "$SING_BOX_VERSION" ]; then \
+      SING_BOX_VERSION=$(curl -sSf https://github.com/SagerNet/sing-box/tags \
+          | grep "releases/tag/" | grep -Ev "rc|alpha|beta" \
+          | grep -o "[0-9]\+\.[0-9]\+\.[0-9]\+" | head -n 1); \
+  fi; \
+  curl -fsSL "https://github.com/SagerNet/sing-box/releases/download/v${SING_BOX_VERSION}/sing-box-${SING_BOX_VERSION}-linux-${TARGETARCH}.tar.gz" | tar --strip-components=1 -xzC /tmp/; \
+  upx --lzma --best /tmp/sing-box; \
+  mv /tmp/sing-box /usr/local/bin/
 
 # ===== 安装 Xray =====
-ARG XRAY_VERSION="26.2.4"
+ARG XRAY_VERSION="26.2.6"
 RUN set -ex; \
-    if [ -z "$XRAY_VERSION" ]; then \
-        XRAY_VERSION=$(curl -sSf https://github.com/XTLS/Xray-core/tags \
-            | grep "releases/tag/" | grep -Ev "rc|alpha|beta" \
-            | grep -o "[0-9]\+\.[0-9]\+\.[0-9]\+" | head -n 1); \
-    fi; \
-    case "${TARGETARCH}" in \
-      amd64)   BINARY_FILE="Xray-linux-64.zip";; \
-      arm64)   BINARY_FILE="Xray-linux-arm64-v8a.zip";; \
-      *)       echo "Unsupported architecture: ${TARGETARCH}"; exit 1 ;; \
-    esac; \
-    mkdir -p /tmp/xray; \
-    cd /tmp/xray; \
-    curl -fsSLO "https://github.com/XTLS/Xray-core/releases/download/v${XRAY_VERSION}/${BINARY_FILE}"; \
-    unzip "${BINARY_FILE}"; \
-    rm -f "${BINARY_FILE}" geoip.dat geosite.dat; \
-    upx --lzma --best xray; \
-    mkdir -p /usr/local/bin/bin; \
-    mv xray /usr/local/bin/bin/xray-linux-${TARGETARCH}; \
-    ln -sf /usr/local/bin/bin/xray* /usr/local/bin/xray;
+  if [ -z "$XRAY_VERSION" ]; then \
+      XRAY_VERSION=$(curl -sSf https://github.com/XTLS/Xray-core/tags \
+          | grep "releases/tag/" | grep -Ev "rc|alpha|beta" \
+          | grep -o "[0-9]\+\.[0-9]\+\.[0-9]\+" | head -n 1); \
+  fi; \
+  case "${TARGETARCH}" in \
+    amd64)   BINARY_FILE="Xray-linux-64.zip";; \
+    arm64)   BINARY_FILE="Xray-linux-arm64-v8a.zip";; \
+    *)       echo "Unsupported architecture: ${TARGETARCH}"; exit 1 ;; \
+  esac; \
+  mkdir -p /tmp/xray; \
+  cd /tmp/xray; \
+  curl -fsSLO "https://github.com/XTLS/Xray-core/releases/download/v${XRAY_VERSION}/${BINARY_FILE}"; \
+  unzip "${BINARY_FILE}"; \
+  rm -f "${BINARY_FILE}" geoip.dat geosite.dat; \
+  upx --lzma --best xray; \
+  mkdir -p /usr/local/bin/bin; \
+  mv xray /usr/local/bin/bin/xray-linux-${TARGETARCH}; \
+  ln -sf /usr/local/bin/bin/xray* /usr/local/bin/xray;
 
 FROM docker.io/currycan/nginx:1.29.4
 
@@ -282,7 +282,7 @@ ENV DUFS_LOG_FORMAT=""
 ENV DUFS_COMPRESS="low"
 
 HEALTHCHECK --interval=30s --timeout=30s --start-period=15s --retries=3 \
-    CMD supervisorctl status xray | grep -q 'RUNNING' || exit 1
+  CMD supervisorctl status xray | grep -q 'RUNNING' || exit 1
 
 EXPOSE 80 443
 

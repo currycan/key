@@ -27,15 +27,15 @@ https://github.com/konstpic/3x-ui-new
 ```bash
 docker buildx build \
   --platform linux/amd64,linux/arm64 \
-  --build-arg SUB_STORE_BACKEND_VERSION="2.21.19" \
-  --build-arg SUB_STORE_FRONTEND_VERSION="2.16.12" \
+  --build-arg SUB_STORE_BACKEND_VERSION="2.21.21" \
+  --build-arg SUB_STORE_FRONTEND_VERSION="2.16.13" \
+  --build-arg SUI_VERSION="1.3.9" \
   --build-arg DUFS_VERSION="0.45.0" \
-  --build-arg CLOUDFLARED_VERSION="2026.1.2" \
+  --build-arg CLOUDFLARED_VERSION="2026.2.0" \
   --build-arg XUI_VERSION="2.8.9" \
-  --build-arg SUI_VERSION="1.3.7" \
-  --build-arg SING_BOX_VERSION="1.12.19" \
-  --build-arg XRAY_VERSION="26.2.4" \
-  --tag currycan/sb-xray:26.2.4 \
+  --build-arg SING_BOX_VERSION="1.12.21" \
+  --build-arg XRAY_VERSION="26.2.6" \
+  --tag currycan/sb-xray:26.2.6 \
   --tag currycan/sb-xray:latest \
   --push .
 ```
