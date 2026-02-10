@@ -15,7 +15,7 @@ ARG SUB_STORE_FRONTEND_VERSION="2.16.13"
 COPY --from=substore /opt/app /sub-store
 RUN set -ex; \
   if [ -z "$SUB_STORE_FRONTEND_VERSION" ]; then \
-      SUI_VERSION=$(curl -sSf https://api.github.com/repos/sub-store-org/Sub-Store-Front-End/releases/latest | grep '"tag_name":' | sed -E 's/.*"v?([^"]+)".*/\1/'); \
+    SUI_VERSION=$(curl -sSf https://api.github.com/repos/sub-store-org/Sub-Store-Front-End/releases/latest | grep '"tag_name":' | sed -E 's/.*"v?([^"]+)".*/\1/'); \
   fi; \
   git clone --depth 1 --branch ${SUB_STORE_FRONTEND_VERSION} https://github.com/sub-store-org/Sub-Store-Front-End /app/sub-store-frontend; \
   npm install -g pnpm; \
@@ -32,7 +32,7 @@ RUN apk add --no-cache git
 ARG SUI_VERSION="1.3.9"
 RUN set -ex; \
   if [ -z "$SUI_VERSION" ]; then \
-      SUI_VERSION=$(curl -sSf https://api.github.com/repos/alireza0/s-ui/releases/latest | grep '"tag_name":' | sed -E 's/.*"v?([^"]+)".*/\1/'); \
+    SUI_VERSION=$(curl -sSf https://api.github.com/repos/alireza0/s-ui/releases/latest | grep '"tag_name":' | sed -E 's/.*"v?([^"]+)".*/\1/'); \
   fi; \
   git clone --depth 1 --branch v${SUI_VERSION} https://github.com/alireza0/s-ui /app/s-ui; \
   git clone --depth 1 --branch main https://github.com/alireza0/s-ui-frontend /app/s-ui-frontend; \
@@ -71,9 +71,9 @@ RUN set -ex; \
 ARG DUFS_VERSION="0.45.0"
 RUN set -ex; \
   if [ -z "$DUFS_VERSION" ]; then \
-      DUFS_VERSION=$(curl -sSf https://github.com/sigoden/dufs/tags \
-        | grep "releases/tag/" | grep -Ev "rc|alpha|beta" \
-        | grep -o "[0-9]\+\.[0-9]\+\.[0-9]\+" | head -n 1); \
+    DUFS_VERSION=$(curl -sSf https://github.com/sigoden/dufs/tags \
+      | grep "releases/tag/" | grep -Ev "rc|alpha|beta" \
+      | grep -o "[0-9]\+\.[0-9]\+\.[0-9]\+" | head -n 1); \
   fi; \
   case "${TARGETARCH}" in \
     amd64)   BINARY_FILE="dufs-v${DUFS_VERSION}-x86_64-unknown-linux-musl.tar.gz";; \
@@ -88,9 +88,9 @@ RUN set -ex; \
 ARG CLOUDFLARED_VERSION="2026.2.0"
 RUN set -ex; \
   if [ -z "$CLOUDFLARED_VERSION" ]; then \
-      CLOUDFLARED_VERSION=$(curl -sSf https://github.com/cloudflare/cloudflared/tags \
-          | grep "releases/tag/" | grep -Ev "rc|alpha|beta" \
-          | grep -o "[0-9]\+\.[0-9]\+\.[0-9]\+" | head -n 1); \
+    CLOUDFLARED_VERSION=$(curl -sSf https://github.com/cloudflare/cloudflared/tags \
+      | grep "releases/tag/" | grep -Ev "rc|alpha|beta" \
+      | grep -o "[0-9]\+\.[0-9]\+\.[0-9]\+" | head -n 1); \
   fi; \
   curl -fsSL "https://github.com/cloudflare/cloudflared/releases/download/${CLOUDFLARED_VERSION}/cloudflared-linux-${TARGETARCH}" -o /tmp/cloudflared; \
   chmod +x /tmp/cloudflared; \
@@ -101,9 +101,9 @@ RUN set -ex; \
 ARG XUI_VERSION="2.8.9"
 RUN set -ex; \
   if [ -z "$XUI_VERSION" ]; then \
-      XUI_VERSION=$(curl -sSf https://github.com/MHSanaei/3x-ui/tags \
-          | grep "releases/tag/" | grep -Ev "rc|alpha|beta" \
-          | grep -o "[0-9]\+\.[0-9]\+\.[0-9]\+" | head -n 1); \
+    XUI_VERSION=$(curl -sSf https://github.com/MHSanaei/3x-ui/tags \
+      | grep "releases/tag/" | grep -Ev "rc|alpha|beta" \
+      | grep -o "[0-9]\+\.[0-9]\+\.[0-9]\+" | head -n 1); \
   fi; \
   git clone --recursive --depth 1 --shallow-submodules --branch v${XUI_VERSION} https://github.com/MHSanaei/3x-ui /app/xui; \
   cd /app/xui && go build -ldflags="-s -w" -trimpath -o x-ui main.go; \
@@ -122,9 +122,9 @@ RUN set -ex; \
 ARG SING_BOX_VERSION="1.12.21"
 RUN set -ex; \
   if [ -z "$SING_BOX_VERSION" ]; then \
-      SING_BOX_VERSION=$(curl -sSf https://github.com/SagerNet/sing-box/tags \
-          | grep "releases/tag/" | grep -Ev "rc|alpha|beta" \
-          | grep -o "[0-9]\+\.[0-9]\+\.[0-9]\+" | head -n 1); \
+    SING_BOX_VERSION=$(curl -sSf https://github.com/SagerNet/sing-box/tags \
+      | grep "releases/tag/" | grep -Ev "rc|alpha|beta" \
+      | grep -o "[0-9]\+\.[0-9]\+\.[0-9]\+" | head -n 1); \
   fi; \
   curl -fsSL "https://github.com/SagerNet/sing-box/releases/download/v${SING_BOX_VERSION}/sing-box-${SING_BOX_VERSION}-linux-${TARGETARCH}.tar.gz" | tar --strip-components=1 -xzC /tmp/; \
   upx --lzma --best /tmp/sing-box; \
@@ -134,9 +134,9 @@ RUN set -ex; \
 ARG XRAY_VERSION="26.2.6"
 RUN set -ex; \
   if [ -z "$XRAY_VERSION" ]; then \
-      XRAY_VERSION=$(curl -sSf https://github.com/XTLS/Xray-core/tags \
-          | grep "releases/tag/" | grep -Ev "rc|alpha|beta" \
-          | grep -o "[0-9]\+\.[0-9]\+\.[0-9]\+" | head -n 1); \
+    XRAY_VERSION=$(curl -sSf https://github.com/XTLS/Xray-core/tags \
+      | grep "releases/tag/" | grep -Ev "rc|alpha|beta" \
+      | grep -o "[0-9]\+\.[0-9]\+\.[0-9]\+" | head -n 1); \
   fi; \
   case "${TARGETARCH}" in \
     amd64)   BINARY_FILE="Xray-linux-64.zip";; \
