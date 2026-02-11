@@ -24,11 +24,26 @@ https://github.com/konstpic/3x-ui-new
 
 ## 镜像制作
 
+### 自动构建（推荐）
+
+使用 `build.sh` 脚本自动获取最新依赖版本并构建镜像：
+
+```bash
+./build.sh
+```
+
+### 手动构建
+
+如果需要手动指定版本，可以使用以下命令：
+
 ```bash
 docker buildx build \
   --platform linux/amd64,linux/arm64 \
-  --build-arg SUB_STORE_BACKEND_VERSION="2.21.21" \
+  --build-arg SHOUTRRR_VERSION="0.8.0" \
+  --build-arg MIHOMO_VERSION="1.19.0" \
+  --build-arg HTTP_META_VERSION="1.0.6" \
   --build-arg SUB_STORE_FRONTEND_VERSION="2.16.13" \
+  --build-arg SUB_STORE_BACKEND_VERSION="2.21.21" \
   --build-arg SUI_VERSION="1.3.9" \
   --build-arg DUFS_VERSION="0.45.0" \
   --build-arg CLOUDFLARED_VERSION="2026.2.0" \

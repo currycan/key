@@ -1,48 +1,74 @@
-# ===== sub-store =====
-# https://github.com/sub-store-org/Sub-Store
-ARG SUB_STORE_BACKEND_VERSION="2.21.21"
-FROM xream/sub-store:${SUB_STORE_BACKEND_VERSION}-http-meta AS substore
+# ==========================================
+# 第一阶段: Sub-Store 构建层
+# 从源码构建 Sub-Store 的前端和后端
+# ==========================================
+FROM node:alpine AS sub-store-builder
 
-FROM node:alpine AS sub-store-front-builder
+ARG TARGETARCH
 
-RUN apk add --no-cache git
+RUN apk add --no-cache git curl build-base python3
 
-WORKDIR /app/sub-store-frontend
-
-ENV SUB_STORE_WEBBASEPATH="sub-store"
-
-ARG SUB_STORE_FRONTEND_VERSION="2.16.13"
-COPY --from=substore /opt/app /sub-store
+# --- Shoutrrr ---
+ARG SHOUTRRR_VERSION="0.8.0"
+# arch=$(arch | sed 's/x86_64/amd64/' | sed 's/aarch64/arm64/' | sed 's/armv7l/armv6/' | sed 's/armv7/armv6/');
 RUN set -ex; \
-  if [ -z "$SUB_STORE_FRONTEND_VERSION" ]; then \
-    SUI_VERSION=$(curl -sSf https://api.github.com/repos/sub-store-org/Sub-Store-Front-End/releases/latest | grep '"tag_name":' | sed -E 's/.*"v?([^"]+)".*/\1/'); \
-  fi; \
-  git clone --depth 1 --branch ${SUB_STORE_FRONTEND_VERSION} https://github.com/sub-store-org/Sub-Store-Front-End /app/sub-store-frontend; \
+  curl -fsSL --retry 5 --retry-delay 5 "https://github.com/containrrr/shoutrrr/releases/download/v${SHOUTRRR_VERSION}/shoutrrr_linux_${TARGETARCH}.tar.gz" | tar -xzC /tmp/; \
+  chmod +x /tmp/shoutrrr; \
+  mv /tmp/shoutrrr /usr/local/bin/
+
+# --- Http-Meta ---
+WORKDIR /sub-store/http-meta
+ARG HTTP_META_VERSION="1.0.6"
+RUN set -ex; \
+  curl -fsSL --retry 5 --retry-delay 5 "https://github.com/xream/http-meta/releases/download/${HTTP_META_VERSION}/http-meta.bundle.js" -o /sub-store/http-meta.bundle.js; \
+  curl -fsSL --retry 5 --retry-delay 5 "https://github.com/xream/http-meta/releases/download/${HTTP_META_VERSION}/tpl.yaml" -o /sub-store/http-meta/tpl.yaml
+
+# --- Mihomo ---
+ARG MIHOMO_VERSION="1.19.0"
+RUN set -ex; \
+  curl -fsSL --retry 5 --retry-delay 5 "https://github.com/MetaCubeX/mihomo/releases/download/v${MIHOMO_VERSION}/mihomo-linux-${TARGETARCH}-v${MIHOMO_VERSION}.gz" | gzip -d > /tmp/http-meta; \
+  chmod +x /tmp/http-meta; \
+  mv /tmp/http-meta /sub-store/http-meta/
+
+# --- Sub-Store 后端 ---
+WORKDIR /sub-store
+ARG SUB_STORE_BACKEND_VERSION="2.21.21"
+RUN set -ex; \
+  curl -fsSL --retry 5 --retry-delay 5 "https://github.com/sub-store-org/Sub-Store/releases/download/${SUB_STORE_BACKEND_VERSION}/sub-store.bundle.js" -o /sub-store/sub-store.bundle.js
+
+# --- Sub-Store 前端 ---
+WORKDIR /app/frontend
+ARG SUB_STORE_FRONTEND_VERSION="2.16.13"
+ENV SUB_STORE_WEBBASEPATH="sub-store"
+RUN set -ex; \
+  (git clone --depth 1 --branch ${SUB_STORE_FRONTEND_VERSION} https://github.com/sub-store-org/Sub-Store-Front-End /app/frontend || (sleep 5 && git clone --depth 1 --branch ${SUB_STORE_FRONTEND_VERSION} https://github.com/sub-store-org/Sub-Store-Front-End /app/frontend)); \
   npm install -g pnpm; \
   pnpm install --frozen-lockfile; \
   VITE_PUBLIC_PATH="/${SUB_STORE_WEBBASEPATH}/" pnpm run build; \
-  rm -rf /sub-store/frontend; \
-  mv /app/sub-store-frontend/dist /sub-store/frontend
+  mv /app/frontend/dist /sub-store/frontend
 
-# ===== s-ui frontend builder =====
+# ==========================================
+# 第二阶段: S-UI 前端构建层
+# 构建 S-UI 的前端静态资源
+# ==========================================
 FROM node:alpine AS s-ui-front-builder
 
-RUN apk add --no-cache git
+RUN apk add --no-cache git curl
 
 ARG SUI_VERSION="1.3.9"
 RUN set -ex; \
-  if [ -z "$SUI_VERSION" ]; then \
-    SUI_VERSION=$(curl -sSf https://api.github.com/repos/alireza0/s-ui/releases/latest | grep '"tag_name":' | sed -E 's/.*"v?([^"]+)".*/\1/'); \
-  fi; \
-  git clone --depth 1 --branch v${SUI_VERSION} https://github.com/alireza0/s-ui /app/s-ui; \
-  git clone --depth 1 --branch main https://github.com/alireza0/s-ui-frontend /app/s-ui-frontend; \
+  (git clone --depth 1 --branch v${SUI_VERSION} https://github.com/alireza0/s-ui /app/s-ui || (sleep 5 && git clone --depth 1 --branch v${SUI_VERSION} https://github.com/alireza0/s-ui /app/s-ui)); \
+  (git clone --depth 1 --branch main https://github.com/alireza0/s-ui-frontend /app/s-ui-frontend || (sleep 5 && git clone --depth 1 --branch main https://github.com/alireza0/s-ui-frontend /app/s-ui-frontend)); \
   cd /app/s-ui-frontend && npm install && npm run build; \
   mv /app/s-ui-frontend/dist /app/s-ui/web/html
 
+# ==========================================
+# 第三阶段: 主构建层 (Golang)
+# 构建 Go 语言二进制文件 (x-ui, s-ui 后端, crypctl) 并安装其他工具
+# ==========================================
 FROM golang:1-alpine AS builder
 
 ARG TARGETARCH
-ARG TARGETVARIANT
 
 RUN apk --no-cache --update add \
   ca-certificates \
@@ -61,56 +87,41 @@ WORKDIR /app
 
 # ===== 安装 crypctl =====
 RUN set -ex; \
-  git clone --filter=blob:none --no-checkout https://github.com/currycan/key.git /app/key; \
+  (git clone --filter=blob:none --no-checkout https://github.com/currycan/key.git /app/key || (sleep 5 && git clone --filter=blob:none --no-checkout https://github.com/currycan/key.git /app/key)); \
   cd /app/key && git checkout HEAD -- docker/crypctl; \
   cd docker/crypctl && go build -ldflags="-s -w" -trimpath -o crypctl main.go; \
   upx --lzma --best crypctl; \
   mv crypctl /usr/local/bin/
 
-# ===== 安装 Dufs =====
+# --- Dufs ---
 ARG DUFS_VERSION="0.45.0"
 RUN set -ex; \
-  if [ -z "$DUFS_VERSION" ]; then \
-    DUFS_VERSION=$(curl -sSf https://github.com/sigoden/dufs/tags \
-      | grep "releases/tag/" | grep -Ev "rc|alpha|beta" \
-      | grep -o "[0-9]\+\.[0-9]\+\.[0-9]\+" | head -n 1); \
-  fi; \
   case "${TARGETARCH}" in \
     amd64)   BINARY_FILE="dufs-v${DUFS_VERSION}-x86_64-unknown-linux-musl.tar.gz";; \
     arm64)   BINARY_FILE="dufs-v${DUFS_VERSION}-arm-unknown-linux-musleabihf.tar.gz";; \
     *)       echo "Unsupported architecture: ${TARGETARCH}"; exit 1 ;; \
   esac; \
-  curl -fsSL "https://github.com/sigoden/dufs/releases/download/v${DUFS_VERSION}/${BINARY_FILE}" | tar -xzC /tmp/; \
+  curl -fsSL --retry 5 --retry-delay 5 "https://github.com/sigoden/dufs/releases/download/v${DUFS_VERSION}/${BINARY_FILE}" | tar -xzC /tmp/; \
   upx --lzma --best /tmp/dufs; \
   mv /tmp/dufs /usr/local/bin/
 
-# ===== 安装 cloudflared =====
+# --- Cloudflared ---
 ARG CLOUDFLARED_VERSION="2026.2.0"
 RUN set -ex; \
-  if [ -z "$CLOUDFLARED_VERSION" ]; then \
-    CLOUDFLARED_VERSION=$(curl -sSf https://github.com/cloudflare/cloudflared/tags \
-      | grep "releases/tag/" | grep -Ev "rc|alpha|beta" \
-      | grep -o "[0-9]\+\.[0-9]\+\.[0-9]\+" | head -n 1); \
-  fi; \
-  curl -fsSL "https://github.com/cloudflare/cloudflared/releases/download/${CLOUDFLARED_VERSION}/cloudflared-linux-${TARGETARCH}" -o /tmp/cloudflared; \
+  curl -fsSL --retry 5 --retry-delay 5 "https://github.com/cloudflare/cloudflared/releases/download/${CLOUDFLARED_VERSION}/cloudflared-linux-${TARGETARCH}" -o /tmp/cloudflared; \
   chmod +x /tmp/cloudflared; \
   upx --lzma --best /tmp/cloudflared; \
   mv /tmp/cloudflared /usr/local/bin/
 
-# ===== 安装 x-ui =====
+# --- X-UI ---
 ARG XUI_VERSION="2.8.9"
 RUN set -ex; \
-  if [ -z "$XUI_VERSION" ]; then \
-    XUI_VERSION=$(curl -sSf https://github.com/MHSanaei/3x-ui/tags \
-      | grep "releases/tag/" | grep -Ev "rc|alpha|beta" \
-      | grep -o "[0-9]\+\.[0-9]\+\.[0-9]\+" | head -n 1); \
-  fi; \
-  git clone --recursive --depth 1 --shallow-submodules --branch v${XUI_VERSION} https://github.com/MHSanaei/3x-ui /app/xui; \
+  (git clone --recursive --depth 1 --shallow-submodules --branch v${XUI_VERSION} https://github.com/MHSanaei/3x-ui /app/xui || (sleep 5 && git clone --recursive --depth 1 --shallow-submodules --branch v${XUI_VERSION} https://github.com/MHSanaei/3x-ui /app/xui)); \
   cd /app/xui && go build -ldflags="-s -w" -trimpath -o x-ui main.go; \
   upx --lzma --best x-ui; \
   mv x-ui /usr/local/bin/
 
-# ===== 安装 s-ui backend =====
+# --- S-UI ---
 COPY --from=s-ui-front-builder /app/s-ui /app/s-ui
 RUN set -ex; \
   cd /app/s-ui; \
@@ -118,26 +129,16 @@ RUN set -ex; \
   upx --lzma --best sui; \
   mv sui /usr/local/bin/
 
-# ===== 安装 Sing-box =====
+# --- Sing-box ---
 ARG SING_BOX_VERSION="1.12.21"
 RUN set -ex; \
-  if [ -z "$SING_BOX_VERSION" ]; then \
-    SING_BOX_VERSION=$(curl -sSf https://github.com/SagerNet/sing-box/tags \
-      | grep "releases/tag/" | grep -Ev "rc|alpha|beta" \
-      | grep -o "[0-9]\+\.[0-9]\+\.[0-9]\+" | head -n 1); \
-  fi; \
-  curl -fsSL "https://github.com/SagerNet/sing-box/releases/download/v${SING_BOX_VERSION}/sing-box-${SING_BOX_VERSION}-linux-${TARGETARCH}.tar.gz" | tar --strip-components=1 -xzC /tmp/; \
+  curl -fsSL --retry 5 --retry-delay 5 "https://github.com/SagerNet/sing-box/releases/download/v${SING_BOX_VERSION}/sing-box-${SING_BOX_VERSION}-linux-${TARGETARCH}.tar.gz" | tar --strip-components=1 -xzC /tmp/; \
   upx --lzma --best /tmp/sing-box; \
   mv /tmp/sing-box /usr/local/bin/
 
-# ===== 安装 Xray =====
+# --- Xray ---
 ARG XRAY_VERSION="26.2.6"
 RUN set -ex; \
-  if [ -z "$XRAY_VERSION" ]; then \
-    XRAY_VERSION=$(curl -sSf https://github.com/XTLS/Xray-core/tags \
-      | grep "releases/tag/" | grep -Ev "rc|alpha|beta" \
-      | grep -o "[0-9]\+\.[0-9]\+\.[0-9]\+" | head -n 1); \
-  fi; \
   case "${TARGETARCH}" in \
     amd64)   BINARY_FILE="Xray-linux-64.zip";; \
     arm64)   BINARY_FILE="Xray-linux-arm64-v8a.zip";; \
@@ -145,7 +146,7 @@ RUN set -ex; \
   esac; \
   mkdir -p /tmp/xray; \
   cd /tmp/xray; \
-  curl -fsSLO "https://github.com/XTLS/Xray-core/releases/download/v${XRAY_VERSION}/${BINARY_FILE}"; \
+  curl -fsSLO --retry 5 --retry-delay 5 "https://github.com/XTLS/Xray-core/releases/download/v${XRAY_VERSION}/${BINARY_FILE}"; \
   unzip "${BINARY_FILE}"; \
   rm -f "${BINARY_FILE}" geoip.dat geosite.dat; \
   upx --lzma --best xray; \
@@ -153,6 +154,11 @@ RUN set -ex; \
   mv xray /usr/local/bin/bin/xray-linux-${TARGETARCH}; \
   ln -sf /usr/local/bin/bin/xray* /usr/local/bin/xray;
 
+# ==========================================
+# 第四阶段: 最终镜像层
+# 基础镜像: currycan/nginx:1.29.4
+# 合并所有构建产物和运行时环境
+# ==========================================
 FROM docker.io/currycan/nginx:1.29.4
 
 # Create a non-root user and group
@@ -199,9 +205,8 @@ ENV SUPERVISOR_LOG_MAX_BYTES="20MB"
 WORKDIR ${WORKDIR}
 
 COPY --from=builder --chmod=755 /usr/local/bin/ /usr/local/bin/
-COPY --from=sub-store-front-builder /sub-store /sub-store
-# ADD web.tgz /home/wwwroot/
-# RUN chown -R nginx:nginx /home/wwwroot
+COPY --from=sub-store-builder --chmod=755 /usr/local/bin/ /usr/local/bin/
+COPY --from=sub-store-builder /sub-store/ /sub-store/
 COPY --chmod=755 scripts /scripts
 COPY templates/ /templates/
 COPY sources /sources
