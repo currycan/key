@@ -130,14 +130,6 @@ RUN set -ex; \
   upx --lzma --best sui; \
   mv sui /usr/local/bin/
 
-# --- wgcf ---
-ARG WGCF_VERSION="2.2.30"
-RUN set -ex; \
-  curl -fsSL --retry 5 --retry-delay 5 "https://github.com/ViRb3/wgcf/releases/download/v${WGCF_VERSION}/wgcf_${WGCF_VERSION}_linux_${TARGETARCH}" -o /tmp/wgcf; \
-  chmod +x /tmp/wgcf; \
-  upx --lzma --best /tmp/wgcf; \
-  mv /tmp/wgcf /usr/local/bin/
-
 # --- Sing-box ---
 ARG SING_BOX_VERSION="1.12.21"
 RUN set -ex; \
@@ -241,7 +233,6 @@ ENV SSL_PATH=/pki
 ENV NODE_SUFFIX=""
 
 # ISP proxy
-ENV ENABLE_ISP_PROXY="false"
 ENV DEFAULT_ISP="LA_ISP"
 
 # 新增provider

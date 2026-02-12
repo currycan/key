@@ -1,8 +1,0 @@
-{
-    "experimental": {
-        "cache_file": {
-            "enabled": true,
-            "path": "${WORKDIR}/sing-box/cache.db"
-        }
-    }
-}

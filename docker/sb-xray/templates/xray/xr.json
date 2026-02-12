@@ -84,7 +84,44 @@
                     "geosite:openai"
                 ],
                 "marktag": "fix_openai",
-                "outboundTag": "direct"
+                "outboundTag": "${CHATGPT_OUT}"
+            },
+            {
+                "type": "field",
+                "domain": [
+                    "geosite:netflix"
+                ],
+                "outboundTag": "${NETFLIX_OUT}"
+            },
+            {
+                "type": "field",
+                "domain": [
+                    "geosite:disney"
+                ],
+                "outboundTag": "${DISNEY_OUT}"
+            },
+            {
+                "type": "field",
+                "domain": [
+                    "geosite:anthropic"
+                ],
+                "outboundTag": "${CLAUDE_OUT}"
+            },
+            {
+                "type": "field",
+                "domain": [
+                    "gemini.google.com",
+                    "bard.google.com",
+                    "aistudio.google.com"
+                ],
+                "outboundTag": "${GEMINI_OUT}"
+            },
+            {
+                "type": "field",
+                "domain": [
+                    "geosite:youtube"
+                ],
+                "outboundTag": "${YOUTUBE_OUT}"
             },
             {
                 "type": "field",
@@ -108,11 +145,11 @@
         }
     ],
     "outbounds": [
-        ${CUSTOM_OUTBOUNDS}
         {
             "tag": "direct",
             "protocol": "freedom"
         },
+        ${CUSTOM_OUTBOUNDS}
         {
             "tag": "block",
             "protocol": "blackhole"

@@ -17,8 +17,7 @@ services:
       - XUI_WEBBASEPATH=3xadmin
       # ✈高速
       - NODE_SUFFIX=
-      # 是否启用ISP代理
-      - ENABLE_ISP_PROXY=false
+      # ISP代理
       - DEFAULT_ISP=LA
       # # 配置provider，多个provider用换行分隔
       # - |
@@ -40,14 +39,13 @@ services:
       - ./nginx/dhparam:/etc/nginx/dhparam
       - ./data:/data
       - ./logs:/var/log
-      - /lib/modules:/lib/modules:ro
-      - ./wireguard:/sb-xray/wgcf
+      # - /lib/modules:/lib/modules:ro
     restart: always
     tty: true
     network_mode: host
-    cap_add:
-      - NET_ADMIN
-      - SYS_MODULE
+    # cap_add:
+    #   - NET_ADMIN
+    #   - SYS_MODULE
     ulimits:
       nproc: 65535
       nofile:

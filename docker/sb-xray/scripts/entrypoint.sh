@@ -41,10 +41,99 @@ check_chatgpt_access() {
         -H "Authorization: Bearer null" -H "Referer: https://platform.openai.com/" \
         "https://api.openai.com/compliance/cookie_requirements")
     if [[ -z "$check_rs" ]] || grep -qi "unsupported_country" <<< "$check_rs"; then
-        log WARN "ChatGPT access requires proxy"
-        echo "warp-ep"
+        log WARN "ChatGPT access requires proxy (ISP_TAG=${ISP_TAG:-empty})"
+        if [ -n "${ISP_TAG:-}" ]; then
+            echo "${ISP_TAG}"
+        else
+            echo "direct"
+        fi
     else
         echo "direct"
+    fi
+}
+
+check_netflix_access() {
+    log DEBUG "Checking Netflix..."
+    local check_rs
+    # Netflix is tricky via curl, basic 403 checks or fast.com don't verify geo-blocking.
+    # Simple reachability check.
+    # Status 403 often means blocked IP for Netflix.
+    check_rs=$(curl -I -s -L --max-time 3 --retry 2 -A "Mozilla/5.0" "https://www.netflix.com/title/81249783" 2>/dev/null | head -n 1 | awk '{print $2}')
+    if [[ "$check_rs" =~ ^2 ]] || [[ "$check_rs" =~ ^3 ]]; then
+        echo "direct"
+    else
+        log WARN "Netflix access might be restricted ($check_rs)"
+        if [ -n "${ISP_TAG:-}" ]; then
+            echo "${ISP_TAG}"
+        else
+            echo "direct"
+        fi
+    fi
+}
+
+check_disney_access() {
+    log DEBUG "Checking Disney+..."
+    local check_rs
+    check_rs=$(curl -I -s -L --max-time 3 --retry 2 -A "Mozilla/5.0" "https://www.disneyplus.com/" 2>/dev/null | head -n 1 | awk '{print $2}')
+    if [[ "$check_rs" =~ ^2 ]] || [[ "$check_rs" =~ ^3 ]]; then
+        echo "direct"
+    else
+        log WARN "Disney+ access might be restricted ($check_rs)"
+        if [ -n "${ISP_TAG:-}" ]; then
+            echo "${ISP_TAG}"
+        else
+            echo "direct"
+        fi
+    fi
+}
+
+check_youtube_access() {
+    log DEBUG "Checking YouTube..."
+    # YouTube rarely completely blocks, but Premium might.
+    # Defaulting to direct usually fine, but user wanted check.
+    local check_rs
+    check_rs=$(curl -I -s -L --max-time 3 --retry 2 -A "Mozilla/5.0" "https://www.youtube.com/" 2>/dev/null | head -n 1 | awk '{print $2}')
+    if [[ "$check_rs" =~ ^2 ]] || [[ "$check_rs" =~ ^3 ]]; then
+        echo "direct"
+    else
+        if [ -n "${ISP_TAG:-}" ]; then
+            echo "${ISP_TAG}"
+        else
+            echo "direct"
+        fi
+    fi
+}
+
+check_gemini_access() {
+    log DEBUG "Checking Gemini..."
+    local check_rs
+    # Gemini redirects to accounts.google.com if valid.
+    check_rs=$(curl -I -s -L --max-time 3 --retry 2 -A "Mozilla/5.0" "https://gemini.google.com" 2>/dev/null | head -n 1 | awk '{print $2}')
+    if [[ "$check_rs" =~ ^2 ]] || [[ "$check_rs" =~ ^3 ]]; then
+        echo "direct"
+    else
+        log WARN "Gemini access might be restricted ($check_rs)"
+        if [ -n "${ISP_TAG:-}" ]; then
+            echo "${ISP_TAG}"
+        else
+            echo "direct"
+        fi
+    fi
+}
+
+check_claude_access() {
+    log DEBUG "Checking Claude..."
+    local check_rs
+    check_rs=$(curl -I -s -L --max-time 3 --retry 2 -A "Mozilla/5.0" "https://claude.ai/login" 2>/dev/null | head -n 1 | awk '{print $2}')
+    if [[ "$check_rs" =~ ^2 ]] || [[ "$check_rs" =~ ^3 ]]; then
+        echo "direct"
+    else
+        log WARN "Claude access might be restricted ($check_rs)"
+        if [ -n "${ISP_TAG:-}" ]; then
+            echo "${ISP_TAG}"
+        else
+            echo "direct"
+        fi
     fi
 }
 
@@ -131,6 +220,11 @@ generateEnv() {
         "PORT_ANYTLS|generateRandomStr port"
         "SUBSCRIBE_TOKEN|generateRandomStr path 32"
         "CHATGPT_OUT|check_chatgpt_access"
+        "NETFLIX_OUT|check_netflix_access"
+        "DISNEY_OUT|check_disney_access"
+        "YOUTUBE_OUT|check_youtube_access"
+        "GEMINI_OUT|check_gemini_access"
+        "CLAUDE_OUT|check_claude_access"
         "STRATEGY|detect_ip_strategy_api"
         "GEOIP_INFO|get_geo_info"
         "IS_BRUTAL|check_brutal_status"
@@ -144,7 +238,7 @@ generateEnv() {
 
     ensure_key_pair "Reality" "xray x25519" "XRAY_REALITY_PRIVATE_KEY" "XRAY_REALITY_PUBLIC_KEY"
     ensure_key_pair "MLKEM768" "xray mlkem768" "XRAY_MLKEM768_SEED" "XRAY_MLKEM768_CLIENT"
-    log INFO "Environment ready"
+    log INFO "Environment Generation Done"
 }
 
 # 合并 ISP 配置生成 (Server & Client)
@@ -152,9 +246,12 @@ generateIspConfigs() {
     export SB_SOCKS5_OUTBOUND_CONFIG="" CUSTOM_OUTBOUNDS="" SB_CUSTOM_OUTBOUNDS="" CLASH_ISP_PROXIES=""
 
     # 仅遍历一次环境变量
-    local def_out="" def_sb_out="" oth_out="" oth_sb_out="" clash_proxies=""
+    local def_out="" def_sb_out="" oth_out="" oth_sb_out="" clash_proxies="" first_tag=""
 
-    for var in $(env | grep "_ISP_IP=" | cut -d= -f1); do
+    log INFO "Starting generateIspConfigs..."
+    local env_vars=$(env | grep "_ISP_IP=" | cut -d= -f1)
+
+    for var in $env_vars; do
         local prefix=${var%_IP} ip="${!var}"
         local port_v="${prefix}_PORT" user_v="${prefix}_USER" pass_v="${prefix}_SECRET"
         local port="${!port_v}" user="${!user_v}" pass="${!pass_v}"
@@ -164,18 +261,22 @@ generateIspConfigs() {
             log INFO "Proxy: ${prefix} -> $ip:$port"
 
             # 1. Server Configs (Logic from generateIspSocks5Config)
-            if [[ "${ENABLE_ISP_PROXY}" == "true" ]]; then
-                local tag="proxy-$(echo "${prefix}" | tr '[:upper:]_ ' '[:lower:]-')"
-                local x_json="{\"tag\": \"${tag}\", \"protocol\": \"socks\", \"settings\": {\"servers\": [{\"address\": \"$ip\", \"port\": $port, \"users\": [{\"user\": \"$user\", \"pass\": \"$pass\"}]}]}},"
-                local s_json="{\"type\": \"socks\", \"tag\": \"${tag}\", \"server\": \"$ip\", \"server_port\": $port, \"username\": \"$user\", \"password\": \"$pass\"},"
+            local tag="proxy-$(echo "${prefix}" | tr '[:upper:]_ ' '[:lower:]-')"
+            local x_json="{\"tag\": \"${tag}\", \"protocol\": \"socks\", \"settings\": {\"servers\": [{\"address\": \"$ip\", \"port\": $port, \"users\": [{\"user\": \"$user\", \"pass\": \"$pass\"}]}]}},"
+            local s_json="{\"type\": \"socks\", \"tag\": \"${tag}\", \"server\": \"$ip\", \"server_port\": $port, \"username\": \"$user\", \"password\": \"$pass\"},"
 
-                if [[ -n "${DEFAULT_ISP:-}" && ("$prefix" == "$DEFAULT_ISP" || "$prefix" == "${DEFAULT_ISP}_ISP") ]]; then
+            if [[ -z "${first_tag:-}" ]]; then
+                first_tag="$tag"
+                log INFO "Set first_tag to $first_tag"
+            fi
+
+            if [[ -n "${DEFAULT_ISP:-}" && ("$prefix" == "$DEFAULT_ISP" || "$prefix" == "${DEFAULT_ISP}_ISP") ]]; then
                     def_out="${x_json}"; def_sb_out="${s_json}"
                     export ISP_IP="$ip" ISP_PORT="$port" ISP_USER="$user" ISP_SECRET="$pass"
+                    export ISP_TAG="$tag"
                 else
                     oth_out="${oth_out}${x_json}"; oth_sb_out="${oth_sb_out}${s_json}"
                 fi
-            fi
 
             # 2. Client Configs (Logic from generateClientTemplateConfig)
             # Remove _ISP suffix for cleaner display name
@@ -201,6 +302,13 @@ ${c_yaml}"
     export CUSTOM_OUTBOUNDS="${def_out}${oth_out}"
     export SB_CUSTOM_OUTBOUNDS="${def_sb_out}${oth_sb_out}"
     export CLASH_ISP_PROXIES="${clash_proxies}"
+
+    if [[ -z "${ISP_TAG:-}" && -n "${first_tag:-}" ]]; then
+        export ISP_TAG="$first_tag"
+        log INFO "No DEFAULT_ISP matched, using first available ISP ($ISP_TAG) for unlocking."
+    fi
+    [ -n "${ISP_TAG:-}" ] && log INFO "Unlocking Proxy Tag: ${ISP_TAG}"
+
     log DEBUG "ISP Configs Generated"
 }
 
@@ -341,8 +449,11 @@ if [ "${1#-}" = 'supervisord' ] && [ "$(id -u)" = '0' ]; then
     mkdir -p ${LOGDIR}/{supervisor,xray,sing-box,dufs,nginx,x-ui,s-ui} "${SUI_DB_FOLDER}" "${SUB_STORE_DATA_BASE_PATH}"
 
     decryptSecretsEnv
-    generateEnv
     set +u; source "/.env/secret"; source "/.env/xray"; set -u
+    # Combined ISP Config Generation (Must run before generateEnv)
+    generateIspConfigs
+    generateEnv
+
     while IFS= read -r line; do
         log DEBUG "${line}"
     done < "/.env/xray"
@@ -358,8 +469,6 @@ if [ "${1#-}" = 'supervisord' ] && [ "$(id -u)" = '0' ]; then
 
     /scripts/geo_update.sh
 
-    # Combined ISP Config Generation
-    generateIspConfigs
     generateProxyProvidersConfig
     createConfig
 

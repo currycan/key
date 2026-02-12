@@ -97,7 +97,6 @@ if [ "$USE_DEFAULT_VERSIONS" == "true" ]; then
     XUI_TAG=""
     SING_BOX_TAG=""
     XRAY_TAG=""
-    WGCF_TAG=""
 else
     echo -e "${BLUE}开始获取最新版本信息...${NC}"
 
@@ -113,7 +112,6 @@ CLOUDFLARED_VERSION=$(get_latest_stable_tag "cloudflare/cloudflared")
 XUI_TAG=$(get_latest_stable_tag "MHSanaei/3x-ui")
 SING_BOX_TAG=$(get_latest_stable_tag "SagerNet/sing-box")
 XRAY_TAG=$(get_latest_tag "XTLS/Xray-core")
-WGCF_TAG=$(get_latest_release "ViRb3/wgcf")
 fi
 
 # 处理版本号并构建 Docker 参数
@@ -169,7 +167,6 @@ check_version "Cloudflared"      "$CLOUDFLARED_VERSION"        "CLOUDFLARED_VERS
 check_version "3x-ui"           "$XUI_TAG"                    "XUI_VERSION"                "2.8.10"
 check_version "Sing-box"        "$SING_BOX_TAG"               "SING_BOX_VERSION"           "1.12.21"
 check_version "Xray"            "$XRAY_TAG"                   "XRAY_VERSION"               "26.2.6"
-check_version "wgcf"            "$WGCF_TAG"                   "WGCF_VERSION"               "2.2.30"
 
 # 确定镜像 Tag (如果 Xray 获取失败，则回退到 'manual')
 if [ -z "$XRAY_VERSION_FINAL" ]; then

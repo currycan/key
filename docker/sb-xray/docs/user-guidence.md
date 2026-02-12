@@ -441,7 +441,6 @@ KR_ISP_SECRET=pass2
 
 # 默认 ISP（用于模板引用）
 DEFAULT_ISP=LA
-ENABLE_ISP_PROXY=true
 ```
 
 ### 6.2 生成结果
@@ -533,7 +532,6 @@ services:
       - ACMESH_SERVER_NAME=zerossl
       - ACMESH_EAB_KID=  # Google CA 可选
       - ACMESH_EAB_HMAC_KEY=
-      - ENABLE_ISP_PROXY=false
     ports:
       - '443:443/tcp'
       - '443:443/udp'
@@ -601,9 +599,6 @@ A: 检查 DNS 配置，确保 `DOMAIN` 和 `CDNDOMAIN` 都正确解析到服务�
 
 **Q: 客户端配置为空？**
 A: 检查 `CLASH_PROXY_PROVIDERS` 和 `CLASH_ISP_PROXIES` 环境变量是否正确生成。
-
-**Q: ISP 代理不生效？**
-A: 确保 `ENABLE_ISP_PROXY=true` 且 ISP 变量成组出现（IP、PORT、USER、SECRET）。
 
 ---
 
