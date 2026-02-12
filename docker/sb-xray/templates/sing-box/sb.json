@@ -68,6 +68,54 @@
                 "type": "remote",
                 "format": "binary",
                 "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-anthropic.srs"
+            },
+            {
+                "tag": "geosite-google-gemini",
+                "type": "remote",
+                "format": "binary",
+                "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-google-gemini.srs"
+            },
+            {
+                "tag": "geosite-tiktok",
+                "type": "remote",
+                "format": "binary",
+                "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-tiktok.srs"
+            },
+            {
+                "tag": "geosite-category-social-media-!cn",
+                "type": "remote",
+                "format": "binary",
+                "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-category-social-media-!cn.srs"
+            },
+            {
+                "tag": "geosite-amazon",
+                "type": "remote",
+                "format": "binary",
+                "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-amazon.srs"
+            },
+            {
+                "tag": "geosite-paypal",
+                "type": "remote",
+                "format": "binary",
+                "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-paypal.srs"
+            },
+            {
+                "tag": "geosite-ebay",
+                "type": "remote",
+                "format": "binary",
+                "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-ebay.srs"
+            },
+            {
+                "tag": "geosite-category-ads-all",
+                "type": "remote",
+                "format": "binary",
+                "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-category-ads-all.srs"
+            },
+            {
+                "tag": "geoip-cn",
+                "type": "remote",
+                "format": "binary",
+                "url": "https://raw.githubusercontent.com/SagerNet/sing-geoip/rule-set/geoip-cn.srs"
             }
         ],
         "rules": [
@@ -87,6 +135,22 @@
                     "geosite-openai"
                 ],
                 "strategy": "prefer_ipv6"
+            },
+            {
+                "protocol": "bittorrent",
+                "outbound": "block"
+            },
+            {
+                "rule_set": [
+                    "geoip-cn"
+                ],
+                "outbound": "block"
+            },
+            {
+                "rule_set": [
+                    "geosite-category-ads-all"
+                ],
+                "outbound": "block"
             },
             {
                 "rule_set": [
@@ -114,12 +178,7 @@
             },
             {
                 "rule_set": [
-                    "geosite-google"
-                ],
-                "domain_suffix": [
-                    "gemini.google.com",
-                    "bard.google.com",
-                    "aistudio.google.com"
+                    "geosite-google-gemini"
                 ],
                 "outbound": "${GEMINI_OUT}"
             },
@@ -128,6 +187,47 @@
                     "geosite-anthropic"
                 ],
                 "outbound": "${CLAUDE_OUT}"
+            },
+            {
+                "rule_set": [
+                    "geosite-category-social-media-!cn"
+                ],
+                "outbound": "${ISP_OUT}"
+            },
+            {
+                "rule_set": [
+                    "geosite-tiktok"
+                ],
+                "outbound": "${ISP_OUT}"
+            },
+            {
+                "rule_set": [
+                    "geosite-amazon",
+                    "geosite-paypal",
+                    "geosite-ebay"
+                ],
+                "outbound": "${ISP_OUT}"
+            },
+            {
+                "ip_cidr": [
+                    "0.0.0.0/8",
+                    "10.0.0.0/8",
+                    "100.64.0.0/10",
+                    "127.0.0.0/8",
+                    "169.254.0.0/16",
+                    "172.16.0.0/12",
+                    "192.0.0.0/24",
+                    "192.0.2.0/24",
+                    "192.88.99.0/24",
+                    "192.168.0.0/16",
+                    "198.18.0.0/15",
+                    "198.51.100.0/24",
+                    "203.0.113.0/24",
+                    "224.0.0.0/4",
+                    "240.0.0.0/4",
+                    "255.255.255.255/32"
+                ],
+                "outbound": "block"
             }
         ]
     },

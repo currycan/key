@@ -110,9 +110,7 @@
             {
                 "type": "field",
                 "domain": [
-                    "gemini.google.com",
-                    "bard.google.com",
-                    "aistudio.google.com"
+                    "geosite:google-gemini"
                 ],
                 "outboundTag": "${GEMINI_OUT}"
             },
@@ -122,6 +120,29 @@
                     "geosite:youtube"
                 ],
                 "outboundTag": "${YOUTUBE_OUT}"
+            },
+            {
+                "type": "field",
+                "domain": [
+                    "geosite:category-social-media-!cn"
+                ],
+                "outboundTag": "${ISP_OUT}"
+            },
+            {
+                "type": "field",
+                "domain": [
+                    "geosite:tiktok"
+                ],
+                "outboundTag": "${ISP_OUT}"
+            },
+            {
+                "type": "field",
+                "domain": [
+                    "geosite:amazon",
+                    "geosite:paypal",
+                    "geosite:ebay"
+                ],
+                "outboundTag": "${ISP_OUT}"
             },
             {
                 "type": "field",

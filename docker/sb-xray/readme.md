@@ -22,6 +22,8 @@ https://pengtech.net/network/v2rayA_install.html
 
 https://github.com/konstpic/3x-ui-new
 
+https://github.com/SagerNet/sing-geosite/tree/rule-set
+
 ## 镜像制作
 
 ### 自动构建（推荐）

@@ -16,14 +16,14 @@ log() {
     echo -e "${color}[$(date +"%Y-%m-%d %H:%M:%S")] [${level}] $*${NC}" >&2
 }
 
+# 检查必需环境变量，如有缺失则报错退出
 checkRequiredEnv() {
     local missing=()
     for var in "$@"; do [ -z "${!var:-}" ] && missing+=("$var"); done
     [ ${#missing[@]} -eq 0 ] || { log ERROR "Missing required env: ${missing[*]}"; exit 1; }
 }
 
-# ===== 功能函数 =====
-
+# 检测 IP 策略 (IPv4/IPv6 优先)
 detect_ip_strategy_api() {
     log DEBUG "Getting IP strategy..."
     local v4="" v6=""
@@ -34,6 +34,7 @@ detect_ip_strategy_api() {
     echo ipv4_only
 }
 
+# 检测 ChatGPT 访问状态
 check_chatgpt_access() {
     log DEBUG "Checking ChatGPT..."
     local check_rs
@@ -52,12 +53,11 @@ check_chatgpt_access() {
     fi
 }
 
+# 检测 Netflix 访问状态
 check_netflix_access() {
     log DEBUG "Checking Netflix..."
     local check_rs
-    # Netflix is tricky via curl, basic 403 checks or fast.com don't verify geo-blocking.
-    # Simple reachability check.
-    # Status 403 often means blocked IP for Netflix.
+    # Netflix 通过 curl 检测比较困难，普通的 403 或 fast.com 无法验证地理封锁。
     check_rs=$(curl -I -s -L --max-time 3 --retry 2 -A "Mozilla/5.0" "https://www.netflix.com/title/81249783" 2>/dev/null | head -n 1 | awk '{print $2}')
     if [[ "$check_rs" =~ ^2 ]] || [[ "$check_rs" =~ ^3 ]]; then
         echo "direct"
@@ -71,6 +71,7 @@ check_netflix_access() {
     fi
 }
 
+# 检测 Disney+ 访问状态
 check_disney_access() {
     log DEBUG "Checking Disney+..."
     local check_rs
@@ -87,10 +88,10 @@ check_disney_access() {
     fi
 }
 
+# 检测 YouTube 访问状态
 check_youtube_access() {
     log DEBUG "Checking YouTube..."
-    # YouTube rarely completely blocks, but Premium might.
-    # Defaulting to direct usually fine, but user wanted check.
+    # YouTube 很少完全封锁，但 Premium 功能可能会受限。
     local check_rs
     check_rs=$(curl -I -s -L --max-time 3 --retry 2 -A "Mozilla/5.0" "https://www.youtube.com/" 2>/dev/null | head -n 1 | awk '{print $2}')
     if [[ "$check_rs" =~ ^2 ]] || [[ "$check_rs" =~ ^3 ]]; then
@@ -104,6 +105,7 @@ check_youtube_access() {
     fi
 }
 
+# 检测 Gemini 访问状态
 check_gemini_access() {
     log DEBUG "Checking Gemini..."
     local check_rs
@@ -121,6 +123,7 @@ check_gemini_access() {
     fi
 }
 
+# 检测 Claude 访问状态
 check_claude_access() {
     log DEBUG "Checking Claude..."
     local check_rs
@@ -137,14 +140,38 @@ check_claude_access() {
     fi
 }
 
+# 获取 ISP 优先策略 (如果可用则使用 ISP 代理)
+get_isp_preferred_strategy() {
+    # 如果当前不是 ISP IP 但存在可用的 ISP 代理，则优先使用 ISP 代理
+    # 逻辑: IP_TYPE != isp 且 ISP_TAG 已设置 -> 返回 ISP_TAG
+    if [[ "${IP_TYPE:-unknown}" != "isp" ]] && [[ -n "${ISP_TAG:-}" ]]; then
+        echo "${ISP_TAG}"
+    else
+        echo "direct"
+    fi
+}
+
+# 检查当前 IP 类型 (ISP/DataCenter 等)
+check_ip_type() {
+    log DEBUG "Checking IP Type..."
+    local type
+    # 从 ipapi.is 获取 IP 类型
+
+    type=$(curl -sSL --max-time 5 --retry 2 "https://api.ipapi.is/" | jq -r '.asn.type // "unknown"')
+    echo "${type}"
+}
+
+# 获取地理位置信息
 get_geo_info() {
     curl -fsSL --max-time 10 --retry 2 https://ip111.cn/ | grep '这是您访问国内网站所使用的IP' -B 2 | head -n 1 | awk -F' ' '{print $2$3"|"$1}' | tr -d '</p>'
 }
 
+# 检查 TCP Brutal 模块状态
 check_brutal_status() {
     [ -d "/sys/module/brutal" ] && echo "true" || echo "false"
 }
 
+# 生成随机字符串/端口/UUID
 generateRandomStr() {
     local type=$1 length=${2:-12}
     case $type in
@@ -156,8 +183,7 @@ generateRandomStr() {
     esac
 }
 
-# ===== 环境变量处理 =====
-
+# 确保环境变量存在，不存在则生成
 ensure_var() {
     local key=$1; shift; local cmd="$@"
     if ! grep -q "^export ${key}=" "${ENV_FILE}"; then
@@ -169,6 +195,7 @@ ensure_var() {
     fi
 }
 
+# 确保密钥对存在
 ensure_key_pair() {
     local name=$1 cmd=$2 key1=$3 key2=$4
     if ! grep -q "^export ${key1}=" "${ENV_FILE}" || ! grep -q "^export ${key2}=" "${ENV_FILE}"; then
@@ -185,6 +212,7 @@ ensure_key_pair() {
     fi
 }
 
+# 解密敏感信息环境变量
 decryptSecretsEnv() {
     local base_url="https://raw.githubusercontent.com/currycan/key/master"
     local items=( "tmp.bin:/.env/secret" "ptmp.bin:${WORKDIR}/providers" )
@@ -203,6 +231,7 @@ decryptSecretsEnv() {
     log INFO "Secrets initialized"
 }
 
+# 生成所有必要的环境变量
 generateEnv() {
     mkdir -p "$(dirname "${ENV_FILE}")" && touch "${ENV_FILE}"
     set +u; source "${ENV_FILE}"; set -u
@@ -219,12 +248,14 @@ generateEnv() {
         "PORT_TUIC|generateRandomStr port"
         "PORT_ANYTLS|generateRandomStr port"
         "SUBSCRIBE_TOKEN|generateRandomStr path 32"
+        "IP_TYPE|check_ip_type"
         "CHATGPT_OUT|check_chatgpt_access"
         "NETFLIX_OUT|check_netflix_access"
         "DISNEY_OUT|check_disney_access"
         "YOUTUBE_OUT|check_youtube_access"
         "GEMINI_OUT|check_gemini_access"
         "CLAUDE_OUT|check_claude_access"
+        "ISP_OUT|get_isp_preferred_strategy"
         "STRATEGY|detect_ip_strategy_api"
         "GEOIP_INFO|get_geo_info"
         "IS_BRUTAL|check_brutal_status"
@@ -241,11 +272,10 @@ generateEnv() {
     log INFO "Environment Generation Done"
 }
 
-# 合并 ISP 配置生成 (Server & Client)
+# 合并生成 ISP 配置 (服务端 & 客户端)
 generateIspConfigs() {
     export SB_SOCKS5_OUTBOUND_CONFIG="" CUSTOM_OUTBOUNDS="" SB_CUSTOM_OUTBOUNDS="" CLASH_ISP_PROXIES=""
 
-    # 仅遍历一次环境变量
     local def_out="" def_sb_out="" oth_out="" oth_sb_out="" clash_proxies="" first_tag=""
 
     log INFO "Starting generateIspConfigs..."
@@ -260,7 +290,7 @@ generateIspConfigs() {
             log DEBUG "Checking ISP Var: $var | Prefix: $prefix | IP: $ip | PortVar: $port_v | Port: $port"
             log INFO "Proxy: ${prefix} -> $ip:$port"
 
-            # 1. Server Configs (Logic from generateIspSocks5Config)
+            # 1. 服务端配置 (逻辑源自 generateIspSocks5Config)
             local tag="proxy-$(echo "${prefix}" | tr '[:upper:]_ ' '[:lower:]-')"
             local x_json="{\"tag\": \"${tag}\", \"protocol\": \"socks\", \"settings\": {\"servers\": [{\"address\": \"$ip\", \"port\": $port, \"users\": [{\"user\": \"$user\", \"pass\": \"$pass\"}]}]}},"
             local s_json="{\"type\": \"socks\", \"tag\": \"${tag}\", \"server\": \"$ip\", \"server_port\": $port, \"username\": \"$user\", \"password\": \"$pass\"},"
@@ -278,8 +308,7 @@ generateIspConfigs() {
                     oth_out="${oth_out}${x_json}"; oth_sb_out="${oth_sb_out}${s_json}"
                 fi
 
-            # 2. Client Configs (Logic from generateClientTemplateConfig)
-            # Remove _ISP suffix for cleaner display name
+            # 2. 客户端配置 (逻辑源自 generateClientTemplateConfig)
             local name_prefix="${prefix%_ISP}"
             local c_yaml="  - name: ${name_prefix}-dialer
     type: socks5
@@ -312,12 +341,13 @@ ${c_yaml}"
     log DEBUG "ISP Configs Generated"
 }
 
+# 生成代理提供者配置
 generateProxyProvidersConfig() {
     log INFO "Generating Proxy Providers..."
     local provider_config="${WORKDIR}/providers"
     local clash_providers=""
 
-    # 1. Process File Config
+    # 1. 处理文件配置
     if [ -f "$provider_config" ]; then
         local content
         content=$(sed -e '/^[[:space:]]*#/d' -e '/^[[:space:]]*$/d' -e '/^providers:/d' -e '/^proxy-providers:/d' "$provider_config")
@@ -327,11 +357,13 @@ generateProxyProvidersConfig() {
         log WARN "providers.yaml not found in ${WORKDIR}/providers/!"
     fi
 
-    # 2. Process Env Config (PROVIDERS)
+
+    # 2. 处理环境变量配置 (PROVIDERS)
     if [ -n "${PROVIDERS:-}" ]; then
         log DEBUG "Processing PROVIDERS env var..."
         local env_content
-        # Use awk for efficient parsing of "Name|URL|Suffix" format
+
+        # 使用 awk 解析 "Name|URL|Suffix" 格式
         env_content=$(echo "$PROVIDERS" | awk -F'|' '
             NF>=2 && $1!="" && $2!="" {
                 suffix = ""
@@ -355,6 +387,7 @@ ${env_content}"
     export CLASH_PROXY_PROVIDERS="${clash_providers}"
 }
 
+# 基于模板创建配置文件
 createConfig() {
     log INFO "Creating configurations..."
     local env_list; env_list=$(env | grep -v '^_' | cut -d= -f1 | sed 's/^/${/;s/$/}/' | xargs)
@@ -382,17 +415,18 @@ createConfig() {
     }
 
     apply_tpl "/templates/supervisord/supervisord.conf" "/etc/supervisord.conf"
-    apply_tpl "/templates/supervisord/daemon.ini"      "/etc/supervisor.d/daemon.ini"
-    apply_tpl "/templates/nginx/nginx.conf"            "/etc/nginx/nginx.conf" "$env_list"
-    cp -f /templates/nginx/network_internal.conf       /etc/nginx/network_internal.conf
-    apply_tpl "/templates/nginx/http.conf"             "/etc/nginx/conf.d/http.conf" "$env_list \${RANDOM_NUM}"
-    apply_tpl "/templates/nginx/tcp.conf"              "/etc/nginx/stream.d/tcp.conf" "$env_list"
-    apply_tpl "/templates/dufs/conf.yml"               "${WORKDIR}/dufs/conf.yml"
+    apply_tpl "/templates/supervisord/daemon.ini"       "/etc/supervisor.d/daemon.ini"
+    apply_tpl "/templates/nginx/nginx.conf"             "/etc/nginx/nginx.conf"         "$env_list"
+    cp -f /templates/nginx/network_internal.conf        "/etc/nginx/network_internal.conf"
+    apply_tpl "/templates/nginx/http.conf"              "/etc/nginx/conf.d/http.conf"   "$env_list \${RANDOM_NUM}"
+    apply_tpl "/templates/nginx/tcp.conf"               "/etc/nginx/stream.d/tcp.conf"  "$env_list"
+    apply_tpl "/templates/dufs/conf.yml"                "${WORKDIR}/dufs/conf.yml"
 
     for t in /templates/xray/*.json; do apply_tpl "$t" "${WORKDIR}/xray/$(basename "$t")"; done
     for t in /templates/sing-box/*.json; do apply_tpl "$t" "${WORKDIR}/sing-box/$(basename "$t")"; done
 }
 
+# 申请或更新 SSL 证书
 issueCertificate() {
     local name="$1" params="$2"
     local first_dom="${params%%:*}"
@@ -404,8 +438,8 @@ issueCertificate() {
             log INFO "Cert [$name] exists and is valid for >7 days."
             return 0
         else
-            log WARN "Cert [$name] is expiring within 7 days. Forcing renewal..."
             # 如果 acme.sh 配置丢失,下面的逻辑会重新注册并签发
+            log WARN "Cert [$name] is expiring within 7 days. Forcing renewal..."
         fi
     fi
 
@@ -416,13 +450,14 @@ issueCertificate() {
         log INFO "Requesting cert for $name..."
         local reg_args=("-m" "${ACMESH_REGISTER_EMAIL}" "--server" "${ACMESH_SERVER_NAME}")
 
-        # Google CA 特殊处理：强制检查 EAB
+        # Google CA 特殊处理：强制检查 EAB 凭证
         if [[ "${ACMESH_SERVER_NAME}" == "google" ]]; then
             if [[ -z "${ACMESH_EAB_KID:-}" || -z "${ACMESH_EAB_HMAC_KEY:-}" ]]; then
                 log ERROR "Google CA requires EAB credentials (ACMESH_EAB_KID & ACMESH_EAB_HMAC_KEY)!"
                 return 1
             fi
         fi
+
         [[ -n "${ACMESH_EAB_KID:-}" && -n "${ACMESH_EAB_HMAC_KEY:-}" ]] && reg_args+=("--eab-kid" "${ACMESH_EAB_KID}" "--eab-hmac-key" "${ACMESH_EAB_HMAC_KEY}")
 
         acme.sh --register-account "${reg_args[@]}" >/dev/null 2>&1
@@ -443,14 +478,12 @@ issueCertificate() {
     /usr/sbin/nginx -s quit 2>/dev/null && rm -f /var/run/nginx/nginx.pid || true
 }
 
-# ===== 主流程 =====
-
 if [ "${1#-}" = 'supervisord' ] && [ "$(id -u)" = '0' ]; then
     mkdir -p ${LOGDIR}/{supervisor,xray,sing-box,dufs,nginx,x-ui,s-ui} "${SUI_DB_FOLDER}" "${SUB_STORE_DATA_BASE_PATH}"
 
     decryptSecretsEnv
     set +u; source "/.env/secret"; source "/.env/xray"; set -u
-    # Combined ISP Config Generation (Must run before generateEnv)
+    # 生成 ISP 配置
     generateIspConfigs
     generateEnv
 
@@ -480,12 +513,12 @@ if [ "${1#-}" = 'supervisord' ] && [ "$(id -u)" = '0' ]; then
     sui admin -password "${PUBLIC_PASSWORD}" -username "${PUBLIC_USER}" >/dev/null
     [ -f "${SUI_DB_FOLDER}/s-ui.db" ] && sqlite3 "${SUI_DB_FOLDER}/s-ui.db" "UPDATE settings SET value='https://${DOMAIN}/${SUI_SUB_PATH}/' WHERE key='subURI';"
 
-    # Generate .htpasswd for subscription endpoint authentication
+    # 生成用于订阅端点认证的 .htpasswd 文件
     log INFO "Generating .htpasswd for subscription endpoint..."
     HTPASSWD_FILE="/etc/nginx/.htpasswd"
     if [ -n "${PUBLIC_USER}" ] && [ -n "${PUBLIC_PASSWORD}" ]; then
-        # Use openssl to generate bcrypt password hash (more secure than MD5)
-        # Note: nginx supports bcrypt, MD5, SHA, and crypt formats
+        # 使用 openssl 生成 bcrypt 密码哈希 (比 MD5 更安全)
+        # 注意: nginx 支持 bcrypt, MD5, SHA, 和 crypt 格式
         ENCRYPTED_PASS=$(openssl passwd -apr1 "${PUBLIC_PASSWORD}")
         echo "${PUBLIC_USER}:${ENCRYPTED_PASS}" > "${HTPASSWD_FILE}"
         chmod 644 "${HTPASSWD_FILE}"
@@ -494,9 +527,10 @@ if [ "${1#-}" = 'supervisord' ] && [ "$(id -u)" = '0' ]; then
         log WARN "PUBLIC_USER or PUBLIC_PASSWORD not set, skipping .htpasswd generation"
     fi
 
+
     log INFO "Starting fail2ban..." && fail2ban-client -x start >/dev/null
 
-    # Cron setup
+    # Cron 设置
     cron_file="/var/spool/cron/crontabs/root"
     touch "$cron_file"
     sed -i '/geo_update.sh/d' "$cron_file"
