@@ -110,6 +110,13 @@
             {
                 "type": "field",
                 "domain": [
+                    "geosite:google"
+                ],
+                "outboundTag": "${GEMINI_OUT}"
+            },
+            {
+                "type": "field",
+                "domain": [
                     "geosite:google-gemini"
                 ],
                 "outboundTag": "${GEMINI_OUT}"
