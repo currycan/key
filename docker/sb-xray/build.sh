@@ -76,9 +76,32 @@ get_latest_stable_tag() {
     fi
 }
 
-echo -e "${BLUE}开始获取最新版本信息...${NC}"
+# 检查是否使用默认版本模式
+USE_DEFAULT_VERSIONS=false
+if [ "$1" == "default" ]; then
+    USE_DEFAULT_VERSIONS=true
+    echo -e "${YELLOW}使用默认版本模式，跳过 API 调用...${NC}"
+fi
 
 # 获取各组件版本
+if [ "$USE_DEFAULT_VERSIONS" == "true" ]; then
+    # 使用默认版本，不调用 API
+    SHOUTRRR_TAG=""
+    MIHOMO_TAG=""
+    HTTP_META_VERSION=""
+    SUB_STORE_FRONTEND_VERSION=""
+    SUB_STORE_BACKEND_VERSION=""
+    SUI_TAG=""
+    DUFS_TAG=""
+    CLOUDFLARED_VERSION=""
+    XUI_TAG=""
+    SING_BOX_TAG=""
+    XRAY_TAG=""
+    WGCF_TAG=""
+else
+    echo -e "${BLUE}开始获取最新版本信息...${NC}"
+
+    # 获取各组件版本
 SHOUTRRR_TAG=$(get_latest_release "containrrr/shoutrrr")
 MIHOMO_TAG=$(get_latest_release "MetaCubeX/mihomo")
 HTTP_META_VERSION=$(get_latest_release "xream/http-meta")
@@ -91,6 +114,7 @@ XUI_TAG=$(get_latest_stable_tag "MHSanaei/3x-ui")
 SING_BOX_TAG=$(get_latest_stable_tag "SagerNet/sing-box")
 XRAY_TAG=$(get_latest_tag "XTLS/Xray-core")
 WGCF_TAG=$(get_latest_release "ViRb3/wgcf")
+fi
 
 # 处理版本号并构建 Docker 参数
 BUILD_ARGS=""
@@ -109,7 +133,13 @@ check_version() {
 
     if [ -z "$version" ] || [ "$version" == "null" ]; then
         if [ -n "$default_version" ]; then
-            printf "%-25s ${YELLOW}获取失败! 使用默认版本: %s${NC}\n" "${name}:" "${default_version}"
+            if [ "$USE_DEFAULT_VERSIONS" == "true" ]; then
+                # 默认模式:直接显示使用的版本,不显示"获取失败"
+                printf "%-25s ${GREEN}%s${NC}\n" "${name}:" "${default_version}"
+            else
+                # 正常模式:显示获取失败警告
+                printf "%-25s ${YELLOW}获取失败! 使用默认版本: %s${NC}\n" "${name}:" "${default_version}"
+            fi
             BUILD_ARGS="${BUILD_ARGS} --build-arg ${arg_name}=${default_version}"
         else
             printf "%-25s ${RED}获取失败! 停止构建${NC}\n" "${name}:"
@@ -143,7 +173,9 @@ check_version "wgcf"            "$WGCF_TAG"                   "WGCF_VERSION"    
 
 # 确定镜像 Tag (如果 Xray 获取失败，则回退到 'manual')
 if [ -z "$XRAY_VERSION_FINAL" ]; then
-    echo -e "${YELLOW}警告: 无法获取 Xray 版本用于 Tag。将使用 'manual' 作为 Tag。${NC}"
+    if [ "$USE_DEFAULT_VERSIONS" != "true" ]; then
+        echo -e "${YELLOW}警告: 无法获取 Xray 版本用于 Tag。将使用 'manual' 作为 Tag。${NC}"
+    fi
     TAG_VERSION="manual"
 else
     TAG_VERSION=$XRAY_VERSION_FINAL
