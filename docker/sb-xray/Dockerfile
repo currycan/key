@@ -82,6 +82,7 @@ RUN apk --no-cache --update add \
 
 ENV CGO_ENABLED=1
 ENV CGO_CFLAGS="-D_LARGEFILE64_SOURCE"
+ENV GOTOOLCHAIN=auto
 
 WORKDIR /app
 
@@ -114,7 +115,7 @@ RUN set -ex; \
   mv /tmp/cloudflared /usr/local/bin/
 
 # --- X-UI ---
-ARG XUI_VERSION="2.8.9"
+ARG XUI_VERSION="2.8.10"
 RUN set -ex; \
   (git clone --recursive --depth 1 --shallow-submodules --branch v${XUI_VERSION} https://github.com/MHSanaei/3x-ui /app/xui || (sleep 5 && git clone --recursive --depth 1 --shallow-submodules --branch v${XUI_VERSION} https://github.com/MHSanaei/3x-ui /app/xui)); \
   cd /app/xui && go build -ldflags="-s -w" -trimpath -o x-ui main.go; \
@@ -128,6 +129,14 @@ RUN set -ex; \
   go build -ldflags="-s -w" -trimpath -tags "with_quic,with_grpc,with_utls,with_acme,with_gvisor" -o sui main.go; \
   upx --lzma --best sui; \
   mv sui /usr/local/bin/
+
+# --- wgcf ---
+ARG WGCF_VERSION="2.2.30"
+RUN set -ex; \
+  curl -fsSL --retry 5 --retry-delay 5 "https://github.com/ViRb3/wgcf/releases/download/v${WGCF_VERSION}/wgcf_${WGCF_VERSION}_linux_${TARGETARCH}" -o /tmp/wgcf; \
+  chmod +x /tmp/wgcf; \
+  upx --lzma --best /tmp/wgcf; \
+  mv /tmp/wgcf /usr/local/bin/
 
 # --- Sing-box ---
 ARG SING_BOX_VERSION="1.12.21"
@@ -172,7 +181,7 @@ RUN set -ex; \
 
 # 安装基础组件
 RUN set -ex; \
-  runtime_pkgs="curl bash iproute2 net-tools tzdata bash-completion ca-certificates python3 py3-pip gettext libc6-compat gcompat vim libqrencode-tools socat logrotate nftables jq sqlite nodejs"; \
+  runtime_pkgs="curl bash iproute2 net-tools tzdata bash-completion ca-certificates python3 py3-pip gettext libc6-compat gcompat vim libqrencode-tools socat logrotate nftables jq sqlite nodejs wireguard-tools iptables grep sed coreutils dumb-init"; \
   apk add -U --no-cache --virtual .runtime-deps ${runtime_pkgs}; \
   echo -e "[global]\nbreak-system-packages = true" > /etc/pip.conf; \
   pip install --no-cache-dir -U pip supervisor; \
@@ -295,5 +304,6 @@ VOLUME ${DUFS_SERVE_PATH} ${WORKDIR} ${SUB_STORE_DATA_BASE_PATH} ${LOGDIR} /etc/
 
 STOPSIGNAL SIGTERM
 
-ENTRYPOINT [ "/scripts/entrypoint.sh" ]
+# ENTRYPOINT [ "/scripts/entrypoint.sh" ]
+ENTRYPOINT ["/usr/bin/dumb-init", "--", "/scripts/entrypoint.sh"]
 CMD  [ "supervisord" ]
