@@ -40,9 +40,14 @@ services:
       - ./nginx/dhparam:/etc/nginx/dhparam
       - ./data:/data
       - ./logs:/var/log
+      - /lib/modules:/lib/modules:ro
+      - ./wireguard:/sb-xray/wgcf
     restart: always
     tty: true
     network_mode: host
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
     ulimits:
       nproc: 65535
       nofile:
