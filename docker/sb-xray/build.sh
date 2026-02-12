@@ -90,6 +90,7 @@ CLOUDFLARED_VERSION=$(get_latest_stable_tag "cloudflare/cloudflared")
 XUI_TAG=$(get_latest_stable_tag "MHSanaei/3x-ui")
 SING_BOX_TAG=$(get_latest_stable_tag "SagerNet/sing-box")
 XRAY_TAG=$(get_latest_tag "XTLS/Xray-core")
+WGCF_TAG=$(get_latest_release "ViRb3/wgcf")
 
 # 处理版本号并构建 Docker 参数
 BUILD_ARGS=""
@@ -99,14 +100,21 @@ BUILD_ARGS=""
 # $1 = 组件显示名称
 # $2 =获取到的版本号 (可能带 v 前缀)
 # $3 = Docker build-arg 变量名
+# $4 = 默认版本号 (用于 fallback)
 check_version() {
     local name=$1
     local version=$2
     local arg_name=$3
+    local default_version=$4
 
     if [ -z "$version" ] || [ "$version" == "null" ]; then
-        printf "%-25s ${RED}获取失败! 停止构建${NC}\n" "${name}:"
-        exit 1
+        if [ -n "$default_version" ]; then
+            printf "%-25s ${YELLOW}获取失败! 使用默认版本: %s${NC}\n" "${name}:" "${default_version}"
+            BUILD_ARGS="${BUILD_ARGS} --build-arg ${arg_name}=${default_version}"
+        else
+            printf "%-25s ${RED}获取失败! 停止构建${NC}\n" "${name}:"
+            exit 1
+        fi
     else
         # 去除 'v' 前缀
         clean_version=${version#v}
@@ -120,17 +128,18 @@ check_version() {
     fi
 }
 
-check_version "Shoutrrr" "$SHOUTRRR_TAG" "SHOUTRRR_VERSION"
-check_version "Mihomo" "$MIHOMO_TAG" "MIHOMO_VERSION"
-check_version "Http-Meta" "$HTTP_META_VERSION" "HTTP_META_VERSION"
-check_version "Sub-Store Front" "$SUB_STORE_FRONTEND_VERSION" "SUB_STORE_FRONTEND_VERSION"
-check_version "Sub-Store Back" "$SUB_STORE_BACKEND_VERSION" "SUB_STORE_BACKEND_VERSION"
-check_version "s-ui" "$SUI_TAG" "SUI_VERSION"
-check_version "Dufs" "$DUFS_TAG" "DUFS_VERSION"
-check_version "Cloudflared" "$CLOUDFLARED_VERSION" "CLOUDFLARED_VERSION"
-check_version "3x-ui" "$XUI_TAG" "XUI_VERSION"
-check_version "Sing-box" "$SING_BOX_TAG" "SING_BOX_VERSION"
-check_version "Xray" "$XRAY_TAG" "XRAY_VERSION"
+check_version "Shoutrrr"        "$SHOUTRRR_TAG"               "SHOUTRRR_VERSION"           "0.8.0"
+check_version "Mihomo"          "$MIHOMO_TAG"                 "MIHOMO_VERSION"             "1.19.20"
+check_version "Http-Meta"       "$HTTP_META_VERSION"          "HTTP_META_VERSION"          "1.0.6"
+check_version "Sub-Store Front" "$SUB_STORE_FRONTEND_VERSION" "SUB_STORE_FRONTEND_VERSION" "2.16.13"
+check_version "Sub-Store Back"  "$SUB_STORE_BACKEND_VERSION"  "SUB_STORE_BACKEND_VERSION"  "2.21.21"
+check_version "s-ui"            "$SUI_TAG"                    "SUI_VERSION"                "1.3.9"
+check_version "Dufs"            "$DUFS_TAG"                   "DUFS_VERSION"               "0.45.0"
+check_version "Cloudflared"      "$CLOUDFLARED_VERSION"        "CLOUDFLARED_VERSION"        "2026.2.0"
+check_version "3x-ui"           "$XUI_TAG"                    "XUI_VERSION"                "2.8.10"
+check_version "Sing-box"        "$SING_BOX_TAG"               "SING_BOX_VERSION"           "1.12.21"
+check_version "Xray"            "$XRAY_TAG"                   "XRAY_VERSION"               "26.2.6"
+check_version "wgcf"            "$WGCF_TAG"                   "WGCF_VERSION"               "2.2.30"
 
 # 确定镜像 Tag (如果 Xray 获取失败，则回退到 'manual')
 if [ -z "$XRAY_VERSION_FINAL" ]; then
