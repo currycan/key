@@ -113,7 +113,6 @@ proxy-groups:
   - {name: Facebook,   <<: *SelectISP,    icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Facebook.png}
   - {name: 社交平台,    <<: *SelectISP,    icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/PBS.png}
   # ==================== 国外服务 ====================
-  - {name: 谷歌服务,    <<: *OneSmart,    icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Google_Search.png}
   - {name: GitHub,     <<: *OneSmart,    icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/GitHub.png}
   - {name: Reddit,     <<: *OneSmart,    icon: https://github.com/Semporia/Hand-Painted-icon/raw/master/Social_Media/Reddit.png}
   - {name: 亚马逊,      <<: *OneSmart,    icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Amazon.png}
@@ -174,6 +173,8 @@ rules:
   - RULE-SET,Claude / Domain,人工智能
   - RULE-SET,Copilot / Domain,人工智能
   - RULE-SET,Gemini / Domain,人工智能
+  - RULE-SET,Google / Domain,人工智能
+  - RULE-SET,GoogleIP / IP,人工智能,no-resolve
   - RULE-SET,Groq / Domain,人工智能
   - RULE-SET,Grok / Domain,人工智能
   - RULE-SET,Meta AI / Domain,人工智能
@@ -184,8 +185,6 @@ rules:
   - RULE-SET,TikTok / Domain,TikTok
   - RULE-SET,YouTube / Domain,YouTube
   # 国外公司
-  - RULE-SET,Google / Domain,谷歌服务
-  - RULE-SET,GoogleIP / IP,谷歌服务,no-resolve
   - RULE-SET,GitHub / Domain,GitHub
   # Fallback / General
   - RULE-SET,Proxy / Domain,国外流量
