@@ -133,37 +133,33 @@ check_claude_access() {
 
 # 检测 Gemini 访问状态
 check_gemini_access() {
-    log DEBUG "Checking if node IP can access Gemini directly..."
+    log DEBUG "Checking Gemini access strategy..."
 
-    # 先检查其他 AI 服务的访问状态
-    local chatgpt_result claude_result
-    chatgpt_result=$(check_chatgpt_access)
-    claude_result=$(check_claude_access)
-
-    # 如果 ChatGPT 或 Claude 任意一个不能直连,则 Gemini 也不直连
-    if [[ "$chatgpt_result" != "direct" ]] || [[ "$claude_result" != "direct" ]]; then
-        log WARN "ChatGPT or Claude requires proxy, forcing Gemini to use proxy as well"
+    # 策略 1: 手动强制配置优先
+    if [[ "${GEMINI_DIRECT}" == "true" ]]; then
+        log INFO "GEMINI_DIRECT=true, forcing direct routing"
+        echo "direct"
+        return
+    elif [[ "${GEMINI_DIRECT}" == "false" ]]; then
+        log INFO "GEMINI_DIRECT=false, forcing proxy routing"
         echo "${ISP_TAG:-direct}"
         return
     fi
 
-    # 尝试访问 Gemini 应用端点
-    local check_rs final_url curl_output
-    curl_output=$(curl -sS -L -I --max-time 5 --retry 2 \
-        -w "\n%{http_code}\n%{url_effective}" \
-        -A "Mozilla/5.0" "https://gemini.google.com/app" 2>/dev/null)
-
-    check_rs=$(echo "$curl_output" | tail -2 | head -1)
-    final_url=$(echo "$curl_output" | tail -1)
-
-    # 检查是否成功访问应用页面
-    if [[ "$check_rs" == "200" ]] && [[ "$final_url" =~ gemini\.google\.com/app ]]; then
-        log INFO "Node IP can access Gemini directly (HTTP $check_rs)"
-        echo "direct"
-    else
-        log WARN "Node IP cannot access Gemini (HTTP $check_rs, URL: $final_url), routing through ISP proxy"
+    # 策略 2: 基于域名的自动判断 (GEMINI_DIRECT 为空时)
+    if [[ "$DOMAIN" =~ ^(zorocloud|zoro) ]]; then
+        log WARN "Domain matches proxy pattern ($DOMAIN), using proxy routing"
         echo "${ISP_TAG:-direct}"
+        return
+    else
+        log INFO "Domain does not match proxy pattern ($DOMAIN), using direct routing"
+        echo "direct"
+        return
     fi
+
+    # 策略 3: 其他情况默认使用代理 (保守策略)
+    log WARN "Unknown GEMINI_DIRECT value: $GEMINI_DIRECT, using proxy routing"
+    echo "${ISP_TAG:-direct}"
 }
 
 # 获取 ISP 优先策略 (如果可用则使用 ISP 代理)
