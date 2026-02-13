@@ -108,12 +108,21 @@ check_chatgpt_access() {
 # 检测 Claude 访问状态
 check_claude_access() {
     log DEBUG "Checking Claude..."
-    local check_rs
-    check_rs=$(curl -I -s -L --max-time 3 --retry 2 -A "Mozilla/5.0" "https://claude.ai/login" 2>/dev/null | head -n 1 | awk '{print $2}')
-    if [[ "$check_rs" =~ ^2 ]] || [[ "$check_rs" =~ ^3 ]]; then
+    local final_url
+
+    # Claude 会将不支持的地区重定向到特定页面
+    # 检查最终 URL 是否包含地区限制标识
+    final_url=$(curl -sS -L -I --max-time 5 --retry 2 \
+        -w "%{url_effective}" \
+        -A "Mozilla/5.0" "https://claude.ai/login" 2>/dev/null | tail -1)
+
+    # 如果最终 URL 仍然是登录页面,说明可以访问
+    # 如果被重定向到其他页面(如地区不支持页面),则需要代理
+    if [[ "$final_url" =~ claude\.ai/(login|chats) ]]; then
+        log INFO "Claude is accessible directly"
         echo "direct"
     else
-        log WARN "Claude access might be restricted ($check_rs)"
+        log WARN "Claude access might be restricted (redirected to: $final_url)"
         if [ -n "${ISP_TAG:-}" ]; then
             echo "${ISP_TAG}"
         else
