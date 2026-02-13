@@ -34,25 +34,6 @@ detect_ip_strategy_api() {
     echo ipv4_only
 }
 
-# 检测 ChatGPT 访问状态
-check_chatgpt_access() {
-    log DEBUG "Checking ChatGPT..."
-    local check_rs
-    check_rs=$(curl -sSL --max-time 2 --retry 2 -A "Mozilla/5.0" \
-        -H "Authorization: Bearer null" -H "Referer: https://platform.openai.com/" \
-        "https://api.openai.com/compliance/cookie_requirements")
-    if [[ -z "$check_rs" ]] || grep -qi "unsupported_country" <<< "$check_rs"; then
-        log WARN "ChatGPT access requires proxy (ISP_TAG=${ISP_TAG:-empty})"
-        if [ -n "${ISP_TAG:-}" ]; then
-            echo "${ISP_TAG}"
-        else
-            echo "direct"
-        fi
-    else
-        echo "direct"
-    fi
-}
-
 # 检测 Netflix 访问状态
 check_netflix_access() {
     log DEBUG "Checking Netflix..."
@@ -105,21 +86,22 @@ check_youtube_access() {
     fi
 }
 
-# 检测 Gemini 访问状态
-check_gemini_access() {
-    log DEBUG "Checking Gemini..."
+# 检测 ChatGPT 访问状态
+check_chatgpt_access() {
+    log DEBUG "Checking ChatGPT..."
     local check_rs
-    # Gemini redirects to accounts.google.com if valid.
-    check_rs=$(curl -I -s -L --max-time 3 --retry 2 -A "Mozilla/5.0" "https://gemini.google.com" 2>/dev/null | head -n 1 | awk '{print $2}')
-    if [[ "$check_rs" =~ ^2 ]] || [[ "$check_rs" =~ ^3 ]]; then
-        echo "direct"
-    else
-        log WARN "Gemini access might be restricted ($check_rs)"
+    check_rs=$(curl -sSL --max-time 2 --retry 2 -A "Mozilla/5.0" \
+        -H "Authorization: Bearer null" -H "Referer: https://platform.openai.com/" \
+        "https://api.openai.com/compliance/cookie_requirements")
+    if [[ -z "$check_rs" ]] || grep -qi "unsupported_country" <<< "$check_rs"; then
+        log WARN "ChatGPT access requires proxy (ISP_TAG=${ISP_TAG:-empty})"
         if [ -n "${ISP_TAG:-}" ]; then
             echo "${ISP_TAG}"
         else
             echo "direct"
         fi
+    else
+        echo "direct"
     fi
 }
 
@@ -137,6 +119,41 @@ check_claude_access() {
         else
             echo "direct"
         fi
+    fi
+}
+
+# 检测 Gemini 访问状态
+check_gemini_access() {
+    log DEBUG "Checking if node IP can access Gemini directly..."
+
+    # 先检查其他 AI 服务的访问状态
+    local chatgpt_result claude_result
+    chatgpt_result=$(check_chatgpt_access)
+    claude_result=$(check_claude_access)
+
+    # 如果 ChatGPT 或 Claude 任意一个不能直连,则 Gemini 也不直连
+    if [[ "$chatgpt_result" != "direct" ]] || [[ "$claude_result" != "direct" ]]; then
+        log WARN "ChatGPT or Claude requires proxy, forcing Gemini to use proxy as well"
+        echo "${ISP_TAG:-direct}"
+        return
+    fi
+
+    # 尝试访问 Gemini 应用端点
+    local check_rs final_url curl_output
+    curl_output=$(curl -sS -L -I --max-time 5 --retry 2 \
+        -w "\n%{http_code}\n%{url_effective}" \
+        -A "Mozilla/5.0" "https://gemini.google.com/app" 2>/dev/null)
+
+    check_rs=$(echo "$curl_output" | tail -2 | head -1)
+    final_url=$(echo "$curl_output" | tail -1)
+
+    # 检查是否成功访问应用页面
+    if [[ "$check_rs" == "200" ]] && [[ "$final_url" =~ gemini\.google\.com/app ]]; then
+        log INFO "Node IP can access Gemini directly (HTTP $check_rs)"
+        echo "direct"
+    else
+        log WARN "Node IP cannot access Gemini (HTTP $check_rs, URL: $final_url), routing through ISP proxy"
+        echo "${ISP_TAG:-direct}"
     fi
 }
 

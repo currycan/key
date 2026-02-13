@@ -22,7 +22,11 @@ export REGION_INFO="${GEOIP_INFO%%|*}"
 # Auto-detect suffix only if not manually set
 if [ -z "$NODE_SUFFIX" ]; then
     [[ "$DOMAIN" =~ ^(dmit|dc|jp) ]] && export NODE_SUFFIX="✈高速"
-    [[ "$DOMAIN" =~ ^(cstonecloud) ]] && export NODE_SUFFIX="✈isp"
+fi
+
+# Add IP_TYPE to NODE_SUFFIX
+if [ -n "${IP_TYPE:-}" ]; then
+    export NODE_SUFFIX+="✈${IP_TYPE}"
 fi
 
 # Helpers
