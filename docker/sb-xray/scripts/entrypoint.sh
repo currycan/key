@@ -164,22 +164,55 @@ check_gemini_access() {
 
 # 获取 ISP 优先策略 (如果可用则使用 ISP 代理)
 get_isp_preferred_strategy() {
-    # 如果当前不是 ISP IP 但存在可用的 ISP 代理，则优先使用 ISP 代理
-    # 逻辑: IP_TYPE != isp 且 ISP_TAG 已设置 -> 返回 ISP_TAG
-    if [[ "${IP_TYPE:-unknown}" != "isp" ]] && [[ -n "${ISP_TAG:-}" ]]; then
-        echo "${ISP_TAG}"
-    else
+    # 检查 ISP 代理是否可用
+    if [[ -z "${ISP_TAG:-}" ]]; then
         echo "direct"
+        return
     fi
+
+    # 逻辑 1: 如果当前不是 ISP IP (如 DataCenter)，优先使用 ISP 代理
+    if [[ "${IP_TYPE:-unknown}" != "isp" ]]; then
+        echo "${ISP_TAG}"
+        return
+    fi
+
+    # 逻辑 2: 如果当前节点是香港，优先使用 ISP 代理 (针对 HK 节点的特殊策略)
+    # 使用缓存的 ipapi.json 数据避免重复调用
+    if [ ! -f /tmp/ipapi.json ]; then
+        # 理论上应该已经被 check_ip_type 缓存，但以防万一
+        curl -sSL --max-time 5 --retry 2 "https://api.ipapi.is/" > /tmp/ipapi.json
+    fi
+
+    if [ -f /tmp/ipapi.json ]; then
+        local country_code
+        country_code=$(jq -r '.location.country_code // "unknown"' /tmp/ipapi.json)
+        if [[ "$country_code" == "HK" ]]; then
+            # 优先尝试使用 KR_ISP
+            if [[ -n "${KR_ISP_IP:-}" ]]; then
+                log INFO "HK node detected ($country_code), preferring KR ISP (proxy-kr-isp)"
+                echo "proxy-kr-isp"
+            else
+                log INFO "HK node detected ($country_code), KR ISP not found, using default ISP ($ISP_TAG)"
+                echo "${ISP_TAG}"
+            fi
+            return
+        fi
+    fi
+
+    echo "direct"
 }
 
 # 检查当前 IP 类型 (ISP/DataCenter 等)
 check_ip_type() {
     log DEBUG "Checking IP Type..."
-    local type
-    # 从 ipapi.is 获取 IP 类型
 
-    type=$(curl -sSL --max-time 5 --retry 2 "https://api.ipapi.is/" | jq -r '.asn.type // "unknown"')
+    # 避免多次调用 API，先检查缓存文件
+    if [ ! -f /tmp/ipapi.json ]; then
+        curl -sSL --max-time 5 --retry 2 "https://api.ipapi.is/" > /tmp/ipapi.json
+    fi
+
+    local type
+    type=$(jq -r '.asn.type // "unknown"' /tmp/ipapi.json)
     echo "${type}"
 }
 
