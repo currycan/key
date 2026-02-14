@@ -165,15 +165,9 @@ FROM docker.io/currycan/nginx:1.29.4
 # Create a non-root user and group
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 
-# 系统级配置（时区/镜像源）
-RUN set -ex; \
-  # sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories; \
-  ln -sf /usr/share/zoneinfo/Asia/Hong_Kong /etc/localtime; \
-  echo "Asia/Hong_Kong" > /etc/timezone
-
 # 安装基础组件
 RUN set -ex; \
-  runtime_pkgs="curl bash iproute2 net-tools tzdata bash-completion ca-certificates python3 py3-pip gettext libc6-compat gcompat vim libqrencode-tools socat logrotate nftables jq sqlite nodejs wireguard-tools iptables grep sed coreutils dumb-init"; \
+  runtime_pkgs="curl bash iproute2 net-tools tzdata bash-completion ca-certificates python3 py3-pip gettext libc6-compat gcompat vim libqrencode-tools jq sqlite nodejs grep sed coreutils dumb-init"; \
   apk add -U --no-cache --virtual .runtime-deps ${runtime_pkgs}; \
   echo -e "[global]\nbreak-system-packages = true" > /etc/pip.conf; \
   pip install --no-cache-dir -U pip supervisor; \
