@@ -119,15 +119,17 @@ policy-priority: "Reality:10;Hysteria2:9;优:5;中:2;备:1"
 | **机场标识** | `AllOne` | 10 | 主力机场 |
 | **特性标签** | `高速` | 10 | 高速线路标识 |
 | **协议性能** | `Reality/vless` | 10 | 最高优先级 |
-| | `hysteria2` | 8 | 高速协议 |
-| | `V2ray/vmess` | 6 | 通用协议 |
-| | `tuic/TUIC` | 4 | QUIC协议 |
-| | `anytls` | 2 | 基础协议 |
-| **地区偏好** | 🇺🇸 美国 | 10 | 最高优先级 |
-| | 🇰🇷 韩国 | 8 | 高优先级 |
-| | 🇯🇵 日本 | 6 | 中优先级 |
+| | `ysteria2` | 4 | Hysteria2 协议 |
+| | `V2ray/vmess` | 4 | 通用协议 |
+| | `tuic/TUIC` | 2 | QUIC协议 |
+| | `anytls` | 1 | 基础协议 |
+| **地区偏好** | 🇺🇸 美国 | 20 | AI/家宽场景最高优先级 |
+| | 🇰🇷 韩国 | 10 | 家宽场景高优先级 |
+| | 🇯🇵 日本 | 6-10 | 根据场景调整 |
 | | 🇸🇬 新加坡 | 4 | 低优先级 |
-| | 🇭🇹 香港 | 2 | 最低优先级 |
+| | 🇹🇼 台湾 | 2-15 | 一般场景低优先级,链式代理高优先级 |
+| | 🇭🇰 香港 | -50~20 | 家宽场景排除(-50),链式代理最高(20) |
+| | 🇨🇳 大陆 | 15 | 链式代理场景高优先级 |
 | **质量后缀** | `优` | 5 | 优质节点 |
 | | `中` | 2 | 中等节点 |
 | | `备` | 1 | 备用节点 |
@@ -137,24 +139,27 @@ policy-priority: "Reality:10;Hysteria2:9;优:5;中:2;备:1"
 ```yaml
 # ==================== Policy-Priority 模板 ====================
 # 设计理念: filter 负责筛选节点范围, policy-priority 负责在筛选结果中进行多维度排序
-# 协议优先级: Reality/vless(10) > hysteria2(8) > V2ray/vmess(6) > tuic(4) > anytls(2)
-# 地区优先级: 美国🇺🇸(10) > 韩国🇰🇷(8) > 日本🇯🇵(6) > 新加坡🇸🇬(4) > 香港🇭🇹(2)
-# 特性标签: 高速(10)
-
-# 默认模板 - 适用于地区节点
-PolicyDefault:  &PolicyDefault  "AllOne:10;高速:10;Reality:10;vless:10;hysteria2:8;V2ray:6;vmess:6;tuic:4;TUIC:4;anytls:2;优:5;中:2;备:1"
-
-# 家宽模板 - 优先美国/韩国/日本
-PolicyISP:      &PolicyISP      "AllOne:10;高速:10;Reality:10;vless:10;hysteria2:8;V2ray:6;vmess:6;tuic:4;TUIC:4;anytls:2;优:5;中:2;备:1;🇺🇸:10;🇰🇷:8;🇯🇵:6;🇸🇬:4;🇭🇹:2"
-
-# 媒体模板 - 优先美国/韩国/日本
-PolicyMedia:    &PolicyMedia    "AllOne:10;高速:10;Reality:10;vless:10;hysteria2:8;V2ray:6;vmess:6;tuic:4;TUIC:4;anytls:2;优:5;中:2;备:1;🇺🇸:10;🇰🇷:8;🇯🇵:6;🇸🇬:4;🇭🇹:2"
-
-# 高速模板 - 优先美国/韩国/日本
-PolicyFast:     &PolicyFast     "AllOne:10;高速:10;Reality:10;vless:10;hysteria2:8;V2ray:6;vmess:6;tuic:4;TUIC:4;anytls:2;优:5;中:2;备:1;🇺🇸:10;🇯🇵:6;🇰🇷:8;🇸🇬:4;🇭🇹:2"
-
-# 链式代理模板 - 只关注质量
-PolicyDialer:   &PolicyDialer   "优:10;中:5;备:1"
+#
+# 权重维度说明:
+#   - 机场标识: AllOne(10)
+#   - 特性标签: 高速(10)
+#   - 协议性能: Reality(10), vless(10), Hysteria2(4), V2ray(4), vmess(4), tuic(2), TUIC(2), anytls(1)
+#   - 质量后缀: 优(5), 中(2), 备(1)
+#   - 地区偏好: 根据不同场景动态调整
+#
+# 基础权重配置 - 所有策略共享的协议和质量权重
+# 格式: "机场:权重;特性:权重;协议:权重;...;质量:权重"
+PolicyDefault:  &PolicyDefault  "AllOne:10;高速:10;Reality:10;vless:10;ysteria2:4;V2ray:4;vmess:4;tuic:2;TUIC:2;anytls:1;优:5;中:2;备:1"
+# 家宽专用 - 基础权重 + 地区偏好(美🇺🇸:20 > 韩🇰🇷:10 > 日🇯🇵:6 > 新🇸🇬:4 > 台🇹🇼:2, 排除港🇭🇰:-50)
+PolicyISP:      &PolicyISP      "AllOne:10;高速:10;Reality:10;vless:10;ysteria2:4;V2ray:4;vmess:4;tuic:2;TUIC:2;anytls:1;优:5;中:2;备:1;🇺🇸:20;🇰🇷:10;🇯🇵:6;🇸🇬:4;🇹🇼:2;🇭🇰:-50"
+# 流媒体专用 - 基础权重 + 地区偏好(美🇺🇸:15 > 韩🇰🇷:8 > 日🇯🇵:6 > 新🇸🇬:4 > 台🇹🇼:2)
+PolicyMedia:    &PolicyMedia    "AllOne:10;高速:10;Reality:10;vless:10;ysteria2:4;V2ray:4;vmess:4;tuic:2;TUIC:2;anytls:1;优:5;中:2;备:1;🇺🇸:15;🇰🇷:8;🇯🇵:6;🇸🇬:4;🇹🇼:2"
+# 高速专用 - 基础权重 + 地区偏好(美🇺🇸:15 > 日🇯🇵:10 > 韩🇰🇷:8 > 新🇸🇬:4 > 台🇹🇼:2)
+PolicyFast:     &PolicyFast     "AllOne:10;高速:10;Reality:10;vless:10;ysteria2:4;V2ray:4;vmess:4;tuic:2;TUIC:2;anytls:1;优:5;中:2;备:1;🇺🇸:15;🇯🇵:10;🇰🇷:8;🇸🇬:4;🇹🇼:2"
+# AI 服务专用 - 基础权重 + 地区偏好(美🇺🇸:20 > 日🇯🇵:10 > 韩🇰🇷:8 > 新🇸🇬:4 > 台🇹🇼:2)
+PolicyAI:       &PolicyAI       "AllOne:10;高速:10;Reality:10;vless:10;ysteria2:4;V2ray:4;vmess:4;tuic:2;TUIC:2;anytls:1;优:5;中:2;备:1;🇺🇸:20;🇯🇵:10;🇰🇷:8;🇸🇬:4;🇹🇼:2"
+# 链式代理专用 - 基础权重 + 地区偏好(港🇭🇰:20 > 台🇹🇼:15 > 陆🇨🇳:15 > 韩🇰🇷:10 > 日🇯🇵:6 > 新🇸🇬:4 > 美🇺🇸:2)
+PolicyDialer:   &PolicyDialer   "AllOne:10;高速:10;Reality:10;vless:10;ysteria2:4;V2ray:4;vmess:4;tuic:2;TUIC:2;anytls:1;优:5;中:2;备:1;🇭🇰:20;🇹🇼:15;🇨🇳:15;🇰🇷:10;🇯🇵:6;🇸🇬:4;🇺🇸:2"
 ```
 
 ### 4.3 使用示例
@@ -203,20 +208,21 @@ D: [Reality] 🇸🇬SG|ISP|anytls|备
 **使用 PolicyISP 模板的权重计算**:
 
 ```yaml
-PolicyISP: "AllOne:10;Reality:10;vless:10;hysteria2:8;V2ray:6;vmess:6;tuic:4;TUIC:4;anytls:2;优:5;中:2;备:1;🇺🇸:10;🇰🇷:8;🇯🇵:6;🇸🇬:4;🇭🇹:2"
+PolicyISP: "AllOne:10;高速:10;Reality:10;vless:10;ysteria2:4;V2ray:4;vmess:4;tuic:2;TUIC:2;anytls:1;优:5;中:2;备:1;🇺🇸:20;🇰🇷:10;🇯🇵:6;🇸🇬:4;🇹🇼:2;🇭🇰:-50"
 ```
 
 | 节点 | 匹配关键字 | 权重计算 | 总分 |
 |:---|:---|:---|:---:|
-| A | `AllOne(10) + Reality(10) + vless(10) + 🇺🇸(10) + 优(5)` | 10+10+10+10+5 | **45** |
-| B | `AllOne(10) + Reality(10) + hysteria2(8) + 🇰🇷(8) + 优(5)` | 10+10+8+8+5 | **41** |
-| C | `AllOne(10) + Reality(10) + vmess(6) + 🇯🇵(6) + 中(2)` | 10+10+6+6+2 | **34** |
-| D | `AllOne(10) + Reality(10) + anytls(2) + 🇸🇬(4) + 备(1)` | 10+10+2+4+1 | **27** |
+| A | `AllOne(10) + Reality(10) + vless(10) + 🇺🇸(20) + 优(5)` | 10+10+10+20+5 | **55** |
+| B | `AllOne(10) + Reality(10) + ysteria2(4) + 🇰🇷(10) + 优(5)` | 10+10+4+10+5 | **39** |
+| C | `AllOne(10) + Reality(10) + vmess(4) + 🇯🇵(6) + 中(2)` | 10+10+4+6+2 | **32** |
+| D | `AllOne(10) + Reality(10) + anytls(1) + 🇸🇬(4) + 备(1)` | 10+10+1+4+1 | **26** |
 
 **最终选择顺序**: A (美国Reality/vless优) > B (韩国Reality/hysteria2优) > C (日本Reality/vmess中) > D (新加坡Reality/anytls备)
 
 **分析**:
-- ✅ 美国节点优先 (地区偏好 10分)
+- ✅ 美国节点优先 (地区偏好 20分,家宽场景最高权重)
+- ✅ 香港节点排除 (负权重 -50分,避免家宽使用香港)
 - ✅ Reality/vless 协议优先 (协议性能 10分)
 - ✅ 优质节点优先 (质量后缀 5分)
 - ✅ 多维度权重自动叠加
@@ -226,15 +232,15 @@ PolicyISP: "AllOne:10;Reality:10;vless:10;hysteria2:8;V2ray:6;vmess:6;tuic:4;TUI
 **场景1: 媒体-智选** (filter 已筛选出媒体节点)
 
 ```yaml
-PolicyMedia: "AllOne:10;Reality:10;vless:10;hysteria2:8;V2ray:6;vmess:6;tuic:4;TUIC:4;anytls:2;优:5;中:2;备:1;🇺🇸:10;🇰🇷:8;🇯🇵:6;🇸🇬:4;🇭🇹:2"
+PolicyMedia: "AllOne:10;高速:10;Reality:10;vless:10;ysteria2:4;V2ray:4;vmess:4;tuic:2;TUIC:2;anytls:1;优:5;中:2;备:1;🇺🇸:15;🇰🇷:8;🇯🇵:6;🇸🇬:4;🇹🇼:2"
 ```
 
 ```
 节点: [Reality] 🇺🇸US|流媒体|Reality|vless|优
-权重: AllOne(10) + Reality(10) + vless(10) + 🇺🇸(10) + 优(5) = 45分
+权重: AllOne(10) + Reality(10) + vless(10) + 🇺🇸(15) + 优(5) = 50分
 
-节点: [Reality] 🇰🇷KR|SsrDog|hysteria2|优
-权重: AllOne(10) + Reality(10) + hysteria2(8) + 🇰🇷(8) + 优(5) = 41分
+节点: [Reality] 🇰🇷KR|SsrDog|ysteria2|优
+权重: AllOne(10) + Reality(10) + ysteria2(4) + 🇰🇷(8) + 优(5) = 37分
 ```
 
 **优先级**: 美国 > 韩国 (媒体库更全)
@@ -242,18 +248,18 @@ PolicyMedia: "AllOne:10;Reality:10;vless:10;hysteria2:8;V2ray:6;vmess:6;tuic:4;T
 **场景2: 高速-智选** (filter 已筛选出高速节点)
 
 ```yaml
-PolicyFast: "AllOne:10;Reality:10;vless:10;hysteria2:8;V2ray:6;vmess:6;tuic:4;TUIC:4;anytls:2;优:5;中:2;备:1;🇺🇸:10;🇯🇵:6;🇰🇷:8;🇸🇬:4;🇭🇹:2"
+PolicyFast: "AllOne:10;高速:10;Reality:10;vless:10;ysteria2:4;V2ray:4;vmess:4;tuic:2;TUIC:2;anytls:1;优:5;中:2;备:1;🇺🇸:15;🇯🇵:10;🇰🇷:8;🇸🇬:4;🇹🇼:2"
 ```
 
 ```
 节点: [Reality] 🇺🇸US|高速|Reality|vless|优
-权重: AllOne(10) + Reality(10) + vless(10) + 🇺🇸(10) + 优(5) = 45分
+权重: AllOne(10) + 高速(10) + Reality(10) + vless(10) + 🇺🇸(15) + 优(5) = 60分
 
-节点: [Reality] 🇰🇷KR|[优]|hysteria2|优
-权重: AllOne(10) + Reality(10) + hysteria2(8) + 🇰🇷(8) + 优(5) = 41分
+节点: [Reality] 🇰🇷KR|高速|ysteria2|优
+权重: AllOne(10) + 高速(10) + Reality(10) + ysteria2(4) + 🇰🇷(8) + 优(5) = 47分
 ```
 
-**优先级**: 美国Reality/vless > 韩国hysteria2 (协议和地区双重优势)
+**优先级**: 美国Reality/vless > 韩国Hysteria2 (协议和地区双重优势,高速标签额外加分)
 
 ### 5.3 职责分离的优势
 
@@ -315,23 +321,170 @@ A: 建议:
 
 ---
 
+---
+
+## 6. Smart 模式延迟容忍度机制
+
+### 6.1 什么是延迟容忍度(tolerance)?
+
+Smart 模式不仅考虑权重分数,还会综合**延迟因素**来选择节点。`tolerance` 参数控制延迟在节点选择中的影响程度。
+
+**配置位置**:
+```yaml
+BaseSmart: &BaseSmart {
+  type: smart,
+  interval: 180,
+  tolerance: 300,  # 延迟容忍度(ms)
+  lazy: true,
+  url: "https://www.google.com/generate_204"
+}
+```
+
+### 6.2 工作原理
+
+Smart 模式的最终得分计算逻辑:
+
+```
+最终得分 = 权重分数 × 延迟因子
+
+延迟因子计算:
+- 如果节点延迟差距 ≤ tolerance: 主要看权重分数
+- 如果节点延迟差距 > tolerance: 延迟因素权重增加
+```
+
+### 6.3 实际案例分析
+
+**场景**: 家宽-智选策略,有以下两个节点:
+
+| 节点 | 权重分数 | 延迟 |
+|------|---------|------|
+| 🇺🇸 美国 Reality 优 | 45分 | 150ms |
+| 🇭🇰 香港 Reality 优 | 25分 | 20ms |
+
+**权重计算**:
+```yaml
+PolicyISP: "AllOne:10;Reality:10;优:5;🇺🇸:20;🇰🇷:10;🇯🇵:6;🇸🇬:4;🇹🇼:2;🇭🇰:0"
+
+🇺🇸 美国: AllOne(10) + Reality(10) + 优(5) + 🇺🇸(20) = 45分
+🇭🇰 香港: AllOne(10) + Reality(10) + 优(5) + 🇭🇰(0) = 25分
+```
+
+**不同 tolerance 值的选择结果**:
+
+#### tolerance = 100ms (默认)
+
+```
+延迟差距 = 150ms - 20ms = 130ms > 100ms
+→ 延迟因素权重增加,香港节点因低延迟被优先选择 ❌
+```
+
+#### tolerance = 200ms
+
+```
+延迟差距 = 130ms,接近 200ms
+→ 权重和延迟因素平衡,美国节点可能被选择 ⚠️
+```
+
+#### tolerance = 300ms (推荐)
+
+```
+延迟差距 = 130ms < 300ms
+→ 权重因素占主导,美国节点(45分)优先于香港节点(25分) ✅
+```
+
+### 6.4 调优建议
+
+#### 场景 1: 优先考虑权重(地区/协议偏好)
+
+**适用**: 家宽策略、AI 服务策略、流媒体策略
+
+```yaml
+BaseSmart: {tolerance: 300}  # 或更高
+```
+
+**效果**: 即使目标地区延迟较高,仍会优先选择
+
+#### 场景 2: 平衡权重和延迟
+
+**适用**: 高速策略、日常使用
+
+```yaml
+BaseSmart: {tolerance: 200}
+```
+
+**效果**: 权重和延迟各占一定比重
+
+#### 场景 3: 优先考虑延迟
+
+**适用**: 游戏加速、实时通信
+
+```yaml
+BaseSmart: {tolerance: 100}  # 或更低
+```
+
+**效果**: 低延迟节点优先,权重影响较小
+
+### 6.5 常见问题
+
+**Q: 为什么设置了高权重,仍选择低权重的节点?**
+
+A: 检查 `tolerance` 值。如果延迟差距超过 tolerance,低延迟节点会被优先选择。
+
+**解决方案**:
+1.  提高 `tolerance` 值(如 300ms)
+2.  或在 filter 中直接排除不想要的地区
+
+**Q: tolerance 设置多少合适?**
+
+A: 根据实际需求:
+-  **重视地区偏好**: 300-500ms
+-  **平衡选择**: 150-250ms
+-  **重视延迟**: 50-100ms
+
+**Q: 如何完全忽略延迟,只看权重?**
+
+A: Mihomo Smart 模式无法完全忽略延迟。如需纯权重排序,建议:
+1.  设置极高的 tolerance(如 1000ms)
+2.  或使用 `fallback` 模式 + 手动排序
+
+### 6.6 最佳实践
+
+#### 家宽策略配置示例
+
+```yaml
+# 1. 设置较高的 tolerance
+BaseSmart: {tolerance: 300}
+
+# 2. 给目标地区高权重,非目标地区低权重或 0 权重
+PolicyISP: "AllOne:10;Reality:10;优:5;🇺🇸:20;🇰🇷:10;🇯🇵:6;🇸🇬:4;🇹🇼:2;🇭🇰:0"
+
+# 3. 或在 filter 中直接排除
+FilterISP: "^(?=.*(?i)(住宅|isp))(?!.*(🇭🇰|HK|Hong|香港)).*$"
+```
+
+**效果**: 美国节点优先,香港节点作为最后备选或完全排除
+
+---
+
 ## 7. 最佳实践
 
 ### 7.1 模板命名规范
 
 ```yaml
-PolicyDefault:    # 默认模板,适用于大部分场景
-PolicyISP:        # 家宽专用模板
-PolicyMedia:      # 媒体专用模板
-PolicyFast:       # 高速专用模板
-PolicyDialer:     # 链式代理专用模板
+PolicyDefault:    # 默认模板,纯协议质量优先,无地区偏好
+PolicyISP:        # 家宽专用模板,美国权重最高(20),排除香港(-50)
+PolicyMedia:      # 媒体专用模板,美国权重较高(15)
+PolicyFast:       # 高速专用模板,美日优先
+PolicyAI:         # AI服务专用模板,美国权重最高(20)
+PolicyDialer:     # 链式代理专用模板,港台陆优先
 ```
 
 ### 7.2 权重设置原则
 
-1.  **特性优先**: 特殊用途节点 (家宽/媒体) 权重最高 (15)
-2.  **协议次之**: 按性能排序 Reality(10) > Hysteria2(9) > Xhttp(8)
-3.  **质量最后**: 优(5) > 中(2) > 备(1)
+1.  **基础权重**: 所有策略共享协议和质量权重
+2.  **地区偏好**: 根据使用场景动态调整 (家宽/AI: 美国20且排除香港, 媒体: 美国15, 链式代理: 香港20)
+3.  **协议性能**: Reality/vless(10) > Hysteria2(4) > V2ray/vmess(4) > tuic(2) > anytls(1)
+4.  **质量后缀**: 优(5) > 中(2) > 备(1)
 
 ### 7.3 维护建议
 
