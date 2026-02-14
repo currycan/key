@@ -142,11 +142,7 @@ main() {
 
     # Client Templates
     for c in /templates/client_template/*.yaml; do
-        if [ -f "$c" ]; then
-            local filename=$(basename "$c")
-            # The name variable is not used for file generation, only for printing in show_info_links
-            envsubst < "$c" > "${WORKDIR}/subscribe/${filename}"
-        fi
+        [ -f "$c" ] && envsubst < "$c" > "${WORKDIR}/subscribe/$(basename "$c")"
     done
 
     cp -a /sources/* ${WORKDIR}/subscribe 2>/dev/null || true
