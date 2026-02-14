@@ -95,7 +95,7 @@ show_info_links() {
     fi
 
     print_colored ${GREEN} "\n******************************************************************\n  *        Sing-box / Xray 多协议多传输客户端配置文件汇总         *\n"
-    print_colored ${RED} "Index:\nhttps://${CDNDOMAIN}/sb-xray/${token_param}"
+    print_colored ${RED} "Index:\nhttps://${CDNDOMAIN}/sb-xray/show-config${token_param}"
     print_colored ${YELLOW} "全部订阅:\nhttps://${CDNDOMAIN}/sb-xray/proxies${token_param}"
     print_colored ${MAGENTA} "Clash 订阅:\nhttps://${CDNDOMAIN}/sb-xray/clashsub${token_param}"
     print_colored ${CYAN} "V2rayN 订阅:\nhttps://${CDNDOMAIN}/sb-xray/v2rayn${token_param}"
