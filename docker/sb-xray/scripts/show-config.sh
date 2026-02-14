@@ -100,10 +100,19 @@ show_info_links() {
     print_colored ${MAGENTA} "Clash 订阅:\nhttps://${CDNDOMAIN}/sb-xray/clashsub${token_param}"
     print_colored ${CYAN} "V2rayN 订阅:\nhttps://${CDNDOMAIN}/sb-xray/v2rayn${token_param}"
 
+    # Client Templates
+    for c in /templates/client_template/*.yaml; do
+        if [ -f "$c" ]; then
+            local filename=$(basename "$c")
+            local name="${filename%.yaml}"
+            print_colored ${PURPLE} "${name} 订阅:\nhttps://${CDNDOMAIN}/sb-xray/${filename}${token_param}"
+        fi
+    done
+
     # 提示用户
     if [ -n "$token_param" ]; then
-         echo -e "💡 \033[33m已自动附加安全认证 Token，可直接导入客户端使用。\033[0m"
-         echo -e "🔒 \033[33m基础认证用户: ${PUBLIC_USER} / ${PUBLIC_PASSWORD}\033[0m"
+        echo -e "💡 \033[33m已自动附加安全认证 Token，可直接导入客户端使用。\033[0m"
+        echo -e "🔒 \033[33m基础认证用户: ${PUBLIC_USER} / ${PUBLIC_PASSWORD}\033[0m"
     fi
 
     print_colored ${GREEN} "\n*                                                                *\n *        Sing-box / Xray 多协议多传输客户端配置文件汇总         *\n******************************************************************"
@@ -121,7 +130,6 @@ main() {
     mkdir -p ${WORKDIR}/subscribe
     xui_info
     generate_links
-    show_info_links
 
     # 批量处理简单模板
     for t in all:proxies clash stash surge surge.conf; do
@@ -134,10 +142,16 @@ main() {
 
     # Client Templates
     for c in /templates/client_template/*.yaml; do
-        [ -f "$c" ] && envsubst < "$c" > "${WORKDIR}/subscribe/$(basename "$c")"
+        if [ -f "$c" ]; then
+            local filename=$(basename "$c")
+            # The name variable is not used for file generation, only for printing in show_info_links
+            envsubst < "$c" > "${WORKDIR}/subscribe/${filename}"
+        fi
     done
 
     cp -a /sources/* ${WORKDIR}/subscribe 2>/dev/null || true
+
+    show_info_links
 }
 
 main | tee >(sed 's/\x1b\[[0-9;]*m//g' > ${WORKDIR}/subscribe/show-config)
