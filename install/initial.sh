@@ -47,21 +47,6 @@ optimizing_system() {
     fi
 }
 
-# pip_install() {
-#     if [ $(which pip | wc -l) == 0 ]; then
-#         sudo curl -SLo ./get-pip.py https://bootstrap.pypa.io/pip/2.7/get-pip.py
-#         sudo python3 get-pip.py
-#         rm -f get-pip.py
-#     else
-#         VERSION=$(pip --version | tr -s ' ' | cut -d' ' -f2 | cut -d'.' -f1)
-#         if [ $VERSION != 19 ]; then
-#             sudo curl -SLo ./get-pip.py https://bootstrap.pypa.io/pip/2.7/get-pip.py
-#             sudo python3 get-pip.py
-#             rm -f get-pip.py
-#         fi
-#     fi
-# }
-
 user_init() {
     mkdir -p /app
     FLAG_GROUP=$(grep andrew /etc/group | wc -l)
@@ -89,7 +74,7 @@ download_ssh_key() {
 
 yum_init() {
     sudo yum update -y
-    sudo yum install -y sudo vim wget net-tools telnet lsof bash-completion epel-release python3 psmisc git
+    sudo yum install -y sudo vim wget net-tools telnet lsof bash-completion epel-release python3 psmisc git jq
     yum install -y yum-utils device-mapper-persistent-data lvm2
     yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
     rpm -Uvh --nodeps --force https://download.docker.com/linux/centos/7/x86_64/stable/Packages/containerd.io-1.2.6-3.3.el7.x86_64.rpm
@@ -119,7 +104,7 @@ yum_init() {
 apt_init() {
     apt update
     apt upgrade -y
-    apt install -y vim ca-certificates curl lsof bash-completion tree net-tools telnet lsof python3 python3-pip psmisc git
+    apt install -y vim ca-certificates curl lsof bash-completion tree net-tools telnet lsof python3 python3-pip psmisc git jq
     sudo install -m 0755 -d /etc/apt/keyrings
 
     if [[ "${release}" == "ubuntu" ]]; then
