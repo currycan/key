@@ -537,10 +537,11 @@ if [ "${1#-}" = 'supervisord' ] && [ "$(id -u)" = '0' ]; then
     mkdir -p ${LOGDIR}/{supervisor,xray,sing-box,dufs,nginx,x-ui,s-ui} "${SUI_DB_FOLDER}" "${SUB_STORE_DATA_BASE_PATH}"
 
     decryptSecretsEnv
-    set +u; source "/.env/secret"; source "/.env/xray"; set -u
+    source "/.env/secret"
     # 生成 ISP 配置
     generateIspConfigs
     generateEnv
+    source "/.env/xray"
 
     while IFS= read -r line; do
         log DEBUG "${line}"
