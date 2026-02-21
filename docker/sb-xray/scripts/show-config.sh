@@ -120,6 +120,10 @@ show_info_links() {
         fi
     done
 
+    if [ -f "/templates/client_template/surge.conf" ]; then
+        print_colored ${PURPLE} "Surge 订阅:\nhttps://${CDNDOMAIN}/sb-xray/surge.conf${token_param}"
+    fi
+
     # 提示用户
     if [ -n "$token_param" ]; then
         echo -e "💡 \033[33m已自动附加安全认证 Token，可直接导入客户端使用。\033[0m"
@@ -134,7 +138,7 @@ main() {
     generate_links
 
     # 批量处理简单模板
-    for t in all:proxies clash stash surge surge.conf; do
+    for t in all:proxies clash surge surge.conf; do
         local src="${t%:*}" dst="${t#*:}"
         local path="/templates/proxies/${src}"
         [[ "$src" == "surge.conf" ]] && path="/templates/client_template/surge.conf"

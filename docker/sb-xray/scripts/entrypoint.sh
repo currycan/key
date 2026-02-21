@@ -827,7 +827,7 @@ build_client_and_server_configs() {
     log INFO "==== 根据内存决断引擎参数矩阵装配渲染客户端呈现与服务端出站 JSON ===="
 
     export SB_SOCKS5_OUTBOUND_CONFIG="" CUSTOM_OUTBOUNDS="" SB_CUSTOM_OUTBOUNDS="" CLASH_ISP_PROXIES=""
-    export clash_proxies=""
+    export clash_proxies="" surge_proxies=""
 
     local env_vars=$(env | grep "_ISP_IP=" | cut -d= -f1)
 
@@ -848,14 +848,21 @@ build_client_and_server_configs() {
     udp: true
     dialer-proxy: 链式前置"
 
+            local surge_ini="${name_prefix}-dialer = socks5, ${ip}, ${port}, username=${user}, password=${pass}, udp-relay=true"
+
             if [ -z "$clash_proxies" ]; then
                 clash_proxies="${c_yaml}"
+                surge_proxies="${surge_ini}"
             else
-                clash_proxies="${clash_proxies}\n${c_yaml}"
+                clash_proxies="${clash_proxies}
+${c_yaml}"
+                surge_proxies="${surge_proxies}
+${surge_ini}"
             fi
         fi
     done
     export CLASH_ISP_PROXIES="${clash_proxies}"
+    export SURGE_ISP_PROXIES="${surge_proxies}"
 
     # 安装特定指纹选定的冠军级服务端 JSON 通配逻辑块
     export CUSTOM_OUTBOUNDS="" SB_CUSTOM_OUTBOUNDS=""
@@ -915,6 +922,44 @@ generateProxyProvidersConfig() {
     fi
 
     export CLASH_PROXY_PROVIDERS="${clash_providers}"
+
+    # Surge 采用 Policy-Path 结构，如:
+    # 机场名称 = smart, policy-path=https://.../raw/AllOne-Surge, update-interval=86400, no-alert=0, hidden=1, include-all-proxies=0
+    # 依据整理后的 clash_providers 统一列表，过滤提取链接并将其组装成 .ini 格式
+    local surge_providers=""
+    if [ -n "${clash_providers}" ]; then
+        surge_providers=$(echo "$clash_providers" | awk -F":" '
+            $0 ~ /url:/ {
+                name = $1
+                gsub(/^[ \t]+|[ \t]+$/, "", name)
+
+                # 用户要求配置 surge 只需要 AllOne 机场
+                if (name != "AllOne") {
+                    next
+                }
+
+                match($0, /url:[ \t]*"[^"]+"/)
+                if (RSTART > 0) {
+                    url_part = substr($0, RSTART, RLENGTH)
+                    match(url_part, /"[^"]+"/)
+                    url = substr(url_part, RSTART + 1, RLENGTH - 2)
+                    sub(/-Common$/, "-Surge", url)
+                    sub(/-common$/, "-Surge", url)
+                    printf "%s = smart, policy-path=%s, update-interval=86400, no-alert=0, hidden=1, include-all-proxies=0\n", name, url
+                }
+            }
+        ')
+    fi
+    export SURGE_PROXY_PROVIDERS="${surge_providers}"
+
+    local surge_names=""
+    if [ -n "${surge_providers}" ]; then
+        surge_names=$(echo "$surge_providers" | awk -F'=' '{print $1}' | awk '{$1=$1};1' | paste -sd "," -)
+        if [ -n "$surge_names" ]; then
+            surge_names=", ${surge_names}"
+        fi
+    fi
+    export SURGE_PROVIDER_NAMES="${surge_names}"
 }
 
 
