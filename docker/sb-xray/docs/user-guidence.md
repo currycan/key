@@ -145,15 +145,21 @@ graph TB
 
 **功能**：容器启动时的主控脚本，负责环境初始化、配置生成和服务启动。
 
-**核心流程**：
+> 💡 **深度解析进阶阅读**
+> 关于 `entrypoint.sh` 的详细五大启动扇区（变量加工 -> 证书生成 -> 服务端渲染 -> 客户端组装）、测速跑分逻辑、多节点智能选路系统，请务必参考配套流程图解白皮书：
+> 👉 [**《Entrypoint.sh 核心生命周期与架构解析》**](./entrypoint-architecture.md)
+
+**核心粗略流程**：
 
 ```mermaid
 graph LR
     Start[容器启动] --> Decrypt[解密 Secrets]
-    Decrypt --> GenEnv[生成环境变量]
+    Decrypt --> Cache[检查测速缓存]
+    Cache --> SpeedTest[极限跑分或短路截断]
+    SpeedTest --> GenEnv[生成变量网]
     GenEnv --> IssueCert[申请/续期证书]
-    IssueCert --> GenISP[生成 ISP 配置]
-    GenISP --> GenProviders[生成 Providers]
+    IssueCert --> Render[纯净渲染提取配置]
+    Render --> GenProviders[生成 Providers]
     GenProviders --> RenderTemplates[渲染所有模板]
     RenderTemplates --> InitUI[初始化 X-UI/S-UI]
     InitUI --> StartSupervisor[启动 Supervisor]
@@ -169,9 +175,14 @@ graph LR
     *   `STRATEGY`：IP 策略（IPv4/IPv6）
     *   `CHATGPT_OUT`：ChatGPT 访问检测
 
-2.  **`generateIspConfigs()`**：扫描环境变量中的 `*_ISP_IP` 模式
-    *   生成 Xray/Sing-box 的 Socks5 出站配置
-    *   生成客户端的 ISP 代理节点配置
+2.  **`run_speed_tests_if_needed()`**：测速及优选评估
+    *   检查 `/.env/xray` 中是否存在 `ISP_TAG`，**存在即立刻短路跳过测试流程**。
+    *   扫描环境变量中的 `*_ISP_IP` 进行满载跑分评估，挑出最优直出或代理通道保存。
+
+3.  **`build_client_and_server_configs()`**：纯净结构组装
+    *   基于选出的 `ISP_TAG`，秒速无网构建 Xray/Sing-box 的出站配置。
+    *   构建客户端 YAML 的 ISP 代理节点配置段。生成的拨号底层名不会受到任何杂质污染。
+    *   结合测算出的 `IS_8K_SMOOTH` 布尔锁与节点属性，交由 `show-config.sh` 在最终呈现的外显订阅链接中附加智能策略后缀（如 `✈super` 代表住宅流畅， `✈good` 代表代理流畅）。
 
 3.  **`generateProxyProvidersConfig()`**：处理 `providers` 文件
     *   解析订阅源配置

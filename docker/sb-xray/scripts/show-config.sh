@@ -5,9 +5,11 @@ set -eou pipefail
 RED="\033[31m"; GREEN="\033[32m"; YELLOW="\033[33m"; BLUE="\033[34m"; MAGENTA="\033[35m"; CYAN="\033[36m"; PURPLE="\033[0;35m"; RESET="\033[0m"
 
 # Env
-ENV_FILE="/.env/xray"
+ENV_FILE="/.env/sb-xray"
+STATUS_FILE="/.env/status"
 [ -f "$ENV_FILE" ] || { echo -e "${RED}Error: $ENV_FILE missing${RESET}"; exit 1; }
 source "$ENV_FILE"
+[ -f "$STATUS_FILE" ] && source "$STATUS_FILE"
 
 # Ensure output directory exists immediately
 mkdir -p "${WORKDIR}/subscribe"
@@ -19,9 +21,18 @@ export REGION_INFO="${GEOIP_INFO%%|*}"
 # Preserve NODE_SUFFIX from env, default to empty if not set
 : "${NODE_SUFFIX:=}"
 
-# Auto-detect suffix only if not manually set
-if [ -z "$NODE_SUFFIX" ]; then
-    [[ "$DOMAIN" =~ ^(dmit|dc|jp) ]] && export NODE_SUFFIX="✈高速"
+# Auto-detect suffix logic (supports stacking)
+# 0. 域名硬编码匹配 (dmit/dc/jp) -> ✈高速
+if [[ "$DOMAIN" =~ ^(dmit|dc|jp) ]]; then
+    export NODE_SUFFIX="${NODE_SUFFIX}✈高速"
+fi
+# 1. 8K 能力场景分发
+# good: 使用了 sock5 代理后支持 8k 流媒体 (优先级最高，无论宿主是否为住宅，只要被收编进代理统统算 good)
+if [[ -n "${ISP_TAG:-}" && "${ISP_TAG}" != "direct" && "${IS_8K_SMOOTH:-}" == "true" ]]; then
+    export NODE_SUFFIX+="✈good"
+# super: 宿主是纯净的住宅 ip 且全链路直出支持 8k 流媒体
+elif [[ "${IP_TYPE:-}" == "isp" && "${IS_8K_SMOOTH:-}" == "true" ]]; then
+    export NODE_SUFFIX+="✈super"
 fi
 
 # Add IP_TYPE to NODE_SUFFIX
@@ -118,17 +129,8 @@ show_info_links() {
     print_colored ${GREEN} "\n*                                                                *\n *        Sing-box / Xray 多协议多传输客户端配置文件汇总         *\n******************************************************************"
 }
 
-xui_info() {
-    echo -e "${GREEN}=== x-ui 用户信息 ===${RESET}"
-    /usr/local/bin/x-ui setting --show
-    echo ""
-    print_colored ${CYAN} ">>>>>>>>>>>>>>>>>>>>>>>>>>>>> ${PUBLIC_USER} <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
-    print_colored ${CYAN} ">>>>>>>>>>>>>>>>>>>>>>>>>>>>> ${PUBLIC_PASSWORD} <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
-}
-
 main() {
     mkdir -p ${WORKDIR}/subscribe
-    xui_info
     generate_links
 
     # 批量处理简单模板
