@@ -8,7 +8,10 @@
     "dns": {
         "servers": [
             {
-                "type": "local"
+                "address": "1.1.1.1"
+            },
+            {
+                "address": "8.8.8.8"
             }
         ],
         "strategy": "${STRATEGY}"
