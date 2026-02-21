@@ -16,10 +16,12 @@
 BaseProvider:   &BaseProvider {type: http, interval: 86400, proxy: DIRECT, health-check: {enable: true, url: "https://www.google.com/generate_204", interval: 300}, filter: "^(?!.*(❗|群(?!岛)|邀请|返利|循环|官网|客服|网站|网址|获取|订阅|流量|到期|机场|下次|版本|官址|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|套餐|有效|剩余|失联|测试|官方|学术|更快|如果|客户|距离|Traffic|Reset|Days|Left|TEST|USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author|\\d+\\s*GB))"}
 
 # 策略组类型模板 - 定义不同的策略组基础配置
-BaseFB:         &BaseFB {type: fallback,     interval: 180, tolerance: 200, lazy: true, url: "https://www.google.com/generate_204"}
-BaseCH:         &BaseCH {type: load-balance, interval: 180, tolerance: 200, lazy: true, url: "https://www.google.com/generate_204", strategy: consistent-hashing, hidden: true}
-BaseCR:         &BaseCR {type: load-balance, interval: 180, tolerance: 200, lazy: true, url: "https://www.google.com/generate_204", strategy: round-robin, hidden: true}
-BaseUT:         &BaseUT {type: url-test,     interval: 180, tolerance: 200, lazy: true, url: "https://www.google.com/generate_204", hidden: true}
+BaseFB:         &BaseFB {type: fallback,     interval: 180, tolerance: 300, lazy: true, url: "https://www.google.com/generate_204"}
+BaseCH:         &BaseCH {type: load-balance, interval: 180, tolerance: 300, lazy: true, url: "https://www.google.com/generate_204", strategy: consistent-hashing, hidden: true}
+BaseCR:         &BaseCR {type: load-balance, interval: 180, tolerance: 300, lazy: true, url: "https://www.google.com/generate_204", strategy: round-robin, hidden: true}
+BaseUT:         &BaseUT {type: url-test,     interval: 180, tolerance: 300, lazy: true, url: "https://www.google.com/generate_204", hidden: true}
+MediaUT:        &MediaUT {type: url-test,    interval: 180, tolerance: 1000, lazy: true, url: "https://www.google.com/generate_204", hidden: true}
+StableUT:       &StableUT {type: url-test,   interval: 180, tolerance: 800, lazy: true, url: "https://www.google.com/generate_204", hidden: true}
 
 # 全部节点筛选正则表达式 - 所有节点
 FilterALL:      &FilterALL "^(?!.*(❗|群(?!岛)|邀请|返利|循环|官网|客服|网站|网址|获取|订阅|流量|到期|机场|下次|版本|官址|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|套餐|有效|剩余|失联|测试|官方|学术|更快|如果|客户|距离|Traffic|Reset|Days|Left|TEST|USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author|\\d+\\s*GB))"
@@ -33,12 +35,12 @@ FilterKR:       &FilterKR  "^(?=.*(?i)(广韩|韩国|韓國|KR|首尔|春川|�
 FilterOT:       &FilterOT  "^(?!.*(DIRECT|REJECT|直接连接|住宅|isp|ISP|广港|香港|HK|Hong Kong|🇭🇰|HongKong|深港|沪港|呼港|京港|杭港|Hong[\\s-]?Kong|HONG[\\s-]?KONG|广台|台湾|台灣|TW|Tai Wan|🇹🇼|🇨🇳|TaiWan|Taiwan|新[北竹]|彰化|高雄|[台臺][湾灣北]|Taipei|Kaohsiung|Hsinchu|Taichung|广日|日本|JP|川日|东京|大阪|泉日|埼玉|沪日|深日|🇯🇵|Japan|名古屋|福冈|Tokyo|Osaka|Saitama|Nagoya|Fukuoka|Hokkaido|Okinawa|Kyoto|Yokohama|广新|新加坡|SG|坡|狮城|🇸🇬|Singapore|[狮獅]城|Changi|广韩|韩国|韓國|KR|首尔|春川|🇰🇷|Korea|[韩韓][国國]|South[\\s-]?Korea|Seoul|Incheon|Busan|Chuncheon|广美|US|美国|纽约|波特兰|达拉斯|俄勒|凤凰城|费利蒙|洛杉|圣何塞|圣克拉|西雅|芝加|🇺🇸|United States|美[国國]|华盛顿|菲尼克斯|弗里蒙特|硅谷|旧金山|拉斯维加斯|圣荷西|哥伦布|阿什本|纽瓦克|丹佛|加利福尼亚|弗吉尼亚|马纳萨斯|俄亥俄|得克萨斯|[佐乔]治亚|亚特兰大|佛罗里达|迈阿密|United[\\s-_]+States|Los[\\s-_]+Angeles|San[\\s-_]+Jose|Silicon[\\s-_]+Valley|San[\\s-_]+Francisco|Santa[\\s-_]+Clara|Seattle|Chicago|New[\\s-_]+York|Miami|Dallas|Phoenix|Fremont|Atlanta|Boston|Las[\\s-_]+Vegas|Houston|Ashburn|Buffalo|Washington|D\\.C\\.|Oregon|Portland|Virginia|Ohio|Texas|Florida|Illinois|Arizona|Orem|Kansas|5x)).*$"
 
 # 节点筛选正则表达式 - 家宽节点
-FilterISP:      &FilterISP    "^(?=.*(?i)(住宅|isp|ISP))(?!.*(DIRECT|直接连接|5x|HK|香港|Hong Kong|🇭🇰|HongKong|深港|沪港|呼港|京港|杭港|Hong[\\s-]?Kong|HONG[\\s-]?KONG)).*$"
+FilterISP:      &FilterISP    "^(?=.*(?i)(住宅|isp|ISP))(?!.*(DIRECT|直接连接|5x)).*$"
 FilterMedia:    &FilterMedia  "^(?=.*(?i)(流媒体))(?!.*(DIRECT|直接连接|5x)).*$"
 # 节点筛选正则表达式 - 高速节点
 FilterFAST:     &FilterFAST   "^(?=.*(?i)(高速))(?!.*(DIRECT|直接连接|5x)).*$"
 # 节点筛选正则表达式 - AI节点
-FilterAI:       &FilterAI     "^(?=.*(?i)(AI|AllOne))(?!.*(DIRECT|直接连接|5x|racknerd|hostdare|zorocloud)).*$"
+FilterAI:       &FilterAI     "^(?=.*(?i)(AI|AllOne))(?!.*(DIRECT|直接连接|5x)).*$"
 # 节点筛选正则表达式 - 过滤链式代理节点
 FilterDialer:   &FilterDialer "^(?=.*(?i)(🇭🇰|🇹🇼|🇨🇳))(?!.*(DIRECT|直接连接|REJECT|-dialer)).*$"
 
@@ -79,16 +81,16 @@ proxy-groups:
   # ==================== 线路节点策略组 ====================
   - {name: 家宽-故转,   <<: *BaseFB,     proxies: [家宽-自动, 家宽-手动], icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Area.png}
   - {name: 家宽-手动,   type: select,    filter: *FilterISP,   include-all: true, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Area.png}
-  - {name: 家宽-自动,   <<: *BaseUT,     filter: *FilterISP,   include-all: true, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Area.png}
+  - {name: 家宽-自动,   <<: *MediaUT, filter: *FilterISP,     icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Area.png}
   - {name: 媒体-故转,   <<: *BaseFB,     proxies: [媒体-自动, 媒体-手动], icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Clubhouse_1.png}
   - {name: 媒体-手动,   type: select,    filter: *FilterMedia, include-all: true, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Clubhouse_1.png}
-  - {name: 媒体-自动,   <<: *BaseUT,     filter: *FilterMedia, include-all: true, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Clubhouse_1.png}
+  - {name: 媒体-自动,   <<: *MediaUT, filter: *FilterMedia,   icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Clubhouse_1.png}
   - {name: 高速-故转,   <<: *BaseFB,     proxies: [高速-自动, 高速-手动], icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Rocket.png}
   - {name: 高速-手动,   type: select,    filter: *FilterFAST,  include-all: true, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Rocket.png}
   - {name: 高速-自动,   <<: *BaseUT,     filter: *FilterFAST,  include-all: true, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Rocket.png}
   - {name: AI-故转,    <<: *BaseFB,     proxies: [AI-自动, AI-手动], icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/AI.png}
   - {name: AI-手动,    type: select,    filter: *FilterAI,    include-all: true, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/AI.png}
-  - {name: AI-自动,    <<: *BaseUT,     filter: *FilterAI,    include-all: true, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/AI.png}
+  - {name: AI-自动,     <<: *StableUT, filter: *FilterAI,      icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/AI.png}
   # ==================== AI 服务 ====================
   - {name: 人工智能,    <<: *SelectAI,    icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/AI.png}
   # ==================== 媒体服务 ====================
@@ -259,12 +261,14 @@ rules:
   # Final
   - MATCH,兜底流量
 
+
 # ==================== 规则集 ====================
 # 规则集行为模板
-BehaviorDN:   &BehaviorDN   {type: http, behavior: domain,         format: mrs,  interval: 86400}
-BehaviorIP:   &BehaviorIP   {type: http, behavior: ipcidr,         format: mrs,  interval: 86400}
-BehaviorCL:   &BehaviorCL   {type: http, behavior: classical,      format: text, interval: 86400}
+BehaviorDN:   &BehaviorDN   {type: http, behavior: domain,    format: mrs,  interval: 86400}
+BehaviorIP:   &BehaviorIP   {type: http, behavior: ipcidr,    format: mrs,  interval: 86400}
+BehaviorCL:   &BehaviorCL   {type: http, behavior: classical, format: text, interval: 86400}
 
+# 规则提供者
 rule-providers:
   TEST / Domain:          {<<: *BehaviorCL, url: "https://gh-proxy.com/raw.githubusercontent.com/liandu2024/clash/main/list/Check.list"}
   ChatGPT / Domain:       {<<: *BehaviorDN, url: "https://gh-proxy.com/raw.githubusercontent.com/metacubex/meta-rules-dat/meta/geo/geosite/openai.mrs"}
@@ -333,12 +337,8 @@ unified-delay: true
 tcp-concurrent: true
 log-level: warning
 bind-address: "*"
-find-process-mode: "always"
-client-fingerprint: chrome
 keep-alive-interval: 15
 keep-alive-idle: 600
-clash-for-android:
-  append-system-dns: false
 
 # 认证配置
 authentication:
@@ -382,6 +382,9 @@ sniffer:
   skip-domain:
     - "Mijia Cloud"
     - "+.push.apple.com"
+    - "+.local"
+    - "+.msftconnecttest.com"
+    - "+.msftncsi.com"
 
 # TUN模式配置
 # tun:
@@ -397,6 +400,9 @@ tun:
   enable: true
   stack: gvisor
   device: utun
+  dns-hijack:
+    - "any:53"
+    - "tcp://any:53"
   endpoint-independent-nat: true
   auto-route: false
   auto-detect-interface: false
@@ -416,17 +422,16 @@ dns:
   fake-ip-filter:
     - "rule-set:fakeipfilter_domain"
   default-nameserver:
-    - https://223.5.5.5/dns-query
+    - 1.1.1.1
+    - 8.8.8.8
   proxy-server-nameserver:
-    - https://dns.alidns.com/dns-query
-    - https://doh.pub/dns-query
+    - https://dns.google/dns-query
+    - 1.1.1.1
   nameserver:
-    - https://dns.alidns.com/dns-query
-    - https://doh.pub/dns-query
-    - 119.29.29.29
-    - 180.184.1.1
-    - 223.5.5.5
-
+    - https://dns.google/dns-query
+    - https://base.dns.mullvad.net/dns-query
+    - 1.1.1.1
+    - 8.8.8.8
   # 支持通配符域名 (例如: *.clash.dev, *.foo.*.example.com )
   # 不使用通配符的域名优先级高于使用通配符的域名 (例如: foo.example.com > *.example.com > .example.com )
   # 注意: +.foo.com 的效果等同于 .foo.com 和 foo.com

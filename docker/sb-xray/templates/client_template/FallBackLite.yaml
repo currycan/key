@@ -16,10 +16,12 @@
 BaseProvider:   &BaseProvider {type: http, interval: 86400, proxy: DIRECT, health-check: {enable: true, url: "https://www.google.com/generate_204", interval: 300}, filter: "^(?!.*(❗|群(?!岛)|邀请|返利|循环|官网|客服|网站|网址|获取|订阅|流量|到期|机场|下次|版本|官址|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|套餐|有效|剩余|失联|测试|官方|学术|更快|如果|客户|距离|Traffic|Reset|Days|Left|TEST|USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author|\\d+\\s*GB))"}
 
 # 策略组类型模板 - 定义不同的策略组基础配置
-BaseFB:         &BaseFB {type: fallback,     interval: 180, tolerance: 200, lazy: true, url: "https://www.google.com/generate_204"}
-BaseCH:         &BaseCH {type: load-balance, interval: 180, tolerance: 200, lazy: true, url: "https://www.google.com/generate_204", strategy: consistent-hashing, hidden: true}
-BaseCR:         &BaseCR {type: load-balance, interval: 180, tolerance: 200, lazy: true, url: "https://www.google.com/generate_204", strategy: round-robin, hidden: true}
-BaseUT:         &BaseUT {type: url-test,     interval: 180, tolerance: 200, lazy: true, url: "https://www.google.com/generate_204", hidden: true}
+BaseFB:         &BaseFB {type: fallback,     interval: 180, tolerance: 300, lazy: true, url: "https://www.google.com/generate_204"}
+BaseCH:         &BaseCH {type: load-balance, interval: 180, tolerance: 300, lazy: true, url: "https://www.google.com/generate_204", strategy: consistent-hashing, hidden: true}
+BaseCR:         &BaseCR {type: load-balance, interval: 180, tolerance: 300, lazy: true, url: "https://www.google.com/generate_204", strategy: round-robin, hidden: true}
+BaseUT:         &BaseUT {type: url-test,     interval: 180, tolerance: 300, lazy: true, url: "https://www.google.com/generate_204", hidden: true}
+MediaUT:        &MediaUT {type: url-test,    interval: 180, tolerance: 1000, lazy: true, url: "https://www.google.com/generate_204", hidden: true}
+StableUT:       &StableUT {type: url-test,   interval: 180, tolerance: 800, lazy: true, url: "https://www.google.com/generate_204", hidden: true}
 
 # 全部节点筛选正则表达式 - 所有节点
 FilterALL:      &FilterALL "^(?!.*(❗|群(?!岛)|邀请|返利|循环|官网|客服|网站|网址|获取|订阅|流量|到期|机场|下次|版本|官址|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|套餐|有效|剩余|失联|测试|官方|学术|更快|如果|客户|距离|Traffic|Reset|Days|Left|TEST|USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author|\\d+\\s*GB))"
@@ -79,16 +81,16 @@ proxy-groups:
   # ==================== 线路节点策略组 ====================
   - {name: 家宽-故转,   <<: *BaseFB,     proxies: [家宽-自动, 家宽-手动], icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Area.png}
   - {name: 家宽-手动,   type: select,    filter: *FilterISP,   include-all: true, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Area.png}
-  - {name: 家宽-自动,   <<: *BaseUT,     filter: *FilterISP,   include-all: true, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Area.png}
+  - {name: 家宽-自动,   <<: *MediaUT,     filter: *FilterISP,   include-all: true, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Area.png}
   - {name: 媒体-故转,   <<: *BaseFB,     proxies: [媒体-自动, 媒体-手动], icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Clubhouse_1.png}
   - {name: 媒体-手动,   type: select,    filter: *FilterMedia, include-all: true, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Clubhouse_1.png}
-  - {name: 媒体-自动,   <<: *BaseUT,     filter: *FilterMedia, include-all: true, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Clubhouse_1.png}
+  - {name: 媒体-自动,   <<: *MediaUT,     filter: *FilterMedia, include-all: true, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Clubhouse_1.png}
   - {name: 高速-故转,   <<: *BaseFB,     proxies: [高速-自动, 高速-手动], icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Rocket.png}
   - {name: 高速-手动,   type: select,    filter: *FilterFAST,  include-all: true, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Rocket.png}
   - {name: 高速-自动,   <<: *BaseUT,     filter: *FilterFAST,  include-all: true, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Rocket.png}
   - {name: AI-故转,    <<: *BaseFB,     proxies: [AI-自动, AI-手动], icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/AI.png}
   - {name: AI-手动,    type: select,    filter: *FilterAI,    include-all: true, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/AI.png}
-  - {name: AI-自动,    <<: *BaseUT,     filter: *FilterAI,    include-all: true, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/AI.png}
+  - {name: AI-自动,    <<: *StableUT,     filter: *FilterAI,    include-all: true, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/AI.png}
   # ==================== AI 服务 ====================
   - {name: 人工智能,    <<: *SelectAI,    icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/AI.png}
   # ==================== 媒体服务 ====================
@@ -279,12 +281,8 @@ unified-delay: true
 tcp-concurrent: true
 log-level: warning
 bind-address: "*"
-find-process-mode: "always"
-client-fingerprint: chrome
 keep-alive-interval: 15
 keep-alive-idle: 600
-clash-for-android:
-  append-system-dns: false
 
 # 认证配置
 authentication:
@@ -328,6 +326,9 @@ sniffer:
   skip-domain:
     - "Mijia Cloud"
     - "+.push.apple.com"
+    - "+.local"
+    - "+.msftconnecttest.com"
+    - "+.msftncsi.com"
 
 # TUN模式配置
 # tun:
@@ -343,6 +344,9 @@ tun:
   enable: true
   stack: gvisor
   device: utun
+  dns-hijack:
+    - "any:53"
+    - "tcp://any:53"
   endpoint-independent-nat: true
   auto-route: false
   auto-detect-interface: false
@@ -362,17 +366,16 @@ dns:
   fake-ip-filter:
     - "rule-set:fakeipfilter_domain"
   default-nameserver:
-    - https://223.5.5.5/dns-query
+    - 1.1.1.1
+    - 8.8.8.8
   proxy-server-nameserver:
-    - https://dns.alidns.com/dns-query
-    - https://doh.pub/dns-query
+    - https://dns.google/dns-query
+    - 1.1.1.1
   nameserver:
-    - https://dns.alidns.com/dns-query
-    - https://doh.pub/dns-query
-    - 119.29.29.29
-    - 180.184.1.1
-    - 223.5.5.5
-
+    - https://dns.google/dns-query
+    - https://base.dns.mullvad.net/dns-query
+    - 1.1.1.1
+    - 8.8.8.8
   # 支持通配符域名 (例如: *.clash.dev, *.foo.*.example.com )
   # 不使用通配符的域名优先级高于使用通配符的域名 (例如: foo.example.com > *.example.com > .example.com )
   # 注意: +.foo.com 的效果等同于 .foo.com 和 foo.com

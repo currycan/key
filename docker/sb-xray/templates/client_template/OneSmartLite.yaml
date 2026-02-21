@@ -16,9 +16,11 @@
 BaseProvider:   &BaseProvider {type: http, interval: 86400, proxy: DIRECT, health-check: {enable: true, url: "https://www.google.com/generate_204", interval: 300}, filter: "^(?!.*(❗|群(?!岛)|邀请|返利|循环|官网|客服|网站|网址|获取|订阅|流量|到期|机场|下次|版本|官址|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|套餐|有效|剩余|失联|测试|官方|学术|更快|如果|客户|距离|Traffic|Reset|Days|Left|TEST|USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author|\\d+\\s*GB))"}
 
 # 策略组类型模板 - 定义不同的策略组基础配置
-BaseFB:         &BaseFB    {type: fallback,     interval: 180, tolerance: 200, lazy: true, url: "https://www.google.com/generate_204"}
-BaseLB:         &BaseLB    {type: load-balance, interval: 180, tolerance: 200, lazy: true, url: "https://www.google.com/generate_204"}
-BaseSmart:      &BaseSmart {type: smart,        interval: 180, tolerance: 200, lazy: true, url: "https://www.google.com/generate_204", hidden: true, uselightgbm: true, collectdata: true}
+BaseFB:         &BaseFB    {type: fallback,     interval: 180, tolerance: 300, lazy: true, url: "https://www.google.com/generate_204"}
+BaseLB:         &BaseLB    {type: load-balance, interval: 180, tolerance: 300, lazy: true, url: "https://www.google.com/generate_204"}
+BaseSmart:      &BaseSmart {type: smart,        interval: 180, tolerance: 300, lazy: true, url: "https://www.google.com/generate_204", hidden: true, uselightgbm: true, collectdata: true}
+MediaSmart:     &MediaSmart {type: smart,       interval: 180, tolerance: 1000, lazy: true, url: "https://www.google.com/generate_204", hidden: true, uselightgbm: true, collectdata: true}
+StableSmart:    &StableSmart {type: smart,      interval: 180, tolerance: 800, lazy: true, url: "https://www.google.com/generate_204", hidden: true, uselightgbm: true, collectdata: true}
 
 # 全部节点筛选正则表达式 - 所有节点
 FilterALL:      &FilterALL "^(?!.*(❗|群(?!岛)|邀请|返利|循环|官网|客服|网站|网址|获取|订阅|流量|到期|机场|下次|版本|官址|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|套餐|有效|剩余|失联|测试|官方|学术|更快|如果|客户|距离|Traffic|Reset|Days|Left|TEST|USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author|\\d+\\s*GB))"
@@ -46,32 +48,32 @@ FilterDialer:   &FilterDialer "^(?=.*(?i)(🇭🇰|🇹🇼|🇨🇳))(?!.*(DIRE
 #
 # 权重维度说明:
 #   - 机场标识: AllOne(10)
-#   - 特性标签: 高速(10)
-#   - 协议性能: Reality(10), vless(10), Hysteria2(4), V2ray(4), vmess(4), tuic(2), TUIC(2), anytls(1)
+#   - 特性标签: 高速(10), super(5), good(3)
+#   - 协议性能: Reality(10), vless(10), Hysteria2(8), hysteria2(8), hy2(8), HY2(8), TUIC(8), tuic(8), V2ray(3), vmess(3), anytls(1)
 #   - 质量后缀: 优(5), 中(2), 备(1)
 #   - 地区偏好: 根据不同场景动态调整
 #
 # ==================== 基础权重配置(所有策略共享) ====================
-# 格式: AllOne:10;高速:10;Reality:10;vless:10;ysteria2:4;V2ray:4;vmess:4;tuic:2;TUIC:2;anytls:1;优:5;中:2;备:1
+# 格式: AllOne:10;高速:10;super:5;good:3;Reality:10;vless:10;Hysteria2:8;hysteria2:8;hy2:8;HY2:8;TUIC:8;tuic:8;V2ray:3;vmess:3;anytls:1;优:5;中:2;备:1
 # 说明: 以下所有策略都包含此基础权重,仅地区偏好部分有差异
 # ---------- 默认策略 ----------
 # 地区偏好: 无
-PolicyDefault:  &PolicyDefault  "AllOne:10;高速:10;Reality:10;vless:10;ysteria2:4;V2ray:4;vmess:4;tuic:2;TUIC:2;anytls:1;优:5;中:2;备:1"
+PolicyDefault:  &PolicyDefault  "AllOne:10;高速:10;super:5;good:3;Reality:10;vless:10;Hysteria2:8;hysteria2:8;hy2:8;HY2:8;TUIC:8;tuic:8;V2ray:3;vmess:3;anytls:1;优:5;中:2;备:1"
 # ---------- 家宽策略 ----------
 # 地区偏好: 🇺🇸:20 > 🇰🇷:10 > 🇯🇵:6 > 🇸🇬:4 > 🇹🇼:2
-PolicyISP:      &PolicyISP      "AllOne:10;高速:10;Reality:10;vless:10;ysteria2:4;V2ray:4;vmess:4;tuic:2;TUIC:2;anytls:1;优:5;中:2;备:1;🇺🇸:20;🇰🇷:10;🇯🇵:6;🇸🇬:4;🇹🇼:2"
+PolicyISP:      &PolicyISP      "AllOne:10;高速:10;super:5;good:3;Reality:10;vless:10;Hysteria2:8;hysteria2:8;hy2:8;HY2:8;TUIC:8;tuic:8;V2ray:3;vmess:3;anytls:1;优:5;中:2;备:1;🇺🇸:20;🇰🇷:10;🇯🇵:6;🇸🇬:4;🇹🇼:2"
 # ---------- 流媒体策略 ----------
 # 地区偏好: 🇺🇸:15 > 🇰🇷:8 > 🇯🇵:6 > 🇸🇬:4 > 🇹🇼:2
-PolicyMedia:    &PolicyMedia    "AllOne:10;高速:10;Reality:10;vless:10;ysteria2:4;V2ray:4;vmess:4;tuic:2;TUIC:2;anytls:1;优:5;中:2;备:1;🇺🇸:15;🇰🇷:8;🇯🇵:6;🇸🇬:4;🇹🇼:2"
+PolicyMedia:    &PolicyMedia    "AllOne:10;高速:10;super:5;good:3;Reality:10;vless:10;Hysteria2:8;hysteria2:8;hy2:8;HY2:8;TUIC:8;tuic:8;V2ray:3;vmess:3;anytls:1;优:5;中:2;备:1;🇺🇸:15;🇰🇷:8;🇯🇵:6;🇸🇬:4;🇹🇼:2"
 # ---------- 高速策略 ----------
 # 地区偏好: 🇺🇸:15 > 🇯🇵:10 > 🇰🇷:8 > 🇸🇬:4 > 🇹🇼:2
-PolicyFast:     &PolicyFast     "AllOne:10;高速:10;Reality:10;vless:10;ysteria2:4;V2ray:4;vmess:4;tuic:2;TUIC:2;anytls:1;优:5;中:2;备:1;🇺🇸:15;🇯🇵:10;🇰🇷:8;🇸🇬:4;🇹🇼:2"
+PolicyFast:     &PolicyFast     "AllOne:10;高速:10;super:5;good:3;Reality:10;vless:10;Hysteria2:8;hysteria2:8;hy2:8;HY2:8;TUIC:8;tuic:8;V2ray:3;vmess:3;anytls:1;优:5;中:2;备:1;🇺🇸:15;🇯🇵:10;🇰🇷:8;🇸🇬:4;🇹🇼:2"
 # ---------- AI 服务策略 ----------
 # 地区偏好: 🇺🇸:20 > 🇯🇵:10 > 🇰🇷:8 > 🇸🇬:4 > 🇹🇼:2
-PolicyAI:       &PolicyAI       "AllOne:10;高速:10;Reality:10;vless:10;ysteria2:4;V2ray:4;vmess:4;tuic:2;TUIC:2;anytls:1;优:5;中:2;备:1;🇺🇸:20;🇯🇵:10;🇰🇷:8;🇸🇬:4;🇹🇼:2"
+PolicyAI:       &PolicyAI       "AllOne:10;高速:10;super:5;good:3;Reality:10;vless:10;Hysteria2:8;hysteria2:8;hy2:8;HY2:8;TUIC:8;tuic:8;V2ray:3;vmess:3;anytls:1;优:5;中:2;备:1;🇺🇸:20;🇯🇵:10;🇰🇷:8;🇸🇬:4;🇹🇼:2"
 # ---------- 链式代理策略 ----------
 # 地区偏好: 🇭🇰:20 > 🇹🇼:15 > 🇨🇳:15 > 🇰🇷:10 > 🇯🇵:6 > 🇸🇬:4 > 🇺🇸:2
-PolicyDialer:   &PolicyDialer   "AllOne:10;高速:10;Reality:10;vless:10;ysteria2:4;V2ray:4;vmess:4;tuic:2;TUIC:2;anytls:1;优:5;中:2;备:1;🇭🇰:20;🇹🇼:15;🇨🇳:15;🇰🇷:10;🇯🇵:6;🇸🇬:4;🇺🇸:2"
+PolicyDialer:   &PolicyDialer   "AllOne:10;高速:10;super:5;good:3;Reality:10;vless:10;Hysteria2:8;hysteria2:8;hy2:8;HY2:8;TUIC:8;tuic:8;V2ray:3;vmess:3;anytls:1;优:5;中:2;备:1;🇭🇰:20;🇹🇼:15;🇨🇳:15;🇰🇷:10;🇯🇵:6;🇸🇬:4;🇺🇸:2"
 
 # 策略组代理列表模板 - 预定义的代理节点优先级排序
 DEFAULT:        &DEFAULT      {type: select, proxies: [高速-智选, LD-智选, AI-智选, 媒体-智选, 家宽-智选, 香港-智选, 台湾-智选, 日本-智选, 狮城-智选, 韩国-智选, 美国-智选, 其他-智选, 全球手动, 直接连接]}
@@ -108,10 +110,10 @@ proxy-groups:
   - {name: 网络测试,    <<: *OneSmart,  include-all: true, filter: *FilterALL, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Speedtest.png}
 
   # ==================== 线路节点策略组 ====================
-  - {name: 家宽-智选,   <<: *BaseSmart, filter: *FilterISP,   include-all: true, policy-priority: *PolicyISP,   icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Area.png}
-  - {name: 媒体-智选,   <<: *BaseSmart, filter: *FilterMedia, include-all: true, policy-priority: *PolicyMedia, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Clubhouse_1.png}
+  - {name: 家宽-智选,   <<: *MediaSmart, filter: *FilterISP,   include-all: true, policy-priority: *PolicyISP,   icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Area.png}
+  - {name: 媒体-智选,   <<: *MediaSmart, filter: *FilterMedia, include-all: true, policy-priority: *PolicyMedia, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Clubhouse_1.png}
   - {name: 高速-智选,   <<: *BaseSmart, filter: *FilterFAST,  include-all: true, policy-priority: *PolicyFast,  icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Rocket.png}
-  - {name: AI-智选,    <<: *BaseSmart, filter: *FilterAI,    include-all: true, policy-priority: *PolicyAI,    icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/AI.png}
+  - {name: AI-智选,    <<: *StableSmart, filter: *FilterAI,    include-all: true, policy-priority: *PolicyAI,    icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/AI.png}
   - {name: LD-智选,    <<: *BaseSmart,  include-all: true, policy-priority: *PolicyDialer, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Round_Robin_1.png}
   # ==================== AI 服务 ====================
   - {name: 人工智能,    <<: *SelectAI,    icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/AI.png}
@@ -283,12 +285,8 @@ unified-delay: true
 tcp-concurrent: true
 log-level: warning
 bind-address: "*"
-find-process-mode: "always"
-client-fingerprint: chrome
 keep-alive-interval: 15
 keep-alive-idle: 600
-clash-for-android:
-  append-system-dns: false
 
 # 认证配置
 authentication:
@@ -332,6 +330,9 @@ sniffer:
   skip-domain:
     - "Mijia Cloud"
     - "+.push.apple.com"
+    - "+.local"
+    - "+.msftconnecttest.com"
+    - "+.msftncsi.com"
 
 # TUN模式配置
 # tun:
@@ -347,6 +348,9 @@ tun:
   enable: true
   stack: gvisor
   device: utun
+  dns-hijack:
+    - "any:53"
+    - "tcp://any:53"
   endpoint-independent-nat: true
   auto-route: false
   auto-detect-interface: false
@@ -366,17 +370,16 @@ dns:
   fake-ip-filter:
     - "rule-set:fakeipfilter_domain"
   default-nameserver:
-    - https://223.5.5.5/dns-query
+    - 1.1.1.1
+    - 8.8.8.8
   proxy-server-nameserver:
-    - https://dns.alidns.com/dns-query
-    - https://doh.pub/dns-query
+    - https://dns.google/dns-query
+    - 1.1.1.1
   nameserver:
-    - https://dns.alidns.com/dns-query
-    - https://doh.pub/dns-query
-    - 119.29.29.29
-    - 180.184.1.1
-    - 223.5.5.5
-
+    - https://dns.google/dns-query
+    - https://base.dns.mullvad.net/dns-query
+    - 1.1.1.1
+    - 8.8.8.8
   # 支持通配符域名 (例如: *.clash.dev, *.foo.*.example.com )
   # 不使用通配符的域名优先级高于使用通配符的域名 (例如: foo.example.com > *.example.com > .example.com )
   # 注意: +.foo.com 的效果等同于 .foo.com 和 foo.com
