@@ -439,10 +439,10 @@ tun:
     - "any:53"
     - "tcp://any:53"
   endpoint-independent-nat: true
-  auto-route: false
-  auto-detect-interface: false
-  auto-redirect: false
-  strict-route: false
+  auto-route: true
+  auto-detect-interface: true
+  auto-redirect: true
+  strict-route: true
 
 # DNS配置
 dns:

@@ -348,10 +348,10 @@ tun:
     - "any:53"
     - "tcp://any:53"
   endpoint-independent-nat: true
-  auto-route: false
-  auto-detect-interface: false
-  auto-redirect: false
-  strict-route: false
+  auto-route: true
+  auto-detect-interface: true
+  auto-redirect: true
+  strict-route: true
 
 # DNS配置
 dns:
@@ -366,7 +366,10 @@ dns:
     - "geosite:cn"
     - "rule-set:fakeipfilter_domain"
   nameserver:
-    - 223.5.5.5
+    - https://dns.google/dns-query
+    - https://base.dns.mullvad.net/dns-query
+    - 1.1.1.1
+    - 8.8.8.8
   # 支持通配符域名 (例如: *.clash.dev, *.foo.*.example.com )
   # 不使用通配符的域名优先级高于使用通配符的域名 (例如: foo.example.com > *.example.com > .example.com )
   # 注意: +.foo.com 的效果等同于 .foo.com 和 foo.com
