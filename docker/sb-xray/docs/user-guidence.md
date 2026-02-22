@@ -173,7 +173,7 @@ graph LR
     *   `XRAY_MLKEM768_SEED/CLIENT`：抗量子加密密钥
     *   `PORT_HYSTERIA2`、`PORT_TUIC`、`PORT_ANYTLS`：随机端口
     *   `STRATEGY`：IP 策略（IPv4/IPv6）
-    *   `CHATGPT_OUT`：ChatGPT 访问检测
+    *   `CHATGPT_OUT`, `GEMINI_OUT`, `NETFLIX_OUT` 等：基于 IP 类型 (`IP_TYPE` 判断是否为住宅 ISP) 及连通性作出的 AI 与流媒体访问路由探测缓存。
 
 2.  **`run_speed_tests_if_needed()`**：测速及优选评估
     *   检查 `/.env/xray` 中是否存在 `ISP_TAG`，**存在即立刻短路跳过测试流程**。
@@ -210,14 +210,14 @@ graph LR
 地区: 香港 | 电信
 IP策略: prefer_ipv4
 
-=== 订阅链接 ===
-Mihomo Pro:  https://domain.com/subscribe/MihomoPro.yaml
-Clash:       https://domain.com/subscribe/clash.yaml
-Stash:       https://domain.com/subscribe/stash.yaml
+=== 订阅链接 (需携带 Token) ===
+Mihomo Pro:  https://domain.com/sb-xray/MihomoPro.yaml?token=YOUR_TOKEN
+Clash:       https://domain.com/sb-xray/clash.yaml?token=YOUR_TOKEN
+Stash:       https://domain.com/sb-xray/stash.yaml?token=YOUR_TOKEN
 
-=== 代理链接 ===
-所有协议:    https://domain.com/proxies/all
-Clash格式:   https://domain.com/proxies/clash
+=== 代理链接 (需携带 Token) ===
+所有协议:    https://domain.com/sb-xray/all?token=YOUR_TOKEN
+Clash格式:   https://domain.com/sb-xray/clash?token=YOUR_TOKEN
 ```
 
 **生成逻辑**：
@@ -568,8 +568,8 @@ docker logs -f sb-xray
 # 3. 查看生成的配置
 docker exec sb-xray show
 
-# 4. 访问订阅链接
-curl https://example.com/subscribe/MihomoPro.yaml
+# 4. 访问订阅链接 (需携带 Token)
+curl "https://example.com/sb-xray/MihomoPro.yaml?token=您的订阅Token"
 ```
 
 ### 8.3 配置更新

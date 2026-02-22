@@ -128,7 +128,7 @@ policy-priority: "Reality:10;Hysteria2:9;优:5;中:2;备:1"
 | | 🇯🇵 日本 | 6-10 | 根据场景调整 |
 | | 🇸🇬 新加坡 | 4 | 低优先级 |
 | | 🇹🇼 台湾 | 2-15 | 一般场景低优先级,链式代理高优先级 |
-| | 🇭🇰 香港 | -50~20 | 家宽场景排除(-50),链式代理最高(20) |
+| | 🇭🇰 香港 | 0~20 | 家宽场景排除(设为0或不配),链式代理最高(20) |
 | | 🇨🇳 大陆 | 15 | 链式代理场景高优先级 |
 | **质量后缀** | `优` | 5 | 优质节点 |
 | | `中` | 2 | 中等节点 |
@@ -150,8 +150,8 @@ policy-priority: "Reality:10;Hysteria2:9;优:5;中:2;备:1"
 # 基础权重配置 - 所有策略共享的协议和质量权重
 # 格式: "机场:权重;特性:权重;协议:权重;...;质量:权重"
 PolicyDefault:  &PolicyDefault  "AllOne:10;高速:10;Reality:10;vless:10;ysteria2:4;V2ray:4;vmess:4;tuic:2;TUIC:2;anytls:1;优:5;中:2;备:1"
-# 家宽专用 - 基础权重 + 地区偏好(美🇺🇸:20 > 韩🇰🇷:10 > 日🇯🇵:6 > 新🇸🇬:4 > 台🇹🇼:2, 排除港🇭🇰:-50)
-PolicyISP:      &PolicyISP      "AllOne:10;高速:10;Reality:10;vless:10;ysteria2:4;V2ray:4;vmess:4;tuic:2;TUIC:2;anytls:1;优:5;中:2;备:1;🇺🇸:20;🇰🇷:10;🇯🇵:6;🇸🇬:4;🇹🇼:2;🇭🇰:-50"
+# 家宽专用 - 基础权重 + 地区偏好(美🇺🇸:20 > 韩🇰🇷:10 > 日🇯🇵:6 > 新🇸🇬:4 > 台🇹🇼:2, 排除港🇭🇰:0 或不配置)
+PolicyISP:      &PolicyISP      "AllOne:10;高速:10;Reality:10;vless:10;ysteria2:4;V2ray:4;vmess:4;tuic:2;TUIC:2;anytls:1;优:5;中:2;备:1;🇺🇸:20;🇰🇷:10;🇯🇵:6;🇸🇬:4;🇹🇼:2"
 # 流媒体专用 - 基础权重 + 地区偏好(美🇺🇸:15 > 韩🇰🇷:8 > 日🇯🇵:6 > 新🇸🇬:4 > 台🇹🇼:2)
 PolicyMedia:    &PolicyMedia    "AllOne:10;高速:10;Reality:10;vless:10;ysteria2:4;V2ray:4;vmess:4;tuic:2;TUIC:2;anytls:1;优:5;中:2;备:1;🇺🇸:15;🇰🇷:8;🇯🇵:6;🇸🇬:4;🇹🇼:2"
 # 高速专用 - 基础权重 + 地区偏好(美🇺🇸:15 > 日🇯🇵:10 > 韩🇰🇷:8 > 新🇸🇬:4 > 台🇹🇼:2)
@@ -208,7 +208,7 @@ D: [Reality] 🇸🇬SG|ISP|anytls|备
 **使用 PolicyISP 模板的权重计算**:
 
 ```yaml
-PolicyISP: "AllOne:10;高速:10;Reality:10;vless:10;ysteria2:4;V2ray:4;vmess:4;tuic:2;TUIC:2;anytls:1;优:5;中:2;备:1;🇺🇸:20;🇰🇷:10;🇯🇵:6;🇸🇬:4;🇹🇼:2;🇭🇰:-50"
+PolicyISP: "AllOne:10;高速:10;Reality:10;vless:10;ysteria2:4;V2ray:4;vmess:4;tuic:2;TUIC:2;anytls:1;优:5;中:2;备:1;🇺🇸:20;🇰🇷:10;🇯🇵:6;🇸🇬:4;🇹🇼:2"
 ```
 
 | 节点 | 匹配关键字 | 权重计算 | 总分 |
@@ -222,7 +222,7 @@ PolicyISP: "AllOne:10;高速:10;Reality:10;vless:10;ysteria2:4;V2ray:4;vmess:4;t
 
 **分析**:
 - ✅ 美国节点优先 (地区偏好 20分,家宽场景最高权重)
-- ✅ 香港节点排除 (负权重 -50分,避免家宽使用香港)
+- ✅ 香港节点排除 (零权重或不配置,避免家宽使用香港)
 - ✅ Reality/vless 协议优先 (协议性能 10分)
 - ✅ 优质节点优先 (质量后缀 5分)
 - ✅ 多维度权重自动叠加
@@ -472,7 +472,7 @@ FilterISP: "^(?=.*(?i)(住宅|isp))(?!.*(🇭🇰|HK|Hong|香港)).*$"
 
 ```yaml
 PolicyDefault:    # 默认模板,纯协议质量优先,无地区偏好
-PolicyISP:        # 家宽专用模板,美国权重最高(20),排除香港(-50)
+PolicyISP:        # 家宽专用模板,美国权重最高(20),排除香港(零权重或不配置)
 PolicyMedia:      # 媒体专用模板,美国权重较高(15)
 PolicyFast:       # 高速专用模板,美日优先
 PolicyAI:         # AI服务专用模板,美国权重最高(20)
