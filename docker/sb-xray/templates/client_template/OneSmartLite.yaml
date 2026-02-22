@@ -13,14 +13,14 @@
 
 # ==================== 锚点配置 ====================
 # 代理提供者模板 - 订阅源基础配置
-BaseProvider:   &BaseProvider {type: http, interval: 86400, proxy: DIRECT, health-check: {enable: true, url: "http://1.1.1.1/generate_204", interval: 300}, filter: "^(?!.*(❗|群(?!岛)|邀请|返利|循环|官网|客服|网站|网址|获取|订阅|流量|到期|机场|下次|版本|官址|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|套餐|有效|剩余|失联|测试|官方|学术|更快|如果|客户|距离|Traffic|Reset|Days|Left|TEST|USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author|\\d+\\s*GB))"}
+BaseProvider:   &BaseProvider {type: http, interval: 86400, proxy: DIRECT, health-check: {enable: true, url: "https://www.gstatic.com/generate_204", interval: 300}, filter: "^(?!.*(❗|群(?!岛)|邀请|返利|循环|官网|客服|网站|网址|获取|订阅|流量|到期|机场|下次|版本|官址|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|套餐|有效|剩余|失联|测试|官方|学术|更快|如果|客户|距离|Traffic|Reset|Days|Left|TEST|USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author|\\d+\\s*GB))"}
 
 # 策略组类型模板 - 定义不同的策略组基础配置
-BaseFB:         &BaseFB    {type: fallback,     interval: 180, tolerance: 300, lazy: true, url: "http://1.1.1.1/generate_204"}
-BaseLB:         &BaseLB    {type: load-balance, interval: 180, tolerance: 300, lazy: true, url: "http://1.1.1.1/generate_204"}
-BaseSmart:      &BaseSmart {type: smart,        interval: 180, tolerance: 300, lazy: true, url: "http://1.1.1.1/generate_204", hidden: true, uselightgbm: true, collectdata: true}
-MediaSmart:     &MediaSmart {type: smart,       interval: 180, tolerance: 1000, lazy: true, url: "http://1.1.1.1/generate_204", hidden: true, uselightgbm: true, collectdata: true}
-StableSmart:    &StableSmart {type: smart,      interval: 180, tolerance: 800, lazy: true, url: "http://1.1.1.1/generate_204", hidden: true, uselightgbm: true, collectdata: true}
+BaseFB:         &BaseFB    {type: fallback,     interval: 180, tolerance: 300, lazy: true, url: "https://www.gstatic.com/generate_204"}
+BaseLB:         &BaseLB    {type: load-balance, interval: 180, tolerance: 300, lazy: true, url: "https://www.gstatic.com/generate_204"}
+BaseSmart:      &BaseSmart {type: smart,        interval: 180, tolerance: 300, lazy: true, url: "https://www.gstatic.com/generate_204", hidden: true, uselightgbm: true, collectdata: true}
+MediaSmart:     &MediaSmart {type: smart,       interval: 180, tolerance: 1000, lazy: true, url: "https://www.gstatic.com/generate_204", hidden: true, uselightgbm: true, collectdata: true}
+StableSmart:    &StableSmart {type: smart,      interval: 180, tolerance: 800, lazy: true, url: "https://www.gstatic.com/generate_204", hidden: true, uselightgbm: true, collectdata: true}
 
 # 全部节点筛选正则表达式 - 所有节点
 FilterALL:      &FilterALL "^(?!.*(❗|群(?!岛)|邀请|返利|循环|官网|客服|网站|网址|获取|订阅|流量|到期|机场|下次|版本|官址|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|套餐|有效|剩余|失联|测试|官方|学术|更快|如果|客户|距离|Traffic|Reset|Days|Left|TEST|USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author|\\d+\\s*GB))"
@@ -273,20 +273,17 @@ rule-providers:
 
 # ==================== 核心配置 ====================
 # 基础配置
-mode: rule
 port: 7899
 socks-port: 7891
 redir-port: 7892
 mixed-port: 7893
 tproxy-port: 7895
-ipv6: true
+
 allow-lan: true
-unified-delay: true
-tcp-concurrent: true
-log-level: warning
-bind-address: "*"
-keep-alive-interval: 15
-keep-alive-idle: 600
+mode: rule
+log-level: info
+
+ipv6: false
 
 # 认证配置
 authentication:
@@ -297,19 +294,12 @@ skip-auth-prefixes:
   - 192.168.0.0/16
   - 127.0.0.1/8
 
-# 实验性功能
-experimental:
-  quic-go-disable-gso: true
-
-geodata-mode: true
-geodata-loader: standard
-
 # # 管理面板配置
-# external-controller: 0.0.0.0:9090
+external-controller: 0.0.0.0:9090
 # external-ui: ui
 # external-ui-name: zashboard
 # external-ui-url: https://gh-proxy.com/github.com/Zephyruso/zashboard/archive/refs/heads/gh-pages.zip
-# secret: yyds666
+secret: yyds666
 
 # 配置存储
 profile:
@@ -335,27 +325,15 @@ sniffer:
     - "+.msftncsi.com"
 
 # TUN模式配置
-# tun:
-#   enable: false
-#   stack: mixed
-#   dns-hijack:
-#     - "any:53"
-#     - "tcp://any:53"
-#   auto-route: true
-#   auto-redirect: true
-#   auto-detect-interface: true
 tun:
   enable: true
   stack: gvisor
   device: utun
-  dns-hijack:
-    - "any:53"
-    - "tcp://any:53"
   endpoint-independent-nat: true
-  auto-route: true
-  auto-detect-interface: true
-  auto-redirect: true
-  strict-route: true
+  auto-route: false
+  auto-detect-interface: false
+  auto-redirect: false
+  strict-route: false
 
 # DNS配置
 dns:
@@ -363,23 +341,26 @@ dns:
   cache-algorithm: arc
   listen: 0.0.0.0:7874
   ipv6: true
-  respect-rules: true
   enhanced-mode: fake-ip
   fake-ip-range: 198.20.0.1/16
   fake-ip-filter-mode: blacklist
   fake-ip-filter:
+    - +.lan
+    - +.local
+    - geosite:cn
     - "rule-set:fakeipfilter_domain"
   default-nameserver:
-    - 1.1.1.1
-    - 8.8.8.8
+    - https://223.5.5.5/dns-query
   proxy-server-nameserver:
-    - https://dns.google/dns-query
-    - 1.1.1.1
+    - https://dns.alidns.com/dns-query
+    - https://doh.pub/dns-query
   nameserver:
-    - https://dns.google/dns-query
-    - https://base.dns.mullvad.net/dns-query
-    - 1.1.1.1
-    - 8.8.8.8
+    - https://dns.alidns.com/dns-query
+    - https://doh.pub/dns-query
+    - 119.29.29.29
+    - 180.184.1.1
+    - 223.5.5.5
+
   # 支持通配符域名 (例如: *.clash.dev, *.foo.*.example.com )
   # 不使用通配符的域名优先级高于使用通配符的域名 (例如: foo.example.com > *.example.com > .example.com )
   # 注意: +.foo.com 的效果等同于 .foo.com 和 foo.com
