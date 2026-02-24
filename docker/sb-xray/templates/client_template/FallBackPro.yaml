@@ -367,19 +367,11 @@ mixed-port: 7893
 tproxy-port: 7895
 ipv6: true
 allow-lan: true
-unified-delay: true
-tcp-concurrent: true
 log-level: info
-bind-address: "*"
-find-process-mode: "always"
-keep-alive-interval: 15
-keep-alive-idle: 600
-clash-for-android:
-  append-system-dns: false
 
 # 认证配置
 authentication:
-  - mihomo:yyds666
+  - openclash:yyds666
 skip-auth-prefixes:
   - 10.0.0.0/8
   - 172.16.0.0/12
@@ -398,24 +390,6 @@ profile:
   store-selected: true
   store-fake-ip: true
 
-# 流量嗅探
-sniffer:
-  enable: true
-  sniff:
-    HTTP:
-      ports: [80, 8080-8880]
-      override-destination: true
-    TLS:
-      ports: [443, 8443]
-    QUIC:
-      ports: [443, 8443]
-  skip-domain:
-    - "Mijia Cloud"
-    - "+.push.apple.com"
-    - "+.local"
-    - "+.msftconnecttest.com"
-    - "+.msftncsi.com"
-
 # TUN模式配置
 tun:
   enable: true
@@ -433,26 +407,22 @@ dns:
   cache-algorithm: arc
   listen: 0.0.0.0:7874
   ipv6: true
-  respect-rules: false
   enhanced-mode: fake-ip
   fake-ip-range: 198.20.0.1/16
+  nameserver:
+    # 上海电信 DNS
+    - 202.96.209.133
+    - 116.228.111.118
+    # 上海联通 DNS
+    - 210.22.70.3
+    - 210.22.84.3
+    - 223.5.5.5
   fake-ip-filter-mode: blacklist
   fake-ip-filter:
     - +.lan
     - +.local
     - "geosite:cn"
     - "rule-set:fakeipfilter_domain"
-  default-nameserver:
-    - https://223.5.5.5/dns-query
-  proxy-server-nameserver:
-    - https://dns.alidns.com/dns-query
-    - https://doh.pub/dns-query
-  nameserver:
-    - https://dns.alidns.com/dns-query
-    - https://doh.pub/dns-query
-    - 119.29.29.29
-    - 180.184.1.1
-    - 223.5.5.5
 
   # 支持通配符域名 (例如: *.clash.dev, *.foo.*.example.com )
   # 不使用通配符的域名优先级高于使用通配符的域名 (例如: foo.example.com > *.example.com > .example.com )
