@@ -92,7 +92,6 @@ proxy-providers:
 ${CLASH_PROXY_PROVIDERS}
 
 proxies:
-  # 发往 ${DEFAULT_ISP}-dialer 的流量先经过 "链式前置"，从而实现指定下一跳代理的效果
 ${CLASH_ISP_PROXIES}
 
 
@@ -113,7 +112,7 @@ proxy-groups:
   - {name: 家宽-智选,   <<: *MediaSmart, filter: *FilterISP,   include-all: true, policy-priority: *PolicyISP,   icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Area.png}
   - {name: 媒体-智选,   <<: *MediaSmart, filter: *FilterMedia, include-all: true, policy-priority: *PolicyMedia, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Clubhouse_1.png}
   - {name: 高速-智选,   <<: *BaseSmart, filter: *FilterFAST,  include-all: true, policy-priority: *PolicyFast,  icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Rocket.png}
-  - {name: AI-智选,    <<: *StableSmart, filter: *FilterAI,    include-all: true, policy-priority: *PolicyAI,    icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/AI.png}
+  - {name: AI-智选,    <<: *StableSmart, filter: *FilterAI,    include-all: true, policy-priority: *PolicyAI,    icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/ChatGPT.png}
   - {name: LD-智选,    <<: *BaseSmart,  include-all: true, policy-priority: *PolicyDialer, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Round_Robin_1.png}
   # ==================== AI 服务 ====================
   - {name: 人工智能,    <<: *SelectAI,    icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/AI.png}
@@ -364,17 +363,24 @@ rule-providers:
 
 # ==================== 核心配置 ====================
 # 基础配置
+mode: rule
 port: 7899
 socks-port: 7891
 redir-port: 7892
 mixed-port: 7893
 tproxy-port: 7895
-
+ipv6: true
 allow-lan: true
-mode: rule
+unified-delay: true
+tcp-concurrent: true
 log-level: info
-
-ipv6: false
+bind-address: "*"
+find-process-mode: "always"
+client-fingerprint: chrome
+keep-alive-interval: 15
+keep-alive-idle: 600
+clash-for-android:
+  append-system-dns: false
 
 # 认证配置
 authentication:
@@ -432,13 +438,14 @@ dns:
   cache-algorithm: arc
   listen: 0.0.0.0:7874
   ipv6: true
+  respect-rules: false
   enhanced-mode: fake-ip
   fake-ip-range: 198.20.0.1/16
   fake-ip-filter-mode: blacklist
   fake-ip-filter:
     - +.lan
     - +.local
-    - geosite:cn
+    - "geosite:cn"
     - "rule-set:fakeipfilter_domain"
   default-nameserver:
     - https://223.5.5.5/dns-query
