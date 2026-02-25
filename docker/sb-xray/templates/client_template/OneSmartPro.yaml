@@ -373,7 +373,7 @@ mixed-port: 7893
 tproxy-port: 7895
 ipv6: true
 allow-lan: true
-log-level: info
+log-level: warning
 
 # 认证配置
 authentication:
