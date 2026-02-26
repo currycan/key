@@ -579,6 +579,8 @@ function operator(proxies) {
     // Phase 1: Cleaning & Formatting (单个节点处理)
     const sortedProxies = proxies
         .filter(p => !Constants.INVALID_REGEX.test(p.name))
+        // [新增防线] 拦截目前 Mihomo 等主流内核尚不支持的最新实验性协议 (如 Xhttp)，确保不被带入生产环境
+        .filter(p => !(/xhttp/i.test(JSON.stringify(p))))
         .map(p => {
             let name = p.name;
             const protocol = p.type ? p.type.toLowerCase() : "unknown";
