@@ -47,43 +47,42 @@ FilterDialer:   &FilterDialer "^(?=.*(?i)(🇭🇰|🇹🇼|🇨🇳))(?!.*(DIRE
 # 设计理念: filter 负责筛选节点范围, policy-priority 负责在筛选结果中进行多维度排序
 #
 # 权重维度说明:
-#   - 机场标识: AllOne(10)
-#   - 特性标签: 高速(10), super(5), good(3)
-#   - 协议性能: Reality(10), vless(10), Hysteria2(8), hysteria2(8), hy2(8), HY2(8), TUIC(8), tuic(8), V2ray(3), vmess(3), anytls(1)
-#   - 质量后缀: 优(5), 中(2), 备(1)
+#   - 特性标签: 高速(10), super(20), good(10)
+#   - 协议性能: Reality(20), vless(10), Hysteria2(8), hysteria2(8), hy2(8), HY2(8), TUIC(8), tuic(8), V2ray(3), vmess(3), anytls(1)
+#   - 质量后缀: 优(30), 中(2), 备(1)
 #   - 地区偏好: 根据不同场景动态调整
 #
 # ==================== 基础权重配置(所有策略共享) ====================
-# 格式: AllOne:10;高速:10;super:5;good:3;Reality:10;vless:10;Hysteria2:8;hysteria2:8;hy2:8;HY2:8;TUIC:8;tuic:8;V2ray:3;vmess:3;anytls:1;优:5;中:2;备:1
+# 格式: 高速:10;super:20;good:10;Reality:20;vless:10;Hysteria2:8;hysteria2:8;hy2:8;HY2:8;TUIC:8;tuic:8;V2ray:3;vmess:3;anytls:1;优:30;中:2;备:1
 # 说明: 以下所有策略都包含此基础权重,仅地区偏好部分有差异
 # ---------- 默认策略 ----------
 # 地区偏好: 无
-PolicyDefault:  &PolicyDefault  "AllOne:10;高速:10;super:5;good:3;Reality:10;vless:10;Hysteria2:8;hysteria2:8;hy2:8;HY2:8;TUIC:8;tuic:8;V2ray:3;vmess:3;anytls:1;优:5;中:2;备:1"
+PolicyDefault:  &PolicyDefault  "高速:10;super:20;good:10;Reality:20;vless:10;Hysteria2:8;hysteria2:8;hy2:8;HY2:8;TUIC:8;tuic:8;V2ray:3;vmess:3;anytls:1;优:30;中:2;备:1"
 # ---------- 家宽策略 ----------
 # 地区偏好: 🇺🇸:20 > 🇰🇷:10 > 🇯🇵:6 > 🇸🇬:4 > 🇹🇼:2
-PolicyISP:      &PolicyISP      "AllOne:10;高速:10;super:5;good:3;Reality:10;vless:10;Hysteria2:8;hysteria2:8;hy2:8;HY2:8;TUIC:8;tuic:8;V2ray:3;vmess:3;anytls:1;优:5;中:2;备:1;🇺🇸:20;🇰🇷:10;🇯🇵:6;🇸🇬:4;🇹🇼:2"
+PolicyISP:      &PolicyISP      "高速:10;super:20;good:10;Reality:20;vless:10;Hysteria2:8;hysteria2:8;hy2:8;HY2:8;TUIC:8;tuic:8;V2ray:3;vmess:3;anytls:1;优:30;中:2;备:1;🇺🇸:20;🇰🇷:10;🇯🇵:6;🇸🇬:4;🇹🇼:2"
 # ---------- 流媒体策略 ----------
 # 地区偏好: 🇺🇸:15 > 🇰🇷:8 > 🇯🇵:6 > 🇸🇬:4 > 🇹🇼:2
-PolicyMedia:    &PolicyMedia    "AllOne:10;高速:10;super:5;good:3;Reality:10;vless:10;Hysteria2:8;hysteria2:8;hy2:8;HY2:8;TUIC:8;tuic:8;V2ray:3;vmess:3;anytls:1;优:5;中:2;备:1;🇺🇸:15;🇰🇷:8;🇯🇵:6;🇸🇬:4;🇹🇼:2"
+PolicyMedia:    &PolicyMedia    "高速:10;super:20;good:10;Reality:20;vless:10;Hysteria2:8;hysteria2:8;hy2:8;HY2:8;TUIC:8;tuic:8;V2ray:3;vmess:3;anytls:1;优:30;中:2;备:1;🇺🇸:15;🇰🇷:8;🇯🇵:6;🇸🇬:4;🇹🇼:2"
 # ---------- 高速策略 ----------
 # 地区偏好: 🇺🇸:15 > 🇯🇵:10 > 🇰🇷:8 > 🇸🇬:4 > 🇹🇼:2
-PolicyFast:     &PolicyFast     "AllOne:10;高速:10;super:5;good:3;Reality:10;vless:10;Hysteria2:8;hysteria2:8;hy2:8;HY2:8;TUIC:8;tuic:8;V2ray:3;vmess:3;anytls:1;优:5;中:2;备:1;🇺🇸:15;🇯🇵:10;🇰🇷:8;🇸🇬:4;🇹🇼:2"
+PolicyFast:     &PolicyFast     "高速:10;super:20;good:10;Reality:20;vless:10;Hysteria2:8;hysteria2:8;hy2:8;HY2:8;TUIC:8;tuic:8;V2ray:3;vmess:3;anytls:1;优:30;中:2;备:1;🇺🇸:15;🇯🇵:10;🇰🇷:8;🇸🇬:4;🇹🇼:2"
 # ---------- AI 服务策略 ----------
 # 地区偏好: 🇺🇸:20 > 🇯🇵:10 > 🇰🇷:8 > 🇸🇬:4 > 🇹🇼:2
-PolicyAI:       &PolicyAI       "AllOne:10;高速:10;super:5;good:3;Reality:10;vless:10;Hysteria2:8;hysteria2:8;hy2:8;HY2:8;TUIC:8;tuic:8;V2ray:3;vmess:3;anytls:1;优:5;中:2;备:1;🇺🇸:20;🇯🇵:10;🇰🇷:8;🇸🇬:4;🇹🇼:2"
+PolicyAI:       &PolicyAI       "高速:10;super:20;good:10;Reality:20;vless:10;Hysteria2:8;hysteria2:8;hy2:8;HY2:8;TUIC:8;tuic:8;V2ray:3;vmess:3;anytls:1;优:30;中:2;备:1;🇺🇸:20;🇯🇵:10;🇰🇷:8;🇸🇬:4;🇹🇼:2"
 # ---------- 链式代理策略 ----------
 # 地区偏好: 🇭🇰:20 > 🇹🇼:15 > 🇨🇳:15 > 🇰🇷:10 > 🇯🇵:6 > 🇸🇬:4 > 🇺🇸:2
-PolicyDialer:   &PolicyDialer   "AllOne:10;高速:10;super:5;good:3;Reality:10;vless:10;Hysteria2:8;hysteria2:8;hy2:8;HY2:8;TUIC:8;tuic:8;V2ray:3;vmess:3;anytls:1;优:5;中:2;备:1;🇭🇰:20;🇹🇼:15;🇨🇳:15;🇰🇷:10;🇯🇵:6;🇸🇬:4;🇺🇸:2"
+PolicyDialer:   &PolicyDialer   "高速:10;super:20;good:10;Reality:20;vless:10;Hysteria2:8;hysteria2:8;hy2:8;HY2:8;TUIC:8;tuic:8;V2ray:3;vmess:3;anytls:1;优:30;中:2;备:1;🇭🇰:20;🇹🇼:15;🇨🇳:15;🇰🇷:10;🇯🇵:6;🇸🇬:4;🇺🇸:2"
 
 # 策略组代理列表模板 - 预定义的代理节点优先级排序
-DEFAULT:        &DEFAULT      {type: select, proxies: [高速-智选, LD-智选, AI-智选, 媒体-智选, 家宽-智选, 香港-智选, 台湾-智选, 日本-智选, 狮城-智选, 韩国-智选, 美国-智选, 其他-智选, 全球手动, 直接连接]}
-OneSmart:       &OneSmart     {type: select, proxies: [默认代理, 高速-智选, LD-智选, AI-智选, 媒体-智选, 家宽-智选, 香港-智选, 台湾-智选, 日本-智选, 狮城-智选, 韩国-智选, 美国-智选, 其他-智选, 全球手动, 直接连接]}
-SelectDC:       &SelectDC     {type: select, proxies: [直接连接, 默认代理, 高速-智选, LD-智选, AI-智选, 媒体-智选, 家宽-智选, 香港-智选, 台湾-智选, 日本-智选, 狮城-智选, 韩国-智选, 美国-智选, 其他-智选, 全球手动]}
-SelectLD:       &SelectLD     {type: select, proxies: [LD-智选, 默认代理, 高速-智选, AI-智选, 媒体-智选, 家宽-智选, 香港-智选, 台湾-智选, 日本-智选, 狮城-智选, 韩国-智选, 美国-智选, 其他-智选, 全球手动, 直接连接]}
-SelectISP:      &SelectISP    {type: select, proxies: [家宽-智选, 默认代理, 高速-智选, LD-智选, AI-智选, 媒体-智选, 香港-智选, 台湾-智选, 日本-智选, 狮城-智选, 韩国-智选, 美国-智选, 其他-智选, 全球手动, 直接连接]}
-SelectMedia:    &SelectMedia  {type: select, proxies: [媒体-智选, 默认代理, 高速-智选, LD-智选, AI-智选, 家宽-智选, 香港-智选, 台湾-智选, 日本-智选, 狮城-智选, 韩国-智选, 美国-智选, 其他-智选, 全球手动, 直接连接]}
-SelectFAST:     &SelectFAST   {type: select, proxies: [高速-智选, 默认代理, LD-智选, AI-智选, 媒体-智选, 家宽-智选, 香港-智选, 台湾-智选, 日本-智选, 狮城-智选, 韩国-智选, 美国-智选, 其他-智选, 全球手动, 直接连接]}
-SelectAI:       &SelectAI     {type: select, proxies: [AI-智选, 默认代理, 高速-智选, LD-智选, 媒体-智选, 家宽-智选, 香港-智选, 台湾-智选, 日本-智选, 狮城-智选, 韩国-智选, 美国-智选, 其他-智选, 全球手动, 直接连接]}
+DEFAULT:        &DEFAULT      {type: select, include-all: true, filter: *FilterALL, proxies: [高速-智选, LD-智选, AI-智选, 媒体-智选, 家宽-智选, 香港-智选, 台湾-智选, 日本-智选, 狮城-智选, 韩国-智选, 美国-智选, 其他-智选, 全球手动, 直接连接]}
+OneSmart:       &OneSmart     {type: select, include-all: true, filter: *FilterALL, proxies: [默认代理, 高速-智选, LD-智选, AI-智选, 媒体-智选, 家宽-智选, 香港-智选, 台湾-智选, 日本-智选, 狮城-智选, 韩国-智选, 美国-智选, 其他-智选, 全球手动, 直接连接]}
+SelectDC:       &SelectDC     {type: select, include-all: true, filter: *FilterALL, proxies: [直接连接, 默认代理, 高速-智选, LD-智选, AI-智选, 媒体-智选, 家宽-智选, 香港-智选, 台湾-智选, 日本-智选, 狮城-智选, 韩国-智选, 美国-智选, 其他-智选, 全球手动]}
+SelectLD:       &SelectLD     {type: select, include-all: true, filter: *FilterALL, proxies: [LD-智选, 默认代理, 高速-智选, AI-智选, 媒体-智选, 家宽-智选, 香港-智选, 台湾-智选, 日本-智选, 狮城-智选, 韩国-智选, 美国-智选, 其他-智选, 全球手动, 直接连接]}
+SelectISP:      &SelectISP    {type: select, include-all: true, filter: *FilterALL, proxies: [家宽-智选, 默认代理, 高速-智选, LD-智选, AI-智选, 媒体-智选, 香港-智选, 台湾-智选, 日本-智选, 狮城-智选, 韩国-智选, 美国-智选, 其他-智选, 全球手动, 直接连接]}
+SelectMedia:    &SelectMedia  {type: select, include-all: true, filter: *FilterALL, proxies: [媒体-智选, 默认代理, 高速-智选, LD-智选, AI-智选, 家宽-智选, 香港-智选, 台湾-智选, 日本-智选, 狮城-智选, 韩国-智选, 美国-智选, 其他-智选, 全球手动, 直接连接]}
+SelectFAST:     &SelectFAST   {type: select, include-all: true, filter: *FilterALL, proxies: [高速-智选, 默认代理, LD-智选, AI-智选, 媒体-智选, 家宽-智选, 香港-智选, 台湾-智选, 日本-智选, 狮城-智选, 韩国-智选, 美国-智选, 其他-智选, 全球手动, 直接连接]}
+SelectAI:       &SelectAI     {type: select, include-all: true, filter: *FilterALL, proxies: [AI-智选, 默认代理, 高速-智选, LD-智选, 媒体-智选, 家宽-智选, 香港-智选, 台湾-智选, 日本-智选, 狮城-智选, 韩国-智选, 美国-智选, 其他-智选, 全球手动, 直接连接]}
 
 
 # ==================== 代理提供者 ====================

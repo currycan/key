@@ -45,14 +45,14 @@ FilterAI:       &FilterAI     "^(?=.*(?i)(AI|AllOne))(?!.*(DIRECT|直接连接|5
 FilterDialer:   &FilterDialer "^(?=.*(?i)(🇭🇰|🇹🇼|🇨🇳))(?!.*(DIRECT|直接连接|REJECT|-dialer)).*$"
 
 # 策略组代理列表模板 - 预定义的代理节点优先级排序
-DEFAULT:        &DEFAULT      {type: select, proxies: [高速-故转, AI-故转, 媒体-故转, 家宽-故转, 链式前置, 香港-故转, 台湾-故转, 日本-故转, 狮城-故转, 韩国-故转, 美国-故转, 其他-故转, 全球手动, 直接连接]}
-FallBack:       &FallBack     {type: select, proxies: [默认代理, 高速-故转, AI-故转, 媒体-故转, 家宽-故转, 链式前置, 香港-故转, 台湾-故转, 日本-故转, 狮城-故转, 韩国-故转, 美国-故转, 其他-故转, 全球手动, 直接连接]}
-SelectDC:       &SelectDC     {type: select, proxies: [直接连接, 默认代理, 高速-故转, AI-故转, 媒体-故转, 家宽-故转, 链式前置, 香港-故转, 台湾-故转, 日本-故转, 狮城-故转, 韩国-故转, 美国-故转, 其他-故转, 全球手动]}
-SelectLD:       &SelectLD     {type: select, proxies: [链式前置, 默认代理, 高速-故转, AI-故转, 媒体-故转, 家宽-故转, 香港-故转, 台湾-故转, 日本-故转, 狮城-故转, 韩国-故转, 美国-故转, 其他-故转, 全球手动, 直接连接]}
-SelectISP:      &SelectISP    {type: select, proxies: [家宽-故转, 默认代理, 高速-故转, AI-故转, 媒体-故转, 链式前置, 香港-故转, 台湾-故转, 日本-故转, 狮城-故转, 韩国-故转, 美国-故转, 其他-故转, 全球手动, 直接连接]}
-SelectMedia:    &SelectMedia  {type: select, proxies: [媒体-故转, 默认代理, 高速-故转, AI-故转, 家宽-故转, 链式前置, 香港-故转, 台湾-故转, 日本-故转, 狮城-故转, 韩国-故转, 美国-故转, 其他-故转, 全球手动, 直接连接]}
-SelectFAST:     &SelectFAST   {type: select, proxies: [高速-故转, 默认代理, AI-故转, 媒体-故转, 家宽-故转, 链式前置, 香港-故转, 台湾-故转, 日本-故转, 狮城-故转, 韩国-故转, 美国-故转, 其他-故转, 全球手动, 直接连接]}
-SelectAI:       &SelectAI     {type: select, proxies: [AI-故转, 默认代理, 高速-故转, 媒体-故转, 家宽-故转, 链式前置, 香港-故转, 台湾-故转, 日本-故转, 狮城-故转, 韩国-故转, 美国-故转, 其他-故转, 全球手动, 直接连接]}
+DEFAULT:        &DEFAULT      {type: select, include-all: true, filter: *FilterALL, proxies: [高速-故转, AI-故转, 媒体-故转, 家宽-故转, 链式前置, 香港-故转, 台湾-故转, 日本-故转, 狮城-故转, 韩国-故转, 美国-故转, 其他-故转, 全球手动, 直接连接]}
+FallBack:       &FallBack     {type: select, include-all: true, filter: *FilterALL, proxies: [默认代理, 高速-故转, AI-故转, 媒体-故转, 家宽-故转, 链式前置, 香港-故转, 台湾-故转, 日本-故转, 狮城-故转, 韩国-故转, 美国-故转, 其他-故转, 全球手动, 直接连接]}
+SelectDC:       &SelectDC     {type: select, include-all: true, filter: *FilterALL, proxies: [直接连接, 默认代理, 高速-故转, AI-故转, 媒体-故转, 家宽-故转, 链式前置, 香港-故转, 台湾-故转, 日本-故转, 狮城-故转, 韩国-故转, 美国-故转, 其他-故转, 全球手动]}
+SelectLD:       &SelectLD     {type: select, include-all: true, filter: *FilterALL, proxies: [链式前置, 默认代理, 高速-故转, AI-故转, 媒体-故转, 家宽-故转, 香港-故转, 台湾-故转, 日本-故转, 狮城-故转, 韩国-故转, 美国-故转, 其他-故转, 全球手动, 直接连接]}
+SelectISP:      &SelectISP    {type: select, include-all: true, filter: *FilterALL, proxies: [家宽-故转, 默认代理, 高速-故转, AI-故转, 媒体-故转, 链式前置, 香港-故转, 台湾-故转, 日本-故转, 狮城-故转, 韩国-故转, 美国-故转, 其他-故转, 全球手动, 直接连接]}
+SelectMedia:    &SelectMedia  {type: select, include-all: true, filter: *FilterALL, proxies: [媒体-故转, 默认代理, 高速-故转, AI-故转, 家宽-故转, 链式前置, 香港-故转, 台湾-故转, 日本-故转, 狮城-故转, 韩国-故转, 美国-故转, 其他-故转, 全球手动, 直接连接]}
+SelectFAST:     &SelectFAST   {type: select, include-all: true, filter: *FilterALL, proxies: [高速-故转, 默认代理, AI-故转, 媒体-故转, 家宽-故转, 链式前置, 香港-故转, 台湾-故转, 日本-故转, 狮城-故转, 韩国-故转, 美国-故转, 其他-故转, 全球手动, 直接连接]}
+SelectAI:       &SelectAI     {type: select, include-all: true, filter: *FilterALL, proxies: [AI-故转, 默认代理, 高速-故转, 媒体-故转, 家宽-故转, 链式前置, 香港-故转, 台湾-故转, 日本-故转, 狮城-故转, 韩国-故转, 美国-故转, 其他-故转, 全球手动, 直接连接]}
 
 
 # ==================== 代理提供者 ====================
@@ -186,8 +186,8 @@ rules:
   - RULE-SET,XPTVIP / IP,直接连接,no-resolve
   - RULE-SET,Download / Domain,直接连接
   - RULE-SET,AppleCN / Domain,直接连接
-  - RULE-SET,China / Domain,直接连接
-  - RULE-SET,ChinaIP / IP,直接连接,no-resolve
+  # - RULE-SET,China / Domain,直接连接
+  # - RULE-SET,ChinaIP / IP,直接连接,no-resolve
   # 国外媒体
   - RULE-SET,TikTok / Domain,TikTok
   - RULE-SET,YouTube / Domain,YouTube
@@ -287,8 +287,8 @@ rule-providers:
   Download / Domain:        {<<: *BehaviorDN, url: https://gh-proxy.com/raw.githubusercontent.com/666OS/rules/release/mihomo/domain/Download.mrs}
   XPTV / Domain:            {<<: *BehaviorDN, url: https://gh-proxy.com/raw.githubusercontent.com/666OS/rules/release/mihomo/domain/XPTV.mrs}
   XPTVIP / IP:              {<<: *BehaviorIP, url: https://gh-proxy.com/raw.githubusercontent.com/666OS/rules/release/mihomo/ip/XPTV.mrs}
-  China / Domain:           {<<: *BehaviorDN, url: https://gh-proxy.com/raw.githubusercontent.com/666OS/rules/release/mihomo/domain/China.mrs}
-  ChinaIP / IP:             {<<: *BehaviorIP, url: https://gh-proxy.com/raw.githubusercontent.com/666OS/rules/release/mihomo/ip/China.mrs}
+  # China / Domain:           {<<: *BehaviorDN, url: https://gh-proxy.com/raw.githubusercontent.com/666OS/rules/release/mihomo/domain/China.mrs}
+  # ChinaIP / IP:             {<<: *BehaviorIP, url: https://gh-proxy.com/raw.githubusercontent.com/666OS/rules/release/mihomo/ip/China.mrs}
   # AI规则
   ChatGPT / Domain:         {<<: *BehaviorDN, url: https://gh-proxy.com/raw.githubusercontent.com/metacubex/meta-rules-dat/meta/geo/geosite/openai.mrs}
   Claude / Domain:          {<<: *BehaviorCL, url: https://gh-proxy.com/raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Claude/Claude.list}
