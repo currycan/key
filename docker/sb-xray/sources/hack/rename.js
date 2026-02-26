@@ -67,8 +67,8 @@ const CleaningRules = [
 const RegionMap = {
     // 亚洲
     "香港": /((?:\bHK\b)|Hong[\s-]?Kong|HONG[\s-]?KONG|Hongkong|香港|深港|沪港|呼港|京港|广港|杭港|HKT)+/gi,
-    "台湾": /((?:\bTW\b)|Taiwan|Taipei|Kaohsiung|Hsinchu|Taichung|台湾|台北|高雄|新竹|台中|新北|彰化|台|新台)+/g,
-    "日本": /((?:\bJP\b)|Japan|Tokyo|Osaka|Saitama|Nagoya|Fukuoka|Hokkaido|Okinawa|Kyoto|Yokohama|日本|东京|大阪|名古屋|埼玉|福冈|北海道|冲绳|京都|横滨|深日|沪日|呼日|京日|广日|杭日)+/gi,
+    "台湾": /((?:\bTW\b)|Taiwan|Taipei|Kaohsiung|Hsinchu|Taichung|台湾|台北|高雄|新竹|台中|新北|彰化|台|新台)+/gi,
+    "日本": /(Japan|Tokyo|Osaka|Saitama|Nagoya|Fukuoka|Hokkaido|Okinawa|Kyoto|Yokohama|日本|东京|大阪|名古屋|埼玉|福冈|北海道|冲绳|京都|横滨|深日|沪日|呼日|京日|广日|杭日)+/gi,
     "新加坡": /((?:\bSG\b)|Singapore|Changi|新加坡|狮城|深新|沪新|呼新|京新|广新|杭新)+/gi,
     "韩国": /((?:\bKR\b)|South[\s-]?Korea|Korea|Seoul|Incheon|Busan|Chuncheon|韩国|首尔|仁川|釜山|春川)+/gi,
     "印尼": /((?:\bID\b)|Indonesia|Jakarta|Bali|Surabaya|印尼|印度尼西亚|雅加达|巴厘岛|泗水)+/gi,
@@ -671,8 +671,6 @@ function operator(proxies) {
     const nameCounts = {};
 
     return sortedProxies.map(p => {
-
-
         // 解析已经处理好的 parts (为了准确提取 RegionKey)
         // 注意: 我们需要从 p.processedName (Clean Name) 中提取 Region
         // 格式: Region[N]✈Suffix
@@ -730,7 +728,6 @@ function operator(proxies) {
         if (suffixPart && !/^\d+$/.test(suffixPart)) {
             newName += `${Constants.SEPARATOR}${suffixPart}`;
         }
-
 
         // Final output string
         const extras = [];
