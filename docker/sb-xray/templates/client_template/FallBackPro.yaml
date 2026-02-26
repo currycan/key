@@ -56,7 +56,6 @@ SelectAI:       &SelectAI     {type: select, include-all: true, filter: *FilterA
 
 
 # ==================== 代理提供者 ====================
-# 注意：请提供您的机场订阅链接，每个链接一行，并为每个机场命名，末尾的[优][备]为每个节点添加机场名称前缀，可自定义
 proxy-providers:
 ${CLASH_PROXY_PROVIDERS}
 
