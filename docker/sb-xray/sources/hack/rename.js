@@ -585,7 +585,7 @@ function operator(proxies) {
 
             // [新增能力] 初步判断：是否已完全满足我们的终极格式规范？
             // 校验格式并提取关键部位以供后期统一重新编号： Emoji + 空格 + 地区词汇(不含[数字]) + [数字] + ✈ + 内容
-            const standardMatch = name.match(/^([\uD83C][\uDDE6-\uDDFF][\uD83C][\uDDE6-\uDDFF])\s+([^✈\[\]]+?)(?:\[\d+\])?(?:\s*✈\s*(.*))?$/);
+            const standardMatch = name.match(/^([\uD83C][\uDDE6-\uDDFF][\uD83C][\uDDE6-\uDDFF])\s+([^✈\[\]\|]+?)(?:\[\d+\])?(?:(?:\s*✈\s*|\s*\|\s*)(.*))?$/);
 
             if (standardMatch) {
                 p.isPreFormatted = true;
@@ -596,7 +596,8 @@ function operator(proxies) {
                 p.protocol = protocol;
 
                 // 为了让它能和平常节点一样参与后面的排序和重编号，伪造最终所需形式
-                p.name = `${p.flag} ${p.processedName} | ${p.protocol}`;
+                // 注意这里必须用 ✈ 拼接，因为 Phase 3 已经统一按 ✈ 来寻找 planeIndex 切片了以剥离国名和后缀了！
+                p.name = p.protocol && p.protocol !== "unknown" ? `${p.flag} ${p.processedName} ✈ ${p.protocol}` : `${p.flag} ${p.processedName}`;
                 return p;
             }
 
