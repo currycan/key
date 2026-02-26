@@ -3,7 +3,7 @@
  * Sub-Store 节点重命名脚本
  *
  * 功能 (Features):
- * 1. 深度格式化: 清理无效字符、标准化分隔符、统一括号格式。
+ * 1. 深度格式化: 清理无效字符、标准化分隔符、统一括号格式。 (本次更新: 分隔符两侧强制加入空格，保障 OpenClash Smart 模式基于正则的权重计分不串词)
  * 2. 智能重命名: 自动识别国家/地区，提升地区关键词权重。
  * 3. 稳健去重: 智能识别并移除重复的标签（如 "美国" 出现多次）。
  * 4. 自动标旗: 能够根据名称或代码自动填充对应的国旗 Emoji。
@@ -16,7 +16,7 @@
 // ============================================================================
 
 const Constants = {
-    SEPARATOR: '✈', // 通用分隔符 (Plane Icon)
+    SEPARATOR: ' ✈ ', // 通用分隔符 (保留 Emoji，两侧加空格防御污染)
     // 地区排序优先级 (Predefined Priority)
     PRIORITY_REGIONS: ["香港", "台湾", "日本", "新加坡", "韩国", "美国"],
     // 无效节点过滤正则
@@ -102,6 +102,7 @@ const RegionMap = {
     "爱尔兰": /((?:\bIE\b)|Ireland|Dublin|Cork|爱尔兰|都柏林|科克)+/gi,
     "乌克兰": /((?:\bUA\b)|Ukraine|Kyiv|Kiev|Lviv|Odessa|乌克兰|基辅|利沃夫|敖德萨)+/gi,
     "波兰": /((?:\bPL\b)|Poland|Warsaw|Krakow|波兰|华沙|克拉科夫)+/gi,
+    "波黑": /((?:\bBA\b)|Bosnia.*Herzegovina|Sarajevo|波斯尼亚和黑塞哥维那|波斯尼亚|黑塞哥维那|波黑|萨拉热窝)+/gi,
     "芬兰": /((?:\bFI\b)|Finland|Helsinki|Espoo|芬兰|赫尔辛基|埃斯波)+/gi,
     "挪威": /((?:\bNO\b)|Norway|Oslo|Bergen|挪威|奥斯陆|卑尔根)+/gi,
 
@@ -135,7 +136,7 @@ const CountryDB = [
    { flag: '🇦🇼', code: 'AW', name: '阿鲁巴', full: 'Aruba' },
    { flag: '🇦🇽', code: 'AX', name: '奥兰群岛', full: 'Åland Islands' },
    { flag: '🇦🇿', code: 'AZ', name: '阿塞拜疆', full: 'Azerbaijan' },
-   { flag: '🇧🇦', code: 'BA', name: '波黑', full: 'Bosnia & Herzegovina' },
+   { flag: '🇧🇦', code: 'BA', name: '波黑', full: 'Bosnia & Herzegovina', alias: '波斯尼亚和黑塞哥维那' },
    { flag: '🇧🇧', code: 'BB', name: '巴巴多斯', full: 'Barbados' },
    { flag: '🇧🇩', code: 'BD', name: '孟加拉国', full: 'Bangladesh' },
    { flag: '🇧🇪', code: 'BE', name: '比利时', full: 'Belgium' },
@@ -384,6 +385,7 @@ const CountryDB = [
 // 初始化时自动填充
 const FlagRules = [
     // 优先匹配的手动规则 (Manual Overrides)
+    { regex: /((波斯尼亚和黑塞哥维那|波黑|萨拉热窝|Bosnia|Sarajevo))/i, emoji: '🇧🇦' },
     { regex: /(专属纯净住宅)/i, emoji: '🇺🇸' },
     { regex: /((美[国國]|华盛顿|波特兰|达拉斯|俄勒冈|凤凰城|菲尼克斯|费利蒙|弗里蒙特|硅谷|旧金山|拉斯维加斯|洛杉|圣何塞|圣荷西|圣塔?克拉拉|西雅图|芝加哥|哥伦布|纽约|阿什本|纽瓦克|丹佛|加利福尼亚|弗吉尼亚|马纳萨斯|俄亥俄|得克萨斯|[佐乔]治亚|亚特兰大|佛罗里达|迈阿密))/i, emoji: '🇺🇸' },
     { regex: /((日本|东京|大阪|名古屋|埼玉|福冈))/i, emoji: '🇯🇵' },
@@ -580,6 +582,17 @@ function operator(proxies) {
             let name = p.name;
             const protocol = p.type ? p.type.toLowerCase() : "unknown";
 
+            // [新增能力] 初步判断：是否已完全满足我们的终极格式规范？
+            // 校验格式： Emoji + 空格 + 地区词汇带不带[数字] + ✈ + 内容
+            const isStandardFormat = /^[\uD83C][\uDDE6-\uDDFF][\uD83C][\uDDE6-\uDDFF]\s+[^✈]+?\[\d+\](\s+✈\s+|$)/.test(name);
+
+            if (isStandardFormat) {
+                // 如果格式完全合规，直接装回包传递，跳过清理和拆分 (利用标志位)
+                p.isPreFormatted = true;
+                p.processedName = name; // Hack: 把完整的原名赋给 processedName 以防报错
+                return p;
+            }
+
             // Step 1: 基础清理
             name = Utils.cleanName(name);
 
@@ -629,7 +642,7 @@ function operator(proxies) {
             p.protocol = protocol;
 
             // 暂存完整名称用于排序
-            p.name = multiplier ? `${flag} ${tempName}|${multiplier.trim()}|${protocol}` : `${flag} ${tempName}|${protocol}`;
+            p.name = multiplier ? `${flag} ${tempName} ✈ ${multiplier.trim()} ✈ ${protocol}` : `${flag} ${tempName} ✈ ${protocol}`;
 
             return p;
         })
@@ -648,6 +661,19 @@ function operator(proxies) {
     const nameCounts = {};
 
     return sortedProxies.map(p => {
+        // 如果前面判定为标准节点直接跳过，原样抛回处理结果
+        if (p.isPreFormatted) {
+            // [特殊跳过协议检测逻辑] 哪怕它是原声标准节点，依然对尾部可能携带的重复 vmess/vless 尝试清缴
+            if (/vmess$/i.test(p.name) && /(V2ray|TLS|WS)/i.test(p.name)) {
+                p.name = p.name.replace(/(?:\s*✈\s*)vmess$/i, '');
+            } else if (/vless$/i.test(p.name) && /(Reality|XTLS)/i.test(p.name)) {
+                p.name = p.name.replace(/(?:\s*✈\s*)vless$/i, '');
+            }
+            // 同样强制重组输出键位
+            const { name, type, ...restProps } = p;
+            return { name, type, ...restProps };
+        }
+
         // 解析已经处理好的 parts (为了准确提取 RegionKey)
         // 注意: 我们需要从 p.processedName (Clean Name) 中提取 Region
         // 格式: Region[N]✈Suffix
@@ -663,7 +689,7 @@ function operator(proxies) {
         const planeIndex = contentWithoutIPv6.indexOf(Constants.SEPARATOR);
         if (planeIndex !== -1) {
             keyPart = contentWithoutIPv6.substring(0, planeIndex).trim();
-            suffixPart = contentWithoutIPv6.substring(planeIndex + 1).replace(new RegExp(`^${Constants.SEPARATOR}+|${Constants.SEPARATOR}+$`, 'g'), '').trim();
+            suffixPart = contentWithoutIPv6.substring(planeIndex + 1).replace(/^[\s✈]+|[\s✈]+$/g, '').trim();
         }
 
         // Check for IPv6 in key or suffix
@@ -674,7 +700,7 @@ function operator(proxies) {
         }
         if (/IPv6/i.test(suffixPart)) {
             isIPv6 = true;
-            suffixPart = suffixPart.replace(/IPv6/ig, "").replace(new RegExp(`^${Constants.SEPARATOR}+|${Constants.SEPARATOR}+$`, 'g'), '').trim();
+            suffixPart = suffixPart.replace(/IPv6/ig, "").replace(/^[\s✈]+|[\s✈]+$/g, '').trim();
         }
 
         // 清理 Key (移除末尾数字或括号)
@@ -698,9 +724,35 @@ function operator(proxies) {
         // Final output string
         const extras = [];
         if (p.multiplier) extras.push(p.multiplier.trim());
-        if (p.protocol) extras.push(p.protocol);
 
-        p.name = extras.length > 0 ? `${newName}|${extras.join('|')}` : newName;
+        // 智能协议冗余剔除机制 (Smart Protocol Deduplication)
+        // 检查整个节点名中是否已经包含了高级协议特征(Reality, XTLS, V2ray, TLS, WS)
+        const fullCurrentName = p.name + newName;
+        const hasRealityOrXTLS = /(Reality|XTLS)/i.test(fullCurrentName);
+        const hasV2rayOrTLS_WS = /(V2ray|TLS|WS)/i.test(fullCurrentName);
+
+        if (p.protocol) {
+            let shouldAddProtocol = true;
+
+            // 互斥规则 1: 如果名字里已经有 Reality 或 XTLS，就舍弃底层协议 vless
+            if (hasRealityOrXTLS && p.protocol.toLowerCase() === 'vless') {
+                shouldAddProtocol = false;
+            }
+
+            // 互斥规则 2: 如果名字里已经有 V2ray, TLS, 或 WS，就舍弃底层协议 vmess
+            if (hasV2rayOrTLS_WS && p.protocol.toLowerCase() === 'vmess') {
+                shouldAddProtocol = false;
+            }
+
+            if (shouldAddProtocol) {
+                extras.push(p.protocol);
+            }
+        }
+
+        p.name = extras.length > 0 ? `${newName} ✈ ${extras.join(' ✈ ')}` : newName;
+        // 清理由于前面置空字段(如某些标签被去重移除了)导致的连续分隔符 ' ✈  ✈ '。
+        // 将两个或以上的 ' ✈ ' 以及它们之间的空格压缩为一个纯净的 ' ✈ '
+        p.name = p.name.replace(/(?:\s*✈\s*){2,}/g, ' ✈ ');
 
         // Remove temp props
         delete p.processedName;
@@ -708,6 +760,12 @@ function operator(proxies) {
         delete p.multiplier;
         delete p.protocol;
 
-        return p;
+        // 强制重组对象键值顺序：保证 `name` 始终作为第一属性输出用于 JSON 排版美观
+        const { name, type, ...restProps } = p;
+        return {
+            name,
+            type,
+            ...restProps
+        };
     });
 }
