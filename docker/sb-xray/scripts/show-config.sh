@@ -53,14 +53,14 @@ show_qrcode() {
 
 generate_links() {
     local region_name="${REGION_INFO}✈${NODE_NAME}" h2_alpn="alpn=h3"
-    local vmes_json="{\"v\":\"2\",\"ps\":\"${region_name}✈V2ray-TLS-WS${NODE_SUFFIX}\",\"add\":\"${CDNDOMAIN}\",\"port\":\"${LISTENING_PORT}\",\"id\":\"${XRAY_UUID}\",\"aid\":\"0\",\"scy\":\"auto\",\"net\":\"ws\",\"type\":\"none\",\"host\":\"${CDNDOMAIN}\",\"path\":\"/${XRAY_URL_PATH}-vmessws\",\"tls\":\"tls\",\"sni\":\"${CDNDOMAIN}\",\"alpn\":\"h2\",\"fp\":\"chrome\"}"
+    local vmes_json="{\"v\":\"2\",\"ps\":\"${region_name}✈Vmess${NODE_SUFFIX}\",\"add\":\"${CDNDOMAIN}\",\"port\":\"${LISTENING_PORT}\",\"id\":\"${XRAY_UUID}\",\"aid\":\"0\",\"scy\":\"auto\",\"net\":\"ws\",\"type\":\"none\",\"host\":\"${CDNDOMAIN}\",\"path\":\"/${XRAY_URL_PATH}-vmessws\",\"tls\":\"tls\",\"sni\":\"${CDNDOMAIN}\",\"alpn\":\"h2\",\"fp\":\"chrome\"}"
 
     # 基础链接 (Clash 支持部分)
     local link_hysteria2="hysteria2://${SB_UUID}@${DOMAIN}:${PORT_HYSTERIA2}/?${h2_alpn}#${region_name}✈Hysteria2${NODE_SUFFIX}"
     local link_tuic="tuic://${SB_UUID}:${SB_UUID}@${DOMAIN}:${PORT_TUIC}?${h2_alpn}&congestion_control=bbr#${region_name}✈TUIC${NODE_SUFFIX}"
     local link_anytls="anytls://${SB_UUID}@${DOMAIN}:${PORT_ANYTLS}?security=tls&type=tcp#${region_name}✈AnyTLS${NODE_SUFFIX}"
     local link_vmess="vmess://$(echo -n "$vmes_json" | base64 -w0)"
-    local link_vless_vision="vless://${XRAY_UUID}@${DOMAIN}:${LISTENING_PORT}?encryption=none&flow=xtls-rprx-vision&security=reality&sni=${DEST_HOST}&fp=chrome&pbk=${XRAY_REALITY_PUBLIC_KEY}&sid=${XRAY_REALITY_SHORTID}&spx=%2F&type=tcp&headerType=none#${region_name}✈XTLS-Reality${NODE_SUFFIX}"
+    local link_vless_vision="vless://${XRAY_UUID}@${DOMAIN}:${LISTENING_PORT}?encryption=none&flow=xtls-rprx-vision&security=reality&sni=${DEST_HOST}&fp=chrome&pbk=${XRAY_REALITY_PUBLIC_KEY}&sid=${XRAY_REALITY_SHORTID}&spx=%2F&type=tcp&headerType=none#${region_name}✈Reality${NODE_SUFFIX}"
 
     # 高级/Xhttp 链接 (Mihomo / V2rayN / Sing-box 支持)
     local xhttp_base="encryption=mlkem768x25519plus.native.0rtt.${XRAY_MLKEM768_CLIENT}&security=reality&sni=${DEST_HOST}&fp=chrome&pbk=${XRAY_REALITY_PUBLIC_KEY}&sid=${XRAY_REALITY_SHORTID}&type=xhttp&path=%2F${XRAY_URL_PATH}-xhttp&mode=auto"
