@@ -10,7 +10,7 @@
 
 > [!IMPORTANT]
 > **职责分离原则：筛选与排序各司其职**
-> 
+>
 > - **Filter (初筛)**：只负责划定候选节点的范围。例如，只进选支持流媒体的，过滤掉香港的。
 > - **Policy-Priority (定级)**：只负责给范围内的候选者进行「多维打分」。例如，同等条件下，优质节点加分，Reality协议加分。
 
@@ -25,7 +25,7 @@ graph LR
     C -->|分析节点名称| F[质量特征权重]
     D & E & F --> G((总得分最高者))
     G --> H[节点上任服务]
-    
+
     style B fill:#e1f5fe,stroke:#03a9f4,stroke-width:2px
     style C fill:#fff3e0,stroke:#ff9800,stroke-width:2px
     style G fill:#e8f5e9,stroke:#4caf50,stroke-width:3px
@@ -52,7 +52,7 @@ graph LR
 | **地区标识** | `🇭🇰HK`, `🇺🇸US`, `🇯🇵JP` | **定点分流**。例如 AI 节点强行加权美国区。 |
 | **特性标签** | `super`, `good`, `高速` | **业务定速**。识别具有极佳体验的专线或高端节点。 |
 | **协议类型** | `Reality`, `Hysteria2`, `VMess` | **降延迟与抗封锁**。新一代 UDP 协议天然高分。 |
-| **质量后缀** | `优`, `中`, `备` | **机场兜底**。区分节点池里的头等舱和经济舱。 |
+| **质量后缀** | `super`, `good` | **机场兜底**。区分节点池里的头等舱和经济舱。 |
 
 ---
 
@@ -69,7 +69,7 @@ graph LR
 
 | 考核维度 | 关键字命中匹配 | 权重 (分值) | 机制说明 |
 | :--- | :--- | :---: | :--- |
-| **体验加分(特性)** | `super` / `高速` / `good` | +20 / +10 / +10 | 直接对节点打上优质标签。 |
+| **体验加分(特性)** | `super` / `高速` / `good` | +30 / +10 / +10 | 直接对节点打上优质标签。 |
 | **协议抗性(性能)** | `Reality` / `vless` | +20 / +10 | 第一梯队协议，最高加分。 |
 |  | `Hysteria2` (及变体) | +8 | 优秀的 UDP 低阻力协议。 |
 |  | `TUIC` / `tuic` | +6 | 第二代 QUIC 协议。 |
@@ -78,9 +78,6 @@ graph LR
 | **特定业务(地区)** | *🇺🇸 美国 US* | +20 (Max) | AI 和家宽业务的首选区域。 |
 |  | *🇰🇷 韩国 KR* | +10 | 媒体业务替补与高速泛用。 |
 |  | *🇭🇰 香港 HK* | 0 甚至反推 | 严禁 AI 和流媒体命中此区域。 |
-| **质量保障(后缀)** | `优` | **+30** | 单项分值最高，强制优选好节点。 |
-|  | `中` | +10 | 一般商用负载路线。 |
-|  | `备` | +5 | 容灾防线垫底路线。 |
 
 ---
 
@@ -123,13 +120,13 @@ xychart-beta
 
 ```yaml
 # 第一步：指定地区权重模板 (此为家宽专用策略)
-PolicyISP: "Reality:20;优:30;🇺🇸:20;🇰🇷:10;🇯🇵:6;🇸🇬:4;🇹🇼:2"
+PolicyISP: "高速:10;Reality:20;vless:10;Hysteria2:8;hysteria2:8;TUIC:6;tuic:6;Vmess:3;vmess:3;anytls:1;super:30;good:10;🇺🇸:20;🇰🇷:10;🇯🇵:6;🇸🇬:4;🇹🇼:2"
 
 # 第二步：挂载到最终业务的路由组 (注意：使用 MediaSmart + FilterISP双剑合璧)
 proxy-groups:
   - name: 家宽-智选
     type: smart  # 注意：由于使用了 <<: *MediaSmart，这里实际上继承了 1000ms
-    filter: "^(?=.*(?i)(住宅|isp|ISP)).*$"   # 第一期过滤
+    filter: "^(?=.*(?i)(住宅|isp|ISP))(?!.*(DIRECT|直接连接|5x)).*$"  # 第一期过滤
     policy-priority: *PolicyISP                 # 第二期打分
     # ...
 ```
@@ -140,15 +137,15 @@ proxy-groups:
 
 | 选手 | 节点名称 | 延迟表现 |
 | :--- | :--- | :--- |
-| **A** | `[Reality] 🇺🇸US|住宅|Reality|vless|优` | **180 ms** |
-| **B** | `[Reality] 🇰🇷KR|住宅|Hysteria2|优` | **70 ms** |
-| **C** | `[Reality] 🇭🇰HK|住宅|Reality|vless|优` | **30 ms** (极快) |
+| **A** | `[Reality] 🇺🇸US|住宅|Reality|vless|super` | **180 ms** |
+| **B** | `[Reality] 🇰🇷KR|住宅|Hysteria2|super` | **70 ms** |
+| **C** | `[Reality] 🇭🇰HK|住宅|Reality|vless|super` | **30 ms** (极快) |
 
 **打分环节** (基于上面的 `PolicyISP`)：
 
-- **选手A (美国)**：Reality(`20`) + 🇺🇸(`20`) + 优(`30`) = **70 分** 🏆
-- **选手B (韩国)**：Hysteria2(`8`) + 🇰🇷(`10`)  + 优(`30`) = **48 分**
-- **选手C (香港)**：Reality(`20`) + 🇭🇰(`0`) + 优(`30`) = **50 分**
+- **选手A (美国)**：Reality(`20`) + 🇺🇸(`20`) + super(`30`) = **70 分** 🏆
+- **选手B (韩国)**：Hysteria2(`8`) + 🇰🇷(`10`)  + super(`30`) = **48 分**
+- **选手C (香港)**：Reality(`20`) + 🇭🇰(`0`) + super(`30`) = **50 分**
 
 **结果揭晓**：
 
@@ -189,7 +186,7 @@ grep "policy-priority" /tmp/openclash.log
 
 ```yaml
 # 纯协议和质量打分基础架构 (无地理偏置)
-PolicyDefault:  &PolicyDefault  "高速:10;super:20;good:10;Reality:20;vless:10;Hysteria2:8;hysteria2:8;hy2:8;HY2:8;TUIC:6;tuic:6;V2ray:3;vmess:3;anytls:1;优:30;中:10;备:5"
+PolicyDefault:  &PolicyDefault  "高速:10;Reality:20;vless:10;Hysteria2:8;hysteria2:8;TUIC:6;tuic:6;Vmess:3;vmess:3;anytls:1;super:30;good:10"
 
 # 在 Default 基础上追加地缘分化的典型场景：
 PolicyISP:      &PolicyISP      "**继承默认权重**;🇺🇸:20;🇰🇷:10;🇯🇵:6;🇸🇬:4;🇹🇼:2"
