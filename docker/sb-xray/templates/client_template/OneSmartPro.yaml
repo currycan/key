@@ -48,31 +48,31 @@ FilterDialer:   &FilterDialer "^(?=.*(?i)(🇭🇰|🇹🇼|🇨🇳))(?!.*(DIRE
 #
 # 权重维度说明:
 #   - 特性标签: 高速(10), super(20), good(10)
-#   - 协议性能: Reality(20), vless(10), Hysteria2(8), hysteria2(8), hy2(8), HY2(8), TUIC(8), tuic(8), V2ray(3), vmess(3), anytls(1)
-#   - 质量后缀: 优(30), 中(2), 备(1)
+#   - 协议性能: Reality(20), vless(10), Hysteria2(8), hysteria2(8), hy2(8), HY2(8), TUIC(6), tuic(6), V2ray(3), vmess(3), anytls(1)
+#   - 质量后缀: 优(30), 中(10), 备(5)
 #   - 地区偏好: 根据不同场景动态调整
 #
 # ==================== 基础权重配置(所有策略共享) ====================
-# 格式: 高速:10;super:20;good:10;Reality:20;vless:10;Hysteria2:8;hysteria2:8;hy2:8;HY2:8;TUIC:8;tuic:8;V2ray:3;vmess:3;anytls:1;优:30;中:2;备:1
+# 格式: 高速:10;super:20;good:10;Reality:20;vless:10;Hysteria2:8;hysteria2:8;hy2:8;HY2:8;TUIC:6;tuic:6;V2ray:3;vmess:3;anytls:1;优:30;中:10;备:5
 # 说明: 以下所有策略都包含此基础权重,仅地区偏好部分有差异
 # ---------- 默认策略 ----------
 # 地区偏好: 无
-PolicyDefault:  &PolicyDefault  "高速:10;super:20;good:10;Reality:20;vless:10;Hysteria2:8;hysteria2:8;hy2:8;HY2:8;TUIC:8;tuic:8;V2ray:3;vmess:3;anytls:1;优:30;中:2;备:1"
+PolicyDefault:  &PolicyDefault  "高速:10;super:20;good:10;Reality:20;vless:10;Hysteria2:8;hysteria2:8;hy2:8;HY2:8;TUIC:6;tuic:6;V2ray:3;vmess:3;anytls:1;优:30;中:10;备:5"
 # ---------- 家宽策略 ----------
 # 地区偏好: 🇺🇸:20 > 🇰🇷:10 > 🇯🇵:6 > 🇸🇬:4 > 🇹🇼:2
-PolicyISP:      &PolicyISP      "高速:10;super:20;good:10;Reality:20;vless:10;Hysteria2:8;hysteria2:8;hy2:8;HY2:8;TUIC:8;tuic:8;V2ray:3;vmess:3;anytls:1;优:30;中:2;备:1;🇺🇸:20;🇰🇷:10;🇯🇵:6;🇸🇬:4;🇹🇼:2"
+PolicyISP:      &PolicyISP      "高速:10;super:20;good:10;Reality:20;vless:10;Hysteria2:8;hysteria2:8;hy2:8;HY2:8;TUIC:6;tuic:6;V2ray:3;vmess:3;anytls:1;优:30;中:10;备:5;🇺🇸:20;🇰🇷:10;🇯🇵:6;🇸🇬:4;🇹🇼:2"
 # ---------- 流媒体策略 ----------
 # 地区偏好: 🇺🇸:15 > 🇰🇷:8 > 🇯🇵:6 > 🇸🇬:4 > 🇹🇼:2
-PolicyMedia:    &PolicyMedia    "高速:10;super:20;good:10;Reality:20;vless:10;Hysteria2:8;hysteria2:8;hy2:8;HY2:8;TUIC:8;tuic:8;V2ray:3;vmess:3;anytls:1;优:30;中:2;备:1;🇺🇸:15;🇰🇷:8;🇯🇵:6;🇸🇬:4;🇹🇼:2"
+PolicyMedia:    &PolicyMedia    "高速:10;super:20;good:10;Reality:20;vless:10;Hysteria2:8;hysteria2:8;hy2:8;HY2:8;TUIC:6;tuic:6;V2ray:3;vmess:3;anytls:1;优:30;中:10;备:5;🇺🇸:15;🇰🇷:8;🇯🇵:6;🇸🇬:4;🇹🇼:2"
 # ---------- 高速策略 ----------
 # 地区偏好: 🇺🇸:15 > 🇯🇵:10 > 🇰🇷:8 > 🇸🇬:4 > 🇹🇼:2
-PolicyFast:     &PolicyFast     "高速:10;super:20;good:10;Reality:20;vless:10;Hysteria2:8;hysteria2:8;hy2:8;HY2:8;TUIC:8;tuic:8;V2ray:3;vmess:3;anytls:1;优:30;中:2;备:1;🇺🇸:15;🇯🇵:10;🇰🇷:8;🇸🇬:4;🇹🇼:2"
+PolicyFast:     &PolicyFast     "高速:10;super:20;good:10;Reality:20;vless:10;Hysteria2:8;hysteria2:8;hy2:8;HY2:8;TUIC:6;tuic:6;V2ray:3;vmess:3;anytls:1;优:30;中:10;备:5;🇺🇸:15;🇯🇵:10;🇰🇷:8;🇸🇬:4;🇹🇼:2"
 # ---------- AI 服务策略 ----------
 # 地区偏好: 🇺🇸:20 > 🇯🇵:10 > 🇰🇷:8 > 🇸🇬:4 > 🇹🇼:2
-PolicyAI:       &PolicyAI       "高速:10;super:20;good:10;Reality:20;vless:10;Hysteria2:8;hysteria2:8;hy2:8;HY2:8;TUIC:8;tuic:8;V2ray:3;vmess:3;anytls:1;优:30;中:2;备:1;🇺🇸:20;🇯🇵:10;🇰🇷:8;🇸🇬:4;🇹🇼:2"
+PolicyAI:       &PolicyAI       "高速:10;super:20;good:10;Reality:20;vless:10;Hysteria2:8;hysteria2:8;hy2:8;HY2:8;TUIC:6;tuic:6;V2ray:3;vmess:3;anytls:1;优:30;中:10;备:5;🇺🇸:20;🇯🇵:10;🇰🇷:8;🇸🇬:4;🇹🇼:2"
 # ---------- 链式代理策略 ----------
 # 地区偏好: 🇭🇰:20 > 🇹🇼:15 > 🇨🇳:15 > 🇰🇷:10 > 🇯🇵:6 > 🇸🇬:4 > 🇺🇸:2
-PolicyDialer:   &PolicyDialer   "高速:10;super:20;good:10;Reality:20;vless:10;Hysteria2:8;hysteria2:8;hy2:8;HY2:8;TUIC:8;tuic:8;V2ray:3;vmess:3;anytls:1;优:30;中:2;备:1;🇭🇰:20;🇹🇼:15;🇨🇳:15;🇰🇷:10;🇯🇵:6;🇸🇬:4;🇺🇸:2"
+PolicyDialer:   &PolicyDialer   "高速:10;super:20;good:10;Reality:20;vless:10;Hysteria2:8;hysteria2:8;hy2:8;HY2:8;TUIC:6;tuic:6;V2ray:3;vmess:3;anytls:1;优:30;中:10;备:5;🇭🇰:20;🇹🇼:15;🇨🇳:15;🇰🇷:10;🇯🇵:6;🇸🇬:4;🇺🇸:2"
 
 # 策略组代理列表模板 - 预定义的代理节点优先级排序
 DEFAULT:        &DEFAULT      {type: select, include-all: true, filter: *FilterALL, proxies: [高速-智选, LD-智选, AI-智选, 媒体-智选, 家宽-智选, 香港-智选, 台湾-智选, 日本-智选, 狮城-智选, 韩国-智选, 美国-智选, 其他-智选, 全球手动, 直接连接]}
@@ -97,14 +97,13 @@ ${CLASH_ISP_PROXIES}
 # ==================== 策略组 ====================
 proxy-groups:
   # ==================== 网络测试 ====================
-  - {name: 网络测试,    <<: *OneSmart,  include-all: true, filter: *FilterALL, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Speedtest.png}
-
+  - {name: 网络测试,    <<: *OneSmart,     include-all: true,   filter: *FilterALL, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Speedtest.png}
   # ==================== 线路节点策略组 ====================
-  - {name: 家宽-智选,   <<: *MediaSmart, filter: *FilterISP,   include-all: true, policy-priority: *PolicyISP,   icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Area.png}
-  - {name: 媒体-智选,   <<: *MediaSmart, filter: *FilterMedia, include-all: true, policy-priority: *PolicyMedia, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Clubhouse_1.png}
-  - {name: 高速-智选,   <<: *BaseSmart, filter: *FilterFAST,   include-all: true, policy-priority: *PolicyFast,  icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Rocket.png}
-  - {name: AI-智选,    <<: *StableSmart, filter: *FilterAI,    include-all: true, policy-priority: *PolicyAI,    icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/ChatGPT.png}
-  - {name: LD-智选,    <<: *BaseSmart,  include-all: true, policy-priority: *PolicyDialer, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Round_Robin_1.png}
+  - {name: 家宽-智选,   <<: *MediaSmart,   filter: *FilterISP,   include-all: true, policy-priority: *PolicyISP,   icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Area.png}
+  - {name: 媒体-智选,   <<: *MediaSmart,   filter: *FilterMedia, include-all: true, policy-priority: *PolicyMedia, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Clubhouse_1.png}
+  - {name: 高速-智选,   <<: *BaseSmart,    filter: *FilterFAST,  include-all: true, policy-priority: *PolicyFast,  icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Rocket.png}
+  - {name: AI-智选,    <<: *StableSmart,  filter: *FilterAI,    include-all: true, policy-priority: *PolicyAI,    icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/ChatGPT.png}
+  - {name: LD-智选,    <<: *BaseSmart,    include-all: true,   policy-priority: *PolicyDialer, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Round_Robin_1.png}
   # ==================== 媒体服务 ====================
   - {name: TikTok,     <<: *SelectISP,   icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/TikTok.png}
   - {name: YouTube,    <<: *SelectFAST,  icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/YouTube.png}
@@ -135,26 +134,26 @@ proxy-groups:
   - {name: 游戏平台,    <<: *SelectLD,    icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Game.png}
   # ==================== 虚拟币 ====================
   - {name: 货币平台,    <<: *OneSmart,    icon: https://raw.githubusercontent.com/Orz-3/mini/master/Alpha/Bitcloud.png}
-  - {name: 直接连接,    type: select,     proxies: [DIRECT], hidden: true, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Direct.png}
 
   # ==================== 主要策略组 ====================
-  - {name: 链式前置,    <<: *BaseSmart,  include-all: true,     filter: *FilterDialer, policy-priority: *PolicyDialer,  icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Daily.png}
   - {name: 默认代理,    <<: *DEFAULT,    icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Static.png}
   - {name: 一键智选,    <<: *OneSmart,   icon: https://gh-proxy.com/raw.githubusercontent.com/666OS/YYDS/main/mihomo/image/mihomo.png}
-  - {name: 全球手动,    <<: *BaseSmart,  include-all: true, policy-priority: *PolicyDefault, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Static.png}
   - {name: 国外流量,    <<: *OneSmart,   icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Global.png}
   - {name: 国内流量,    <<: *SelectDC,   icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/China.png}
   - {name: 兜底流量,    <<: *OneSmart,   icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Final.png}
+  - {name: 全球手动,    <<: *BaseSmart,  include-all: true, policy-priority: *PolicyDefault, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Static.png}
+  - {name: 直接连接,    type: select,    proxies: [DIRECT], hidden: true, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Direct.png}
 
   # ==================== 智选节点 ====================
-  # 地理策略层 - Smart智选选择，使用锚点模板实现多维度权重: 特性(15) + 机场(10) + 协议(5-10) + 质量(1-5)
-  - {name: 香港-智选,          <<: *BaseSmart, filter: *FilterHK,     include-all: true, policy-priority: *PolicyDefault, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Hong_Kong.png}
-  - {name: 台湾-智选,          <<: *BaseSmart, filter: *FilterTW,     include-all: true, policy-priority: *PolicyDefault, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Taiwan.png}
-  - {name: 日本-智选,          <<: *BaseSmart, filter: *FilterJP,     include-all: true, policy-priority: *PolicyDefault, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Japan.png}
-  - {name: 狮城-智选,          <<: *BaseSmart, filter: *FilterSG,     include-all: true, policy-priority: *PolicyDefault, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Singapore.png}
-  - {name: 韩国-智选,          <<: *BaseSmart, filter: *FilterKR,     include-all: true, policy-priority: *PolicyDefault, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Korea.png}
-  - {name: 美国-智选,          <<: *BaseSmart, filter: *FilterUS,     include-all: true, policy-priority: *PolicyDefault, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/United_States.png}
-  - {name: 其他-智选,          <<: *BaseSmart, filter: *FilterOT,     include-all: true, policy-priority: *PolicyDefault, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Back.png}
+  - {name: 链式前置,           <<: *BaseSmart,   filter: *FilterDialer,   include-all: true, policy-priority: *PolicyDialer,  icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Daily.png}
+  # 地理策略层 - Smart智选选择，使用锚点模板实现多维度权重:
+  - {name: 香港-智选,          <<: *BaseSmart,   filter: *FilterHK,       include-all: true, policy-priority: *PolicyDefault, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Hong_Kong.png}
+  - {name: 台湾-智选,          <<: *BaseSmart,   filter: *FilterTW,       include-all: true, policy-priority: *PolicyDefault, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Taiwan.png}
+  - {name: 日本-智选,          <<: *BaseSmart,   filter: *FilterJP,       include-all: true, policy-priority: *PolicyDefault, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Japan.png}
+  - {name: 狮城-智选,          <<: *BaseSmart,   filter: *FilterSG,       include-all: true, policy-priority: *PolicyDefault, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Singapore.png}
+  - {name: 韩国-智选,          <<: *BaseSmart,   filter: *FilterKR,       include-all: true, policy-priority: *PolicyDefault, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Korea.png}
+  - {name: 美国-智选,          <<: *BaseSmart,   filter: *FilterUS,       include-all: true, policy-priority: *PolicyDefault, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/United_States.png}
+  - {name: 其他-智选,          <<: *BaseSmart,   filter: *FilterOT,       include-all: true, policy-priority: *PolicyDefault, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Back.png}
 
 
 # ==================== 规则路由 ====================
@@ -358,7 +357,7 @@ rule-providers:
   # 代理规则
   Proxy / Domain:           {<<: *BehaviorDN, url: https://gh-proxy.com/raw.githubusercontent.com/666OS/rules/release/mihomo/domain/Proxy.mrs}
   ProxyIP / IP:             {<<: *BehaviorIP, url: https://gh-proxy.com/raw.githubusercontent.com/666OS/rules/release/mihomo/ip/Proxy.mrs}
-  Global / Domain:           {<<: *BehaviorCL, url: https://gh-proxy.com/raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Global/Global.list}
+  Global / Domain:          {<<: *BehaviorCL, url: https://gh-proxy.com/raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Global/Global.list}
   # GateFireWall / Domain:   {<<: *BehaviorDN, url: https://gh-proxy.com/raw.githubusercontent.com/metacubex/meta-rules-dat/meta/geo/geosite/gfw.mrs}
 
 
