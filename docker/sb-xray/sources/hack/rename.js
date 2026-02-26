@@ -702,10 +702,22 @@ function operator(proxies) {
         // 清理 Key (移除末尾数字或括号)
         const cleanKey = keyPart.replace(/(\[\s*\d*\s*\]|\d+)$/g, '').trim();
 
+        // 提取基准国家维度用于统一计数
+        let baseRegion = cleanKey;
+        if (typeof RegionMap !== 'undefined') {
+            for (const region of Object.keys(RegionMap)) {
+                // 如果 cleanKey 包含该基准国家名，归类到同一组计数，例如 "香港01-深港IEPL" -> "香港"
+                if (cleanKey.startsWith(region)) {
+                    baseRegion = region;
+                    break;
+                }
+            }
+        }
+
         // 计数
-        if (!nameCounts[cleanKey]) nameCounts[cleanKey] = 0;
-        nameCounts[cleanKey]++;
-        const index = nameCounts[cleanKey];
+        if (!nameCounts[baseRegion]) nameCounts[baseRegion] = 0;
+        nameCounts[baseRegion]++;
+        const index = nameCounts[baseRegion];
 
         // 重组
         const prefix = isIPv6 ? "IPv6 " : "";
@@ -724,7 +736,7 @@ function operator(proxies) {
         // 智能协议冗余剔除机制 (Smart Protocol Deduplication)
         // 检查整个节点名中是否已经包含了高级协议特征(Reality, XTLS, V2ray, TLS, WS)
         const fullCurrentName = p.name + newName;
-        const hasRealityOrXTLS = /(Reality|XTLS)/i.test(fullCurrentName);
+        const hasRealityOrXTLS = /(Reality|XTLS|Xhttp)/i.test(fullCurrentName);
         const hasV2rayOrTLS_WS = /(V2ray|TLS|WS)/i.test(fullCurrentName);
 
         if (p.protocol) {
