@@ -3,7 +3,7 @@
  * Sub-Store 节点重命名脚本
  *
  * 功能 (Features):
- * 1. 深度格式化: 清理无效字符、标准化分隔符、统一括号格式。 (本次更新: 分隔符两侧强制加入空格，保障 OpenClash Smart 模式基于正则的权重计分不串词)
+ * 1. 深度格式化: 清理无效字符、标准化分隔符、统一括号格式。 (本次更新: 分隔符两侧强制加入空格，保障 OpenClash Smart 模式基于正则的权重计分不串词) (本次更新: 分隔符两侧强制加入空格，保障 OpenClash Smart 模式基于正则的权重计分不串词)
  * 2. 智能重命名: 自动识别国家/地区，提升地区关键词权重。
  * 3. 稳健去重: 智能识别并移除重复的标签（如 "美国" 出现多次）。
  * 4. 自动标旗: 能够根据名称或代码自动填充对应的国旗 Emoji。
@@ -464,11 +464,12 @@ const Utils = {
             // 简单去重
             if (self.indexOf(item) !== index) return false;
 
-            // 智能去重: 如果 "美国01" 存在，则移除 "美国"
-            // 安全检查: 仅移除非ASCII、纯数字或长字符串
+            // 智能去重: 只有在对方*严格长于*自己的前提下，才认为自己被长字符包含了。
+            // 这是为了防止如果存在两个 "日本" 时触发互相包含的 bug。
             const isRedundant = self.some((other, otherIndex) => {
                 if (index === otherIndex) return false;
-                if (!other.includes(item)) return false;
+                // [修复Bug] 增加 other.length <= item.length 的阻断，只有比自己长的词才有资格说是我的母词
+                if (other.length <= item.length || !other.includes(item)) return false;
                 const isNonAscii = /[^\x00-\x7F]/.test(item);
                 const isNumeric = /^\d+$/.test(item);
                 const isLong = item.length > 3;
@@ -583,13 +584,19 @@ function operator(proxies) {
             const protocol = p.type ? p.type.toLowerCase() : "unknown";
 
             // [新增能力] 初步判断：是否已完全满足我们的终极格式规范？
-            // 校验格式： Emoji + 空格 + 地区词汇带不带[数字] + ✈ + 内容
-            const isStandardFormat = /^[\uD83C][\uDDE6-\uDDFF][\uD83C][\uDDE6-\uDDFF]\s+[^✈]+?\[\d+\](\s+✈\s+|$)/.test(name);
+            // 校验格式并提取关键部位以供后期统一重新编号： Emoji + 空格 + 地区词汇(不含[数字]) + [数字] + ✈ + 内容
+            const standardMatch = name.match(/^([\uD83C][\uDDE6-\uDDFF][\uD83C][\uDDE6-\uDDFF])\s+([^✈\[\]]+?)(?:\[\d+\])?(?:\s*✈\s*(.*))?$/);
 
-            if (isStandardFormat) {
-                // 如果格式完全合规，直接装回包传递，跳过清理和拆分 (利用标志位)
+            if (standardMatch) {
                 p.isPreFormatted = true;
-                p.processedName = name; // Hack: 把完整的原名赋给 processedName 以防报错
+                p.flag = standardMatch[1];
+                // 剔除旧标号，留出纯净的地区名，如果后面有内容则加上 ✈ 和内容作为后缀
+                p.processedName = standardMatch[2].trim() + (standardMatch[3] ? ` ✈ ${standardMatch[3]}` : "");
+                p.multiplier = "";
+                p.protocol = protocol;
+
+                // 为了让它能和平常节点一样参与后面的排序和重编号，伪造最终所需形式
+                p.name = `${p.flag} ${p.processedName} | ${p.protocol}`;
                 return p;
             }
 
@@ -661,18 +668,7 @@ function operator(proxies) {
     const nameCounts = {};
 
     return sortedProxies.map(p => {
-        // 如果前面判定为标准节点直接跳过，原样抛回处理结果
-        if (p.isPreFormatted) {
-            // [特殊跳过协议检测逻辑] 哪怕它是原声标准节点，依然对尾部可能携带的重复 vmess/vless 尝试清缴
-            if (/vmess$/i.test(p.name) && /(V2ray|TLS|WS)/i.test(p.name)) {
-                p.name = p.name.replace(/(?:\s*✈\s*)vmess$/i, '');
-            } else if (/vless$/i.test(p.name) && /(Reality|XTLS)/i.test(p.name)) {
-                p.name = p.name.replace(/(?:\s*✈\s*)vless$/i, '');
-            }
-            // 同样强制重组输出键位
-            const { name, type, ...restProps } = p;
-            return { name, type, ...restProps };
-        }
+
 
         // 解析已经处理好的 parts (为了准确提取 RegionKey)
         // 注意: 我们需要从 p.processedName (Clean Name) 中提取 Region
@@ -750,6 +746,9 @@ function operator(proxies) {
         }
 
         p.name = extras.length > 0 ? `${newName} ✈ ${extras.join(' ✈ ')}` : newName;
+        // 清理由于前面置空字段(如某些标签被去重移除了)导致的连续分隔符 ' ✈  ✈ '。
+        // 将两个或以上的 ' ✈ ' 以及它们之间的空格压缩为一个纯净的 ' ✈ '
+        p.name = p.name.replace(/(?:\s*✈\s*){2,}/g, ' ✈ ');
         // 清理由于前面置空字段(如某些标签被去重移除了)导致的连续分隔符 ' ✈  ✈ '。
         // 将两个或以上的 ' ✈ ' 以及它们之间的空格压缩为一个纯净的 ' ✈ '
         p.name = p.name.replace(/(?:\s*✈\s*){2,}/g, ' ✈ ');
