@@ -414,7 +414,7 @@ get_isp_preferred_strategy() {
 # 读取并同步远程配置
 decryptSecretsEnv() {
     local base_url="https://raw.githubusercontent.com/currycan/key/master"
-    local items=( "tmp.bin:${SECRET_FILE}" "ptmp.bin:${WORKDIR}/providers" )
+    local items=( "tmp.bin:${SECRET_FILE}" )
 
     checkRequiredEnv DECODE
     for item in "${items[@]}"; do
@@ -691,6 +691,7 @@ createConfig() {
     apply_tpl "/templates/nginx/http.conf"              "/etc/nginx/conf.d/http.conf"   "$env_list \${RANDOM_NUM}"
     apply_tpl "/templates/nginx/tcp.conf"               "/etc/nginx/stream.d/tcp.conf"  "$env_list"
     apply_tpl "/templates/dufs/conf.yml"                "${WORKDIR}/dufs/conf.yml"
+    apply_tpl "/templates/providers/providers.yaml"     "${WORKDIR}/providers"
 
     for t in /templates/xray/*.json; do apply_tpl "$t" "${WORKDIR}/xray/$(basename "$t")"; done
     for t in /templates/sing-box/*.json; do apply_tpl "$t" "${WORKDIR}/sing-box/$(basename "$t")"; done
@@ -1018,8 +1019,8 @@ main_init() {
     /scripts/geo_update.sh
 
     log INFO "[步骤 9] 取交控制面板与路由网规则渲染对发于外界分发节点的 YAML 与组配 JSON 源包映射执行装填！"
-    generateProxyProvidersConfig
     createConfig
+    generateProxyProvidersConfig
 
     log INFO "[步骤 10] 初始化拉取业务核心交互微界面(如 X-UI / S-UI)管理组及生成挂装认证准入验证组件配置工作！"
     log INFO "  > 系统微服编排调度：载入 X-UI 工具节点初始化状态装机指令上下文执行分配..."
