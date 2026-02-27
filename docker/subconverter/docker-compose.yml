@@ -1,7 +1,0 @@
-services:
-  subconverter:
-    image: currycan/subconverter:latest
-    container_name: subconverter
-    ports:
-      - "15051:25500"
-    restart: always
