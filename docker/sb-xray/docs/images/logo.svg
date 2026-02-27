@@ -64,7 +64,48 @@
   <!-- 数据流桥梁 -->
   <path d="M 80 380 Q 120 120, 240 100 T 460 280" fill="none" stroke="url(#bridgeGrad)" stroke-width="24" stroke-linecap="round" filter="url(#glow)"/>
   <path d="M 80 380 Q 120 120, 240 100 T 460 280" fill="none" stroke="#ffffff" stroke-width="6" stroke-linecap="round" opacity="0.9"/>
-        
+
+  <!-- 铁丝网突破点火花 -->
+  <g transform="translate(160, 160)">
+    <path d="M -20 -20 L 20 20 M -20 20 L 20 -20" stroke="#fcd34d" stroke-width="6" stroke-linecap="round" filter="url(#glow)"/>
+    <path d="M 0 -28 L 0 28 M -28 0 L 28 0" stroke="#ffffff" stroke-width="4" stroke-linecap="round" opacity="0.8"/>
+  </g>
+
+  <!-- 代理数据舱 (带 X 标志) -->
+  <g transform="translate(260, 105) rotate(45)">
+    <path d="M -30 -5 L -50 0 L -30 5 Z" fill="#f59e0b" filter="url(#glow)"/>
+    <rect x="-30" y="-12" width="60" height="24" rx="12" fill="#ffffff" filter="url(#glow)"/>
+    <path d="M -6 -6 L 6 6 M 6 -6 L -6 6" stroke="#a855f7" stroke-width="3" stroke-linecap="round"/>
+  </g>
+
+  <!-- 外边框 -->
+  <rect width="508" height="508" x="2" y="2" rx="110" fill="none" stroke="#e2e8f0" stroke-width="4" opacity="0.5"/>
+</svg>
+  <rect width="512" height="512" rx="112" fill="url(#skyGrad)"/>
+
+  <!-- 太阳与云海 -->
+  <circle cx="380" cy="140" r="80" fill="url(#sunGrad)"/>
+  <circle cx="380" cy="140" r="30" fill="#ffffff" filter="url(#glow)"/>
+  <path d="M 180 340 Q 280 280, 360 300 T 512 280 L 512 512 L 180 512 Z" fill="#38bdf8" opacity="0.3"/>
+  <path d="M 240 380 Q 320 320, 420 360 T 512 340 L 512 512 L 240 512 Z" fill="#10b981" opacity="0.4"/>
+  <path d="M 360 100 Q 370 90, 380 100 Q 390 90, 400 100 Q 380 110, 360 100 Z" fill="#ffffff" opacity="0.8"/>
+  <path d="M 410 80  Q 415 75, 420 80  Q 425 75, 430 80  Q 420 85,  410 80  Z" fill="#ffffff" opacity="0.6"/>
+
+  <!-- 高墙与铁丝网 -->
+  <g>
+    <path d="M 0 512 L 0 240 L 180 240 L 180 512 Z" fill="url(#wallGrad)"/>
+    <path d="M 0 280 L 180 280 M 0 340 L 180 340 M 0 400 L 180 400 M 0 460 L 180 460" stroke="#1e293b" stroke-width="4"/>
+    <path d="M 60 280 L 60 340 M 120 240 L 120 280 M 120 340 L 120 400 M 60 400 L 60 460 M 120 460 L 120 512" stroke="#1e293b" stroke-width="4"/>
+    <path d="M 20 240 L 40 160 M 100 240 L 120 160 M 180 240 L 200 160" stroke="url(#fenceGrad)" stroke-width="8" stroke-linecap="round"/>
+    <path d="M 10 180 L 220 180 M 30 210 L 190 210" stroke="#cbd5e1" stroke-width="3" opacity="0.7"/>
+    <path d="M 40 180 L 45 170 M 100 180 L 105 170 M 160 180 L 165 170 M 60 210 L 65 200 M 130 210 L 135 200" stroke="#cbd5e1" stroke-width="2"/>
+    <path d="M 180 240 L 220 512 L 180 512 Z" fill="#020617" opacity="0.5"/>
+  </g>
+
+  <!-- 数据流桥梁 -->
+  <path d="M 80 380 Q 120 120, 240 100 T 460 280" fill="none" stroke="url(#bridgeGrad)" stroke-width="24" stroke-linecap="round" filter="url(#glow)"/>
+  <path d="M 80 380 Q 120 120, 240 100 T 460 280" fill="none" stroke="#ffffff" stroke-width="6" stroke-linecap="round" opacity="0.9"/>
+
   <!-- 铁丝网突破点火花 -->
   <g transform="translate(160, 160)">
     <path d="M -20 -20 L 20 20 M -20 20 L 20 -20" stroke="#fcd34d" stroke-width="6" stroke-linecap="round" filter="url(#glow)"/>

@@ -1,4 +1,4 @@
-# SB-Xray Enterprise 🚀
+# SB-Xray 平台 🚀
 > 专业级全栈网络调度与代理安全网关 (v26.2.6)
 
 <div align="center">
