@@ -8,13 +8,16 @@
     "dns": {
         "servers": [
             {
-                "address": "1.1.1.1"
+                "type": "udp",
+                "tag": "cloudflare",
+                "server": "1.1.1.1"
             },
             {
-                "address": "8.8.8.8"
+                "type": "udp",
+                "tag": "google",
+                "server": "8.8.8.8"
             }
-        ],
-        "strategy": "${STRATEGY}"
+        ]
     },
     "ntp": {
         "enabled": true,
@@ -35,6 +38,10 @@
         }
     ],
     "route": {
+        "default_domain_resolver": {
+            "server": "cloudflare",
+            "strategy": "${STRATEGY}"
+        },
         "rule_set": [
             {
                 "tag": "geosite-openai",
