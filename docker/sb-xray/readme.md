@@ -2,7 +2,8 @@
 > 专业级全栈网络调度与代理安全网关 (v26.2.6)
 
 <div align="center">
-  <img src="docs/images/logo.svg" alt="SB-Xray Logo" width="120" height="120" style="border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.25);">
+  <img src="docs/images/logo.png
+  " alt="SB-Xray Logo" width="120" height="120" style="border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.25);">
 
   <h3>您的企业级高性能网络安全枢纽</h3>
   <p>打破网络壁垒、聚合多协议、实现无感智能调度的终极云端边缘网关。</p>
