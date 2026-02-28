@@ -327,15 +327,16 @@ graph TD
 
 ### 4.1 模板类型对比
 
-| 模板 | 定位 | 规则数 | 策略组 | 适用场景 |
-|:---|:---|:---|:---|:---|
-| **OneSmartPro.yaml** | 智能完整版 | ~15000 | 40+ | 自动选择最优节点 |
-| **MihomoPro.yaml** | 完整版 | ~15000 | 50+ | 桌面端极致分流 |
-| **MihomoLite.yaml** | 精简版 | ~5000 | 20+ | 移动端节省内存 |
-| **OneSmartLite.yaml** | 智能精简版 | ~5000 | 15+ | 移动端智能分流 |
-| **phone.yaml** | 移动优化 | ~3000 | 10+ | 手机专用 |
-| **stash-full.yaml** | Stash 完整 | ~12000 | 45+ | iOS Stash 客户端 |
-| **surge.conf** | Surge | ~8000 | 30+ | macOS/iOS Surge |
+| 模板 | 定位 | 内核 | 核心机制 | 策略组 | 适用场景 |
+|:---|:---|:---|:---|:---:|:---|
+| **OneSmartPro.yaml** | 智能完整版 | Mihomo | Smart 智选 + Policy-Priority 多维权重 | ~40 | OpenClash / Mihomo 自动选择最优节点 |
+| **FallBackPro.yaml** | 故障转移版 | Mihomo | Fallback 故转 + url-test 自动切换 | ~50 | OpenClash / Mihomo 稳定优先、自动容灾 |
+| **surge.conf** | Surge 配置 | Surge | url-test + 正则分组 | ~15 | macOS / iOS Surge 客户端 |
+
+> [!NOTE]
+> **两套 Mihomo 模板的核心区别**：
+> - **OneSmartPro** 使用 Mihomo 最新的 `smart` 策略组类型，通过 `policy-priority` 进行**多维度加权打分**（协议、地区、质量标签），每个场景只需一个策略组即可智能决策。
+> - **FallBackPro** 使用传统的 `fallback` + `url-test` 组合，每个地区/场景拆分为「故转 → 自动/手动」**三层嵌套**，更加稳健但策略组数量更多。
 
 ### 4.2 核心变量说明
 
@@ -350,6 +351,7 @@ graph TD
 | `${SB_UUID}` | Sing-box UUID | `yyyy-yyyy-yyyy` |
 | `${PORT_HYSTERIA2}` | Hysteria2 端口 | `30001` |
 | `${PORT_TUIC}` | TUIC 端口 | `30002` |
+| `${PORT_ANYTLS}` | AnyTLS 端口 | `30003` |
 | `${XRAY_REALITY_PUBLIC_KEY}` | Reality 公钥 | `abcd1234...` |
 | `${XRAY_URL_PATH}` | WebSocket/XHTTP 路径 | `random32chars` |
 | `${CLASH_PROXY_PROVIDERS}` | 订阅源配置 | YAML 格式字符串 |

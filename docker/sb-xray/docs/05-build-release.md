@@ -1,6 +1,6 @@
-# 05. 构建部署指南
+# 05. 构建部署与版本发布指南
 
-> 本文档详细解析 SB-Xray Docker 镜像的完整构建流程，包括环境准备、自动化构建脚本、四阶段 Dockerfile 架构以及常见构建问题。
+> 本文档详细解析 SB-Xray Docker 镜像的完整构建流程，包括环境准备、自动化构建脚本、四阶段 Dockerfile 架构、常见构建问题，以及 Git Release 自动化版本发布机制。
 
 ---
 
@@ -12,6 +12,7 @@
 4. [组件版本管理](#4-组件版本管理)
 5. [手动精细构建](#5-手动精细构建)
 6. [常见构建问题 FAQ](#6-常见构建问题-faq)
+7. [Git Release 版本发布](#7-git-release-版本发布releasesh)
 
 ---
 
@@ -325,3 +326,93 @@ docker run --rm currycan/sb-xray:latest bash -c "
 1. 确认 UPX 压缩正常执行
 2. 确认使用 `--no-cache` 的 `apk add`
 3. 多阶段构建已自动丢弃中间层
+
+---
+
+## 7. Git Release 版本发布（release.sh）
+
+`release.sh` 负责将项目的 Git Release 版本号与 Docker 镜像版本（即 Xray 版本号）保持**自动同步**。
+
+### 7.1 版本同步策略
+
+本项目的版本号直接对齐 **Xray-core 最新 Tag**，确保三者一致：
+
+| 标识 | 格式 | 示例 |
+|:---|:---|:---|
+| Xray-core Tag | `vX.Y.Z` | `v26.2.6` |
+| Docker 镜像 Tag | `X.Y.Z` (无 `v` 前缀) | `26.2.6` |
+| Git Release Tag | `vX.Y.Z` | `v26.2.6` |
+
+### 7.2 基本用法
+
+```bash
+# 自动获取最新 Xray 版本，创建对应 Git Tag 和 GitHub Release
+./release.sh
+
+# 推荐配置 GitHub Token 以避免 API 限流
+export GITHUB_TOKEN=ghp_xxxxxxxxxxxxxxxxxxxx
+./release.sh
+```
+
+### 7.3 工作流程
+
+```mermaid
+flowchart TD
+    Start(["./release.sh"]) --> Fetch["调用 GitHub API<br/>获取 Xray 最新 Tag"]
+    Fetch --> Valid{"版本获取成功?"}
+    Valid -- 否 --> Abort(["❌ 取消发布"])
+    Valid -- 是 --> CalcTag["计算版本号<br/>v26.2.6 → Git Tag: v26.2.6<br/>Docker Tag: 26.2.6"]
+
+    CalcTag --> LocalTag{"本地 Tag<br/>已存在?"}
+    LocalTag -- 是 --> SkipTag["跳过本地 Tag 创建"]
+    LocalTag -- 否 --> CreateTag["git tag -a vX.Y.Z"]
+
+    SkipTag --> GhCli
+    CreateTag --> GhCli{"gh CLI<br/>可用?"}
+
+    GhCli -- 是 --> RemoteCheck{"远端 Release<br/>已存在?"}
+    RemoteCheck -- 是 --> Done(["✅ 无需操作"])
+    RemoteCheck -- 否 --> Push1["git push origin tag"] --> CreateRelease["gh release create"]
+    CreateRelease --> Done2(["✅ Release 创建成功"])
+
+    GhCli -- 否 --> Push2["git push origin tag"] --> Manual(["⚠️ 请手动创建 Release"])
+
+    style Abort fill:#ff6b6b,color:white
+    style Done fill:#95e1d3
+    style Done2 fill:#4ecdc4,color:white
+    style Manual fill:#ffeaa7
+```
+
+### 7.4 详细流程说明
+
+| 步骤 | 动作 | 说明 |
+|:---:|:---|:---|
+| 1 | 获取 Xray 最新版本 | 通过 GitHub API `/repos/XTLS/Xray-core/tags` 获取最新 Tag |
+| 2 | 计算 Release Tag | 去除/添加 `v` 前缀以匹配 Docker 与 Git 两种命名规范 |
+| 3 | 创建本地 Git Tag | 使用 `git tag -a` 创建附注标签（annotated tag） |
+| 4a | 推送 + 创建 Release | 若检测到 `gh` CLI → 自动推送标签并创建 GitHub Release |
+| 4b | 仅推送标签 | 若无 `gh` CLI → 推送标签后提示用户手动创建 Release |
+
+### 7.5 幂等性保障
+
+`release.sh` 设计为**可重复执行**，不会产生副作用：
+
+* **本地 Tag 已存在** → 跳过创建，不报错
+* **远端 Release 已存在** → 跳过创建，不报错
+* **获取版本失败** → 立即中止，不执行任何 Git 操作
+
+### 7.6 与 build.sh 的关系
+
+```mermaid
+graph LR
+    Build["build.sh<br/>构建 Docker 镜像"] -- "镜像 Tag: 26.2.6" --> Registry["Docker Hub"]
+    Release["release.sh<br/>发布 Git Release"] -- "Git Tag: v26.2.6" --> GitHub["GitHub Releases"]
+    API(("GitHub API<br/>Xray 版本")) --> Build
+    API --> Release
+
+    style Build fill:#74b9ff,color:white
+    style Release fill:#a29bfe,color:white
+    style API fill:#ffeaa7
+```
+
+两个脚本共享同一版本源（Xray-core 最新 Tag），确保 Docker 镜像版本与 Git Release 版本始终一致。推荐在成功执行 `build.sh` 后运行 `release.sh`。

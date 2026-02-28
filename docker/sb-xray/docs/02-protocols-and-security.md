@@ -141,12 +141,23 @@ graph LR
 另一种基于 QUIC 的高性能协议。
 
 * **连接方式**: UDP / 独立高位端口
+
+#### 流量图解
+
+```mermaid
+graph LR
+    User((客户端)) -- "UDP 高位端口" --> Singbox(("Sing-box 核心"))
+    Singbox -- "TUIC V5 / QUIC" --> Internet((互联网))
+```
+
+#### 客户端配置
+
 * **URL 示例**:
   ```
   tuic://${SB_UUID}:${SB_UUID}@${DOMAIN}:${PORT_TUIC}?alpn=h3&insecure=1&congestion_control=bbr#${NODE_NAME}✈TUIC✈good${NODE_SUFFIX}
   ```
-* **服务端配置文件**: `templates/sing-box/12_tuic_inbounds.json`
-* **路径**: **直连**
+* **服务端配置文件**: `templates/sing-box/02_tuic_inbounds.json`
+* **路径**: **直连**（不经过 Nginx，不经过 Xray）
 
 ---
 
@@ -155,12 +166,23 @@ graph LR
 伪装成任意 HTTPS 流量的 TCP 协议。
 
 * **连接方式**: TCP / 独立高位端口
+
+#### 流量图解
+
+```mermaid
+graph LR
+    User((客户端)) -- "TCP 高位端口 TLS" --> Singbox(("Sing-box 核心"))
+    Singbox -- "AnyTLS 流量" --> Internet((互联网))
+```
+
+#### 客户端配置
+
 * **URL 示例**:
   ```
   anytls://${SB_UUID}@${DOMAIN}:${PORT_ANYTLS}?security=tls&allowInsecure=1&type=tcp#${NODE_NAME}✈AnyTLS✈good${NODE_SUFFIX}
   ```
-* **服务端配置文件**: `templates/sing-box/13_anytls_inbounds.json`
-* **路径**: **直连**
+* **服务端配置文件**: `templates/sing-box/03_anytls_inbounds.json`
+* **路径**: **直连**（不经过 Nginx，不经过 Xray）
 
 ---
 
@@ -267,11 +289,37 @@ graph LR
 
 * **模式**: 上行直连，下行走 CDN
 * **特点**: 保护服务器出站 IP 不被长时间占用
+* **流量图解**:
+  ```mermaid
+  graph TB
+      User((客户端))
+      NginxStream["Nginx Stream"]
+      NginxWeb["Nginx Web"]
+      Reality(("Xray Reality"))
+      Xray(("Xray 核心"))
+      CDN["Cloudflare/CDN"]
+
+      User -- "1. 上行 Reality SNI: 伪装域名" --> NginxStream
+      NginxStream -- "udsreality.sock" --> Reality
+      Reality -- "Fallback gRPC" --> NginxWeb
+      NginxWeb -- "grpc_pass" --> Xray
+
+      Xray -- "2. 下行 TLS+CDN" --> CDN
+      CDN -- "HTTPS" --> User
+  ```
 
 #### 1.6.4 全程 CDN (Full CDN)
 
 * **模式**: 双向都走 CDN
 * **特点**: IP 彻底被阻断时的**最终保底方案**
+* **流量图解**:
+  ```mermaid
+  graph LR
+      User((客户端)) -- "HTTPS" --> CDN["Cloudflare/CDN"]
+      CDN -- "TCP 443 SNI: CDN域名" --> NginxStream["Nginx Stream"]
+      NginxStream -- "cdnh2.sock" --> NginxWeb["Nginx Web"]
+      NginxWeb -- "grpc_pass" --> Xray(("Xray 核心"))
+  ```
 
 #### 1.6.5 XHTTP 服务端机制
 
@@ -279,6 +327,21 @@ XHTTP 同时利用了 **Nginx 双监听架构** 和 **Xray Fallback 机制**：
 
 1. **Reality 直连通道**: 用户 → Reality (解密) → Fallback → `nginx.sock` → Nginx 识别路径 → `grpc_pass` → `udsxhttp.sock`
 2. **CDN/标准 HTTPS 通道**: 用户 → `cdnh2.sock` → Nginx SSL 解密 → `grpc_pass` → `udsxhttp.sock`
+
+```mermaid
+graph TB
+    User1((直连用户)) -- "TCP 443 SNI: 伪装域名" --> NginxStream["Nginx Stream"]
+    NginxStream -- "udsreality.sock" --> Reality(("Xray Reality"))
+    Reality -- "Fallback" --> NginxSock["nginx.sock<br/>Nginx Web"]
+    NginxSock -- "grpc_pass" --> Xhttp
+
+    User2((CDN 用户)) -- "HTTPS" --> CDN["Cloudflare/CDN"]
+    CDN -- "TCP 443 SNI: CDN域名" --> NginxStream
+    NginxStream -- "cdnh2.sock" --> NginxWeb["Nginx Web<br/>SSL 解密"]
+    NginxWeb -- "grpc_pass" --> Xhttp(("udsxhttp.sock<br/>Xray Xhttp"))
+
+    Xhttp --> Internet((互联网))
+```
 
 同一个 Xray 入站接口 (`udsxhttp.sock`) 可以同时服务于**直连用户**和 **CDN 用户**。
 
@@ -539,6 +602,30 @@ volumes:
 * **开机检查**: 每次容器启动自动检查证书有效期，不足 30 天触发续期
 * **定时检查**: 内置 `acme.sh` 守护进程定期续期
 * **证书覆盖**: 泛域名证书 `*.example.com` + 主域名 `example.com`
+
+#### 证书签发流程图解
+
+```mermaid
+flowchart TD
+    Start([容器启动]) --> CheckExist{证书文件<br/>是否存在?}
+    CheckExist -- 不存在 --> Register
+    CheckExist -- 存在 --> CheckExpiry{有效期<br/>≥ 7 天?}
+    CheckExpiry -- 是 --> Skip([跳过续期<br/>继续启动])
+    CheckExpiry -- 否 --> Register
+
+    Register[注册 CA 账户<br/>ZeroSSL / Google / LE] --> EAB{Google CA?}
+    EAB -- 是 --> EABCheck{EAB 凭据<br/>已配置?}
+    EABCheck -- 否 --> Error([❌ 中止启动])
+    EABCheck -- 是 --> Issue
+    EAB -- 否 --> Issue
+
+    Issue[acme.sh --issue --ecc<br/>DNS 验证签发泛域名证书] --> Install[安装证书到 SSL_PATH<br/>fullchain + key + ca]
+    Install --> Reload[重载 Nginx] --> Done([✅ 证书就绪])
+
+    style Error fill:#ff6b6b,color:white
+    style Done fill:#4ecdc4,color:white
+    style Skip fill:#95e1d3
+```
 
 ### 4.4 证书常见问题
 
