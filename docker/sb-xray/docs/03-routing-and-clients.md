@@ -273,22 +273,20 @@ proxy-groups:
 
 ```mermaid
 graph TD
-    A["输入: 原始混杂的 Proxy 节点列表"] --> B("第一阶段: 数据清理与标准化")
+    A["输入: 原始混杂的 Proxy 节点列表"] --> F0
 
-    subgraph 核心处理流水线
-        B --> C{"过滤无效节点"}
-        C -- "有效节点" --> D{"预格式化判断"}
-        D -- "已格式化" --> H("直接保留")
-        D -- "需处理" --> E["基础字符清洗"]
-        E --> F["地名标准化"]
-        F --> G["深度拆分与去重"]
-        G --> I["动态挂载国旗"]
+    subgraph Pipeline
+        F0["Pipeline.filter: 过滤无效节点"] --> F1
+        F1{"Pipeline.format: 预格式化判断"}
+        F1 -- "已含 ✈" --> PF["processPreFormatted: 轻量清理"]
+        F1 -- "其余节点" --> PR["processRawNode: 完整清洗流水线"]
+        PF --> S
+        PR --> S
+        S["Pipeline.sort: 地区优先级排序"] --> R
+        R["Pipeline.renumber: 重编号与最终输出"]
     end
 
-    H --> L("第二阶段: 节点排序")
-    I --> L
-    L --> M("第三阶段: 重新编号与组装")
-    M --> Z["输出: 标准化的 Proxy 节点列表"]
+    R --> Z["输出: 标准化的 Proxy 节点列表"]
 
     style A fill:#f9f,stroke:#333,stroke-width:2px
     style Z fill:#6f9,stroke:#333,stroke-width:2px
@@ -298,17 +296,19 @@ graph TD
 
 | 阶段 | 动作 | 说明 |
 |:---|:---|:---|
-| **去重与过滤** | `INVALID_REGEX` | 彻底拦截含"距离/套餐/到期/剩余"等无关信息的无效节点 |
-| **地名统一归化** | `RegionMap` | 将 `Hong Kong`、`HK`、`深港` 统一为 `香港` |
-| **视觉美化** | `detectFlag` | 自动挂载国旗 Emoji，按 `-` 拆分地区与细节，协议名追加为后缀 |
-| **协议精简** | 互斥剔除 | 有 `Reality` 则隐藏 `vless`，避免冗余 |
+| **去重与过滤** | `Pipeline.filter` | 彻底拦截含"距离/套餐/到期/剩余"等无关信息的无效节点 |
+| **地名统一归化** | `Utils.standardizeRegion` | 将 `Hong Kong`、`HK`、`深港` 统一为 `香港` |
+| **视觉美化** | `Utils.detectFlag` | 自动挂载国旗 Emoji，格式化为 `Flag Protocol ✈ Region ✈ Detail` |
+| **协议精简** | `Utils.shouldHideProtocol` | 有 `Reality` 则隐藏 `vless`，避免冗余 |
 
 ### 3.3 处理效果对比
 
 | 原始命名 | 清洗后结果 |
 |:---|:---|
 | `![使用教程与联系客服].txt` | **（自动剔除）** |
-| `🇭🇰 香港01-深港IEPL` (ss) | `🇭🇰 香港 ✈ 深港IEPL ✈ ss` |
+| `🇭🇰 香港01-深港IEPL` (ss) | `🇭🇰 ss ✈ 香港` |
+| `🇭🇰 Hong Kong丨01` (ss) | `🇭🇰 ss ✈ 香港` |
+| `🇭🇰香港[1]✈原生家庭(协议一)` (ss) | `🇭🇰 ss ✈ 香港 ✈ 原生家庭` |
 | `✨🇭🇰 香港 01 x1.5 \| IPLC -- Reality` | `🇭🇰 Reality ✈ IPLC ✈ 香港 ✈ 1.5×` |
 | `🇺🇸美国洛杉矶v6 08 🎯 udp` | `🇺🇸 IPv6 美国 ✈ UDP ✈ 洛杉矶` |
 | `Taiwan-Hsinchu-02-1.0倍` | `🇹🇼 台湾 ✈ 1× ✈ 新竹` |
