@@ -114,6 +114,8 @@ proxy-groups:
   - {name: 国际媒体,    <<: *SelectMedia, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/DomesticMedia.png}
   - {name: 新闻媒体,    <<: *SelectMedia, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Apple_News.png}
   # ==================== AI 服务 ====================
+  - {name: Claude,     <<: *SelectAI,    icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Bot.png}
+  - {name: Gemini,     <<: *SelectAI,    icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Google_Search.png}
   - {name: 人工智能,    <<: *SelectAI,    icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/AI.png}
   # ==================== 社交平台 ====================
   - {name: 推特社交,    <<: *SelectISP,    icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/X.png}
@@ -204,12 +206,12 @@ rules:
   - RULE-SET,Streaming / Domain,国际媒体
   - RULE-SET,StreamingIP / IP,国际媒体,no-resolve
   # AI
+  - RULE-SET,Claude / Domain,Claude
+  - RULE-SET,Gemini / Domain,Gemini
+  - RULE-SET,Google / Domain,Gemini
+  - RULE-SET,GoogleIP / IP,Gemini,no-resolve
   - RULE-SET,ChatGPT / Domain,人工智能
-  - RULE-SET,Claude / Domain,人工智能
   - RULE-SET,Copilot / Domain,人工智能
-  - RULE-SET,Gemini / Domain,人工智能
-  - RULE-SET,Google / Domain,人工智能
-  - RULE-SET,GoogleIP / IP,人工智能,no-resolve
   - RULE-SET,Groq / Domain,人工智能
   - RULE-SET,Grok / Domain,人工智能
   - RULE-SET,Meta AI / Domain,人工智能
