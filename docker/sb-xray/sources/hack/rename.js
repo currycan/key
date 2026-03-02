@@ -582,26 +582,48 @@ function operator(proxies) {
         .map(p => {
             let name = p.name;
             const protocol = p.type ? p.type.toLowerCase() : "unknown";
-
-            // [新增能力] 初步判断：是否已完全满足我们的终极格式规范？
-            // 校验格式并提取关键部位以供后期统一重新编号： Emoji + 空格 + 协议名(可选) + ✈(如果含协议) + Region(不含[数字]) + [数字] + ✈ + 内容
-            const standardMatch = name.match(/^([\uD83C][\uDDE6-\uDDFF][\uD83C][\uDDE6-\uDDFF])\s+(?:([A-Za-z0-9]+)\s*✈\s*)?([^✈\[\]\|]+?)(?:\s*\[\d+\])(?:(?:\s*✈\s*|\s*\|\s*)(.*))?$/);
-
-            if (standardMatch) {
-                p.isPreFormatted = true;
-                p.flag = standardMatch[1];
-                p.protocol = standardMatch[2] || p.protocol;
-                p.name = `${p.flag} ${p.protocol && p.protocol !== "unknown" ? p.protocol + ' ✈ ' : ''}${standardMatch[3]}${standardMatch[4] ? ' ✈ ' + standardMatch[4].trim() : ''}`;
-                return p;
+            // 预处理：提取 Emoji
+            let preFlag = "";
+            let remainingName = name;
+            const emojiMatch = name.match(/^([\uD83C][\uDDE6-\uDDFF][\uD83C][\uDDE6-\uDDFF])\s*(.*)$/);
+            if (emojiMatch) {
+                preFlag = emojiMatch[1];
+                remainingName = emojiMatch[2];
             }
 
-            // [兼容旧逻辑] 若不满足终极规范，尝试匹配：Emoji + 空格 + Region(不含[数字]) + [数字] + ✈ + 内容
-            const legacyMatch = name.match(/^([\uD83C][\uDDE6-\uDDFF][\uD83C][\uDDE6-\uDDFF])\s+([^✈\[\]\|]+?)(?:\[\d+\])?(?:(?:\s*✈\s*|\s*\|\s*)(.*))?$/);
-            if (legacyMatch) {
-                p.isPreFormatted = true;
-                p.flag = legacyMatch[1];
-                p.name = `${p.flag} ${p.protocol && p.protocol !== "unknown" ? p.protocol + ' ✈ ' : ''}${legacyMatch[2].trim()}${legacyMatch[3] ? ' ✈ ' + legacyMatch[3].trim() : ''}`;
-                return p;
+            // 新增：极其智能的预格式化与简单命名兼容逻辑
+            if (preFlag) {
+                // 判断是否已经是终极标准格式：Flag Protocol ✈ Name ✈ Suffix
+                // 或者只是含 Emoji 的简单名字： 🇭🇰 香港01-深港IEPL
+                const hasFlightSeparator = remainingName.includes('✈');
+
+                if (hasFlightSeparator) {
+                    p.isPreFormatted = true;
+                    p.flag = preFlag;
+                    // 分割并处理，确保有 Protocol 前缀
+                    let parts = remainingName.split('✈').map(s => s.trim()).filter(s => s !== '');
+                    let firstPart = parts[0].toLowerCase();
+
+                    // 如果第一段不是协议，我们强制加上去
+                    let hasProtocol = /vless|vmess|trojan|shadowsocks|ss|ssr|tuic|hysteria2|reality/i.test(firstPart);
+                    let finalProtocolPrefix = hasProtocol ? parts.shift() : (p.protocol && p.protocol !== "unknown" ? p.protocol : "");
+
+                    let newNameStr = parts.join(' ✈ ');
+                    p.name = `${p.flag} ${finalProtocolPrefix ? finalProtocolPrefix + ' ✈ ' : ''}${newNameStr}`;
+                    return p;
+                } else {
+                     // 没有 ✈ 分隔符的简单节点 (例如 "🇭🇰 香港01-深港IEPL")
+                     // 我们同样希望变成 `Flag Protocol ✈ 原始名字`，防止它被错误地深度肢解
+                     p.isPreFormatted = true;
+                     p.flag = preFlag;
+                     let finalContent = remainingName;
+
+                     // 把旧有数字如 "香港01" 的编号剃掉，保持美观
+                     finalContent = finalContent.replace(/\d{1,2}(?=-|$)/, '').trim();
+
+                     p.name = `${p.flag} ${p.protocol && p.protocol !== "unknown" ? p.protocol + ' ✈ ' : ''}${finalContent}`;
+                     return p;
+                }
             }
 
             // Step 1: 基础清理
