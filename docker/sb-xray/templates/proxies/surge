@@ -1,6 +1,6 @@
 # Hysteria2
-${REGION_INFO}✈${NODE_NAME}✈Hysteria2${NODE_SUFFIX}=hysteria2,${DOMAIN},${PORT_HYSTERIA2},password=${SB_UUID},skip-cert-verify=false,download-bandwidth=2500
+Hysteria2 ✈ ${REGION_INFO} ✈ ${NODE_NAME}${NODE_SUFFIX}=hysteria2,${DOMAIN},${PORT_HYSTERIA2},password=${SB_UUID},skip-cert-verify=false,download-bandwidth=2500
 # TUICv5
-${REGION_INFO}✈${NODE_NAME}✈TUIC${NODE_SUFFIX}=tuic-v5,${DOMAIN},${PORT_TUIC},uuid=${SB_UUID},password=${SB_UUID},alpn=h3,sni=off,skip-cert-verify=false
+TUIC ✈ ${REGION_INFO} ✈ ${NODE_NAME}${NODE_SUFFIX}=tuic-v5,${DOMAIN},${PORT_TUIC},uuid=${SB_UUID},password=${SB_UUID},alpn=h3,sni=off,skip-cert-verify=false
 # VMESS TLS WS
-${REGION_INFO}✈${NODE_NAME}✈Vmess${NODE_SUFFIX}=vmess,${CDNDOMAIN},${LISTENING_PORT},username=${XRAY_UUID},tls=true,sni=${CDNDOMAIN},skip-cert-verify=false,ws=true,ws-path=/${XRAY_URL_PATH}-vmessws,ws-headers=Host:${CDNDOMAIN},vmess-aead=true,udp-relay=true
+Vmess ✈ ${REGION_INFO} ✈ ${NODE_NAME}${NODE_SUFFIX}=vmess,${CDNDOMAIN},${LISTENING_PORT},username=${XRAY_UUID},tls=true,sni=${CDNDOMAIN},skip-cert-verify=false,ws=true,ws-path=/${XRAY_URL_PATH}-vmessws,ws-headers=Host:${CDNDOMAIN},vmess-aead=true,udp-relay=true

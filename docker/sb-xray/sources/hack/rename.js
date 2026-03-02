@@ -599,7 +599,7 @@ function operator(proxies) {
 
                 // 为了让它能和平常节点一样参与后面的排序和重编号，伪造最终所需形式
                 // 注意这里必须用 ✈ 拼接，因为 Phase 3 已经统一按 ✈ 来寻找 planeIndex 切片了以剥离国名和后缀了！
-                p.name = p.protocol && p.protocol !== "unknown" ? `${p.flag} ${p.processedName} ✈ ${p.protocol}` : `${p.flag} ${p.processedName}`;
+                p.name = p.protocol && p.protocol !== "unknown" ? `${p.protocol} ✈ ${p.flag} ${p.processedName}` : `${p.flag} ${p.processedName}`;
                 return p;
             }
 
@@ -652,7 +652,7 @@ function operator(proxies) {
             p.protocol = protocol;
 
             // 暂存完整名称用于排序
-            p.name = multiplier ? `${flag} ${tempName} ✈ ${multiplier.trim()} ✈ ${protocol}` : `${flag} ${tempName} ✈ ${protocol}`;
+            p.name = multiplier ? `${protocol} ✈ ${flag} ${tempName} ✈ ${multiplier.trim()}` : `${protocol} ✈ ${flag} ${tempName}`;
 
             return p;
         })
@@ -753,7 +753,7 @@ function operator(proxies) {
             }
 
             if (shouldAddProtocol) {
-                extras.push(p.protocol);
+                newName = `${p.protocol} ✈ ${newName}`;
             }
         }
 

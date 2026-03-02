@@ -133,7 +133,7 @@ services:
       - XUI_WEBBASEPATH=3xadmin                     # X-UI 面板访问路径
       # Gemini 直连策略: true=直连, false=使用代理, 空=自动判断
       - GEMINI_DIRECT=
-      # 节点名称后缀 (如: ✈高速)
+      # 节点名称后缀 (如: ✈ 高速)
       - NODE_SUFFIX=
       # ISP 落地代理: 留空则不启用
       - DEFAULT_ISP=
@@ -203,7 +203,7 @@ docker compose up -d
 | `DECODE` | *空* | 自定义解码密钥 |
 | `DEST_HOST` | `www.microsoft.com` | Reality 伪装目标站点（推荐 `speed.cloudflare.com`） |
 | `LISTENING_PORT` | `443` | 主监听端口 |
-| `NODE_SUFFIX` | *空* | 节点名称后缀（如 `✈高速`），会附加在所有生成的节点名后 |
+| `NODE_SUFFIX` | *空* | 节点名称后缀（如 ` ✈ 高速`），会附加在所有生成的节点名后 |
 
 #### 证书配置
 

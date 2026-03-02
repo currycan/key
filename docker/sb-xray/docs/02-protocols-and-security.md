@@ -57,7 +57,7 @@ graph LR
 * **连接方式**: TCP / 443 端口
 * **URL 示例**:
   ```
-  vless://${XRAY_UUID}@${DOMAIN}:${LISTENING_PORT}?encryption=none&flow=xtls-rprx-vision&security=reality&sni=${DEST_HOST}&fp=chrome&pbk=${XRAY_REALITY_PUBLIC_KEY}&sid=${XRAY_REALITY_SHORTID}&type=tcp&headerType=none#${NODE_NAME}✈Reality✈super${NODE_SUFFIX}
+  vless://${XRAY_UUID}@${DOMAIN}:${LISTENING_PORT}?encryption=none&flow=xtls-rprx-vision&security=reality&sni=${DEST_HOST}&fp=chrome&pbk=${XRAY_REALITY_PUBLIC_KEY}&sid=${XRAY_REALITY_SHORTID}&type=tcp&headerType=none#Reality ✈ ${NODE_NAME} ✈ super${NODE_SUFFIX}
   ```
 * **核心参数**:
   * `flow`: `xtls-rprx-vision`（必须）
@@ -97,7 +97,7 @@ graph LR
 * **连接方式**: UDP / 独立高位端口
 * **URL 示例**:
   ```
-  hysteria2://${SB_UUID}@${DOMAIN}:${PORT_HYSTERIA2}/?alpn=h3&insecure=1#${NODE_NAME}✈Hysteria2✈super${NODE_SUFFIX}
+  hysteria2://${SB_UUID}@${DOMAIN}:${PORT_HYSTERIA2}/?alpn=h3&insecure=1#Hysteria2 ✈ ${NODE_NAME} ✈ super${NODE_SUFFIX}
   ```
 * **核心参数**:
   * `insecure`: `1`（自签名证书需开启跳过验证）
@@ -154,7 +154,7 @@ graph LR
 
 * **URL 示例**:
   ```
-  tuic://${SB_UUID}:${SB_UUID}@${DOMAIN}:${PORT_TUIC}?alpn=h3&insecure=1&congestion_control=bbr#${NODE_NAME}✈TUIC✈good${NODE_SUFFIX}
+  tuic://${SB_UUID}:${SB_UUID}@${DOMAIN}:${PORT_TUIC}?alpn=h3&insecure=1&congestion_control=bbr#TUIC ✈ ${NODE_NAME} ✈ good${NODE_SUFFIX}
   ```
 * **服务端配置文件**: `templates/sing-box/02_tuic_inbounds.json`
 * **路径**: **直连**（不经过 Nginx，不经过 Xray）
@@ -179,7 +179,7 @@ graph LR
 
 * **URL 示例**:
   ```
-  anytls://${SB_UUID}@${DOMAIN}:${PORT_ANYTLS}?security=tls&allowInsecure=1&type=tcp#${NODE_NAME}✈AnyTLS✈good${NODE_SUFFIX}
+  anytls://${SB_UUID}@${DOMAIN}:${PORT_ANYTLS}?security=tls&allowInsecure=1&type=tcp#AnyTLS ✈ ${NODE_NAME} ✈ good${NODE_SUFFIX}
   ```
 * **服务端配置文件**: `templates/sing-box/03_anytls_inbounds.json`
 * **路径**: **直连**（不经过 Nginx，不经过 Xray）
@@ -209,7 +209,7 @@ graph LR
   ```json
   {
     "v": "2",
-    "ps": "${NODE_NAME}✈Vmess✈${NODE_SUFFIX}",
+    "ps": "Vmess ✈ ${NODE_NAME}${NODE_SUFFIX}",
     "add": "${CDNDOMAIN}",
     "port": "${LISTENING_PORT}",
     "id": "${XRAY_UUID}",
@@ -252,7 +252,7 @@ graph LR
 * **特点**: 速度最快，延迟最低
 * **URL 示例**:
   ```
-  vless://${XRAY_UUID}@${DOMAIN}:${LISTENING_PORT}?encryption=mlkem768x25519plus.native.600s.${XRAY_MLKEM768_SEED}&security=reality&sni=${DEST_HOST}&fp=chrome&pbk=${XRAY_REALITY_PUBLIC_KEY}&sid=${XRAY_REALITY_SHORTID}&type=xhttp&path=/${XRAY_URL_PATH}-xhttp&mode=auto#${NODE_NAME}✈Xhttp+Reality直连✈super${NODE_SUFFIX}
+  vless://${XRAY_UUID}@${DOMAIN}:${LISTENING_PORT}?encryption=mlkem768x25519plus.native.600s.${XRAY_MLKEM768_SEED}&security=reality&sni=${DEST_HOST}&fp=chrome&pbk=${XRAY_REALITY_PUBLIC_KEY}&sid=${XRAY_REALITY_SHORTID}&type=xhttp&path=/${XRAY_URL_PATH}-xhttp&mode=auto#Xhttp+Reality直连 ✈ ${NODE_NAME} ✈ super${NODE_SUFFIX}
   ```
 * **流量图解**:
   ```mermaid

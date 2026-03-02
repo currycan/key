@@ -961,6 +961,13 @@ generateProxyProvidersConfig() {
         fi
     fi
     export SURGE_PROVIDER_NAMES="${surge_names}"
+
+    # Stash 模板使用 use: [provider1, provider2] 引用节点，需提取所有 provider 名称
+    local stash_names=""
+    if [ -n "${clash_providers}" ]; then
+        stash_names=$(echo "${clash_providers}" | awk -F':' 'NF>=2 && $1 !~ /^[[:space:]]*#/ {name=$1; gsub(/^[ \t]+|[ \t]+$/, "", name); if (name != "") print name}' | paste -sd ", " -)
+    fi
+    export STASH_PROVIDER_NAMES="${stash_names}"
 }
 
 
