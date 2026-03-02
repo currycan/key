@@ -1,5 +1,5 @@
 proxies:
-  - name: Hysteria2 ✈ ${REGION_INFO} ✈ ${NODE_NAME}${NODE_SUFFIX}
+  - name: ${FLAG_PREFIX}Hysteria2 ✈ ${NODE_NAME}${NODE_SUFFIX}
     type: hysteria2
     server: ${DOMAIN}
     port: ${PORT_HYSTERIA2}
@@ -10,7 +10,7 @@ proxies:
     password: ${SB_UUID}
     skip-cert-verify: false
 
-  - name: TUIC ✈ ${REGION_INFO} ✈ ${NODE_NAME}${NODE_SUFFIX}
+  - name: ${FLAG_PREFIX}TUIC ✈ ${NODE_NAME}${NODE_SUFFIX}
     type: tuic
     server: ${DOMAIN}
     port: ${PORT_TUIC}
@@ -26,7 +26,7 @@ proxies:
     skip-cert-verify: false
     version: 5
 
-  - name: AnyTLS ✈ ${REGION_INFO} ✈ ${NODE_NAME}${NODE_SUFFIX}
+  - name: ${FLAG_PREFIX}AnyTLS ✈ ${NODE_NAME}${NODE_SUFFIX}
     type: anytls
     server: ${DOMAIN}
     port: ${PORT_ANYTLS}
@@ -37,7 +37,7 @@ proxies:
     idle-session-timeout: 30
     skip-cert-verify: false
 
-  - name: Vmess ✈ ${REGION_INFO} ✈ ${NODE_NAME}${NODE_SUFFIX}
+  - name: ${FLAG_PREFIX}Vmess ✈ ${NODE_NAME}${NODE_SUFFIX}
     type: vmess
     server: ${CDNDOMAIN}
     port: ${LISTENING_PORT}
@@ -56,7 +56,7 @@ proxies:
       path: /${XRAY_URL_PATH}-vmessws
     servername: ${CDNDOMAIN}
 
-  - name: Reality ✈ ${REGION_INFO} ✈ ${NODE_NAME}${NODE_SUFFIX}
+  - name: ${FLAG_PREFIX}Reality ✈ ${NODE_NAME}${NODE_SUFFIX}
     type: vless
     server: ${DOMAIN}
     port: ${LISTENING_PORT}
@@ -72,7 +72,7 @@ proxies:
     network: tcp
     servername: ${DEST_HOST}
 
-  - name: Xhttp+Reality直连 ✈ ${REGION_INFO} ✈ ${NODE_NAME}${NODE_SUFFIX}
+  - name: ${FLAG_PREFIX}Xhttp+Reality直连 ✈ ${NODE_NAME}${NODE_SUFFIX}
     type: vless
     server: ${DOMAIN}
     port: ${LISTENING_PORT}
@@ -95,7 +95,7 @@ proxies:
     servername: ${DEST_HOST}
     encryption: mlkem768x25519plus.native.0rtt.${XRAY_MLKEM768_CLIENT}
 
-  - name: 上行Xhttp+TLS+CDN ✈ 下行Xhttp+Reality ✈ ${REGION_INFO} ✈ ${NODE_NAME}${NODE_SUFFIX}
+  - name: ${FLAG_PREFIX}上行Xhttp+TLS+CDN下行Xhttp+Reality ✈ ${NODE_NAME}${NODE_SUFFIX}
     type: vless
     server: ${CDNDOMAIN}
     port: ${LISTENING_PORT}
@@ -131,7 +131,7 @@ proxies:
     servername: ${CDNDOMAIN}
     encryption: mlkem768x25519plus.native.0rtt.${XRAY_MLKEM768_CLIENT}
 
-  - name: 上行Xhttp+Reality ✈ 下行Xhttp+TLS+CDN ✈ ${REGION_INFO} ✈ ${NODE_NAME}${NODE_SUFFIX}
+  - name: ${FLAG_PREFIX}上行Xhttp+Reality下行Xhttp+TLS+CDN ✈ ${NODE_NAME}${NODE_SUFFIX}
     type: vless
     server: ${DOMAIN}
     port: ${LISTENING_PORT}
@@ -167,7 +167,7 @@ proxies:
     servername: ${DEST_HOST}
     encryption: mlkem768x25519plus.native.0rtt.${XRAY_MLKEM768_CLIENT}
 
-  - name: Xhttp+TLS+CDN上下行不分离 ✈ ${REGION_INFO} ✈ ${NODE_NAME}${NODE_SUFFIX}
+  - name: ${FLAG_PREFIX}Xhttp+TLS+CDN上下行不分离 ✈ ${NODE_NAME}${NODE_SUFFIX}
     type: vless
     server: ${CDNDOMAIN}
     port: ${LISTENING_PORT}

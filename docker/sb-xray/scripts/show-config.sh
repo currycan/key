@@ -18,6 +18,50 @@ mkdir -p "${WORKDIR}/subscribe"
 export NODE_NAME="${DOMAIN%%.*}"
 export NODE_IP="${GEOIP_INFO#*|}"
 export REGION_INFO="${GEOIP_INFO%%|*}"
+
+get_flag_emoji() {
+    case "$1" in
+        *"香港"*|*"Hong Kong"*) echo "🇭🇰" ;;
+        *"台湾"*|*"Taiwan"*) echo "🇹🇼" ;;
+        *"日本"*|*"Japan"*) echo "🇯🇵" ;;
+        *"新加坡"*|*"Singapore"*) echo "🇸🇬" ;;
+        *"美国"*|*"United States"*) echo "🇺🇸" ;;
+        *"韩国"*|*"Korea"*) echo "🇰🇷" ;;
+        *"英国"*|*"United Kingdom"*) echo "🇬🇧" ;;
+        *"德国"*|*"Germany"*) echo "🇩🇪" ;;
+        *"法国"*|*"France"*) echo "🇫🇷" ;;
+        *"加拿大"*|*"Canada"*) echo "🇨🇦" ;;
+        *"澳大利亚"*|*"Australia"*) echo "🇦🇺" ;;
+        *"俄罗斯"*|*"Russia"*) echo "🇷🇺" ;;
+        *"印度"*|*"India"*) echo "🇮🇳" ;;
+        *"荷兰"*|*"Netherlands"*) echo "🇳🇱" ;;
+        *"菲律宾"*|*"Philippines"*) echo "🇵🇭" ;;
+        *"马来西亚"*|*"Malaysia"*) echo "🇲🇾" ;;
+        *"泰国"*|*"Thailand"*) echo "🇹🇭" ;;
+        *"越南"*|*"Vietnam"*) echo "🇻🇳" ;;
+        *"印尼"*|*"印度尼西亚"*|*"Indonesia"*) echo "🇮🇩" ;;
+        *"土耳其"*|*"Turkey"*) echo "🇹🇷" ;;
+        *"阿根廷"*|*"Argentina"*) echo "🇦🇷" ;;
+        *"巴西"*|*"Brazil"*) echo "🇧🇷" ;;
+        *"南非"*|*"South Africa"*) echo "🇿🇦" ;;
+        *"澳门"*|*"Macao"*|*"Macau"*) echo "🇲🇴" ;;
+        *"瑞士"*|*"Switzerland"*) echo "🇨🇭" ;;
+        *"瑞典"*|*"Sweden"*) echo "🇸🇪" ;;
+        *"意大利"*|*"Italy"*) echo "🇮🇹" ;;
+        *"爱尔兰"*|*"Ireland"*) echo "🇮🇪" ;;
+        *"土库曼斯坦"*) echo "🇹🇲" ;;
+        *"中国"*|*"China"*) echo "🇨🇳" ;;
+        *) echo "" ;;
+    esac
+}
+
+export FLAG_INFO="$(get_flag_emoji "$REGION_INFO")"
+if [ -n "$FLAG_INFO" ]; then
+    export FLAG_PREFIX="${FLAG_INFO} "
+else
+    export FLAG_PREFIX=""
+fi
+
 # Preserve NODE_SUFFIX from env, default to empty if not set
 : "${NODE_SUFFIX:=}"
 
@@ -52,30 +96,30 @@ show_qrcode() {
 }
 
 generate_links() {
-    local region_name="${REGION_INFO} ✈ ${NODE_NAME}" h2_alpn="alpn=h3"
-    local vmes_json="{\"v\":\"2\",\"ps\":\"Vmess ✈ ${region_name}${NODE_SUFFIX}\",\"add\":\"${CDNDOMAIN}\",\"port\":\"${LISTENING_PORT}\",\"id\":\"${XRAY_UUID}\",\"aid\":\"0\",\"scy\":\"auto\",\"net\":\"ws\",\"type\":\"none\",\"host\":\"${CDNDOMAIN}\",\"path\":\"/${XRAY_URL_PATH}-vmessws\",\"tls\":\"tls\",\"sni\":\"${CDNDOMAIN}\",\"alpn\":\"h2\",\"fp\":\"chrome\"}"
+    local region_name="${NODE_NAME}" h2_alpn="alpn=h3"
+    local vmes_json="{\"v\":\"2\",\"ps\":\"${FLAG_PREFIX}Vmess ✈ ${region_name}${NODE_SUFFIX}\",\"add\":\"${CDNDOMAIN}\",\"port\":\"${LISTENING_PORT}\",\"id\":\"${XRAY_UUID}\",\"aid\":\"0\",\"scy\":\"auto\",\"net\":\"ws\",\"type\":\"none\",\"host\":\"${CDNDOMAIN}\",\"path\":\"/${XRAY_URL_PATH}-vmessws\",\"tls\":\"tls\",\"sni\":\"${CDNDOMAIN}\",\"alpn\":\"h2\",\"fp\":\"chrome\"}"
 
     # 基础链接 (Clash 支持部分)
-    local link_hysteria2="hysteria2://${SB_UUID}@${DOMAIN}:${PORT_HYSTERIA2}/?${h2_alpn}#Hysteria2 ✈ ${region_name}${NODE_SUFFIX}"
-    local link_tuic="tuic://${SB_UUID}:${SB_UUID}@${DOMAIN}:${PORT_TUIC}?${h2_alpn}&congestion_control=bbr#TUIC ✈ ${region_name}${NODE_SUFFIX}"
-    local link_anytls="anytls://${SB_UUID}@${DOMAIN}:${PORT_ANYTLS}?security=tls&type=tcp#AnyTLS ✈ ${region_name}${NODE_SUFFIX}"
+    local link_hysteria2="hysteria2://${SB_UUID}@${DOMAIN}:${PORT_HYSTERIA2}/?${h2_alpn}#${FLAG_PREFIX}Hysteria2 ✈ ${region_name}${NODE_SUFFIX}"
+    local link_tuic="tuic://${SB_UUID}:${SB_UUID}@${DOMAIN}:${PORT_TUIC}?${h2_alpn}&congestion_control=bbr#${FLAG_PREFIX}TUIC ✈ ${region_name}${NODE_SUFFIX}"
+    local link_anytls="anytls://${SB_UUID}@${DOMAIN}:${PORT_ANYTLS}?security=tls&type=tcp#${FLAG_PREFIX}AnyTLS ✈ ${region_name}${NODE_SUFFIX}"
     local link_vmess="vmess://$(echo -n "$vmes_json" | base64 -w0)"
-    local link_vless_vision="vless://${XRAY_UUID}@${DOMAIN}:${LISTENING_PORT}?encryption=none&flow=xtls-rprx-vision&security=reality&sni=${DEST_HOST}&fp=chrome&pbk=${XRAY_REALITY_PUBLIC_KEY}&sid=${XRAY_REALITY_SHORTID}&spx=%2F&type=tcp&headerType=none#Reality ✈ ${region_name}${NODE_SUFFIX}"
+    local link_vless_vision="vless://${XRAY_UUID}@${DOMAIN}:${LISTENING_PORT}?encryption=none&flow=xtls-rprx-vision&security=reality&sni=${DEST_HOST}&fp=chrome&pbk=${XRAY_REALITY_PUBLIC_KEY}&sid=${XRAY_REALITY_SHORTID}&spx=%2F&type=tcp&headerType=none#${FLAG_PREFIX}Reality ✈ ${region_name}${NODE_SUFFIX}"
 
     # 高级/Xhttp 链接 (Mihomo / V2rayN / Sing-box 支持)
     local xhttp_base="encryption=mlkem768x25519plus.native.0rtt.${XRAY_MLKEM768_CLIENT}&security=reality&sni=${DEST_HOST}&fp=chrome&pbk=${XRAY_REALITY_PUBLIC_KEY}&sid=${XRAY_REALITY_SHORTID}&type=xhttp&path=%2F${XRAY_URL_PATH}-xhttp&mode=auto"
-    local link_xhttp_reality="vless://${XRAY_UUID}@${DOMAIN}:${LISTENING_PORT}?${xhttp_base}&extra=%22host%22%3A%20%22%22%2C%22path%22%3A%20%22%2F${XRAY_URL_PATH}-xhttp%22%2C%22mode%22%3A%20%22auto%22#Xhttp+Reality直连 ✈ ${region_name}${NODE_SUFFIX}"
+    local link_xhttp_reality="vless://${XRAY_UUID}@${DOMAIN}:${LISTENING_PORT}?${xhttp_base}&extra=%22host%22%3A%20%22%22%2C%22path%22%3A%20%22%2F${XRAY_URL_PATH}-xhttp%22%2C%22mode%22%3A%20%22auto%22#${FLAG_PREFIX}Xhttp+Reality直连 ✈ ${region_name}${NODE_SUFFIX}"
 
     # 复杂的 CDN/Reality 混合模式 json
     local down_settings="%22downloadSettings%22%3A%20%7B%0D%0A%20%20%22address%22%3A%20%22${DOMAIN}%22%2C%0D%0A%20%20%20%22port%22%3A%20${LISTENING_PORT}%2C%0D%0A%20%20%22network%22%3A%20%22xhttp%22%2C%0D%0A%20%20%22security%22%3A%20%22reality%22%2C%0D%0A%20%20%22realitySettings%22%3A%20%7B%0D%0A%20%20%20%20%22show%22%3A%20false%2C%0D%0A%20%20%20%20%22serverName%22%3A%20%22${DEST_HOST}%22%2C%0D%0A%20%20%20%20%22fingerprint%22%3A%20%22chrome%22%2C%0D%0A%20%20%20%20%22publicKey%22%3A%20%22${XRAY_REALITY_PUBLIC_KEY}%22%2C%0D%0A%20%20%20%20%22shortId%22%3A%20%22${XRAY_REALITY_SHORTID}%22%2C%0D%0A%20%20%20%20%22spiderX%22%3A%20%22%2F%22%0D%0A%20%20%7D%2C%0D%0A%20%20%22xhttpSettings%22%3A%20%7B%0D%0A%20%20%20%20%22host%22%3A%20%22%22%2C%0D%0A%20%20%20%20%22path%22%3A%20%22%2F${XRAY_URL_PATH}-xhttp%22%2C%0D%0A%20%20%20%20%22mode%22%3A%20%22auto%22%0D%0A%20%20%20%20%7D%0D%0A%7D"
 
-    local link_up_cdn_down_reality="vless://${XRAY_UUID}@${CDNDOMAIN}:${LISTENING_PORT}?encryption=mlkem768x25519plus.native.0rtt.${XRAY_MLKEM768_CLIENT}&security=tls&sni=${CDNDOMAIN}&alpn=h2&fp=chrome&type=xhttp&host=${CDNDOMAIN}&path=%2F${XRAY_URL_PATH}-xhttp&mode=auto&extra=${down_settings}#上行Xhttp+TLS+CDN ✈ 下行Xhttp+Reality ✈ ${region_name}${NODE_SUFFIX}"
+    local link_up_cdn_down_reality="vless://${XRAY_UUID}@${CDNDOMAIN}:${LISTENING_PORT}?encryption=mlkem768x25519plus.native.0rtt.${XRAY_MLKEM768_CLIENT}&security=tls&sni=${CDNDOMAIN}&alpn=h2&fp=chrome&type=xhttp&host=${CDNDOMAIN}&path=%2F${XRAY_URL_PATH}-xhttp&mode=auto&extra=${down_settings}#${FLAG_PREFIX}上行Xhttp+TLS+CDN下行Xhttp+Reality ✈ ${region_name}${NODE_SUFFIX}"
 
     local tls_settings="%22downloadSettings%22%3A%20%7B%0D%0A%20%20%22address%22%3A%20%22${DOMAIN}%22%2C%0D%0A%20%20%20%22port%22%3A%20${LISTENING_PORT}%2C%0D%0A%20%20%22network%22%3A%20%22xhttp%22%2C%0D%0A%20%20%22security%22%3A%20%22tls%22%2C%0D%0A%20%20%22tlsSettings%22%3A%20%7B%0D%0A%20%20%20%20%22serverName%22%3A%20%22${CDNDOMAIN}%22%2C%0D%0A%20%20%20%20%22alpn%22%3A%20%5B%22h2%22%5D%2C%0D%0A%20%20%20%20%22fingerprint%22%3A%20%22chrome%22%0D%0A%20%20%7D%2C%0D%0A%20%20%22xhttpSettings%22%3A%20%7B%0D%0A%20%20%20%20%22host%22%3A%20%22${CDNDOMAIN}%22%2C%0D%0A%20%20%20%20%22path%22%3A%20%22%2F${XRAY_URL_PATH}-xhttp%22%2C%0D%0A%20%20%20%20%22mode%22%3A%20%22auto%22%0D%0A%20%20%20%20%7D%0D%0A%20%20%7D%0D%0A%7D"
 
-    local link_up_reality_down_cdn="vless://${XRAY_UUID}@${DOMAIN}:${LISTENING_PORT}?encryption=mlkem768x25519plus.native.0rtt.${XRAY_MLKEM768_CLIENT}&security=reality&sni=${DEST_HOST}&fp=chrome&pbk=${XRAY_REALITY_PUBLIC_KEY}&sid=${XRAY_REALITY_SHORTID}&type=xhttp&path=%2F${XRAY_URL_PATH}-xhttp&mode=auto&extra=${tls_settings}#上行Xhttp+Reality ✈ 下行Xhttp+TLS+CDN ✈ ${region_name}${NODE_SUFFIX}"
+    local link_up_reality_down_cdn="vless://${XRAY_UUID}@${DOMAIN}:${LISTENING_PORT}?encryption=mlkem768x25519plus.native.0rtt.${XRAY_MLKEM768_CLIENT}&security=reality&sni=${DEST_HOST}&fp=chrome&pbk=${XRAY_REALITY_PUBLIC_KEY}&sid=${XRAY_REALITY_SHORTID}&type=xhttp&path=%2F${XRAY_URL_PATH}-xhttp&mode=auto&extra=${tls_settings}#${FLAG_PREFIX}上行Xhttp+Reality下行Xhttp+TLS+CDN ✈ ${region_name}${NODE_SUFFIX}"
 
-    local link_mix="vless://${XRAY_UUID}@${CDNDOMAIN}:${LISTENING_PORT}?encryption=mlkem768x25519plus.native.0rtt.${XRAY_MLKEM768_CLIENT}&security=tls&sni=${CDNDOMAIN}&alpn=h2&fp=chrome&pbk=${XRAY_REALITY_PUBLIC_KEY}&sid=${XRAY_REALITY_SHORTID}&type=xhttp&host=${CDNDOMAIN}&path=%2F${XRAY_URL_PATH}-xhttp&mode=auto#Xhttp+TLS+CDN上下行不分离 ✈ ${region_name}${NODE_SUFFIX}"
+    local link_mix="vless://${XRAY_UUID}@${CDNDOMAIN}:${LISTENING_PORT}?encryption=mlkem768x25519plus.native.0rtt.${XRAY_MLKEM768_CLIENT}&security=tls&sni=${CDNDOMAIN}&alpn=h2&fp=chrome&pbk=${XRAY_REALITY_PUBLIC_KEY}&sid=${XRAY_REALITY_SHORTID}&type=xhttp&host=${CDNDOMAIN}&path=%2F${XRAY_URL_PATH}-xhttp&mode=auto#${FLAG_PREFIX}Xhttp+TLS+CDN上下行不分离 ✈ ${region_name}${NODE_SUFFIX}"
 
     # 加上注释 (保留原样格式)
     local part1="${link_hysteria2}
@@ -109,6 +153,7 @@ show_info_links() {
     print_colored ${RED} "Index:\nhttps://${CDNDOMAIN}/sb-xray/show-config${token_param}"
     print_colored ${YELLOW} "全部订阅:\nhttps://${CDNDOMAIN}/sb-xray/proxies${token_param}"
     print_colored ${MAGENTA} "Clash 订阅:\nhttps://${CDNDOMAIN}/sb-xray/clashsub${token_param}"
+    print_colored ${BLUE} "Stash 订阅:\nhttps://${CDNDOMAIN}/sb-xray/stash${token_param}"
     print_colored ${CYAN} "V2rayN 订阅:\nhttps://${CDNDOMAIN}/sb-xray/v2rayn${token_param}"
 
     # Client Templates
@@ -138,7 +183,7 @@ main() {
     generate_links
 
     # 批量处理简单模板
-    for t in all:proxies clash surge surge.conf; do
+    for t in all:proxies clash stash surge surge.conf; do
         local src="${t%:*}" dst="${t#*:}"
         local path="/templates/proxies/${src}"
         [[ "$src" == "surge.conf" ]] && path="/templates/client_template/surge.conf"

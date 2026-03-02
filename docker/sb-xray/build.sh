@@ -159,13 +159,13 @@ check_version() {
 check_version "Shoutrrr"        "$SHOUTRRR_TAG"               "SHOUTRRR_VERSION"           "0.8.0"
 check_version "Mihomo"          "$MIHOMO_TAG"                 "MIHOMO_VERSION"             "1.19.20"
 check_version "Http-Meta"       "$HTTP_META_VERSION"          "HTTP_META_VERSION"          "1.0.6"
-check_version "Sub-Store Front" "$SUB_STORE_FRONTEND_VERSION" "SUB_STORE_FRONTEND_VERSION" "2.16.18"
-check_version "Sub-Store Back"  "$SUB_STORE_BACKEND_VERSION"  "SUB_STORE_BACKEND_VERSION"  "2.21.32"
-check_version "s-ui"            "$SUI_TAG"                    "SUI_VERSION"                "1.3.10"
+check_version "Sub-Store Front" "$SUB_STORE_FRONTEND_VERSION" "SUB_STORE_FRONTEND_VERSION" "2.16.19"
+check_version "Sub-Store Back"  "$SUB_STORE_BACKEND_VERSION"  "SUB_STORE_BACKEND_VERSION"  "2.21.35"
+check_version "s-ui"            "$SUI_TAG"                    "SUI_VERSION"                "1.3.11"
 check_version "Dufs"            "$DUFS_TAG"                   "DUFS_VERSION"               "0.45.0"
 check_version "Cloudflared"      "$CLOUDFLARED_VERSION"        "CLOUDFLARED_VERSION"        "2026.2.0"
 check_version "3x-ui"           "$XUI_TAG"                    "XUI_VERSION"                "2.8.10"
-check_version "Sing-box"        "$SING_BOX_TAG"               "SING_BOX_VERSION"           "1.12.23"
+check_version "Sing-box"        "$SING_BOX_TAG"               "SING_BOX_VERSION"           "1.13.0"
 check_version "Xray"            "$XRAY_TAG"                   "XRAY_VERSION"               "26.2.6"
 
 # 确定镜像 Tag (如果 Xray 获取失败，则回退到 'manual')

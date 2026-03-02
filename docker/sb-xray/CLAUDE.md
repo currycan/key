@@ -21,7 +21,9 @@
 
 ### 语言与风格
 
-- 所有回复、注释和文档使用**简体中文**
+- **全局语言约束**: 所有回复、思考过程及任务清单，总是使用中文回答。 (All replies, thought processes, and task lists MUST ALWAYS be answered in Chinese.)
+- **固定指令**: `Implementation Plan, Task List and Thought in Chinese`
+- **默认语言**: 所有回复、注释和文档使用**简体中文**。生成应用时，除非特别要求，否则一律采用简体中文。
 - 技术术语保留英文原文（如 Reality、Hysteria2、WebSocket）
 - 脚本日志使用中文
 
@@ -34,6 +36,49 @@
 ### 敏感词约束
 
 文档中禁止使用以下词汇：翻墙、科学上网、梯子、VPN（翻墙含义）、GFW、防火长城、墙、机场。替代用语见 `.agents/skills/documentation/SKILL.md`。
+
+---
+
+## 终端同步绕过与安全保护机制
+
+### 配置变量
+
+要调整终端绕过规则的行为，请修改以下变量：
+
+- **`[VAR_TEMP_DIR]`**: `.agents/tmp/` -> 存储输出文件的相对工作区目录。
+- **`[VAR_FAST_TRACK_MS]`**: `2500` -> 在将命令发送到后台之前等待其完成的时间（毫秒）。增加此值可以允许更多命令同步完成，从而省去后续的文件验证步骤。
+- **`[VAR_CLEANUP_DAYS]`**: `+1` -> 清理终端日志的过期天数界限。
+- **`[VAR_TIMEOUT_MINS]`**: `2` -> 后台命令运行多少分钟后，代理机器人应主动提示您是否终止。
+
+---
+
+### 终端同步绕过 (强制执行)
+
+为避免已知的平台 Bug（如终端输出挂起或状态卡在 `RUNNING`），对于每个终端命令，**务必**遵循以下步骤：
+
+**前提条件与清理**：在每次对话中运行第一个命令之前：
+
+1. 确保目录存在：`mkdir -p [VAR_TEMP_DIR]`
+2. 清理工作区，删除之前对话中保留的旧终端输出文件：`find [VAR_TEMP_DIR] -type f -name "ag_output_*.txt" -mtime [VAR_CLEANUP_DAYS] -delete 2>/dev/null || true`
+    - *注意：始终向 `[VAR_TEMP_DIR]` 读取和写入。这避免了工作区外的权限获取弹窗，同时保持临时执行日志文件的条理清晰。*
+3. **强制重定向 (结合 Tee)**: 在每次调用 `run_command` 工具时，在命令前添加 `set -o pipefail; `，并在命令后追加 ` 2>&1 | tee [VAR_TEMP_DIR]ag_output_<conversation_id>.txt && echo "===AGENT COMMAND DONE===" >> [VAR_TEMP_DIR]ag_output_<conversation_id>.txt`。
+    - *原因：`set -o pipefail` 可确保在主命令执行失败时，管道能正确返回失败的退出码，而不会被 `tee` 的成功状态所掩盖。`tee`（不带 `-a` 参数）会为同一对话中的每个新命令覆写文件，从而保持文件体积较小。重定向到 `tee` 既能让输出对用户在 IDE 终端中可见，又能将内容安全写入文件供代理后续验证。*
+4. **注入等待时间**: 将 `run_command` 工具的 `WaitMsBeforeAsync` 参数精准设置为 `[VAR_FAST_TRACK_MS]`。
+
+### 完成逻辑与性能优化 (强制执行)
+
+- **同步快速通道**: 如果 `run_command` 在 `[VAR_FAST_TRACK_MS]` 窗口期内完成，它将直接返回全部输出结果（不会生成单独的后台命令 ID）。您可以正常使用该输出并**跳过**下方说明的验证步骤。
+- **异步文件系统验证**: 如果命令执行时间超过了 `[VAR_FAST_TRACK_MS]` 并返回了一个后台命令 ID，请立刻对 `[VAR_TEMP_DIR]ag_output_<conversation_id>.txt` 调用 `view_file` 工具。
+- 必须将该文本文件的内容全面视为官方的命令最终输出。如果文件末尾包含 "===AGENT COMMAND DONE===" 标记，代表执行成功结束，请立即继续往下执行任务。
+- *忽略状态卡死*: 如果 `view_file` 确认命令已完成执行，**绝对不要**去傻等 `command_status` 报告 `DONE` 状态。如果命令在前端 UI 中显示卡住了，直接忽略它并转入下一步工作。
+
+### 长时间运行命令的防范保险 (强制执行)
+
+为了防止僵尸进程或失控的死循环命令导致任务无限期挂机，必须对所有后台命令执行施加严格的超时限制：
+
+- **挂起限制**: 如果终端后台命令运行了超过 `[VAR_TIMEOUT_MINS]` 分钟却依然未产生预期的新输出或完成标记，代理请**立即停止隐式死等**。
+- **人工确认**: 立即使用 `notify_user` 工具明确询问用户是否继续。例如："命令 `XYZ` 已经运行了超过 `[VAR_TIMEOUT_MINS]` 分钟。我应该继续等待还是强制终止它？"
+- **终止工具**: 如果用户指示您终止进程，必须直接使用带有 `Terminate: true` 布尔参数以及相应的 `CommandId` 的 `send_command_input` 工具彻底杀掉该失控进程。
 
 ---
 

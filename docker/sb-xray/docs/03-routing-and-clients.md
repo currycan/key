@@ -308,9 +308,9 @@ graph TD
 | 原始命名 | 清洗后结果 |
 |:---|:---|
 | `![使用教程与联系客服].txt` | **（自动剔除）** |
-| `✨🇭🇰 香港 01 x1.5 \| IPLC -- Reality` | `Reality ✈ 🇭🇰 香港[1] ✈ IPLC ✈ 1.5×` |
-| `🇺🇸美国洛杉矶v6 08 🎯udp` | `🇺🇸 IPv6 美国[1] ✈ 洛杉矶 ✈ UDP` |
-| `Taiwan-Hsinchu-02-1.0倍` | `🇹🇼 台湾[1] ✈ 新竹 ✈ 1×` |
+| `✨🇭🇰 香港 01 x1.5 \| IPLC -- Reality` | `🇭🇰 Reality ✈ IPLC ✈ 香港[1] ✈ 1.5×` |
+| `🇺🇸美国洛杉矶v6 08 🎯udp` | `🇺🇸 IPv6 美国[1] ✈ UDP ✈ 洛杉矶` |
+| `Taiwan-Hsinchu-02-1.0倍` | `🇹🇼 台湾[1] ✈ 1× ✈ 新竹` |
 
 ### 3.4 部署方式
 
@@ -365,6 +365,7 @@ graph TD
 |:---|:---|:---|
 | **Windows / Android** | v2rayN | 复制单条链接进行剪贴板导入；或复制 `/sb-xray/all?token=xxx` 作为订阅源 |
 | **macOS / iOS** | ClashX Pro / Shadowrocket | 复制针对性 YAML 模板链接，选择"从 URL 下载配置" |
+| **iOS / iPadOS** | Stash | 复制 `/sb-xray/stash?token=xxx`，在“配置”页面选择“从 URL 下载”导入 |
 | **OpenWrt** | OpenClash | 复制 `OneSmartPro.yaml?token=xxx` 作为订阅源，内核选择 Mihomo |
 
 ---

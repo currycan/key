@@ -1,5 +1,29 @@
+# Dockerfile Config & Compiles
 Dockerfile
 docker-compose.yml
+build.sh
+
+# Git & Logs
+.git/
+.gitignore
+.gitattributes
+
+# AI Assistant Configs & Brains
+.agents/
+.gemini/
+.idea/
+CLAUDE.md
+
+# Documentation
 docs/
 *.md
+
+# Project Meta
 LICENSE
+*.jpg
+*.png
+
+# Temporary & Test Execution Output
+tmp/
+ag_output_*.txt
+test_rename.js

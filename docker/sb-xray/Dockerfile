@@ -134,7 +134,6 @@ RUN set -ex; \
 ARG SING_BOX_VERSION="1.12.21"
 RUN set -ex; \
   curl -fsSL --retry 5 --retry-delay 5 "https://github.com/SagerNet/sing-box/releases/download/v${SING_BOX_VERSION}/sing-box-${SING_BOX_VERSION}-linux-${TARGETARCH}.tar.gz" | tar --strip-components=1 -xzC /tmp/; \
-  upx --lzma --best /tmp/sing-box; \
   mv /tmp/sing-box /usr/local/bin/
 
 # --- Xray ---

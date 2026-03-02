@@ -579,27 +579,28 @@ function operator(proxies) {
     // Phase 1: Cleaning & Formatting (单个节点处理)
     const sortedProxies = proxies
         .filter(p => !Constants.INVALID_REGEX.test(p.name))
-        // [新增防线] 拦截目前 Mihomo 等主流内核尚不支持的最新实验性协议 (如 Xhttp)，确保不被带入生产环境
-        .filter(p => !(/xhttp/i.test(JSON.stringify(p))))
         .map(p => {
             let name = p.name;
             const protocol = p.type ? p.type.toLowerCase() : "unknown";
 
             // [新增能力] 初步判断：是否已完全满足我们的终极格式规范？
-            // 校验格式并提取关键部位以供后期统一重新编号： Emoji + 空格 + 地区词汇(不含[数字]) + [数字] + ✈ + 内容
-            const standardMatch = name.match(/^([\uD83C][\uDDE6-\uDDFF][\uD83C][\uDDE6-\uDDFF])\s+([^✈\[\]\|]+?)(?:\[\d+\])?(?:(?:\s*✈\s*|\s*\|\s*)(.*))?$/);
+            // 校验格式并提取关键部位以供后期统一重新编号： Emoji + 空格 + 协议名(可选) + ✈(如果含协议) + Region(不含[数字]) + [数字] + ✈ + 内容
+            const standardMatch = name.match(/^([\uD83C][\uDDE6-\uDDFF][\uD83C][\uDDE6-\uDDFF])\s+(?:([A-Za-z0-9]+)\s*✈\s*)?([^✈\[\]\|]+?)(?:\s*\[\d+\])(?:(?:\s*✈\s*|\s*\|\s*)(.*))?$/);
 
             if (standardMatch) {
                 p.isPreFormatted = true;
                 p.flag = standardMatch[1];
-                // 剔除旧标号，留出纯净的地区名，如果后面有内容则加上 ✈ 和内容作为后缀
-                p.processedName = standardMatch[2].trim() + (standardMatch[3] ? ` ✈ ${standardMatch[3]}` : "");
-                p.multiplier = "";
-                p.protocol = protocol;
+                p.protocol = standardMatch[2] || p.protocol;
+                p.name = `${p.flag} ${p.protocol && p.protocol !== "unknown" ? p.protocol + ' ✈ ' : ''}${standardMatch[3]}${standardMatch[4] ? ' ✈ ' + standardMatch[4].trim() : ''}`;
+                return p;
+            }
 
-                // 为了让它能和平常节点一样参与后面的排序和重编号，伪造最终所需形式
-                // 注意这里必须用 ✈ 拼接，因为 Phase 3 已经统一按 ✈ 来寻找 planeIndex 切片了以剥离国名和后缀了！
-                p.name = p.protocol && p.protocol !== "unknown" ? `${p.protocol} ✈ ${p.flag} ${p.processedName}` : `${p.flag} ${p.processedName}`;
+            // [兼容旧逻辑] 若不满足终极规范，尝试匹配：Emoji + 空格 + Region(不含[数字]) + [数字] + ✈ + 内容
+            const legacyMatch = name.match(/^([\uD83C][\uDDE6-\uDDFF][\uD83C][\uDDE6-\uDDFF])\s+([^✈\[\]\|]+?)(?:\[\d+\])?(?:(?:\s*✈\s*|\s*\|\s*)(.*))?$/);
+            if (legacyMatch) {
+                p.isPreFormatted = true;
+                p.flag = legacyMatch[1];
+                p.name = `${p.flag} ${p.protocol && p.protocol !== "unknown" ? p.protocol + ' ✈ ' : ''}${legacyMatch[2].trim()}${legacyMatch[3] ? ' ✈ ' + legacyMatch[3].trim() : ''}`;
                 return p;
             }
 
@@ -651,8 +652,7 @@ function operator(proxies) {
             p.multiplier = multiplier;
             p.protocol = protocol;
 
-            // 暂存完整名称用于排序
-            p.name = multiplier ? `${protocol} ✈ ${flag} ${tempName} ✈ ${multiplier.trim()}` : `${protocol} ✈ ${flag} ${tempName}`;
+            p.name = multiplier ? `${p.flag} ${protocol} ✈ ${tempName} ✈ ${multiplier.trim()}` : `${p.flag} ${protocol} ✈ ${tempName}`;
 
             return p;
         })
@@ -671,11 +671,18 @@ function operator(proxies) {
     const nameCounts = {};
 
     return sortedProxies.map(p => {
+        if (p.isPreFormatted) {
+            delete p.isPreFormatted;
+            // 强制重组对象键值顺序
+            const { name, type, ...restProps } = p;
+            return { name, type, ...restProps };
+        }
+
         // 解析已经处理好的 parts (为了准确提取 RegionKey)
         // 注意: 我们需要从 p.processedName (Clean Name) 中提取 Region
         // 格式: Region[N]✈Suffix
 
-        let content = p.processedName;
+        let content = p.processedName || "";
         // 移除开头的 IPv6 标签干扰 (如果存在)
         const contentWithoutIPv6 = content.replace(/^IPv6\s+/, "");
 
@@ -722,11 +729,16 @@ function operator(proxies) {
 
         // 重组
         const prefix = isIPv6 ? "IPv6 " : "";
-        let newName = `${p.flag} ${prefix}${cleanKey}[${index}]`;
+        let newName = `${prefix}${cleanKey}`;
 
-        // Check if suffixPart is numeric (redundant with index [N])
+        // Check if suffixPart is numeric
         if (suffixPart && !/^\d+$/.test(suffixPart)) {
-            newName += `${Constants.SEPARATOR}${suffixPart}`;
+            // deduplicate checking if suffixPart is already contained in newName
+            if (!newName.includes(suffixPart)) {
+                // Remove adjacent or global duplicates in suffixPart
+                const uniqueSuffixParts = [...new Set(suffixPart.split(/\s*✈\s*/))].join(Constants.SEPARATOR);
+                newName = `${newName}${Constants.SEPARATOR}${uniqueSuffixParts}`;
+            }
         }
 
         // Final output string
@@ -753,8 +765,12 @@ function operator(proxies) {
             }
 
             if (shouldAddProtocol) {
-                newName = `${p.protocol} ✈ ${newName}`;
+                newName = `${p.flag} ${p.protocol} ✈ ${newName}`;
+            } else {
+                newName = `${p.flag} ${newName}`;
             }
+        } else {
+            newName = `${p.flag} ${newName}`;
         }
 
         p.name = extras.length > 0 ? `${newName} ✈ ${extras.join(' ✈ ')}` : newName;
