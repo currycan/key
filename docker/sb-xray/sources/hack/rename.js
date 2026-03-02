@@ -50,10 +50,11 @@ const CleaningRules = [
     { desc: "移除 'HY2'", regex: /-?HY2/gi, value: "" },
     { desc: "移除 'VPN' 关键字", regex: /\bVPN\b/gi, value: "" },
     { desc: "移除 'IP' 关键字 (排除 原生IP/IPv6/IPLC)", regex: /\b(?<!原生)IP\b/g, value: "" },
-    { desc: "移除 'GG/read/大学/加州/负载均衡'", regex: /(GG|read|大学|加州|负载均衡)/gi, value: "" },
+    { desc: "移除 'GG/read/大学/加州/负载均衡/中继'", regex: /(GG|read|大学|加州|负载均衡|中继)/gi, value: "" },
     { desc: "替换 AI 关键词", regex: /[-_]?\d*(SV|chatgpt|gemini)/gi, value: "AI" },
     { desc: "移除流量标识 (TB)", regex: /-?\d+-?\d*TB/gi, value: "" },
     { desc: "保留 '原生IP'", regex: /原生\s?IP/gi, value: "原生IP" },
+    { desc: "移除地区名后的编号", regex: /([\u4e00-\u9fff])\d{1,2}(?=[-_\s丨✈\/]|$)/g, value: "$1" },
 
     // 分隔符标准化：统一转为 "-"，后续由 splitAndDedup 拆分
     { desc: "统一分隔符", regex: /[-_|\s丨✈\/]+/g, value: "-" },
@@ -590,65 +591,29 @@ function operator(proxies) {
                 remainingName = emojiMatch[2];
             }
 
-            // 预格式化分支：含 Emoji 前缀的节点直接走快速通道
-            if (preFlag) {
-                const hasFlightSeparator = remainingName.includes('✈');
-
-                if (hasFlightSeparator) {
-                    // 已含 ✈ 分隔符 → 已格式化节点，仅做协议补全
-                    p.isPreFormatted = true;
-                    p.flag = preFlag;
-                    // 分割并处理，确保有 Protocol 前缀
-                    let parts = remainingName.split('✈').map(s => s.trim()).filter(s => s !== '');
-                    // 检测首段是否为已知协议名
-                    let hasProtocol = /vless|vmess|trojan|shadowsocks|ss|ssr|tuic|hysteria2|reality/i.test(parts[0].toLowerCase());
-                    let finalProtocolPrefix = hasProtocol ? parts.shift() : (p.protocol && p.protocol !== "unknown" ? p.protocol : "");
-                    let newNameStr = parts.join(' ✈ ');
-                    p.name = `${p.flag} ${finalProtocolPrefix ? finalProtocolPrefix + ' ✈ ' : ''}${newNameStr}`;
-                    return p;
-                } else {
-                     // 无 ✈ 分隔符的简单节点（如 "🇭🇰 香港01-深港IEPL"）
-                     // 目标输出: 🇭🇰 香港 ✈ 深港IEPL ✈ ss
-                     p.isPreFormatted = true;
-                     p.flag = preFlag;
-                     let finalContent = remainingName;
-
-                     // 移除编号（如 "香港01" → "香港"）
-                     finalContent = finalContent.replace(/\d{1,2}(?=-|$)/, '').trim();
-
-                     // 协议简写映射（shadowsocks → ss）
-                     const protoMap = { shadowsocks: 'ss', shadowsocksr: 'ssr' };
-                     let shortProto = protoMap[protocol] || protocol;
-
-                     // 按 "-" 拆分地区与细节（"香港-深港IEPL" → ["香港", "深港IEPL"]）
-                     let nameParts = [];
-                     const dashSplit = finalContent.match(/^([^-]+)-(.+)$/);
-                     if (dashSplit) {
-                         nameParts.push(dashSplit[1].trim());
-                         nameParts.push(dashSplit[2].trim());
-                     } else {
-                         nameParts.push(finalContent);
-                     }
-
-                     // 追加协议后缀
-                     if (shortProto && shortProto !== "unknown") {
-                         nameParts.push(shortProto);
-                     }
-
-                     // 相邻去重（"香港 ✈ 香港 ✈ vmess" → "香港 ✈ vmess"）
-                     let deduped = [nameParts[0]];
-                     for (let i = 1; i < nameParts.length; i++) {
-                         if (nameParts[i] !== nameParts[i - 1]) {
-                             deduped.push(nameParts[i]);
-                         }
-                     }
-
-                     p.name = `${p.flag} ${deduped.join(' ✈ ')}`;
-                     return p;
-                }
+            // 预格式化分支：仅对已含 ✈ 分隔符的节点走快速通道
+            if (preFlag && remainingName.includes('✈')) {
+                p.isPreFormatted = true;
+                p.flag = preFlag;
+                let parts = remainingName.split('✈').flatMap(s => {
+                    // 复用 CleaningRules 中的非分隔符规则进行清理（移除 [N]、(协议X) 等）
+                    let cleaned = s;
+                    for (const rule of CleaningRules) {
+                        if (rule.desc.includes('分隔符')) continue;
+                        cleaned = cleaned.replace(rule.regex, rule.value);
+                    }
+                    // 将残留的 / 拆分为独立段（如 "数据中心//美西专线" → ["数据中心", "美西专线"]）
+                    return cleaned.split('/').map(p => p.trim()).filter(p => p !== '');
+                });
+                // 检测首段是否为已知协议名
+                let hasProtocol = /vless|vmess|trojan|shadowsocks|ss|ssr|tuic|hysteria2|reality/i.test(parts[0].toLowerCase());
+                let finalProtocolPrefix = hasProtocol ? parts.shift() : (protocol && protocol !== "unknown" ? protocol : "");
+                let newNameStr = parts.join(' ✈ ');
+                p.name = `${p.flag} ${finalProtocolPrefix ? finalProtocolPrefix + ' ✈ ' : ''}${newNameStr}`;
+                return p;
             }
 
-            // ── 无 Emoji 前缀的节点 → 完整清洗流水线 ──
+            // 其余所有节点（含 Emoji 简单节点如 "🇭🇰 Hong Kong丨01"）→ 完整清洗流水线
             name = Utils.cleanName(name);           // 基础清理
             name = Utils.standardizeRegion(name);   // 地名标准化
             let parts = Utils.splitAndDedup(name);  // 拆分与去重
@@ -804,8 +769,8 @@ function operator(proxies) {
         }
 
         p.name = extras.length > 0 ? `${newName} ✈ ${extras.join(' ✈ ')}` : newName;
-        // 压缩连续分隔符（' ✈  ✈ ' → ' ✈ '）
-        p.name = p.name.replace(/(?:\s*✈\s*){2,}/g, ' ✈ ');
+        // 压缩连续分隔符、清理首尾多余的 ✈，以及移除残留的 /
+        p.name = p.name.replace(/(?:\s*✈\s*){2,}/g, ' ✈ ').replace(/\s*✈\s*$/, '').replace(/\s*\/+\s*/g, ' ').trim();
 
         // 清理临时属性
         delete p.processedName;
