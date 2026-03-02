@@ -1,30 +1,32 @@
 /**
- * Sub-Store Node Renaming Script
- * Sub-Store 节点重命名脚本
+ * Sub-Store 节点重命名脚本 (rename.js)
  *
- * 功能 (Features):
- * 1. 深度格式化: 清理无效字符、标准化分隔符、统一括号格式。 (本次更新: 分隔符两侧强制加入空格，保障 OpenClash Smart 模式基于正则的权重计分不串词) (本次更新: 分隔符两侧强制加入空格，保障 OpenClash Smart 模式基于正则的权重计分不串词)
- * 2. 智能重命名: 自动识别国家/地区，提升地区关键词权重。
- * 3. 稳健去重: 智能识别并移除重复的标签（如 "美国" 出现多次）。
- * 4. 自动标旗: 能够根据名称或代码自动填充对应的国旗 Emoji。
- * 5. 排序优化: 按照预设的地理优先级（香港>台湾>日本...）进行排序。
- * 6. 序号生成: 对同类节点进行标准化编号 (如 "香港[1]", "香港[2]").
+ * 功能概览:
+ * 1. 深度格式化 — 清理无效字符、标准化分隔符（两侧加空格防止 OpenClash 权重正则串词）。
+ * 2. 智能重命名 — 自动识别国家/地区并提升地区关键词位置。
+ * 3. 稳健去重   — 移除重复标签（如 "美国" 出现多次自动合并）。
+ * 4. 自动标旗   — 根据名称或国家代码自动填充对应的国旗 Emoji。
+ * 5. 排序优化   — 按预设地理优先级排列（香港 > 台湾 > 日本 …）。
+ * 6. 预格式化兼容 — 已标准化的节点（含 ✈）直接保留；简单节点（如 "🇭🇰 香港01-深港IEPL"）
+ *                   智能拆分为 "🇭🇰 香港 ✈ 深港IEPL ✈ ss" 格式。
+ *
+ * 输出格式: Flag Region ✈ Detail ✈ Protocol ✈ Suffix
  */
 
 // ============================================================================
-// 1. 基础配置与数据 (Configuration & Data)
+// 第一部分: 基础配置与数据
 // ============================================================================
 
 const Constants = {
-    SEPARATOR: ' ✈ ', // 通用分隔符 (保留 Emoji，两侧加空格防御污染)
+    SEPARATOR: ' ✈ ', // 通用分隔符，两侧加空格防止 OpenClash 权重正则串词
     // 地区排序优先级 (Predefined Priority)
     PRIORITY_REGIONS: ["香港", "台湾", "日本", "新加坡", "韩国", "美国"],
     // 无效节点过滤正则
     INVALID_REGEX: /(❗|套餐|到期|有效|剩余|版本|已用|过期|失联|测试|官方|网址|群(?!岛)|TEST|客服|获取|订阅|流量|机场|下次|官址|联系|邮箱|工单|学术|USE|USED|TOTAL|EXPIRE|EMAIL|更快|更新|如果|客户|教程|距离|国内|Traffic|Reset|Days|Left|\d+\s*GB)/i
 };
 
-// 1.1 清理规则 (Cleaning Rules)
-// 按顺序执行正则替换。合并了旧版的 regexArray 和 valueArray，避免索引错位。
+// 1.1 清理规则
+// 按顺序执行正则替换，每条规则含描述、正则和替换值。
 const CleaningRules = [
     { desc: "移除残留序号 [N]", regex: /\[\d+\]/g, value: "" },
     { desc: "提取倍率 (x2 -> 2x)", regex: /\|\s*x(\d+(?:\.\d+)?)(?:倍)?/gi, value: " $1×" },
@@ -35,12 +37,12 @@ const CleaningRules = [
     { desc: "移除孤立的 '无' 字符", regex: /(^|[-_\s丨✈\/])无(?=($|[-_\s丨✈\/]))/g, value: "$1" },
     { desc: "移除 IPv6- 前缀", regex: /IPv6-/gi, value: "" },
 
-    // [Critical] 括号清理逻辑
+    // 括号清理
     { desc: "移除空括号", regex: /\[\s*\]/g, value: "" },
     { desc: "移除空全角括号", regex: /【\s*】/g, value: "" },
-    { desc: "剩余括号转空格 (处理 [IPV6])", regex: /[\[\]【】]/g, value: " " }, // Global bracket fix
+    { desc: "剩余括号转空格 (处理 [IPV6])", regex: /[\[\]【】]/g, value: " " },
 
-    { desc: "标准化 IPv6 标识", regex: /(ipv6|v6)/gi, value: "IPv6" }, // Restore IPv6
+    { desc: "标准化 IPv6 标识", regex: /(ipv6|v6)/gi, value: "IPv6" },
     { desc: "移除 NEW专线 后缀", regex: /-?NEW专线/gi, value: "-专线" },
     { desc: "移除深港IEPL后缀", regex: /(.+?)[-_\s]+(香港|深港|沪港|呼港|京港|广港|杭港)\s?IEPL/gi, value: "$1" },
     { desc: "移除IEPL主体后缀", regex: /-?(香港|深港|沪港|呼港|京港|广港|杭港)\s?IEPL/gi, value: "$1" },
@@ -49,12 +51,12 @@ const CleaningRules = [
     { desc: "移除 'VPN' 关键字", regex: /\bVPN\b/gi, value: "" },
     { desc: "移除 'IP' 关键字 (排除 原生IP/IPv6/IPLC)", regex: /\b(?<!原生)IP\b/g, value: "" },
     { desc: "移除 'GG/read/大学/加州/负载均衡'", regex: /(GG|read|大学|加州|负载均衡)/gi, value: "" },
-    { desc: "替换 AI 关键词", regex: /[-_]?\d*(SV|chatgpt|gemini)/gi, value: "AI" }, // AI Replacement
+    { desc: "替换 AI 关键词", regex: /[-_]?\d*(SV|chatgpt|gemini)/gi, value: "AI" },
     { desc: "移除流量标识 (TB)", regex: /-?\d+-?\d*TB/gi, value: "" },
     { desc: "保留 '原生IP'", regex: /原生\s?IP/gi, value: "原生IP" },
 
-    // [Critical] 分隔符标准化 (支持 / 和 ✈)
-    { desc: "统一分隔符 (转为 -，后续会被 split 拆分)", regex: /[-_|\s丨✈\/]+/g, value: "-" },
+    // 分隔符标准化：统一转为 "-"，后续由 splitAndDedup 拆分
+    { desc: "统一分隔符", regex: /[-_|\s丨✈\/]+/g, value: "-" },
 
     { desc: "移除上标字符", regex: /ˣ²|ˣ³|ˣ⁴|ˣ⁵|ˣ⁶|ˣ⁷|ˣ⁸|ˣ⁹|ˣ¹⁰|ˣ²⁰|ˣ³⁰|ˣ⁴⁰|ˣ⁵⁰/, value: "" },
     { desc: "移除 UDP/GPT 标签", regex: /\budp\b/i, value: "UDP" },
@@ -62,8 +64,8 @@ const CleaningRules = [
     { desc: "移除 UDPN 标签", regex: /udpn\b/, value: "UDPN" }
 ];
 
-// 1.2 地区关键词映射 (Region Mapping)
-// 用于标准化地名 (如 'HK' -> '香港')
+// 1.2 地区关键词映射
+// 将各语言地名统一为中文简称（如 'HK' / 'Hong Kong' → '香港'）
 const RegionMap = {
     // 亚洲
     "香港": /((?:\bHK\b)|Hong[\s-]?Kong|HONG[\s-]?KONG|Hongkong|香港|深港|沪港|呼港|京港|广港|杭港|HKT)+/gi,
@@ -92,7 +94,6 @@ const RegionMap = {
     "法国": /((?:\bFR\b)|France|Paris|Marseille|Lyon|Nice|Toulouse|法国|巴黎|马赛|里昂|尼斯|图卢兹)+/gi,
     "俄罗斯": /((?:\bRU\b)|Russia|Moscow|St\.?[\s-]?Petersburg|Novosibirsk|Siberia|Khabarovsk|俄罗斯|莫斯科|圣彼得堡|新西伯利亚|西伯利亚|伯力)+/gi,
     "荷兰": /((?:\bNL\b)|Netherlands|Amsterdam|Rotterdam|The[\s-]?Hague|荷兰|阿姆斯特丹|鹿特丹|海牙)+/gi,
-    // [Critical] 比利时支持 (Belgium Support)
     "比利时": /((?:\bBE\b)|Belgium|Brussels|Antwerp|Ghent|比利时|布鲁塞尔|安特卫普|根特)+/gi,
     "意大利": /((?:\bIT\b)|Italy|Milan|Rome|Venice|Florence|Naples|意大利|米兰|罗马|威尼斯|佛罗伦萨|那不勒斯)+/gi,
     "土耳其": /((?:\bTR\b)|Turkey|Istanbul|Ankara|土耳其|伊斯坦布尔|安卡拉)+/gi,
@@ -116,8 +117,8 @@ const RegionMap = {
     "南非": /((?:\bZA\b)|South[\s-]?Africa|Johannesburg|Cape[\s-]?Town|南非|约翰内斯堡|开普敦)+/gi
 };
 
-// 1.3 国家/地区数据库 (Country DB)
-// 包含: 旗帜 (flag), 二位代码 (code), 中文简称 (name), 英文全称 (full)
+// 1.3 国家/地区数据库
+// 字段: flag(旗帜), code(二位代码), name(中文简称), full(英文全称)
 const CountryDB = [
    { flag: '🇦🇨', code: 'AC', name: '阿森松岛', full: 'Ascension Island' },
    { flag: '🇦🇩', code: 'AD', name: '安道尔', full: 'Andorra' },
@@ -381,10 +382,10 @@ const CountryDB = [
    { flag: '🇰🇷', code: 'KR', name: '韩国', full: 'South Korea' }, // 补充
 ];
 
-// 1.4 动态国旗规则 (Auto-generated Rules)
-// 初始化时自动填充
+// 1.4 动态国旗匹配规则
+// 手动优先规则 + 从 CountryDB 自动生成的规则
 const FlagRules = [
-    // 优先匹配的手动规则 (Manual Overrides)
+    // 手动优先规则（覆盖自动生成的规则）
     { regex: /((波斯尼亚和黑塞哥维那|波黑|萨拉热窝|Bosnia|Sarajevo))/i, emoji: '🇧🇦' },
     { regex: /(专属纯净住宅)/i, emoji: '🇺🇸' },
     { regex: /((美[国國]|华盛顿|波特兰|达拉斯|俄勒冈|凤凰城|菲尼克斯|费利蒙|弗里蒙特|硅谷|旧金山|拉斯维加斯|洛杉|圣何塞|圣荷西|圣塔?克拉拉|西雅图|芝加哥|哥伦布|纽约|阿什本|纽瓦克|丹佛|加利福尼亚|弗吉尼亚|马纳萨斯|俄亥俄|得克萨斯|[佐乔]治亚|亚特兰大|佛罗里达|迈阿密))/i, emoji: '🇺🇸' },
@@ -403,7 +404,7 @@ const FlagRules = [
     { regex: /((中[国國]|[广廣贵貴]州|深圳|北京|上海|[广廣山][东東西]|[河湖][北南]|天津|重[庆慶]|[辽遼][宁寧]|吉林|黑[龙龍]江|江[苏蘇西]|浙江|安徽|福建|[海云雲]南|四川|[陕陝]西|甘[肃肅]|青海|[内內]蒙古|西藏|[宁寧]夏|新疆))/i, emoji: '🇨🇳' }
 ];
 
-// 自动填充 FlagRules
+// 自动从 CountryDB 填充 FlagRules
 (function initFlagRules() {
     const initialFlagMap = {};
     CountryDB.forEach(item => {
@@ -417,14 +418,14 @@ const FlagRules = [
             emoji: item.flag
         });
     });
-    // 保存排序后的关键词用于兜底匹配
+    // 按长度降序排列关键词，用于 detectFlag 兜底匹配
     Constants.SORTED_COUNTRY_KEYS = Object.keys(initialFlagMap).sort((a, b) => b.length - a.length);
     Constants.COUNTRY_MAP = initialFlagMap;
 })();
 
 
 // ============================================================================
-// 2. 工具函数 (Helper Functions)
+// 第二部分: 工具函数
 // ============================================================================
 
 const Utils = {
@@ -457,18 +458,16 @@ const Utils = {
      * 分割字符串，移除重复项，并将 "美国AI" 拆分为 "美国" 和 "AI"
      */
     splitAndDedup: (name) => {
-        // 3.1 初始拆分 (Split by separators)
-        // 使用 [-_| s丨✈/] 进行拆分，过滤空值和完全重复项
+        // 3.1 初始拆分与智能去重
         let uniqueParts = name.split(/[-_|\s丨✈\/]+/).filter((item, index, self) => {
             if (!item || item.trim() === "" || item === "[]") return false;
             // 简单去重
             if (self.indexOf(item) !== index) return false;
 
-            // 智能去重: 只有在对方*严格长于*自己的前提下，才认为自己被长字符包含了。
-            // 这是为了防止如果存在两个 "日本" 时触发互相包含的 bug。
+            // 智能去重: 仅当另一个词严格长于当前词且包含当前词时，才视为冗余。
+            // 防止两个相同词互相包含导致的误删 Bug。
             const isRedundant = self.some((other, otherIndex) => {
                 if (index === otherIndex) return false;
-                // [修复Bug] 增加 other.length <= item.length 的阻断，只有比自己长的词才有资格说是我的母词
                 if (other.length <= item.length || !other.includes(item)) return false;
                 const isNonAscii = /[^\x00-\x7F]/.test(item);
                 const isNumeric = /^\d+$/.test(item);
@@ -478,8 +477,7 @@ const Utils = {
             return !isRedundant;
         });
 
-        // 3.2 深度拆分 (Split combined regions)
-        // 处理 "美国流媒体" -> "美国", "流媒体"
+        // 3.2 深度拆分：将 "美国流媒体" 拆为 ["美国", "流媒体"]
         const allRegions = [...Constants.PRIORITY_REGIONS, ...Object.keys(RegionMap)];
         const expandedParts = [];
 
@@ -503,8 +501,7 @@ const Utils = {
             }
         }
 
-        // [Critical] 再次去重 (Post-Split Deduplication)
-        // 解决拆分后产生的重复 (如 "美国AI" 拆出 "AI", 若原本也有 "AI", 则需去重)
+        // 拆分后再次去重（如 "美国AI" 拆出的 "AI" 与已有 "AI" 合并）
         return [...new Set(expandedParts)];
     },
 
@@ -533,27 +530,27 @@ const Utils = {
     },
 
     /**
-     * 智能标志检测 (Flag Detection)
+     * 智能国旗检测
      */
     detectFlag: (name) => {
-        // 正则匹配
+        // 优先使用 FlagRules 正则匹配
         for (const rule of FlagRules) {
             if (rule.regex.test(name)) return rule.emoji;
         }
-        // 关键词兜底
+        // 关键词兜底匹配
         for (const key of Constants.SORTED_COUNTRY_KEYS) {
             if (name.toUpperCase().includes(key.toUpperCase())) {
                 return Constants.COUNTRY_MAP[key];
             }
         }
-        return "🏳️"; // Default
+        return "🏳️"; // 未识别地区默认白旗
     },
 
     /**
      * 获取排序优先级
      */
     getPriority: (name) => {
-        // 优先列表 + 剩余 RegionMap 键
+        // 按优先列表排序，其余地区按 RegionMap 顺序追加
         const allKeys = [...Constants.PRIORITY_REGIONS, ...Object.keys(RegionMap).filter(k => !Constants.PRIORITY_REGIONS.includes(k))];
         const index = allKeys.findIndex(k => name.includes(k));
         return index === -1 ? 9999 : index;
@@ -569,14 +566,16 @@ const Utils = {
 };
 
 // ============================================================================
-// 3. 主处理流程 (Main Pipeline)
+// 第三部分: 主处理流程
 // ============================================================================
 
 /**
- * 核心处理函数 (脚本入口)
+ * 核心处理函数（Sub-Store 脚本入口）
+ * @param {Array} proxies - Sub-Store 传入的节点数组
+ * @returns {Array} 格式化并排序后的节点数组
  */
 function operator(proxies) {
-    // Phase 1: Cleaning & Formatting (单个节点处理)
+    // ── 阶段一: 清洗与格式化（逐节点处理）──
     const sortedProxies = proxies
         .filter(p => !Constants.INVALID_REGEX.test(p.name))
         .map(p => {
@@ -591,61 +590,75 @@ function operator(proxies) {
                 remainingName = emojiMatch[2];
             }
 
-            // 新增：极其智能的预格式化与简单命名兼容逻辑
+            // 预格式化分支：含 Emoji 前缀的节点直接走快速通道
             if (preFlag) {
-                // 判断是否已经是终极标准格式：Flag Protocol ✈ Name ✈ Suffix
-                // 或者只是含 Emoji 的简单名字： 🇭🇰 香港01-深港IEPL
                 const hasFlightSeparator = remainingName.includes('✈');
 
                 if (hasFlightSeparator) {
+                    // 已含 ✈ 分隔符 → 已格式化节点，仅做协议补全
                     p.isPreFormatted = true;
                     p.flag = preFlag;
                     // 分割并处理，确保有 Protocol 前缀
                     let parts = remainingName.split('✈').map(s => s.trim()).filter(s => s !== '');
-                    let firstPart = parts[0].toLowerCase();
-
-                    // 如果第一段不是协议，我们强制加上去
-                    let hasProtocol = /vless|vmess|trojan|shadowsocks|ss|ssr|tuic|hysteria2|reality/i.test(firstPart);
+                    // 检测首段是否为已知协议名
+                    let hasProtocol = /vless|vmess|trojan|shadowsocks|ss|ssr|tuic|hysteria2|reality/i.test(parts[0].toLowerCase());
                     let finalProtocolPrefix = hasProtocol ? parts.shift() : (p.protocol && p.protocol !== "unknown" ? p.protocol : "");
-
                     let newNameStr = parts.join(' ✈ ');
                     p.name = `${p.flag} ${finalProtocolPrefix ? finalProtocolPrefix + ' ✈ ' : ''}${newNameStr}`;
                     return p;
                 } else {
-                     // 没有 ✈ 分隔符的简单节点 (例如 "🇭🇰 香港01-深港IEPL")
-                     // 我们同样希望变成 `Flag Protocol ✈ 原始名字`，防止它被错误地深度肢解
+                     // 无 ✈ 分隔符的简单节点（如 "🇭🇰 香港01-深港IEPL"）
+                     // 目标输出: 🇭🇰 香港 ✈ 深港IEPL ✈ ss
                      p.isPreFormatted = true;
                      p.flag = preFlag;
                      let finalContent = remainingName;
 
-                     // 把旧有数字如 "香港01" 的编号剃掉，保持美观
+                     // 移除编号（如 "香港01" → "香港"）
                      finalContent = finalContent.replace(/\d{1,2}(?=-|$)/, '').trim();
 
-                     p.name = `${p.flag} ${p.protocol && p.protocol !== "unknown" ? p.protocol + ' ✈ ' : ''}${finalContent}`;
+                     // 协议简写映射（shadowsocks → ss）
+                     const protoMap = { shadowsocks: 'ss', shadowsocksr: 'ssr' };
+                     let shortProto = protoMap[protocol] || protocol;
+
+                     // 按 "-" 拆分地区与细节（"香港-深港IEPL" → ["香港", "深港IEPL"]）
+                     let nameParts = [];
+                     const dashSplit = finalContent.match(/^([^-]+)-(.+)$/);
+                     if (dashSplit) {
+                         nameParts.push(dashSplit[1].trim());
+                         nameParts.push(dashSplit[2].trim());
+                     } else {
+                         nameParts.push(finalContent);
+                     }
+
+                     // 追加协议后缀
+                     if (shortProto && shortProto !== "unknown") {
+                         nameParts.push(shortProto);
+                     }
+
+                     // 相邻去重（"香港 ✈ 香港 ✈ vmess" → "香港 ✈ vmess"）
+                     let deduped = [nameParts[0]];
+                     for (let i = 1; i < nameParts.length; i++) {
+                         if (nameParts[i] !== nameParts[i - 1]) {
+                             deduped.push(nameParts[i]);
+                         }
+                     }
+
+                     p.name = `${p.flag} ${deduped.join(' ✈ ')}`;
                      return p;
                 }
             }
 
-            // Step 1: 基础清理
-            name = Utils.cleanName(name);
+            // ── 无 Emoji 前缀的节点 → 完整清洗流水线 ──
+            name = Utils.cleanName(name);           // 基础清理
+            name = Utils.standardizeRegion(name);   // 地名标准化
+            let parts = Utils.splitAndDedup(name);  // 拆分与去重
+            parts = Utils.promoteRegion(parts);     // 地区提升到首位
 
-            // Step 2: 地名标准化
-            name = Utils.standardizeRegion(name);
-
-            // Step 3: 拆分与去重
-            let parts = Utils.splitAndDedup(name);
-
-            // Step 4: 地区提升
-            parts = Utils.promoteRegion(parts);
-
-            // 临时重组用于后续处理
             let tempName = parts.join(Constants.SEPARATOR);
+            const flag = Utils.detectFlag(tempName); // 国旗检测
 
-            // Step 5: 标志检测
-            const flag = Utils.detectFlag(tempName);
-
-            // Step 6: 后期处理 (Final Assembly)
-            // 6.1 移除已有 Flag, IPv6 优化, 移除协议名
+            // ── 后期组装 ──
+            // 移除残留 Emoji、处理 IPv6、剔除协议名
             tempName = tempName.replace(/[\uD83C][\uDDE6-\uDDFF][\uD83C][\uDDE6-\uDDFF]/g, "").trim();
 
             const serverAddress = p.server || p.address || "";
@@ -656,7 +669,7 @@ function operator(proxies) {
 
             tempName = tempName.replace(new RegExp(protocol, "ig"), "").trim();
 
-            // 6.2 提取倍率 (x2)
+            // 提取倍率标识（如 2×）
             let multiplier = "";
             const multiplierMatch = tempName.match(/(?:[-_\s]+)?((?:\d+(?:\.\d+)?)\s?[x×])/i);
             if (multiplierMatch) {
@@ -664,12 +677,12 @@ function operator(proxies) {
                 tempName = tempName.replace(multiplierMatch[0], "");
             }
 
-            // 6.3 最终清理
+            // 最终清理：移除首尾分隔符、紧凑末尾数字
             tempName = tempName.trim().replace(/^[-_\s]+|[-_\s]+$/g, "");
-            tempName = tempName.replace(/[-_\s]+(\d+)$/, "$1"); // 紧凑数字
+            tempName = tempName.replace(/[-_\s]+(\d+)$/, "$1");
 
-            // 6.4 构造对象
-            p.processedName = tempName; // 只有名称部分 (不含 flag/protocol)
+            // 构造中间对象（供阶段三重编号使用）
+            p.processedName = tempName;
             p.flag = flag;
             p.multiplier = multiplier;
             p.protocol = protocol;
@@ -679,7 +692,7 @@ function operator(proxies) {
             return p;
         })
         .sort((a, b) => {
-            // Phase 2: Sorting (排序)
+            // ── 阶段二: 排序（地区优先级 → 序号） ──
             const prioA = Utils.getPriority(a.name);
             const prioB = Utils.getPriority(b.name);
             if (prioA !== prioB) return prioA - prioB;
@@ -689,36 +702,34 @@ function operator(proxies) {
             return numA - numB;
         });
 
-    // Phase 3: Renumbering (重编号)
+    // ── 阶段三: 重编号与最终输出 ──
     const nameCounts = {};
 
     return sortedProxies.map(p => {
         if (p.isPreFormatted) {
+            // 预格式化节点直接输出，仅清理临时属性
             delete p.isPreFormatted;
-            // 强制重组对象键值顺序
             const { name, type, ...restProps } = p;
             return { name, type, ...restProps };
         }
 
-        // 解析已经处理好的 parts (为了准确提取 RegionKey)
-        // 注意: 我们需要从 p.processedName (Clean Name) 中提取 Region
-        // 格式: Region[N]✈Suffix
+        // 从 processedName 中提取地区键，用于分组计数
 
         let content = p.processedName || "";
-        // 移除开头的 IPv6 标签干扰 (如果存在)
+        // 移除 IPv6 前缀干扰
         const contentWithoutIPv6 = content.replace(/^IPv6\s+/, "");
 
         let keyPart = contentWithoutIPv6;
         let suffixPart = "";
 
-        // Split by FIRST Plane
+        // 按首个 ✈ 拆分出键部分和后缀部分
         const planeIndex = contentWithoutIPv6.indexOf(Constants.SEPARATOR);
         if (planeIndex !== -1) {
             keyPart = contentWithoutIPv6.substring(0, planeIndex).trim();
             suffixPart = contentWithoutIPv6.substring(planeIndex + 1).replace(/^[\s✈]+|[\s✈]+$/g, '').trim();
         }
 
-        // Check for IPv6 in key or suffix
+        // 检查 IPv6 标记
         let isIPv6 = content.startsWith("IPv6");
         if (/IPv6/i.test(keyPart)) {
             isIPv6 = true;
@@ -729,14 +740,13 @@ function operator(proxies) {
             suffixPart = suffixPart.replace(/IPv6/ig, "").replace(/^[\s✈]+|[\s✈]+$/g, '').trim();
         }
 
-        // 清理 Key (移除末尾数字或括号)
+        // 清理键（移除末尾数字或方括号）
         const cleanKey = keyPart.replace(/(\[\s*\d*\s*\]|\d+)$/g, '').trim();
 
-        // 提取基准国家维度用于统一计数
+        // 提取基准地区名用于分组计数（如 "香港01" → "香港"）
         let baseRegion = cleanKey;
         if (typeof RegionMap !== 'undefined') {
             for (const region of Object.keys(RegionMap)) {
-                // 如果 cleanKey 包含该基准国家名，归类到同一组计数，例如 "香港01-深港IEPL" -> "香港"
                 if (cleanKey.startsWith(region)) {
                     baseRegion = region;
                     break;
@@ -744,31 +754,29 @@ function operator(proxies) {
             }
         }
 
-        // 计数
+        // 分组计数
         if (!nameCounts[baseRegion]) nameCounts[baseRegion] = 0;
         nameCounts[baseRegion]++;
         const index = nameCounts[baseRegion];
 
-        // 重组
+        // 重组最终名称
         const prefix = isIPv6 ? "IPv6 " : "";
         let newName = `${prefix}${cleanKey}`;
 
-        // Check if suffixPart is numeric
+        // 追加后缀（跳过纯数字后缀、去重已包含内容）
         if (suffixPart && !/^\d+$/.test(suffixPart)) {
-            // deduplicate checking if suffixPart is already contained in newName
             if (!newName.includes(suffixPart)) {
-                // Remove adjacent or global duplicates in suffixPart
+                // 后缀内部去重
                 const uniqueSuffixParts = [...new Set(suffixPart.split(/\s*✈\s*/))].join(Constants.SEPARATOR);
                 newName = `${newName}${Constants.SEPARATOR}${uniqueSuffixParts}`;
             }
         }
 
-        // Final output string
+        // 倍率后缀
         const extras = [];
         if (p.multiplier) extras.push(p.multiplier.trim());
 
-        // 智能协议冗余剔除机制 (Smart Protocol Deduplication)
-        // 检查整个节点名中是否已经包含了高级协议特征(Reality, XTLS, V2ray, TLS, WS)
+        // 智能协议冗余剔除：高级协议特征已出现时，隐藏底层协议名
         const fullCurrentName = p.name + newName;
         const hasRealityOrXTLS = /(Reality|XTLS|Xhttp)/i.test(fullCurrentName);
         const hasV2rayOrTLS_WS = /(V2ray|TLS|WS)/i.test(fullCurrentName);
@@ -776,12 +784,12 @@ function operator(proxies) {
         if (p.protocol) {
             let shouldAddProtocol = true;
 
-            // 互斥规则 1: 如果名字里已经有 Reality 或 XTLS，就舍弃底层协议 vless
+            // 互斥: Reality/XTLS 存在时隐藏 vless
             if (hasRealityOrXTLS && p.protocol.toLowerCase() === 'vless') {
                 shouldAddProtocol = false;
             }
 
-            // 互斥规则 2: 如果名字里已经有 V2ray, TLS, 或 WS，就舍弃底层协议 vmess
+            // 互斥: V2ray/TLS/WS 存在时隐藏 vmess
             if (hasV2rayOrTLS_WS && p.protocol.toLowerCase() === 'vmess') {
                 shouldAddProtocol = false;
             }
@@ -796,20 +804,16 @@ function operator(proxies) {
         }
 
         p.name = extras.length > 0 ? `${newName} ✈ ${extras.join(' ✈ ')}` : newName;
-        // 清理由于前面置空字段(如某些标签被去重移除了)导致的连续分隔符 ' ✈  ✈ '。
-        // 将两个或以上的 ' ✈ ' 以及它们之间的空格压缩为一个纯净的 ' ✈ '
-        p.name = p.name.replace(/(?:\s*✈\s*){2,}/g, ' ✈ ');
-        // 清理由于前面置空字段(如某些标签被去重移除了)导致的连续分隔符 ' ✈  ✈ '。
-        // 将两个或以上的 ' ✈ ' 以及它们之间的空格压缩为一个纯净的 ' ✈ '
+        // 压缩连续分隔符（' ✈  ✈ ' → ' ✈ '）
         p.name = p.name.replace(/(?:\s*✈\s*){2,}/g, ' ✈ ');
 
-        // Remove temp props
+        // 清理临时属性
         delete p.processedName;
         delete p.flag;
         delete p.multiplier;
         delete p.protocol;
 
-        // 强制重组对象键值顺序：保证 `name` 始终作为第一属性输出用于 JSON 排版美观
+        // 重组对象：保证 name 始终为第一属性（JSON 排版美观）
         const { name, type, ...restProps } = p;
         return {
             name,
