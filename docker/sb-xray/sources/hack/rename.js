@@ -60,6 +60,7 @@ const CleaningRules = [
     { desc: "移除 'HY2'", regex: /-?HY2/gi, value: "" },
     { desc: "移除 'VPN' 关键字", regex: /\bVPN\b/gi, value: "" },
     { desc: "移除 'IP' 关键字 (排除中文复合词: 动态IP/静态IP/原生IP/IPv6/IPLC)", regex: /(?<![\u4e00-\u9fff])\bIP\b/g, value: "" },
+    { desc: "移除'解锁'前缀（保留内容，分隔符由 splitAndDedup 补全）", regex: /解锁/g, value: "" },
     { desc: "移除 'GG/read/大学/加州/负载均衡/中继/密苏里州'", regex: /(GG|read|大学|加州|负载均衡|中继|密苏里州)/gi, value: "" },
     { desc: "替换 AI 关键词", regex: /[-_]?\d*(SV|chatgpt|gemini)/gi, value: "AI" },
     { desc: "移除流量标识 (TB)", regex: /-?\d+-?\d*TB/gi, value: "" },
