@@ -76,6 +76,39 @@ get_latest_stable_tag() {
     fi
 }
 
+# 辅助函数: 将脚本中某组件的默认版本更新为最新获取值
+update_script_default() {
+    local arg_name=$1
+    local fetched_tag=$2
+    local script
+    script="$(cd "$(dirname "$0")" && pwd)/$(basename "$0")"
+
+    # 跳过空或无效版本
+    if [ -z "$fetched_tag" ] || [ "$fetched_tag" == "null" ]; then
+        return
+    fi
+
+    local clean_version="${fetched_tag#v}"
+
+    # 从脚本中读取当前默认版本
+    local current_default
+    current_default=$(grep "check_version" "$script" | grep "\"${arg_name}\"" | sed "s/.*\"${arg_name}\"[[:space:]]*\"\([^\"]*\)\".*/\1/")
+
+    if [ "$clean_version" == "$current_default" ]; then
+        return
+    fi
+
+    # 跨平台兼容更新
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        sed -i '' "s|\(check_version.*\"${arg_name}\"[[:space:]]*\)\"[^\"]*\"|\1\"${clean_version}\"|" "$script"
+    else
+        sed -i "s|\(check_version.*\"${arg_name}\"[[:space:]]*\)\"[^\"]*\"|\1\"${clean_version}\"|" "$script"
+    fi
+
+    echo -e "  ${GREEN}↑ ${arg_name}: ${current_default} -> ${clean_version}${NC}"
+    VERSIONS_UPDATED=true
+}
+
 # 检查是否使用默认版本模式
 USE_DEFAULT_VERSIONS=false
 if [ "$1" == "default" ]; then
@@ -167,6 +200,28 @@ check_version "Cloudflared"      "$CLOUDFLARED_VERSION"        "CLOUDFLARED_VERS
 check_version "3x-ui"           "$XUI_TAG"                    "XUI_VERSION"                "2.8.10"
 check_version "Sing-box"        "$SING_BOX_TAG"               "SING_BOX_VERSION"           "1.13.0"
 check_version "Xray"            "$XRAY_TAG"                   "XRAY_VERSION"               "26.2.6"
+
+# 当从 GitHub 获取版本后，自动更新脚本中的默认版本配置
+if [ "$USE_DEFAULT_VERSIONS" != "true" ]; then
+    echo -e "${BLUE}检查默认版本配置是否需要更新...${NC}"
+    VERSIONS_UPDATED=false
+    update_script_default "SHOUTRRR_VERSION"           "$SHOUTRRR_TAG"
+    update_script_default "MIHOMO_VERSION"             "$MIHOMO_TAG"
+    update_script_default "HTTP_META_VERSION"          "$HTTP_META_VERSION"
+    update_script_default "SUB_STORE_FRONTEND_VERSION" "$SUB_STORE_FRONTEND_VERSION"
+    update_script_default "SUB_STORE_BACKEND_VERSION"  "$SUB_STORE_BACKEND_VERSION"
+    update_script_default "SUI_VERSION"                "$SUI_TAG"
+    update_script_default "DUFS_VERSION"               "$DUFS_TAG"
+    update_script_default "CLOUDFLARED_VERSION"        "$CLOUDFLARED_VERSION"
+    update_script_default "XUI_VERSION"                "$XUI_TAG"
+    update_script_default "SING_BOX_VERSION"           "$SING_BOX_TAG"
+    update_script_default "XRAY_VERSION"               "$XRAY_TAG"
+    if [ "$VERSIONS_UPDATED" == "true" ]; then
+        echo -e "${GREEN}✓ build.sh 默认版本配置已同步更新${NC}"
+    else
+        echo -e "${BLUE}✓ 所有默认版本均为最新，无需更新${NC}"
+    fi
+fi
 
 # 确定镜像 Tag (如果 Xray 获取失败，则回退到 'manual')
 if [ -z "$XRAY_VERSION_FINAL" ]; then
