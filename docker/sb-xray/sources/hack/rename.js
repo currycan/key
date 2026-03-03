@@ -595,6 +595,11 @@ const Pipeline = {
         p.isPreFormatted = true;
         p.flag = flag;
         let parts = remainingName.split('✈').flatMap(Utils.cleanPreformatted);
+        // 将英文地名转为中文（如 "Hong Kong" → "香港"），并清理 cleanPreformatted 跳过的残留分隔符（| - _）
+        parts = parts
+            .map(part => Utils.standardizeRegion(part))
+            .map(part => part.replace(/^[-_||\s]+|[-_||\s]+$/g, '').trim())
+            .filter(part => part !== '');
         const firstIsProtocol = parts.length > 0 && Utils.isKnownProtocol(parts[0]);
         let protocolPrefix = firstIsProtocol
             ? parts.shift()
