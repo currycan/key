@@ -516,10 +516,14 @@ const Utils = {
             let splitHappened = false;
             for (const region of allRegions) {
                 if (part.startsWith(region) && part.length > region.length) {
-                    const suffix = part.substring(region.length).trim();
+                    let suffix = part.substring(region.length).trim();
+                    // 移除地区正则消费 ISP 缩写后遗留的孤立序号前缀
+                    // 如 "香港hkt" → "香港" 后遗留 "2直连"，去掉前置纯数字 → "直连"
+                    // 仅当数字紧接中文字符时才剥离（避免误删 "2g" "10Gbps" 等带宽标识）
+                    suffix = suffix.replace(/^\d+(?=[\u4e00-\u9fff])/, '').trim();
                     if (!/^\d+$/.test(suffix)) {
                         expandedParts.push(region);
-                        expandedParts.push(suffix);
+                        if (suffix) expandedParts.push(suffix);
                         splitHappened = true;
                         break;
                     }
