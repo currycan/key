@@ -68,12 +68,13 @@ const CleaningRules = [
     { desc: "移除地区名后的编号", regex: /([\u4e00-\u9fff])\d{1,2}(?=[-_\s丨✈\/]|$)/g, value: "$1" },
 
     // 分隔符标准化：统一转为 "-"，后续由 splitAndDedup 拆分
-    { desc: "统一分隔符", regex: /[-_|\s丨✈\/]+/g, value: "-" },
+    // skipInPreformat: 预格式化快速通道跳过此规则（保留 ✈ 结构）
+    { desc: "统一分隔符", regex: /[-_|\s丨✈\/]+/g, value: "-", skipInPreformat: true },
 
     { desc: "移除上标字符", regex: /ˣ²|ˣ³|ˣ⁴|ˣ⁵|ˣ⁶|ˣ⁷|ˣ⁸|ˣ⁹|ˣ¹⁰|ˣ²⁰|ˣ³⁰|ˣ⁴⁰|ˣ⁵⁰/, value: "" },
-    { desc: "移除 UDP/GPT 标签", regex: /\budp\b/i, value: "UDP" },
-    { desc: "移除 GPT 标签", regex: /\bgpt\b/i, value: "GPT" },
-    { desc: "移除 UDPN 标签", regex: /udpn\b/, value: "UDPN" }
+    { desc: "标准化 UDP 大写", regex: /\budp\b/i, value: "UDP" },
+    { desc: "标准化 GPT 大写", regex: /\bgpt\b/i, value: "GPT" },
+    { desc: "标准化 UDPN 大写", regex: /udpn\b/i, value: "UDPN" }
 ];
 
 // 1.2 地区关键词映射
@@ -390,49 +391,52 @@ const CountryDB = [
    { flag: '🇿🇦', code: 'ZA', name: '南非', full: 'South Africa' },
    { flag: '🇿🇲', code: 'ZM', name: '赞比亚', full: 'Zambia' },
    { flag: '🇿🇼', code: 'ZW', name: '津巴布韦', full: 'Zimbabwe' },
-   { flag: '🇬🇧', code: 'UK', name: '英国', full: 'United Kingdom' }, // 补充常见缩写
-   { flag: '🇰🇷', code: 'KR', name: '韩国', full: 'South Korea' }, // 补充
 ];
 
 // 1.4 动态国旗匹配规则
 // 手动优先规则 + 从 CountryDB 自动生成的规则
 const FlagRules = [
-    // 手动优先规则（覆盖自动生成的规则）
-    { regex: /((波斯尼亚和黑塞哥维那|波黑|萨拉热窝|Bosnia|Sarajevo))/i, emoji: '🇧🇦' },
-    { regex: /(专属纯净住宅)/i, emoji: '🇺🇸' },
-    { regex: /((美[国國]|华盛顿|波特兰|达拉斯|俄勒冈|凤凰城|菲尼克斯|费利蒙|弗里蒙特|硅谷|旧金山|拉斯维加斯|洛杉|圣何塞|圣荷西|圣塔?克拉拉|西雅图|芝加哥|哥伦布|纽约|阿什本|纽瓦克|丹佛|加利福尼亚|弗吉尼亚|马纳萨斯|俄亥俄|得克萨斯|[佐乔]治亚|亚特兰大|佛罗里达|迈阿密))/i, emoji: '🇺🇸' },
-    { regex: /((日本|东京|大阪|名古屋|埼玉|福冈))/i, emoji: '🇯🇵' },
-    { regex: /((新加坡|[狮獅]城))/i, emoji: '🇸🇬' },
-    { regex: /(([台臺][湾灣北]|新[北竹]|彰化|高雄))/i, emoji: '🇹🇼' },
-    { regex: /((俄[国國]|俄[罗羅]斯|莫斯科|圣彼得堡|西伯利亚|伯力|哈巴罗夫斯克))/i, emoji: '🇷🇺' },
-    { regex: /((英[国國]|英格兰|伦敦|加的夫|曼彻斯特|伯克郡))/i, emoji: '🇬🇧' },
-    { regex: /((加拿大|[枫楓][叶葉]|多伦多|蒙特利尔|温哥华))/i, emoji: '🇨🇦' },
-    { regex: /((法[国國]|巴黎|马赛|斯特拉斯堡))/i, emoji: '🇫🇷' },
-    { regex: /((朝[鲜鮮]))/i, emoji: '🇰🇵' },
-    { regex: /(([韩韓][国國]|首尔|春川))/i, emoji: '🇰🇷' },
-    { regex: /((爱尔兰|都柏林))/i, emoji: '🇮🇪' },
-    { regex: /((德[国國]|法兰克福|柏林|杜塞尔多夫))/i, emoji: '🇩🇪' },
-    { regex: /((印尼|印度尼西亚|雅加达))/i, emoji: '🇮🇩' },
-    { regex: /((中[国國]|[广廣贵貴]州|深圳|北京|上海|[广廣山][东東西]|[河湖][北南]|天津|重[庆慶]|[辽遼][宁寧]|吉林|黑[龙龍]江|江[苏蘇西]|浙江|安徽|福建|[海云雲]南|四川|[陕陝]西|甘[肃肅]|青海|[内內]蒙古|西藏|[宁寧]夏|新疆))/i, emoji: '🇨🇳' }
+    // 手动优先规则（覆盖 CountryDB 自动生成的规则，处理简体/繁体变体和常见城市名）
+    { regex: /(波斯尼亚和黑塞哥维那|波黑|萨拉热窝|Bosnia|Sarajevo)/i, emoji: '🇧🇦' },
+    { regex: /专属纯净住宅/i, emoji: '🇺🇸' },
+    { regex: /(美[国國]|华盛顿|波特兰|达拉斯|俄勒冈|凤凰城|菲尼克斯|费利蒙|弗里蒙特|硅谷|旧金山|拉斯维加斯|洛杉|圣何塞|圣荷西|圣塔?克拉拉|西雅图|芝加哥|哥伦布|纽约|阿什本|纽瓦克|丹佛|加利福尼亚|弗吉尼亚|马纳萨斯|俄亥俄|得克萨斯|[佐乔]治亚|亚特兰大|佛罗里达|迈阿密)/i, emoji: '🇺🇸' },
+    { regex: /(日本|东京|大阪|名古屋|埼玉|福冈)/i, emoji: '🇯🇵' },
+    { regex: /(新加坡|[狮獅]城)/i, emoji: '🇸🇬' },
+    { regex: /([台臺][湾灣北]|新[北竹]|彰化|高雄)/i, emoji: '🇹🇼' },
+    { regex: /(俄[国國]|俄[罗羅]斯|莫斯科|圣彼得堡|西伯利亚|伯力|哈巴罗夫斯克)/i, emoji: '🇷🇺' },
+    { regex: /(英[国國]|英格兰|伦敦|加的夫|曼彻斯特|伯克郡)/i, emoji: '🇬🇧' },
+    { regex: /(加拿大|[枫楓][叶葉]|多伦多|蒙特利尔|温哥华)/i, emoji: '🇨🇦' },
+    { regex: /(法[国國]|巴黎|马赛|斯特拉斯堡)/i, emoji: '🇫🇷' },
+    { regex: /朝[鲜鮮]/i, emoji: '🇰🇵' },
+    { regex: /([韩韓][国國]|首尔|春川)/i, emoji: '🇰🇷' },
+    { regex: /(爱尔兰|都柏林)/i, emoji: '🇮🇪' },
+    { regex: /(德[国國]|法兰克福|柏林|杜塞尔多夫)/i, emoji: '🇩🇪' },
+    { regex: /(印尼|印度尼西亚|雅加达)/i, emoji: '🇮🇩' },
+    { regex: /(中[国國]|[广廣贵貴]州|深圳|北京|上海|[广廣山][东東西]|[河湖][北南]|天津|重[庆慶]|[辽遼][宁寧]|吉林|黑[龙龍]江|江[苏蘇西]|浙江|安徽|福建|[海云雲]南|四川|[陕陝]西|甘[肃肅]|青海|[内內]蒙古|西藏|[宁寧]夏|新疆)/i, emoji: '🇨🇳' }
 ];
 
-// 自动从 CountryDB 填充 FlagRules
+// 自动从 CountryDB 填充 FlagRules，并缓存全局常量
 (function initFlagRules() {
-    const initialFlagMap = {};
-    CountryDB.forEach(item => {
-        if (item.name) initialFlagMap[item.name] = item.flag;
-        if (item.full) initialFlagMap[item.full] = item.flag;
+    const escapeRegExp = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const flagMap = {};
 
-        const escapeRegExp = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    CountryDB.forEach(item => {
+        if (item.name) flagMap[item.name] = item.flag;
+        if (item.full) flagMap[item.full] = item.flag;
+
         const pattern = `(${escapeRegExp(item.name)}|${escapeRegExp(item.full)})`;
-        FlagRules.push({
-            regex: new RegExp(pattern, 'i'),
-            emoji: item.flag
-        });
+        FlagRules.push({ regex: new RegExp(pattern, 'i'), emoji: item.flag });
     });
-    // 按长度降序排列关键词，用于 detectFlag 兜底匹配
-    Constants.SORTED_COUNTRY_KEYS = Object.keys(initialFlagMap).sort((a, b) => b.length - a.length);
-    Constants.COUNTRY_MAP = initialFlagMap;
+
+    // 兜底匹配：关键词按长度降序，避免短词先匹配
+    Constants.SORTED_COUNTRY_KEYS = Object.keys(flagMap).sort((a, b) => b.length - a.length);
+    Constants.COUNTRY_MAP = flagMap;
+
+    // 缓存全部地区键（优先级地区 + RegionMap 其余地区），避免函数内重复构建
+    Constants.ALL_REGIONS = [
+        ...Constants.PRIORITY_REGIONS,
+        ...Object.keys(RegionMap).filter(k => !Constants.PRIORITY_REGIONS.includes(k))
+    ];
 })();
 
 
@@ -453,11 +457,11 @@ const Utils = {
     /** 判断字符串是否为已知协议名 */
     isKnownProtocol: (str) => Constants.KNOWN_PROTOCOLS.test(str),
 
-    /** 对预格式化段落执行非分隔符清理 + / 拆分 */
+    /** 对预格式化段落执行清理（跳过 skipInPreformat 规则）+ / 拆分 */
     cleanPreformatted: (segment) => {
         let cleaned = segment;
         for (const rule of CleaningRules) {
-            if (rule.desc.includes('分隔符')) continue;
+            if (rule.skipInPreformat) continue;
             cleaned = cleaned.replace(rule.regex, rule.value);
         }
         return cleaned.split('/').map(s => s.trim()).filter(s => s !== '');
@@ -500,27 +504,25 @@ const Utils = {
 
     /** 拆分与去重：分割字符串，移除重复项，深度拆分组合地名 */
     splitAndDedup: (name) => {
-        let uniqueParts = name.split(/[-_|\s丨✈\/]+/).filter((item, index, self) => {
+        const uniqueParts = name.split(/[-_|\s丨✈\/]+/).filter((item, index, self) => {
             if (!item || item.trim() === '' || item === '[]') return false;
-            if (self.indexOf(item) !== index) return false;
+            if (self.indexOf(item) !== index) return false;  // 去重：保留首次出现
+            // 若 item 是某个更长 part 的子串，且满足特定条件则视为冗余
             const isRedundant = self.some((other, otherIndex) => {
-                if (index === otherIndex) return false;
-                if (other.length <= item.length || !other.includes(item)) return false;
+                if (index === otherIndex || other.length <= item.length || !other.includes(item)) return false;
                 return /[^\x00-\x7F]/.test(item) || /^\d+$/.test(item) || item.length > 3;
             });
             return !isRedundant;
         });
 
-        const allRegions = [...Constants.PRIORITY_REGIONS, ...Object.keys(RegionMap)];
         const expandedParts = [];
         for (const part of uniqueParts) {
             let splitHappened = false;
-            for (const region of allRegions) {
+            for (const region of Constants.ALL_REGIONS) {
                 if (part.startsWith(region) && part.length > region.length) {
                     let suffix = part.substring(region.length).trim();
-                    // 移除地区正则消费 ISP 缩写后遗留的孤立序号前缀
-                    // 如 "香港hkt" → "香港" 后遗留 "2直连"，去掉前置纯数字 → "直连"
-                    // 仅当数字紧接中文字符时才剥离（避免误删 "2g" "10Gbps" 等带宽标识）
+                    // ISP 缩写被地区正则消费后可能遗留孤立序号（如 "香港hkt2" → "2直连"）
+                    // 仅当数字紧接中文字符时才剥离，避免误删 "2G"/"10Gbps" 等带宽标识
                     suffix = suffix.replace(/^\d+(?=[\u4e00-\u9fff])/, '').trim();
                     if (!/^\d+$/.test(suffix)) {
                         expandedParts.push(region);
@@ -535,21 +537,15 @@ const Utils = {
         return [...new Set(expandedParts)];
     },
 
-    /** 地区提升：将地区关键词移动到数组首位 */
+    /** 地区提升：将地区关键词移动到数组首位（返回新数组，不修改原数组） */
     promoteRegion: (parts) => {
-        const allRegions = [...Constants.PRIORITY_REGIONS, ...Object.keys(RegionMap)];
-        let regionIndex = -1;
-        for (let i = 0; i < parts.length; i++) {
-            if (allRegions.some(region => parts[i].startsWith(region))) {
-                regionIndex = i;
-                break;
-            }
-        }
-        if (regionIndex > 0) {
-            const regionPart = parts.splice(regionIndex, 1)[0];
-            parts.unshift(regionPart);
-        }
-        return parts;
+        const regionIndex = parts.findIndex(
+            p => Constants.ALL_REGIONS.some(region => p.startsWith(region))
+        );
+        if (regionIndex <= 0) return parts;
+        const result = [...parts];
+        result.unshift(result.splice(regionIndex, 1)[0]);
+        return result;
     },
 
     /** 智能国旗检测 */
@@ -565,10 +561,9 @@ const Utils = {
         return '🏳️';
     },
 
-    /** 获取排序优先级 */
+    /** 获取排序优先级（基于 ALL_REGIONS 有序列表的下标） */
     getPriority: (name) => {
-        const allKeys = [...Constants.PRIORITY_REGIONS, ...Object.keys(RegionMap).filter(k => !Constants.PRIORITY_REGIONS.includes(k))];
-        const index = allKeys.findIndex(k => name.includes(k));
+        const index = Constants.ALL_REGIONS.findIndex(k => name.includes(k));
         return index === -1 ? 9999 : index;
     },
 
@@ -637,8 +632,9 @@ const Pipeline = {
             tempName = `IPv6 ${tempName}`;
         }
 
-        // 移除协议名残留
-        tempName = tempName.replace(new RegExp(protocol, 'ig'), '').trim();
+        // 移除协议名残留（使用词边界避免误删字符串内的同名子串，如 ss 误删 Russia 中的 ss）
+        const escapedProto = protocol.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        tempName = tempName.replace(new RegExp(`\\b${escapedProto}\\b`, 'ig'), '').trim();
 
         // 提取倍率
         let multiplier = '';
@@ -709,10 +705,11 @@ const Pipeline = {
             suffixPart = suffixPart.replace(/IPv6/ig, '').replace(/^[\s✈]+|[\s✈]+$/g, '').trim();
         }
 
-        const cleanKey = keyPart.replace(/(\[\s*\d*\s*\]|\d+)$/g, '').trim();
+        // 去掉末尾的 [N] 或纯数字序号（$锚点只匹配一次，g 标志冗余已移除）
+        const cleanKey = keyPart.replace(/(\[\s*\d*\s*\]|\d+)$/, '').trim();
 
         let baseRegion = cleanKey;
-        for (const region of Object.keys(RegionMap)) {
+        for (const region of Constants.ALL_REGIONS) {
             if (cleanKey.startsWith(region)) {
                 baseRegion = region;
                 break;
