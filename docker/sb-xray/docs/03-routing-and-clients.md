@@ -367,7 +367,8 @@ graph TD
 | 模板 | 定位 | 内核 | 核心机制 | 策略组 | 适用场景 |
 |:---|:---|:---|:---|:---:|:---|
 | **OneSmartPro.yaml** | 智能完整版 | Mihomo | Smart 智选 + Policy-Priority 多维权重 | ~40 | OpenClash / Mihomo 自动选择最优节点 |
-| **FallBackPro.yaml** | 故障转移版 | Mihomo | Fallback 故转 + url-test 自动切换 | ~50 | OpenClash / Mihomo 稳定优先、自动容灾 |
+| **FallBackPro.yaml** | 故障转移版 | Mihomo | Fallback 故转 + url-test 自动切换 | ~50 | OpenClash / ClashMi 稳定优先、自动容灾 |
+| **stash.yaml** | 移动端精简版 | Clash (Stash) | Fallback 故转 + url-test 自动切换 | ~25 | iOS / macOS Stash 客户端，精简分流 |
 | **surge.conf** | Surge 配置 | Surge | url-test + 正则分组 | ~15 | macOS / iOS Surge 客户端 |
 
 > [!NOTE]
@@ -394,7 +395,72 @@ graph TD
 | `${CLASH_PROXY_PROVIDERS}` | 订阅源配置 | YAML 格式字符串 |
 | `${CLASH_ISP_PROXIES}` | ISP 代理配置 | YAML 格式字符串 |
 
-### 4.3 各平台接入方式
+### 4.3 DNS 配置策略
+
+不同客户端模板对 DNS 的处理方式存在显著差异，配置不当会导致节点健康检查全部失败或 YAML 解析错误。
+
+#### 4.3.1 两类已知陷阱
+
+**陷阱一：Stash YAML 解析器不支持 `nameserver-policy` 列表值**
+
+Stash 基于旧版 Clash 解析器，`nameserver-policy` 的值类型硬编码为 `string`（标量）。若将其写为 YAML 列表（`!!seq`），Stash 会抛出解析错误：
+
+```
+yaml: unmarshal errors:
+  line N: cannot unmarshal !!seq into string
+```
+
+**正确写法**（每个 key 仅允许单个字符串值）：
+
+```yaml
+nameserver-policy:
+  "geosite:private,cn": "119.29.29.29"
+  "geosite:geolocation-!cn": "https://1.1.1.1/dns-query"
+```
+
+**错误写法**（Mihomo 支持但 Stash 不支持）：
+
+```yaml
+nameserver-policy:
+  "geosite:private,cn":
+    - 119.29.29.29   # ❌ !!seq → Stash 解析失败
+    - 223.5.5.5
+```
+
+---
+
+**陷阱二：`auto-route: false` 下 DoH 与路由规则形成引导循环**
+
+当 `proxy-server-nameserver` 或 `nameserver-policy` 使用 DoH（`https://1.1.1.1/dns-query`）时，DoH 请求本身是一条发往 `1.1.1.1:443` 的 TCP 连接。此连接会进入 Clash 内部的路由规则匹配：
+
+```
+DoH 请求 → 1.1.1.1:443 → 规则匹配 → MATCH,兜底流量
+         → 兜底流量代理组（无可用节点，因为健康检查都在失败）
+         → DoH 失败 → 节点域名无法解析 → 健康检查继续失败 → 死锁
+```
+
+**根本原因**：`auto-route: false` 时 Clash 不修改系统路由表，也不为 DNS 服务器 IP 注入绕过路由，DoH 的 TCP 连接与普通流量走相同的出站规则链。
+
+#### 4.3.2 DNS 配置对比
+
+| 配置项 | `stash.yaml` | `FallBackPro.yaml` | 差异原因 |
+|:---|:---:|:---:|:---|
+| `tun.auto-route` | `true` | `false` | Stash 作为系统 VPN 运行，ClashMi 作为本地代理运行 |
+| `proxy-server-nameserver` DoH | ✅ 保留 | ❌ 删除 | `auto-route: true` 会注入绕过路由，DoH 直连安全 |
+| `nameserver-policy` DoH | ✅ 保留（值为字符串） | ❌ 删除 | 同上；Stash 还要求值类型为 `string` |
+| `fake-ip-filter` | ✅ 保留 | ✅ 保留 | 两者均需防止本地域名分配假 IP |
+| nameserver 额外 DNS | — | `119.29.29.29` | 删除 DoH 后补充可靠的境外域名解析能力 |
+
+#### 4.3.3 TUN `auto-route` 与 DoH 安全性的关联
+
+| `auto-route` | 系统路由表 | DoH 的出站路径 | DoH 能否可靠工作 |
+|:---:|:---:|:---|:---:|
+| `true` | Clash 注入绕过路由 | DNS 服务器 IP 走物理网卡直连，绕过 TUN | ✅ 安全 |
+| `false` | 不修改，依赖 OS 默认 | DoH TCP 连接经过 Clash 路由规则 → 可能走代理组 → 引导循环 | ❌ 有风险 |
+
+> **注意**：`proxy-server-nameserver` 在设计上应走 DIRECT，但 `auto-route: false` 时缺少系统层面的保障，实际行为依赖客户端实现质量。为彻底规避风险，`auto-route: false` 的模板应改用普通 UDP DNS。
+
+#### 4.3.4 各平台接入方式
 
 容器正常运行后，访问 `https://您的CDN域名/sb-xray/` 调出专属面板，获取包含**独立防泄漏 Token** 的订阅链接。
 

@@ -420,18 +420,7 @@ dns:
     - 210.22.70.3
     - 210.22.84.3
     - 223.5.5.5
-  # 代理服务器域名专用 DNS（DoH IP直连，防止代理节点域名泄露给 ISP）
-  proxy-server-nameserver:
-    - https://1.1.1.1/dns-query
-    - https://8.8.8.8/dns-query
-  # 分流 DNS 策略（境内走本地 DNS，境外走 DoH 加密解析，防止全量查询泄露）
-  nameserver-policy:
-    "geosite:private,cn":
-      - 202.96.209.133
-      - 223.5.5.5
-    "geosite:geolocation-!cn":
-      - https://1.1.1.1/dns-query
-      - https://8.8.8.8/dns-query
+    - 119.29.29.29
   fake-ip-filter-mode: blacklist
   fake-ip-filter:
     - +.lan

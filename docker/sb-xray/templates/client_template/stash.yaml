@@ -252,7 +252,7 @@ rule-providers:
   # 代理规则
   Proxy / Domain:           {<<: *BehaviorDN, url: https://gh-proxy.com/raw.githubusercontent.com/666OS/rules/release/mihomo/domain/Proxy.mrs}
   ProxyIP / IP:             {<<: *BehaviorIP, url: https://gh-proxy.com/raw.githubusercontent.com/666OS/rules/release/mihomo/ip/Proxy.mrs}
-  Global / Domain:           {<<: *BehaviorCL, url: https://gh-proxy.com/raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Global/Global.list}
+  Global / Domain:          {<<: *BehaviorCL, url: https://gh-proxy.com/raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Global/Global.list}
 
 
 # ==================== 核心配置 ====================
@@ -263,7 +263,7 @@ allow-lan: true
 log-level: warning
 
 # 管理面板
-external-controller: 0.0.0.0:9090
+external-controller: 0.0.0.0:9099
 secret: yyds666
 
 # 配置存储
@@ -299,12 +299,8 @@ dns:
     - https://8.8.8.8/dns-query
   # 分流 DNS 策略（境内走本地 DNS，境外走 DoH 加密解析，防止全量查询泄露）
   nameserver-policy:
-    "geosite:private,cn":
-      - 119.29.29.29
-      - 223.5.5.5
-    "geosite:geolocation-!cn":
-      - https://1.1.1.1/dns-query
-      - https://8.8.8.8/dns-query
+    "geosite:private,cn": "119.29.29.29"
+    "geosite:geolocation-!cn": "https://1.1.1.1/dns-query"
   fake-ip-filter-mode: blacklist
   fake-ip-filter:
     - +.lan

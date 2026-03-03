@@ -144,6 +144,38 @@ description: 跨 Skill 的 Bug 修复记录，所有 Agent 工作时必须优先
 
 ---
 
+## 客户端模板 / Clash YAML
+
+### Bug #008 — stash.yaml 中 `nameserver-policy` 值类型错误，Stash 解析失败
+
+| 字段 | 内容 |
+|:---|:---|
+| **涉及文件** | `templates/client_template/stash.yaml` |
+| **函数** | DNS 配置块 `nameserver-policy` |
+| **触发条件** | Stash 客户端（iOS/macOS）加载订阅，`nameserver-policy` 的值为 YAML 列表（`!!seq`）时 |
+| **错误现象** | Stash 抛出 `yaml: unmarshal errors: line N: cannot unmarshal !!seq into string`，配置加载失败 |
+| **根本原因** | Stash 基于旧版 Clash 解析器，`nameserver-policy` 值类型硬编码为 `map[string]string`（标量），不接受 `[]string`（列表）。新版 mihomo 已将该字段升级为 `map[string][]string`，两者不兼容 |
+| **修复方案** | 将列表格式改为单字符串值：`"geosite:private,cn": "119.29.29.29"`，每个 key 只保留一个 DNS 服务器 |
+| **预防措施** | stash.yaml 专属字段凡涉及 nameserver-policy，值一律使用字符串标量，不使用列表；若需多个 DNS 可在 nameserver 字段中配置 |
+| **记录时间** | 2026-03-04 |
+
+---
+
+### Bug #009 — FallBackPro.yaml `proxy-server-nameserver` 使用 DoH 在 `auto-route: false` 下引发 DNS 引导循环，节点健康检查全部失败
+
+| 字段 | 内容 |
+|:---|:---|
+| **涉及文件** | `templates/client_template/FallBackPro.yaml` |
+| **函数** | DNS 配置块 `proxy-server-nameserver`、`nameserver-policy` |
+| **触发条件** | ClashMi（macOS）以 `auto-route: false` 运行，DNS 使用 DoH（`https://1.1.1.1/dns-query`）时 |
+| **错误现象** | 所有节点健康检查失败，无可用节点 |
+| **根本原因** | `auto-route: false` 时 Clash 不修改系统路由表，DoH 请求（TCP 到 `1.1.1.1:443`）进入 Clash 内部路由规则匹配，命中 `MATCH,兜底流量`，被转发给代理组。此时代理组无可用节点（健康检查尚未完成），DoH 失败 → 节点域名解析失败 → 健康检查继续失败 → 死锁。相比之下，`auto-route: true` 时（如 stash.yaml）Clash 会向系统路由表注入 DNS 服务器 IP 的绕过路由，DoH 走物理网卡直连，无此问题 |
+| **修复方案** | 删除 `proxy-server-nameserver` 和 `nameserver-policy` 中的 DoH 配置，改用普通 UDP DNS（`119.29.29.29` 等）；`fake-ip-filter` 无此问题可保留 |
+| **预防措施** | `auto-route: false` 的客户端模板中，DNS 服务器只使用 UDP 纯 IP 地址，不使用 DoH URL；`auto-route: true` 的模板（stash.yaml）可安全使用 DoH |
+| **记录时间** | 2026-03-04 |
+
+---
+
 ## 新增 Bug 记录模板
 
 > 修复 Bug 后，复制以下模板追加到对应分区末尾：
