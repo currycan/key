@@ -754,22 +754,31 @@ const Pipeline = {
 
     /** 阶段三入口：重编号与最终输出 */
     renumber: (proxies) => {
-        const nameCounts = {};
-        return proxies.map(p => {
+        // 第一遍：构建所有节点的最终名称
+        const result = proxies.map(p => {
             if (p.isPreFormatted) {
                 delete p.isPreFormatted;
                 const { name, type, ...restProps } = p;
                 return { name, type, ...restProps };
             }
-
-            const { cleanKey, suffixPart, isIPv6, baseRegion } = Pipeline.extractRegionKey(p.processedName);
-
-            if (!nameCounts[baseRegion]) nameCounts[baseRegion] = 0;
-            nameCounts[baseRegion]++;
-
+            const { cleanKey, suffixPart, isIPv6 } = Pipeline.extractRegionKey(p.processedName);
             p.name = Pipeline.buildFinalName(p, cleanKey, suffixPart, isIPv6);
             return Pipeline.cleanupProxy(p);
         });
+
+        // 第二遍：统计重复名称，仅对实际重名节点追加零填充序号（01, 02 …）
+        const nameCount = {};
+        result.forEach(p => { nameCount[p.name] = (nameCount[p.name] || 0) + 1; });
+
+        const nameSeq = {};
+        result.forEach(p => {
+            if (nameCount[p.name] > 1) {
+                nameSeq[p.name] = (nameSeq[p.name] || 0) + 1;
+                p.name = `${p.name} ${String(nameSeq[p.name]).padStart(2, '0')}`;
+            }
+        });
+
+        return result;
     }
 };
 
