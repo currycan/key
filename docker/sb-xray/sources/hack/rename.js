@@ -21,7 +21,7 @@ const Constants = {
     PRIORITY_REGIONS: ["香港", "台湾", "日本", "新加坡", "韩国", "美国"],
     INVALID_REGEX: /(❗|套餐|到期|有效|剩余|版本|已用|过期|失联|测试|官方|网址|群(?!岛)|TEST|客服|获取|订阅|流量|机场|下次|官址|联系|邮箱|工单|学术|USE|USED|TOTAL|EXPIRE|EMAIL|更快|更新|如果|客户|教程|距离|国内|Traffic|Reset|Days|Left|\d+\s*GB)/i,
     // 已知协议名（用于检测和协议补全）
-    KNOWN_PROTOCOLS: /^(vless|vmess|trojan|shadowsocks|ss|ssr|tuic|hysteria2|reality)$/i,
+    KNOWN_PROTOCOLS: /^(vless|vmess|trojan|shadowsocks|ss|ssr|tuic|hysteria2|reality|anytls)$/i,
     // 协议简写映射
     PROTOCOL_ALIASES: { shadowsocks: 'ss', shadowsocksr: 'ssr' },
     // Emoji 国旗提取正则
@@ -591,9 +591,15 @@ const Pipeline = {
         p.flag = flag;
         let parts = remainingName.split('✈').flatMap(Utils.cleanPreformatted);
         const firstIsProtocol = parts.length > 0 && Utils.isKnownProtocol(parts[0]);
-        const protocolPrefix = firstIsProtocol
+        let protocolPrefix = firstIsProtocol
             ? parts.shift()
             : (protocol && protocol !== 'unknown' ? protocol : '');
+        // 移除与协议名重复的部分（不区分大小写），优先保留大小写更规范的版本（如 anytls → AnyTLS）
+        if (protocolPrefix) {
+            const betterCasing = parts.find(part => part.toLowerCase() === protocolPrefix.toLowerCase() && part !== protocolPrefix);
+            if (betterCasing) protocolPrefix = betterCasing;
+            parts = parts.filter(part => part.toLowerCase() !== protocolPrefix.toLowerCase());
+        }
         const nameStr = parts.join(' ✈ ');
         p.name = `${flag} ${protocolPrefix ? protocolPrefix + ' ✈ ' : ''}${nameStr}`;
         return p;
