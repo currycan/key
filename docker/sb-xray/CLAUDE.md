@@ -88,6 +88,25 @@
 
 ---
 
+## Claude Code 斜杠命令
+
+以下命令在 `.claude/commands/` 目录下定义，可在 Claude Code 中直接调用：
+
+| 命令 | 说明 |
+|------|------|
+| `/project-overview` | 加载项目总览，了解整体架构和组件 |
+| `/xray-expert` | Xray 协议配置专家（VLESS/VMESS/Reality/XTLS）|
+| `/sing-box-expert` | Sing-box 配置专家（入站/出站/路由/DNS）|
+| `/openclash-expert` | OpenClash 配置专家（代理组/规则集/订阅转换）|
+| `/template-config` | Sub-Store 模板与 rename.js 脚本专家 |
+| `/build-release` | Docker 构建发布专家（build.sh/release.sh）|
+| `/script-dev` | Sub-Store 脚本开发与调试专家 |
+| `/doc-sync` | 文档同步检查，根据代码变更更新 docs/ |
+
+每个命令都会自动加载对应的 `.agents/skills/*/SKILL.md` 技术参考，单一数据源，内容不冗余。
+
+---
+
 ## 纠错记录
 
 > 以下规则来自历次纠错，每条对应一次被纠正的经验教训。
