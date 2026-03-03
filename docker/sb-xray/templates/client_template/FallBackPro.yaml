@@ -162,11 +162,11 @@ rules:
   - IP-CIDR,10.242.0.0/16,DIRECT,no-resolve
   - IP-CIDR,172.28.0.0/16,DIRECT,no-resolve
   # 私有网络 IP 段
-  - IP-CIDR, 192.168.0.0/16,DIRECT,no-resolve
-  - IP-CIDR, 172.168.0.0/12,DIRECT,no-resolve
-  - IP-CIDR, 10.0.0.0/8,DIRECT,no-resolve
-  - IP-CIDR, 127.0.0.0/8,DIRECT,no-resolve
-  - IP-CIDR, ::1/128,DIRECT,no-resolve
+  - IP-CIDR,192.168.0.0/16,DIRECT,no-resolve
+  - IP-CIDR,172.16.0.0/12,DIRECT,no-resolve
+  - IP-CIDR,10.0.0.0/8,DIRECT,no-resolve
+  - IP-CIDR,127.0.0.0/8,DIRECT,no-resolve
+  - IP-CIDR,::1/128,DIRECT,no-resolve
   # 拦截规则
   - RULE-SET,Tracking / Domain,REJECT
   - RULE-SET,Advertising / Domain,REJECT
@@ -182,13 +182,12 @@ rules:
   - RULE-SET,Direct / Domain,直接连接
   - RULE-SET,Private / Domain,直接连接
   - RULE-SET,PrivateIP / IP,直接连接,no-resolve
-  - RULE-SET,Direct / Domain,直接连接
   - RULE-SET,XPTV / Domain,直接连接
   - RULE-SET,XPTVIP / IP,直接连接,no-resolve
   - RULE-SET,Download / Domain,直接连接
   - RULE-SET,AppleCN / Domain,直接连接
-  # - RULE-SET,China / Domain,直接连接
-  # - RULE-SET,ChinaIP / IP,直接连接,no-resolve
+  - RULE-SET,China / Domain,直接连接
+  - RULE-SET,ChinaIP / IP,直接连接,no-resolve
   # 国外媒体
   - RULE-SET,TikTok / Domain,TikTok
   - RULE-SET,YouTube / Domain,YouTube
@@ -253,11 +252,10 @@ rules:
   - RULE-SET,Proxy / Domain,国外流量
   - RULE-SET,ProxyIP / IP,国外流量,no-resolve
   - RULE-SET,Global / Domain,国外流量
-  # GeoIP/Site
-  - GEOIP,PRIVATE,DIRECT
+  # GeoIP / GeoSite
   - GEOIP,private,DIRECT,no-resolve
-  - GEOSITE,CN,DIRECT
-  - GEOIP,CN,DIRECT
+  - GEOSITE,CN,国内流量
+  - GEOIP,CN,国内流量
   # Final
   - MATCH,兜底流量
 
@@ -288,8 +286,8 @@ rule-providers:
   Download / Domain:        {<<: *BehaviorDN, url: https://gh-proxy.com/raw.githubusercontent.com/666OS/rules/release/mihomo/domain/Download.mrs}
   XPTV / Domain:            {<<: *BehaviorDN, url: https://gh-proxy.com/raw.githubusercontent.com/666OS/rules/release/mihomo/domain/XPTV.mrs}
   XPTVIP / IP:              {<<: *BehaviorIP, url: https://gh-proxy.com/raw.githubusercontent.com/666OS/rules/release/mihomo/ip/XPTV.mrs}
-  # China / Domain:           {<<: *BehaviorDN, url: https://gh-proxy.com/raw.githubusercontent.com/666OS/rules/release/mihomo/domain/China.mrs}
-  # ChinaIP / IP:             {<<: *BehaviorIP, url: https://gh-proxy.com/raw.githubusercontent.com/666OS/rules/release/mihomo/ip/China.mrs}
+  China / Domain:           {<<: *BehaviorDN, url: https://gh-proxy.com/raw.githubusercontent.com/666OS/rules/release/mihomo/domain/China.mrs}
+  ChinaIP / IP:             {<<: *BehaviorIP, url: https://gh-proxy.com/raw.githubusercontent.com/666OS/rules/release/mihomo/ip/China.mrs}
   # AI规则
   ChatGPT / Domain:         {<<: *BehaviorDN, url: https://gh-proxy.com/raw.githubusercontent.com/metacubex/meta-rules-dat/meta/geo/geosite/openai.mrs}
   Claude / Domain:          {<<: *BehaviorCL, url: https://gh-proxy.com/raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Claude/Claude.list}
@@ -297,6 +295,8 @@ rule-providers:
   Perplexity / Domain:      {<<: *BehaviorDN, url: https://gh-proxy.com/raw.githubusercontent.com/metacubex/meta-rules-dat/meta/geo/geosite/perplexity.mrs}
   Copilot / Domain:         {<<: *BehaviorCL, url: https://gh-proxy.com/raw.githubusercontent.com/liandu2024/clash/main/list/Copilot.list}
   Gemini / Domain:          {<<: *BehaviorCL, url: https://gh-proxy.com/raw.githubusercontent.com/liandu2024/clash/main/list/Gemini.list}
+  Google / Domain:          {<<: *BehaviorDN, url: https://gh-proxy.com/raw.githubusercontent.com/666OS/rules/release/mihomo/domain/Google.mrs}
+  GoogleIP / IP:            {<<: *BehaviorIP, url: https://gh-proxy.com/raw.githubusercontent.com/666OS/rules/release/mihomo/ip/Google.mrs}
   Groq / Domain:            {<<: *BehaviorDN, url: https://gh-proxy.com/raw.githubusercontent.com/metacubex/meta-rules-dat/meta/geo/geosite/groq.mrs}
   Grok / Domain:            {<<: *BehaviorCL, url: https://gh-proxy.com/raw.githubusercontent.com/liandu2024/clash/main/list/Grok.list}
   AI / Domain:              {<<: *BehaviorDN, url: https://gh-proxy.com/raw.githubusercontent.com/666OS/rules/release/mihomo/domain/AI.mrs}
@@ -325,8 +325,6 @@ rule-providers:
   # 新闻媒体规则
   NewsMedia / Domain:       {<<: *BehaviorDN, url: https://gh-proxy.com/raw.githubusercontent.com/666OS/rules/release/mihomo/domain/NewsMedia.mrs}
   # 国外公司规则
-  Google / Domain:          {<<: *BehaviorDN, url: https://gh-proxy.com/raw.githubusercontent.com/666OS/rules/release/mihomo/domain/Google.mrs}
-  GoogleIP / IP:            {<<: *BehaviorIP, url: https://gh-proxy.com/raw.githubusercontent.com/666OS/rules/release/mihomo/ip/Google.mrs}
   GitHub / Domain:          {<<: *BehaviorDN, url: https://gh-proxy.com/raw.githubusercontent.com/metacubex/meta-rules-dat/meta/geo/geosite/github.mrs}
   Reddit / Domain:          {<<: *BehaviorDN, url: https://gh-proxy.com/raw.githubusercontent.com/metacubex/meta-rules-dat/meta/geo/geosite/reddit.mrs}
   Amazon / Domain:          {<<: *BehaviorDN, url: https://gh-proxy.com/raw.githubusercontent.com/metacubex/meta-rules-dat/meta/geo/geosite/amazon.mrs}
@@ -354,7 +352,7 @@ rule-providers:
   # 代理规则
   Proxy / Domain:           {<<: *BehaviorDN, url: https://gh-proxy.com/raw.githubusercontent.com/666OS/rules/release/mihomo/domain/Proxy.mrs}
   ProxyIP / IP:             {<<: *BehaviorIP, url: https://gh-proxy.com/raw.githubusercontent.com/666OS/rules/release/mihomo/ip/Proxy.mrs}
-  Global / Domain:           {<<: *BehaviorCL, url: https://gh-proxy.com/raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Global/Global.list}
+  Global / Domain:          {<<: *BehaviorCL, url: https://gh-proxy.com/raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Global/Global.list}
   # GateFireWall / Domain:   {<<: *BehaviorDN, url: https://gh-proxy.com/raw.githubusercontent.com/metacubex/meta-rules-dat/meta/geo/geosite/gfw.mrs}
 
 

@@ -8,8 +8,8 @@
 # ||      ╚═════╝  ╚═════╝  ╚═════╝      ||
 # ||                                     ||
 # >>=====================================<<
-# 描述: Stash (iOS/macOS) 专用客户端配置 — 故障转移模式
-# 兼容: Stash (Clash Premium 格式)
+# 描述: Stash (iOS/macOS) 日常终端精简版 — TikTok / AI / 社交 精准分流
+# 兼容: Stash / Clash Premium 格式
 # 说明: 在proxy-providers加入您的订阅链接（代理提供者）
 
 # ==================== 锚点配置 ====================
@@ -42,16 +42,18 @@ FilterMedia:    &FilterMedia  "^(?=.*(?i)(流媒体|AllOne))(?!.*(DIRECT|直接�
 FilterFAST:     &FilterFAST   "^(?=.*(?i)(高速))(?!.*(DIRECT|直接连接|5x)).*$"
 # 节点筛选正则表达式 - AI节点
 FilterAI:       &FilterAI     "^(?=.*(?i)(AI|AllOne))(?!.*(DIRECT|直接连接|5x)).*$"
+# 节点筛选正则表达式 - 过滤链式代理节点
+FilterDialer:   &FilterDialer "^(?=.*(?i)(🇭🇰|🇹🇼|🇨🇳))(?!.*(DIRECT|直接连接|REJECT|-dialer)).*$"
 
 # 策略组代理列表模板 - 预定义的代理节点优先级排序
-DEFAULT:        &DEFAULT      {type: select, include-all: true, filter: *FilterALL, proxies: [高速-故转, AI-故转, 媒体-故转, 家宽-故转, 香港-故转, 台湾-故转, 日本-故转, 狮城-故转, 韩国-故转, 美国-故转, 其他-故转, 全球手动, 直接连接]}
-FallBack:       &FallBack     {type: select, include-all: true, filter: *FilterALL, proxies: [默认代理, 高速-故转, AI-故转, 媒体-故转, 家宽-故转, 香港-故转, 台湾-故转, 日本-故转, 狮城-故转, 韩国-故转, 美国-故转, 其他-故转, 全球手动, 直接连接]}
-SelectDC:       &SelectDC     {type: select, include-all: true, filter: *FilterALL, proxies: [直接连接, 默认代理, 高速-故转, AI-故转, 媒体-故转, 家宽-故转, 香港-故转, 台湾-故转, 日本-故转, 狮城-故转, 韩国-故转, 美国-故转, 其他-故转, 全球手动]}
-SelectLD:       &SelectLD     {type: select, include-all: true, filter: *FilterALL, proxies: [默认代理, 高速-故转, AI-故转, 媒体-故转, 家宽-故转, 香港-故转, 台湾-故转, 日本-故转, 狮城-故转, 韩国-故转, 美国-故转, 其他-故转, 全球手动, 直接连接]}
-SelectISP:      &SelectISP    {type: select, include-all: true, filter: *FilterALL, proxies: [家宽-故转, 默认代理, 高速-故转, AI-故转, 媒体-故转, 香港-故转, 台湾-故转, 日本-故转, 狮城-故转, 韩国-故转, 美国-故转, 其他-故转, 全球手动, 直接连接]}
-SelectMedia:    &SelectMedia  {type: select, include-all: true, filter: *FilterALL, proxies: [媒体-故转, 默认代理, 高速-故转, AI-故转, 家宽-故转, 香港-故转, 台湾-故转, 日本-故转, 狮城-故转, 韩国-故转, 美国-故转, 其他-故转, 全球手动, 直接连接]}
-SelectFAST:     &SelectFAST   {type: select, include-all: true, filter: *FilterALL, proxies: [高速-故转, 默认代理, AI-故转, 媒体-故转, 家宽-故转, 香港-故转, 台湾-故转, 日本-故转, 狮城-故转, 韩国-故转, 美国-故转, 其他-故转, 全球手动, 直接连接]}
-SelectAI:       &SelectAI     {type: select, include-all: true, filter: *FilterALL, proxies: [AI-故转, 默认代理, 高速-故转, 媒体-故转, 家宽-故转, 香港-故转, 台湾-故转, 日本-故转, 狮城-故转, 韩国-故转, 美国-故转, 其他-故转, 全球手动, 直接连接]}
+DEFAULT:        &DEFAULT      {type: select, include-all: true, filter: *FilterALL, proxies: [高速-故转, AI-故转, 媒体-故转, 家宽-故转, 自动选择, 手动选择, 直接连接]}
+FallBack:       &FallBack     {type: select, include-all: true, filter: *FilterALL, proxies: [默认代理, 高速-故转, AI-故转, 媒体-故转, 家宽-故转, 自动选择, 手动选择, 直接连接]}
+SelectDC:       &SelectDC     {type: select, include-all: true, filter: *FilterALL, proxies: [DIRECT, 默认代理, 高速-故转, AI-故转, 媒体-故转, 家宽-故转, 自动选择, 手动选择]}
+SelectLD:       &SelectLD     {type: select, include-all: true, filter: *FilterALL, proxies: [默认代理, 高速-故转, AI-故转, 媒体-故转, 家宽-故转, 自动选择, 手动选择, 直接连接]}
+SelectISP:      &SelectISP    {type: select, include-all: true, filter: *FilterALL, proxies: [家宽-故转, 默认代理, 高速-故转, AI-故转, 媒体-故转, 自动选择, 手动选择, 直接连接]}
+SelectMedia:    &SelectMedia  {type: select, include-all: true, filter: *FilterALL, proxies: [媒体-故转, 默认代理, 高速-故转, AI-故转, 家宽-故转, 自动选择, 手动选择, 直接连接]}
+SelectFAST:     &SelectFAST   {type: select, include-all: true, filter: *FilterALL, proxies: [高速-故转, 默认代理, AI-故转, 媒体-故转, 家宽-故转, 自动选择, 手动选择, 直接连接]}
+SelectAI:       &SelectAI     {type: select, include-all: true, filter: *FilterALL, proxies: [AI-故转, 默认代理, 高速-故转, 媒体-故转, 家宽-故转, 自动选择, 手动选择, 直接连接]}
 
 
 # ==================== 代理提供者 ====================
@@ -77,76 +79,29 @@ proxy-groups:
   - {name: AI-故转,    <<: *BaseFB,     proxies: [AI-自动, AI-手动], icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/ChatGPT.png}
   - {name: AI-手动,    type: select,    filter: *FilterAI,    include-all: true, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/ChatGPT.png}
   - {name: AI-自动,     <<: *StableUT,  filter: *FilterAI,    include-all: true, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/ChatGPT.png}
-  # ==================== 媒体服务 ====================
+  # ── 核心节点 ──────────────────────────────────────────────
+  - {name: 默认代理,    <<: *DEFAULT,    icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Static.png}
+  - {name: 自动选择,    <<: *BaseUT,     include-all: true, filter: *FilterALL, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Auto.png}
+  - {name: 手动选择,    type: select,    include-all: true, filter: *FilterALL, proxies: [自动选择, DIRECT], icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Static.png}
+
+  # ── 精准分流 ──────────────────────────────────────────────
+  # TikTok: 家宽-自动 优先（住宅 IP, 规避风控）
   - {name: TikTok,     <<: *SelectISP,   icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/TikTok.png}
   - {name: YouTube,    <<: *SelectFAST,  icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/YouTube.png}
-  - {name: Netflix,     <<: *SelectMedia, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Netflix.png}
-  - {name: Disney,     <<: *SelectMedia, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Disney.png}
-  - {name: HBO,        <<: *SelectMedia, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/HBO.png}
-  - {name: Spotify,    <<: *SelectMedia, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Spotify.png}
-  - {name: Emby,       <<: *SelectMedia, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Emby.png}
-  - {name: 国际媒体,    <<: *SelectMedia, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/DomesticMedia.png}
-  - {name: 新闻媒体,    <<: *SelectMedia, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Apple_News.png}
-  # ==================== AI 服务 ====================
-  - {name: Claude,     <<: *SelectISP,    icon: https://gh-proxy.com/raw.githubusercontent.com/currycan/key/master/icons/ClaudeCode.png}
-  - {name: Gemini,     <<: *SelectISP,    icon: https://gh-proxy.com/raw.githubusercontent.com/currycan/key/master/icons/gemini.png}
-  - {name: 人工智能,    <<: *SelectAI,    icon: https://gh-proxy.com/raw.githubusercontent.com/currycan/key/master/icons/AI.png}
-  # ==================== 社交平台 ====================
-  - {name: 推特社交,    <<: *SelectISP,    icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/X.png}
-  - {name: 电报消息,    <<: *SelectISP,    icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Telegram_X.png}
-  - {name: WhatsApp,   <<: *SelectISP,    icon: https://gh-proxy.com/raw.githubusercontent.com/currycan/key/master/icons/whatsapp.png}
-  - {name: Facebook,   <<: *SelectISP,    icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Facebook.png}
+  # 人工智能: AI-自动 优先（低延迟, AI 专用节点）
+  - {name: Claude,     <<: *SelectAI,    icon: https://gh-proxy.com/raw.githubusercontent.com/currycan/key/master/icons/ClaudeCode.png}
+  - {name: Gemini,     <<: *SelectAI,    icon: https://gh-proxy.com/raw.githubusercontent.com/currycan/key/master/icons/gemini.png}
+  - {name: 人工智能,     <<: *SelectAI,    icon: https://gh-proxy.com/raw.githubusercontent.com/currycan/key/master/icons/AI.png}
+  # 社交平台: 家宽-自动 优先（Telegram/Twitter/WhatsApp 住宅 IP 更稳定）
   - {name: 社交平台,    <<: *SelectISP,    icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/PBS.png}
-  # ==================== 国外服务 ====================
-  - {name: GitHub,     <<: *FallBack,    icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/GitHub.png}
-  - {name: Reddit,     <<: *FallBack,    icon: https://github.com/Semporia/Hand-Painted-icon/raw/master/Social_Media/Reddit.png}
-  - {name: 亚马逊,      <<: *FallBack,    icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Amazon.png}
-  - {name: 苹果服务,    <<: *FallBack,    icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Apple.png}
-  - {name: 微软服务,    <<: *FallBack,    icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Microsoft.png}
-  - {name: 英伟达,      <<: *FallBack,    icon: https://gh-proxy.com/raw.githubusercontent.com/currycan/key/master/icons/nvidia.png}
-  # ==================== 游戏 ====================
-  - {name: Steam,      <<: *SelectLD,    icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Steam.png}
-  - {name: 游戏平台,    <<: *SelectLD,    icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Game.png}
-  # ==================== 虚拟币 ====================
-  - {name: 货币平台,    <<: *FallBack,    icon: https://raw.githubusercontent.com/Orz-3/mini/master/Alpha/Bitcloud.png}
+  # 国际媒体: 媒体-自动 优先（流媒体解锁节点）
+  - {name: 国际媒体,    <<: *SelectMedia, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/DomesticMedia.png}
+
+  # ── 通用与兜底 ────────────────────────────────────────────
+  - {name: 国外流量,    <<: *FallBack, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Global.png}
+  - {name: 国内流量,    type: select, proxies: [DIRECT, 自动选择], icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/China.png}
+  - {name: 兜底流量,    <<: *FallBack, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Final.png}
   - {name: 直接连接,    type: select,     proxies: [DIRECT], hidden: true, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Direct.png}
-
-  # ==================== 主要策略组 ====================
-  - {name: 默认代理,    <<: *DEFAULT,    icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Static.png}
-  - {name: 故障转移,    <<: *FallBack,   icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/ULB.png}
-  - {name: 全球手动,    <<: *BaseFB,     include-all: true, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Static.png}
-  - {name: 国外流量,    <<: *FallBack,   icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Global.png}
-  - {name: 国内流量,    <<: *SelectDC,   icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/China.png}
-  - {name: 兜底流量,    <<: *FallBack,   icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Final.png}
-
-  # ==================== 香港策略组 ====================
-  - {name: 香港-故转,    <<: *BaseFB,    proxies: [香港-自动, 香港-手动],          icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Hong_Kong.png}
-  - {name: 香港-手动,    type: select,   filter: *FilterHK,  include-all: true,  icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Hong_Kong.png}
-  - {name: 香港-自动,    <<: *BaseUT,    filter: *FilterHK,  include-all: true,  icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Hong_Kong.png}
-  # ==================== 台湾策略组 ====================
-  - {name: 台湾-故转,    <<: *BaseFB,    proxies: [台湾-自动, 台湾-手动],          icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Taiwan.png}
-  - {name: 台湾-手动,    type: select,   filter: *FilterTW,  include-all: true,  icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Taiwan.png}
-  - {name: 台湾-自动,    <<: *BaseUT,    filter: *FilterTW,  include-all: true,  icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Taiwan.png}
-  # =================== 新加坡策略组 ====================
-  - {name: 狮城-故转,    <<: *BaseFB,    proxies: [狮城-自动, 狮城-手动],          icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Singapore.png}
-  - {name: 狮城-手动,    type: select,   filter: *FilterSG,  include-all: true,  icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Singapore.png}
-  - {name: 狮城-自动,    <<: *BaseUT,    filter: *FilterSG,  include-all: true,  icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Singapore.png}
-  # =================== 日本策略组 ====================
-  - {name: 日本-故转,    <<: *BaseFB,    proxies: [日本-自动, 日本-手动],           icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Japan.png}
-  - {name: 日本-手动,    type: select,   include-all: true, filter: *FilterJP,    icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Japan.png}
-  - {name: 日本-自动,    <<: *BaseUT,    include-all: true, filter: *FilterJP,    icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Japan.png}
-  # =================== 韩国策略组 ====================
-  - {name: 韩国-故转,    <<: *BaseFB,    proxies: [韩国-自动, 韩国-手动], icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Korea.png}
-  - {name: 韩国-手动,    type: select,   filter: *FilterKR,  include-all: true,   icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Korea.png}
-  - {name: 韩国-自动,    <<: *BaseUT,    filter: *FilterKR,  include-all: true,   icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Korea.png}
-  # =================== 美国策略组 ====================
-  - {name: 美国-故转,    <<: *BaseFB,    proxies: [美国-手动, 美国-自动], icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/United_States.png}
-  - {name: 美国-手动,    type: select,   filter: *FilterUS,  include-all: true,  icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/United_States.png}
-  - {name: 美国-自动,    <<: *BaseUT,    filter: *FilterUS,  include-all: true,  icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/United_States.png}
-  # =================== 其他策略组 ====================
-  - {name: 其他-故转,    <<: *BaseFB,    proxies: [其他-自动, 其他-手动], icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Auto.png}
-  - {name: 其他-手动,    type: select,   filter: *FilterOT,  include-all: true,  icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Auto.png}
-  - {name: 其他-自动,    <<: *BaseUT,    filter: *FilterOT,  include-all: true,  icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Auto.png}
 
 
 # ==================== 规则路由 ====================
@@ -158,11 +113,11 @@ rules:
   - IP-CIDR,10.242.0.0/16,DIRECT,no-resolve
   - IP-CIDR,172.28.0.0/16,DIRECT,no-resolve
   # 私有网络 IP 段
-  - IP-CIDR, 192.168.0.0/16,DIRECT,no-resolve
-  - IP-CIDR, 172.168.0.0/12,DIRECT,no-resolve
-  - IP-CIDR, 10.0.0.0/8,DIRECT,no-resolve
-  - IP-CIDR, 127.0.0.0/8,DIRECT,no-resolve
-  - IP-CIDR, ::1/128,DIRECT,no-resolve
+  - IP-CIDR,192.168.0.0/16,DIRECT,no-resolve
+  - IP-CIDR,172.16.0.0/12,DIRECT,no-resolve
+  - IP-CIDR,10.0.0.0/8,DIRECT,no-resolve
+  - IP-CIDR,127.0.0.0/8,DIRECT,no-resolve
+  - IP-CIDR,::1/128,DIRECT,no-resolve
   # 拦截规则
   - RULE-SET,Tracking / Domain,REJECT
   - RULE-SET,Advertising / Domain,REJECT
@@ -178,23 +133,19 @@ rules:
   - RULE-SET,Direct / Domain,直接连接
   - RULE-SET,Private / Domain,直接连接
   - RULE-SET,PrivateIP / IP,直接连接,no-resolve
-  - RULE-SET,Direct / Domain,直接连接
-  - RULE-SET,XPTV / Domain,直接连接
-  - RULE-SET,XPTVIP / IP,直接连接,no-resolve
-  - RULE-SET,Download / Domain,直接连接
   - RULE-SET,AppleCN / Domain,直接连接
-  # - RULE-SET,China / Domain,直接连接
-  # - RULE-SET,ChinaIP / IP,直接连接,no-resolve
+  - RULE-SET,China / Domain,直接连接
+  - RULE-SET,ChinaIP / IP,直接连接,no-resolve
   # 国外媒体
   - RULE-SET,TikTok / Domain,TikTok
   - RULE-SET,YouTube / Domain,YouTube
-  - RULE-SET,Netflix / Domain,Netflix
-  - RULE-SET,NetflixIP / IP,Netflix,no-resolve
-  - RULE-SET,Disney / Domain,Disney
-  - RULE-SET,HBO / Domain,HBO
-  - RULE-SET,Spotify / Domain,Spotify
-  - RULE-SET,Emby / Domain,Emby
-  - RULE-SET,EmbyIP / IP,Emby,no-resolve
+  - RULE-SET,Netflix / Domain,国际媒体
+  - RULE-SET,NetflixIP / IP,国际媒体,no-resolve
+  - RULE-SET,Disney / Domain,国际媒体
+  - RULE-SET,HBO / Domain,国际媒体
+  - RULE-SET,Spotify / Domain,国际媒体
+  - RULE-SET,Emby / Domain,国际媒体
+  - RULE-SET,EmbyIP / IP,国际媒体,no-resolve
   - RULE-SET,Streaming / Domain,国际媒体
   - RULE-SET,StreamingIP / IP,国际媒体,no-resolve
   # AI
@@ -211,49 +162,25 @@ rules:
   - RULE-SET,AI / Domain,人工智能
   - RULE-SET,AIIP / IP,人工智能,no-resolve
   # 新闻媒体
-  - RULE-SET,NewsMedia / Domain,新闻媒体
+  - RULE-SET,NewsMedia / Domain,国际媒体
   # 社交平台
-  - RULE-SET,Twitter / Domain,推特社交
-  - RULE-SET,Telegram / Domain,电报消息
-  - RULE-SET,TelegramIP / IP,电报消息,no-resolve
-  - RULE-SET,WhatsApp / Domain,WhatsApp
-  - RULE-SET,Facebook / Domain,Facebook
-  - RULE-SET,FacebookIP / IP,Facebook,no-resolve
+  - RULE-SET,Twitter / Domain,社交平台
+  - RULE-SET,Telegram / Domain,社交平台
+  - RULE-SET,TelegramIP / IP,社交平台,no-resolve
+  - RULE-SET,WhatsApp / Domain,社交平台
+  - RULE-SET,Facebook / Domain,社交平台
+  - RULE-SET,FacebookIP / IP,社交平台,no-resolve
   - RULE-SET,SocialMedia / Domain,社交平台
   - RULE-SET,SocialMediaIP / IP,社交平台,no-resolve
-  # 国外公司
-  - RULE-SET,GitHub / Domain,GitHub
-  - RULE-SET,Reddit / Domain,Reddit
-  - RULE-SET,Amazon / Domain,亚马逊
-  - RULE-SET,Apple / Domain,苹果服务
-  - RULE-SET,Apple-Custome / Domain,苹果服务
-  - RULE-SET,Microsoft / Domain,微软服务
-  - RULE-SET,Nvidia / Domain,英伟达
-  # 游戏平台
-  - RULE-SET,Steam / Domain,Steam
-  - RULE-SET,Epic / Domain,游戏平台
-  - RULE-SET,EA / Domain,游戏平台
-  - RULE-SET,Blizzard / Domain,游戏平台
-  - RULE-SET,UBI / Domain,游戏平台
-  - RULE-SET,PlayStation / Domain,游戏平台
-  - RULE-SET,Nintendo / Domain,游戏平台
-  - RULE-SET,Games / Domain,游戏平台
-  # 货币平台
-  - RULE-SET,Crunchyroll / Domain,货币平台
-  - RULE-SET,Popcorn / Domain,货币平台
-  - RULE-SET,OKX / Domain,货币平台
-  - RULE-SET,Bybit / Domain,货币平台
-  - RULE-SET,Binance / Domain,货币平台
-  - RULE-SET,Crypto / Domain,货币平台
-  # Fallback / General
+  # 国外流量（通用兜底代理）
+  - RULE-SET,GitHub / Domain,国外流量
   - RULE-SET,Proxy / Domain,国外流量
   - RULE-SET,ProxyIP / IP,国外流量,no-resolve
   - RULE-SET,Global / Domain,国外流量
-  # GeoIP/Site
-  - GEOIP,PRIVATE,DIRECT
+  # GeoIP / GeoSite
   - GEOIP,private,DIRECT,no-resolve
-  - GEOSITE,CN,DIRECT
-  - GEOIP,CN,DIRECT
+  - GEOSITE,CN,国内流量
+  - GEOIP,CN,国内流量
   # Final
   - MATCH,兜底流量
 
@@ -281,11 +208,9 @@ rule-providers:
   BiliBili / Domain:        {<<: *BehaviorDN, url: https://gh-proxy.com/raw.githubusercontent.com/metacubex/meta-rules-dat/meta/geo/geosite/bilibili.mrs}
   Private / Domain:         {<<: *BehaviorDN, url: https://gh-proxy.com/raw.githubusercontent.com/666OS/rules/release/mihomo/domain/Private.mrs}
   PrivateIP / IP:           {<<: *BehaviorIP, url: https://gh-proxy.com/raw.githubusercontent.com/666OS/rules/release/mihomo/ip/Private.mrs}
-  Download / Domain:        {<<: *BehaviorDN, url: https://gh-proxy.com/raw.githubusercontent.com/666OS/rules/release/mihomo/domain/Download.mrs}
-  XPTV / Domain:            {<<: *BehaviorDN, url: https://gh-proxy.com/raw.githubusercontent.com/666OS/rules/release/mihomo/domain/XPTV.mrs}
-  XPTVIP / IP:              {<<: *BehaviorIP, url: https://gh-proxy.com/raw.githubusercontent.com/666OS/rules/release/mihomo/ip/XPTV.mrs}
-  # China / Domain:           {<<: *BehaviorDN, url: https://gh-proxy.com/raw.githubusercontent.com/666OS/rules/release/mihomo/domain/China.mrs}
-  # ChinaIP / IP:             {<<: *BehaviorIP, url: https://gh-proxy.com/raw.githubusercontent.com/666OS/rules/release/mihomo/ip/China.mrs}
+  AppleCN / Domain:         {<<: *BehaviorDN, url: https://gh-proxy.com/raw.githubusercontent.com/666OS/rules/release/mihomo/domain/AppleCN.mrs}
+  China / Domain:           {<<: *BehaviorDN, url: https://gh-proxy.com/raw.githubusercontent.com/666OS/rules/release/mihomo/domain/China.mrs}
+  ChinaIP / IP:             {<<: *BehaviorIP, url: https://gh-proxy.com/raw.githubusercontent.com/666OS/rules/release/mihomo/ip/China.mrs}
   # AI规则
   ChatGPT / Domain:         {<<: *BehaviorDN, url: https://gh-proxy.com/raw.githubusercontent.com/metacubex/meta-rules-dat/meta/geo/geosite/openai.mrs}
   Claude / Domain:          {<<: *BehaviorCL, url: https://gh-proxy.com/raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Claude/Claude.list}
@@ -293,6 +218,8 @@ rule-providers:
   Perplexity / Domain:      {<<: *BehaviorDN, url: https://gh-proxy.com/raw.githubusercontent.com/metacubex/meta-rules-dat/meta/geo/geosite/perplexity.mrs}
   Copilot / Domain:         {<<: *BehaviorCL, url: https://gh-proxy.com/raw.githubusercontent.com/liandu2024/clash/main/list/Copilot.list}
   Gemini / Domain:          {<<: *BehaviorCL, url: https://gh-proxy.com/raw.githubusercontent.com/liandu2024/clash/main/list/Gemini.list}
+  Google / Domain:          {<<: *BehaviorDN, url: https://gh-proxy.com/raw.githubusercontent.com/666OS/rules/release/mihomo/domain/Google.mrs}
+  GoogleIP / IP:            {<<: *BehaviorIP, url: https://gh-proxy.com/raw.githubusercontent.com/666OS/rules/release/mihomo/ip/Google.mrs}
   Groq / Domain:            {<<: *BehaviorDN, url: https://gh-proxy.com/raw.githubusercontent.com/metacubex/meta-rules-dat/meta/geo/geosite/groq.mrs}
   Grok / Domain:            {<<: *BehaviorCL, url: https://gh-proxy.com/raw.githubusercontent.com/liandu2024/clash/main/list/Grok.list}
   AI / Domain:              {<<: *BehaviorDN, url: https://gh-proxy.com/raw.githubusercontent.com/666OS/rules/release/mihomo/domain/AI.mrs}
@@ -321,65 +248,22 @@ rule-providers:
   # 新闻媒体规则
   NewsMedia / Domain:       {<<: *BehaviorDN, url: https://gh-proxy.com/raw.githubusercontent.com/666OS/rules/release/mihomo/domain/NewsMedia.mrs}
   # 国外公司规则
-  Google / Domain:          {<<: *BehaviorDN, url: https://gh-proxy.com/raw.githubusercontent.com/666OS/rules/release/mihomo/domain/Google.mrs}
-  GoogleIP / IP:            {<<: *BehaviorIP, url: https://gh-proxy.com/raw.githubusercontent.com/666OS/rules/release/mihomo/ip/Google.mrs}
   GitHub / Domain:          {<<: *BehaviorDN, url: https://gh-proxy.com/raw.githubusercontent.com/metacubex/meta-rules-dat/meta/geo/geosite/github.mrs}
-  Reddit / Domain:          {<<: *BehaviorDN, url: https://gh-proxy.com/raw.githubusercontent.com/metacubex/meta-rules-dat/meta/geo/geosite/reddit.mrs}
-  Amazon / Domain:          {<<: *BehaviorDN, url: https://gh-proxy.com/raw.githubusercontent.com/metacubex/meta-rules-dat/meta/geo/geosite/amazon.mrs}
-  AppleCN / Domain:         {<<: *BehaviorDN, url: https://gh-proxy.com/raw.githubusercontent.com/666OS/rules/release/mihomo/domain/AppleCN.mrs}
-  Apple / Domain:           {<<: *BehaviorDN, url: https://gh-proxy.com/raw.githubusercontent.com/666OS/rules/release/mihomo/domain/Apple.mrs}
-  Apple-Custome / Domain:   {<<: *BehaviorCL, url: https://gh-proxy.com/raw.githubusercontent.com/liandu2024/clash/main/list/Apple.list}
-  Microsoft / Domain:       {<<: *BehaviorDN, url: https://gh-proxy.com/raw.githubusercontent.com/666OS/rules/release/mihomo/domain/Microsoft.mrs}
-  Nvidia / Domain:          {<<: *BehaviorCL, url: https://gh-proxy.com/raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Nvidia/Nvidia.list}
-  # 游戏平台规则
-  Steam / Domain:           {<<: *BehaviorDN, url: https://gh-proxy.com/raw.githubusercontent.com/metacubex/meta-rules-dat/meta/geo/geosite/steam.mrs}
-  Epic / Domain:            {<<: *BehaviorCL, url: https://gh-proxy.com/raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Epic/Epic.list}
-  EA / Domain:              {<<: *BehaviorCL, url: https://gh-proxy.com/raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/EA/EA.list}
-  Blizzard / Domain:        {<<: *BehaviorCL, url: https://gh-proxy.com/raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Blizzard/Blizzard.list}
-  UBI / Domain:             {<<: *BehaviorCL, url: https://gh-proxy.com/raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/UBI/UBI.list}
-  PlayStation / Domain:     {<<: *BehaviorCL, url: https://gh-proxy.com/raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/PlayStation/PlayStation.list}
-  Nintendo / Domain:        {<<: *BehaviorCL, url: https://gh-proxy.com/raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Nintendo/Nintendo.list}
-  Games / Domain:           {<<: *BehaviorDN, url: https://gh-proxy.com/raw.githubusercontent.com/666OS/rules/release/mihomo/domain/Games.mrs}
-  # 加密货币规则
-  Crunchyroll / Domain:     {<<: *BehaviorCL, url: https://gh-proxy.com/raw.githubusercontent.com/liandu2024/clash/main/list/Crunchyroll.list}
-  Popcorn / Domain:         {<<: *BehaviorCL, url: https://gh-proxy.com/raw.githubusercontent.com/liandu2024/clash/main/list/Popcorn.list}
-  OKX / Domain:             {<<: *BehaviorDN, url: https://gh-proxy.com/raw.githubusercontent.com/metacubex/meta-rules-dat/meta/geo/geosite/okx.mrs}
-  Bybit / Domain:           {<<: *BehaviorDN, url: https://gh-proxy.com/raw.githubusercontent.com/metacubex/meta-rules-dat/meta/geo/geosite/bybit.mrs}
-  Binance / Domain:         {<<: *BehaviorDN, url: https://gh-proxy.com/raw.githubusercontent.com/metacubex/meta-rules-dat/meta/geo/geosite/binance.mrs}
-  Crypto / Domain:          {<<: *BehaviorDN, url: https://gh-proxy.com/raw.githubusercontent.com/666OS/rules/release/mihomo/domain/Crypto.mrs}
   # 代理规则
   Proxy / Domain:           {<<: *BehaviorDN, url: https://gh-proxy.com/raw.githubusercontent.com/666OS/rules/release/mihomo/domain/Proxy.mrs}
   ProxyIP / IP:             {<<: *BehaviorIP, url: https://gh-proxy.com/raw.githubusercontent.com/666OS/rules/release/mihomo/ip/Proxy.mrs}
   Global / Domain:           {<<: *BehaviorCL, url: https://gh-proxy.com/raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Global/Global.list}
-  # GateFireWall / Domain:   {<<: *BehaviorDN, url: https://gh-proxy.com/raw.githubusercontent.com/metacubex/meta-rules-dat/meta/geo/geosite/gfw.mrs}
 
 
 # ==================== 核心配置 ====================
-# 基础配置
 mode: rule
-port: 7899
-socks-port: 7891
-redir-port: 7892
-mixed-port: 7893
-tproxy-port: 7895
+mixed-port: 7890
 ipv6: true
 allow-lan: true
 log-level: warning
 
-# 认证配置
-authentication:
-  - openclash:yyds666
-skip-auth-prefixes:
-  - 10.0.0.0/8
-  - 172.16.0.0/12
-  - 192.168.0.0/16
-  - 127.0.0.1/8
-
-# # 管理面板配置
+# 管理面板
 external-controller: 0.0.0.0:9090
-# external-ui: ui
-# external-ui-name: zashboard
-# external-ui-url: https://gh-proxy.com/github.com/Zephyruso/zashboard/archive/refs/heads/gh-pages.zip
 secret: yyds666
 
 # 配置存储
@@ -387,18 +271,18 @@ profile:
   store-selected: true
   store-fake-ip: true
 
-# TUN模式配置
+# TUN 模式（终端设备：开启自动路由与接口检测）
 tun:
   enable: true
   stack: gvisor
   device: utun
   endpoint-independent-nat: true
-  auto-route: false
-  auto-detect-interface: false
+  auto-route: true
+  auto-detect-interface: true
   auto-redirect: false
   strict-route: false
 
-# DNS配置
+# DNS 配置
 dns:
   enable: true
   cache-algorithm: arc
@@ -407,28 +291,18 @@ dns:
   enhanced-mode: fake-ip
   fake-ip-range: 198.20.0.1/16
   nameserver:
-    # 上海电信 DNS
-    - 202.96.209.133
-    - 116.228.111.118
-    # 上海联通 DNS
-    - 210.22.70.3
-    - 210.22.84.3
-    - 223.5.5.5
+    - 119.29.29.29   # DNSPod
+    - 223.5.5.5      # 阿里 DNS
   fake-ip-filter-mode: blacklist
   fake-ip-filter:
     - +.lan
     - +.local
     - "geosite:cn"
     - "rule-set:fakeipfilter_domain"
-
-  # 支持通配符域名 (例如: *.clash.dev, *.foo.*.example.com )
-  # 不使用通配符的域名优先级高于使用通配符的域名 (例如: foo.example.com > *.example.com > .example.com )
-  # 注意: +.foo.com 的效果等同于 .foo.com 和 foo.com
   hosts:
     "*.clash.dev": 127.0.0.1
     ".dev": 127.0.0.1
     ".local": 127.0.0.1
     "alpha.clash.dev": "::1"
-  # 跳过证书验证,解决部分兼容性问题 https://help.nextdns.io/t/g9hdkjz
   skip-cert-verify: false
 # ==================== EOF ====================
