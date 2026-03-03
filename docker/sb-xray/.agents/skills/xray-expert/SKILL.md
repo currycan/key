@@ -251,6 +251,8 @@ ML-KEM (Module-Lattice-based Key Encapsulation Mechanism) 是 NIST 标准化的�
 | ML-KEM 握手失败 | 客户端 seed 与服务端不匹配 | 核对 `XRAY_MLKEM768_SEED` vs `XRAY_MLKEM768_CLIENT` |
 | UUID 认证失败 | 客户端 UUID 错误 | 检查 `XRAY_UUID`，通过 `show-config.sh` 获取正确链接 |
 
+> **Bug 记录**：修复 Xray 配置模板 Bug 后，须追加到 `.agents/skills/_shared/BUGS.md` 的「Xray 配置模板」分区。
+
 ---
 
 ## 参考文献

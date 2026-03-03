@@ -124,3 +124,7 @@ Git Release Tag: v1.8.8 (保留 v 前缀)
 1. 更新 `Dockerfile` 中的 `ARG` 默认值
 2. 更新 `build.sh` 中 `check_version` 的第 4 个参数
 3. 运行 `./build.sh default` 验证构建
+
+---
+
+> **Bug 记录**：修复 Dockerfile / build.sh / release.sh Bug 后，须追加到 `.agents/skills/_shared/BUGS.md` 的「Nginx / Docker 构建」分区。

@@ -19,7 +19,13 @@
    - 若修改涉及 `scripts/`、`templates/`、`Dockerfile`、`build.sh` → 更新对应文档
    - 文档更新与代码修改属于同一任务，完成代码修改但未更新文档视为任务未完成
 
-6. **持续学习**: 每次被纠正后，在本文件中添加一条新规则，确保同类错误不再发生。
+6. **Bug 记录（强制）**: 每次修复 Bug 后，**必须**在同一任务内将修复经验写入 `.agents/skills/_shared/BUGS.md`：
+   - 按涉及文件分区追加到对应分区（rename.js / entrypoint.sh / Xray 配置 / Sing-box 配置 / Docker）
+   - 使用规定格式：Bug ID（全库递增）、涉及文件、函数、触发条件、错误现象、根本原因、修复方案、预防措施
+   - 修复 Bug 但未记录到 BUGS.md 视为任务未完成
+   - 编码前先查阅 BUGS.md 对应分区，避免重复踩已知陷阱
+
+7. **持续学习**: 每次被纠正后，在本文件中添加一条新规则，确保同类错误不再发生。
 
 ---
 
@@ -100,10 +106,16 @@
 | `/openclash-expert` | OpenClash 配置专家（代理组/规则集/订阅转换）|
 | `/template-config` | Sub-Store 模板与 rename.js 脚本专家 |
 | `/build-release` | Docker 构建发布专家（build.sh/release.sh）|
-| `/script-dev` | Sub-Store 脚本开发与调试专家 |
-| `/doc-sync` | 文档同步检查，根据代码变更更新 docs/ |
+| `/script-dev` | Sub-Store 脚本开发专家（自动加载 BUGS.md）|
+| `/doc-sync` | 文档同步 + Bug 记录完整性检查 |
 
 每个命令都会自动加载对应的 `.agents/skills/*/SKILL.md` 技术参考，单一数据源，内容不冗余。
+
+### 共享知识库
+
+| 文件 | 用途 |
+|------|------|
+| `.agents/skills/_shared/BUGS.md` | 跨 Skill Bug 记录数据库，所有 Agent 编码前必读，修复 Bug 后必写 |
 
 ---
 

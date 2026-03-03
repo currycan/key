@@ -284,6 +284,8 @@ QUIC 协议对时间精度敏感，NTP 确保服务端时钟准确。
 | Rule Set 加载失败 | 网络无法访问 GitHub Raw | 容器内需配置代理或使用镜像源 |
 | QUIC 性能差 | Brutal 内核模块未加载 | 检查 `IS_BRUTAL` 变量，加载 `tcp_brutal` 模块 |
 
+> **Bug 记录**：修复 Sing-box 配置模板 Bug 后，须追加到 `.agents/skills/_shared/BUGS.md` 的「Sing-box 配置模板」分区。
+
 ---
 
 ## 参考文献

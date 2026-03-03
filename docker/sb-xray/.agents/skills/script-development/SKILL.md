@@ -227,3 +227,147 @@ docker restart sb-xray
 2. **环境变量未生效**: 确认变量已通过 `export` 或写入持久化文件
 3. **证书问题**: 容器内运行 `acme.sh --list` 查看证书状态
 4. **JSON 格式错误**: `apply_tpl` 会自动用 `jq` 校验 JSON 文件
+
+---
+
+## JavaScript 脚本代码生成规范（rename.js 类）
+
+> **强制要求**: 编写或修改 `sources/hack/*.js` 前，必须先阅读 `.agents/skills/_shared/BUGS.md` 中 rename.js 分区的所有条目。
+
+### 正则表达式规范
+
+```javascript
+// ✅ 正确：移除"单词"类关键词必须加词边界
+const escapedProto = protocol.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+name.replace(new RegExp(`\\b${escapedProto}\\b`, 'ig'), '');
+
+// ❌ 错误：无词边界，'ss' 会误删 'Russia' 中的 ss
+name.replace(new RegExp(protocol, 'ig'), '');
+
+// ✅ 正确：FlagRules 正则只保留必要捕获组
+{ regex: /(美[国國]|United States)/i, emoji: '🇺🇸' }
+
+// ❌ 错误：双层括号引入多余捕获组
+{ regex: /((美[国國]|United States))/i, emoji: '🇺🇸' }
+
+// ✅ 正确：锚点无需 g 标志
+keyPart.replace(/(\[\s*\d*\s*\]|\d+)$/, '')
+
+// ❌ 错误：$ 锚点加 g 无意义
+keyPart.replace(/(\[\s*\d*\s*\]|\d+)$/g, '')
+```
+
+### 数组操作规范
+
+```javascript
+// ✅ 正确：纯函数，返回新数组，不修改入参
+const promoteRegion = (parts) => {
+    const result = [...parts];           // 先复制
+    const idx = result.findIndex(...);
+    if (idx <= 0) return result;
+    result.unshift(result.splice(idx, 1)[0]);
+    return result;
+};
+
+// ❌ 错误：直接修改入参，产生副作用
+const promoteRegion = (parts) => {
+    const idx = parts.findIndex(...);
+    parts.unshift(parts.splice(idx, 1)[0]);  // 突变原数组！
+    return parts;
+};
+```
+
+### 常量与缓存规范
+
+```javascript
+// ✅ 正确：派生数据在初始化 IIFE 中一次性计算，缓存到 Constants
+(function initFlagRules() {
+    // ... 构建 flagMap, SORTED_COUNTRY_KEYS ...
+    Constants.ALL_REGIONS = [
+        ...Constants.PRIORITY_REGIONS,
+        ...Object.keys(RegionMap).filter(k => !Constants.PRIORITY_REGIONS.includes(k))
+    ];
+})();
+
+// ✅ 正确：函数内直接引用缓存
+const getPriority = (name) => {
+    return Constants.ALL_REGIONS.findIndex(k => name.includes(k));
+};
+
+// ❌ 错误：每次调用都重新构建，性能浪费
+const getPriority = (name) => {
+    const allRegions = [...Constants.PRIORITY_REGIONS, ...Object.keys(RegionMap)]; // 每次重建！
+    return allRegions.findIndex(k => name.includes(k));
+};
+```
+
+### 功能标志规范
+
+```javascript
+// ✅ 正确：用布尔字段作为功能控制标志
+const CleaningRules = [
+    { desc: "统一分隔符", regex: /[-_|\s丨✈\/]+/g, value: "-", skipInPreformat: true },
+];
+// 使用时：
+if (rule.skipInPreformat) continue;
+
+// ❌ 错误：用描述文字判断，文字改变则逻辑静默失效
+if (rule.desc.includes('分隔符')) continue;
+```
+
+### 数据去重规范
+
+```javascript
+// ✅ 正确：向数据库类数组添加前先检查唯一性
+// CountryDB 添加前：
+const existingCodes = CountryDB.map(x => x.code);
+if (existingCodes.includes(newEntry.code)) {
+    throw new Error(`CountryDB 重复 code: ${newEntry.code}`);
+}
+```
+
+### 预格式化路径规范
+
+```javascript
+// ✅ 正确：预格式化快速通道必须保留地名归化
+let parts = remainingName.split('✈').flatMap(Utils.cleanPreformatted);
+parts = parts
+    .map(part => Utils.standardizeRegion(part))    // 英文地名 → 中文
+    .map(part => part.replace(/^[-_||\s]+|[-_||\s]+$/g, '').trim())  // 清理残留分隔符
+    .filter(part => part !== '');
+
+// ❌ 错误：缺少 standardizeRegion，英文地名未归化
+let parts = remainingName.split('✈').flatMap(Utils.cleanPreformatted);
+// 直接使用 parts，Hong Kong 不会变成 香港
+```
+
+---
+
+## 代码提交前自检清单
+
+> 完成 JavaScript 脚本修改后，逐项确认：
+
+- [ ] 所有"移除单词"类正则都添加了 `\b` 词边界
+- [ ] 数组变换辅助函数返回新数组，未修改入参
+- [ ] 新增 `CleaningRules` 条目检查是否需要 `skipInPreformat` 标志
+- [ ] 功能控制标志使用布尔字段，不依赖描述文字
+- [ ] 向 `CountryDB` / `RegionMap` 等查找表添加条目前检查重复
+- [ ] 新增引用 `RegionMap` 的代码优先使用 `Constants.ALL_REGIONS`
+- [ ] 预格式化分支包含 `standardizeRegion()` 调用
+- [ ] 修复 Bug 后在 `.agents/skills/_shared/BUGS.md` 追加记录
+
+---
+
+## 已知问题速查（rename.js）
+
+快速导航到 `.agents/skills/_shared/BUGS.md` 的对应条目：
+
+| Bug ID | 一句话描述 | 关键词 |
+|:---|:---|:---|
+| #001 | 预格式化通道英文地名未转中文 | `processPreFormatted`, `standardizeRegion` |
+| #002 | 功能标志用字符串描述，修改描述则逻辑失效 | `cleanPreformatted`, `skipInPreformat` |
+| #003 | CountryDB 末尾重复条目 | `CountryDB`, `UK`, `KR` |
+| #004 | 协议名正则无词边界，误删单词内字母 | `processRawNode`, `\b`, `Russia` |
+| #005 | promoteRegion 直接修改入参数组 | `promoteRegion`, 副作用 |
+| #006 | FlagRules 正则双层括号 | `FlagRules`, 捕获组 |
+| #007 | allRegions 在多处函数内重复构建 | `Constants.ALL_REGIONS`, 缓存 |

@@ -275,6 +275,9 @@ grep "policy-priority" /tmp/openclash.log
 | 规则集加载失败 | GitHub 连接超时 | 使用 CDN 代理规则源 (如 `gh-proxy.com`) |
 | Smart 不切换节点 | `tolerance` 过高 | 适当降低容忍度 (如 300ms → 150ms) |
 
+> **rename.js 相关**：节点名格式异常时，优先查 `.agents/skills/_shared/BUGS.md` rename.js 分区（Bug #001-#007），避免重复踩坑。
+> **Bug 记录**：修复 OpenClash / 覆写脚本 Bug 后，追加到 `.agents/skills/_shared/BUGS.md` 对应分区。
+
 ---
 
 ## 参考文献
