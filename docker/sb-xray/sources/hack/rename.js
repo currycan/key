@@ -59,7 +59,7 @@ const CleaningRules = [
     { desc: "移除 '水牛'", regex: /-?大?水牛/gi, value: "" },
     { desc: "移除 'HY2'", regex: /-?HY2/gi, value: "" },
     { desc: "移除 'VPN' 关键字", regex: /\bVPN\b/gi, value: "" },
-    { desc: "移除 'IP' 关键字 (排除 原生IP/IPv6/IPLC)", regex: /\b(?<!原生)IP\b/g, value: "" },
+    { desc: "移除 'IP' 关键字 (排除中文复合词: 动态IP/静态IP/原生IP/IPv6/IPLC)", regex: /(?<![\u4e00-\u9fff])\bIP\b/g, value: "" },
     { desc: "移除 'GG/read/大学/加州/负载均衡/中继/密苏里州'", regex: /(GG|read|大学|加州|负载均衡|中继|密苏里州)/gi, value: "" },
     { desc: "替换 AI 关键词", regex: /[-_]?\d*(SV|chatgpt|gemini)/gi, value: "AI" },
     { desc: "移除流量标识 (TB)", regex: /-?\d+-?\d*TB/gi, value: "" },
@@ -607,7 +607,9 @@ const Pipeline = {
 
     /** 处理原始节点（完整清洗流水线） */
     processRawNode: (p, protocol) => {
-        let name = Utils.cleanName(p.name);
+        // 先剥离 Emoji 国旗前缀，防止其阻断后续 splitAndDedup 的 startsWith 地区匹配
+        const { rest: nameWithoutFlag } = Utils.extractFlag(p.name);
+        let name = Utils.cleanName(nameWithoutFlag || p.name);
         name = Utils.standardizeRegion(name);
         let parts = Utils.splitAndDedup(name);
         parts = Utils.promoteRegion(parts);
