@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 -c \"\nimport sys, json\ntry:\n    d = json.load(sys.stdin)\nexcept Exception:\n    sys.exit(0)\nfp = d.get('tool_input', {}).get('file_path', '')\nif not fp:\n    sys.exit(0)\n# 跳过文档文件本身，避免形成无限循环提醒\nif '/docs/' in fp or fp.endswith('.md'):\n    sys.exit(0)\n# 仅对源文件触发\nSRC_MARKERS = ['/sources/', '/scripts/', '/templates/', 'Dockerfile', 'build.sh', 'release.sh', 'docker-compose']\nif not any(m in fp for m in SRC_MARKERS):\n    sys.exit(0)\nimport os\nrel = fp.split('sb-xray/')[-1] if 'sb-xray/' in fp else os.path.basename(fp)\nprint(f'📋 [文档同步] 已修改源文件: {rel}')\nprint('请对照 .agents/skills/documentation/SKILL.md「代码-文档映射参照表」检查并更新 docs/ 中的相关章节。')\n\""
+          }
+        ]
+      }
+    ]
+  }
+}

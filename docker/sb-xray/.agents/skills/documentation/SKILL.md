@@ -119,12 +119,13 @@ A["客户端(Client)"] --> B
 
 ### 触发条件
 
-以下任一情况发生时，应执行全量文档更新：
+以下任一情况发生时，应执行文档更新（至少检查映射表对应章节）：
 
 - `scripts/entrypoint.sh` 或其他核心脚本发生修改
 - `templates/` 目录下任何模板文件发生变更
 - `Dockerfile`、`build.sh`、`release.sh` 发生变更
 - `docker-compose.yml` 配置变更
+- `sources/hack/rename.js` 节点重命名脚本发生修改
 - 新增或移除组件
 
 ### 第一步：全局变更扫描
@@ -178,6 +179,9 @@ readme.md                        ← 汇总配置参考 / 部署示例变更
 | `scripts/entrypoint.sh` 扇区三 (证书管理) | `02-protocols-and-security.md` | ACME 证书申请/续期流程 |
 | `scripts/entrypoint.sh` 扇区四 (配置生成) | `01-architecture-and-traffic.md` | `apply_tpl()` 渲染引擎、模板调用链 |
 | `scripts/entrypoint.sh` 扇区五 (客户端输出) | `03-routing-and-clients.md` | ISP 测速评估、客户端配置生成 |
+| `sources/hack/rename.js` | `03-routing-and-clients.md` § 3 | 清洗流水线架构（3.1）、核心清洗动作（3.2）、处理效果对比（3.3）、扩展维护（3.5）|
+| `sources/hack/rename.js` — `RegionMap` | `03-routing-and-clients.md` § 3.2 | 新增地区支持时同步更新地名归化说明 |
+| `sources/hack/rename.js` — `CleaningRules` | `03-routing-and-clients.md` § 3.2 | 新增/修改清洗规则时同步更新"核心清洗动作"表 |
 | `templates/xray/` | `02-protocols-and-security.md` | Reality / XHTTP / VMess-WS 协议配置 |
 | `templates/sing-box/` | `02-protocols-and-security.md` | Hysteria2 / TUIC / AnyTLS 协议配置 |
 | `templates/nginx/` | `01-architecture-and-traffic.md` | 反向代理、TLS 终结、路径分发 |
@@ -303,6 +307,9 @@ readme.md                        ← 汇总配置参考 / 部署示例变更
 - [ ] 新增/修改代理协议 → 更新 `02-protocols-and-security.md`
 - [ ] 修改路由逻辑 → 更新 `03-routing-and-clients.md`
 - [ ] 修改客户端模板 → 更新 `03-routing-and-clients.md` 的模板说明
+- [ ] 修改 `rename.js` 清洗流水线 → 更新 `03-routing-and-clients.md` § 3（架构图/动作表/示例表）
+- [ ] 修改 `rename.js` — `RegionMap` 新增地区 → 更新 § 3.2 地名归化说明
+- [ ] 修改 `rename.js` — `CleaningRules` 新增规则 → 更新 § 3.2 核心清洗动作表
 - [ ] 修改构建流程 → 更新 `05-build-release.md`
 - [ ] 新增组件 → 更新 `01-architecture-and-traffic.md` 的架构图
 - [ ] 修改运维命令 → 更新 `04-ops-and-troubleshooting.md`
