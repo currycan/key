@@ -277,13 +277,13 @@ graph TD
 
     subgraph Pipeline
         F0["Pipeline.filter: 过滤无效节点"] --> F1
-        F1{"Pipeline.format: 预格式化判断"}
-        F1 -- "已含 ✈" --> PF["processPreFormatted: 轻量清理"]
-        F1 -- "其余节点" --> PR["processRawNode: 完整清洗流水线"]
+        F1{"Pipeline.format: 预格式化判断\n（已有 Emoji 旗帜且含 ✈？）"}
+        F1 -- "是（快速通道）" --> PF["processPreFormatted\n① 清理（跳过分隔符规则）\n② standardizeRegion 英文→中文\n③ 清理残留分隔符 |/- 等"]
+        F1 -- "否（完整流水线）" --> PR["processRawNode\n① 剥离旗帜 Emoji\n② cleanName 全规则清洗\n③ standardizeRegion\n④ splitAndDedup 拆分去重\n⑤ promoteRegion 地区前置\n⑥ detectFlag 自动标旗"]
         PF --> S
         PR --> S
-        S["Pipeline.sort: 地区优先级排序"] --> R
-        R["Pipeline.renumber: 重编号与最终输出"]
+        S["Pipeline.sort: 按 ALL_REGIONS 优先级排序"] --> R
+        R["Pipeline.renumber: 两遍扫描\n第一遍: 构建最终名称\n第二遍: 同名追加 01/02…"]
     end
 
     R --> Z["输出: 标准化的 Proxy 节点列表"]
@@ -296,22 +296,45 @@ graph TD
 
 | 阶段 | 动作 | 说明 |
 |:---|:---|:---|
-| **去重与过滤** | `Pipeline.filter` | 彻底拦截含"距离/套餐/到期/剩余"等无关信息的无效节点 |
-| **地名统一归化** | `Utils.standardizeRegion` | 将 `Hong Kong`、`HK`、`深港` 统一为 `香港` |
+| **去重与过滤** | `Pipeline.filter` | 拦截含"套餐/到期/剩余/联系客服"等无效信息的噪点节点 |
+| **全规则清洗** | `Utils.cleanName` | 按 `CleaningRules` 顺序执行：移除括号/序号/IEPL后缀、提取倍率、"解锁"前缀等 |
+| **地名统一归化** | `Utils.standardizeRegion` | 将 `Hong Kong`/`HK`/`深港`/`HKT` 统一为 `香港`；贯穿原始通道和预格式化通道 |
+| **拆分与去重** | `Utils.splitAndDedup` | 按分隔符拆分后去重；自动展开组合地名（如 `香港hkt2直连` → `香港` + `直连`，剥离 ISP 遗留孤立序号）|
+| **地区前置** | `Utils.promoteRegion` | 将地区关键词移动到 parts 数组首位；返回新数组，不修改原数组 |
 | **视觉美化** | `Utils.detectFlag` | 自动挂载国旗 Emoji，格式化为 `Flag Protocol ✈ Region ✈ Detail` |
-| **协议精简** | `Utils.shouldHideProtocol` | 有 `Reality` 则隐藏 `vless`，避免冗余 |
+| **协议安全移除** | `processRawNode` | 使用 `\b词边界\b` 正则移除协议名残留，防止 `ss` 误删 `Russia` 中的子串 |
+| **协议精简** | `Utils.shouldHideProtocol` | 有 `Reality` 则隐藏 `vless`，避免冗余标签 |
+| **同名去重编号** | `Pipeline.renumber` | 两遍扫描：第一遍生成所有最终名称，第二遍统计重名并追加零填充序号（`01`/`02`…） |
+| **预格式化残留清理** | `processPreFormatted` | 跳过分隔符规则（`skipInPreformat`）清洗各段后，对每段执行 `standardizeRegion` 并清理 `\|`/`-` 等残留分隔符 |
 
 ### 3.3 处理效果对比
 
-| 原始命名 | 清洗后结果 |
-|:---|:---|
-| `![使用教程与联系客服].txt` | **（自动剔除）** |
-| `🇭🇰 香港01-深港IEPL` (ss) | `🇭🇰 ss ✈ 香港` |
-| `🇭🇰 Hong Kong丨01` (ss) | `🇭🇰 ss ✈ 香港` |
-| `🇭🇰香港[1]✈原生家庭(协议一)` (ss) | `🇭🇰 ss ✈ 香港 ✈ 原生家庭` |
-| `✨🇭🇰 香港 01 x1.5 \| IPLC -- Reality` | `🇭🇰 Reality ✈ IPLC ✈ 香港 ✈ 1.5×` |
-| `🇺🇸美国洛杉矶v6 08 🎯 udp` | `🇺🇸 IPv6 美国 ✈ UDP ✈ 洛杉矶` |
-| `Taiwan-Hsinchu-02-1.0倍` | `🇹🇼 台湾 ✈ 1× ✈ 新竹` |
+**原始通道（`processRawNode`）**
+
+| 原始命名 | 协议 | 清洗后结果 |
+|:---|:---:|:---|
+| `![使用教程与联系客服].txt` | — | **（自动剔除）** |
+| `🇭🇰 香港01-深港IEPL` | ss | `🇭🇰 ss ✈ 香港` |
+| `🇭🇰 Hong Kong丨01` | ss | `🇭🇰 ss ✈ 香港` |
+| `🇭🇰香港[1]✈原生家庭(协议一)` | ss | `🇭🇰 ss ✈ 香港 ✈ 原生家庭` |
+| `✨🇭🇰 香港 01 x1.5 \| IPLC -- Reality` | vless | `🇭🇰 Reality ✈ IPLC ✈ 香港 ✈ 1.5×` |
+| `🇺🇸美国洛杉矶v6 08 🎯 udp` | ss | `🇺🇸 IPv6 美国 ✈ UDP ✈ 洛杉矶` |
+| `Taiwan-Hsinchu-02-1.0倍` | ss | `🇹🇼 台湾 ✈ 1× ✈ 新竹` |
+| `🇭🇰香港hkt2-HY2直连` | hysteria2 | `🇭🇰 hysteria2 ✈ 香港 ✈ 直连` |
+| `🇨🇳台湾02-动态IP` | ss | `🇹🇼 ss ✈ 台湾 ✈ 动态IP` |
+| `解锁流媒体-香港` | vless | `🇭🇰 vless ✈ 香港 ✈ 流媒体` |
+| `香港01-流媒体`（×3 重复） | ss | `🇭🇰 ss ✈ 香港 ✈ 流媒体 01` / `02` / `03` |
+
+**预格式化通道（`processPreFormatted`）**
+
+已含 Emoji + `✈` 的节点走此快速通道，同样执行地名标准化和分隔符清理：
+
+| 原始命名 | 协议 | 清洗后结果 |
+|:---|:---:|:---|
+| `🇭🇰 Hong Kong \| ✈ 流媒体 ✈ 高速` | ss | `🇭🇰 ss ✈ 香港 ✈ 流媒体 ✈ 高速` |
+| `🇺🇸 United States \| ✈ 流媒体` | vless | `🇺🇸 vless ✈ 美国 ✈ 流媒体` |
+| `🇬🇧 Great Britain \| ✈ 高速` | ss | `🇬🇧 ss ✈ 英国 ✈ 高速` |
+| `🇯🇵 Japan \| ✈ AI` | vless | `🇯🇵 vless ✈ 日本 ✈ AI` |
 
 ### 3.4 部署方式
 
@@ -320,7 +343,20 @@ graph TD
 3. 添加类型为 `Operator` 的处理脚本
 4. 将 `rename.js` 代码粘贴进去，保存并预览
 
-> **高级维护**：如遇新机场的未知命名，请在 `RegionMap` 中补上对应关键词正则即可。
+### 3.5 扩展与维护
+
+**新增地区支持**：在 `RegionMap` 中添加对应正则即可，`Constants.ALL_REGIONS` 会在脚本初始化时自动缓存（`initFlagRules` 末尾），无需在各函数内手动维护列表。
+
+**新增清洗规则**：在 `CleaningRules` 数组中追加规则对象。若该规则含有分隔符操作且不应作用于已格式化节点，添加 `skipInPreformat: true` 字段使预格式化通道跳过它：
+
+```javascript
+// 示例：添加一条不影响预格式化节点的清洗规则
+{ desc: "移除特殊前缀", regex: /^特殊-/g, value: "", skipInPreformat: true }
+```
+
+**新增国旗规则**：`FlagRules` 数组中的手动规则（繁体/异体字/城市名）优先级高于 `CountryDB` 自动生成的规则，复杂匹配在此处添加。
+
+**调试重命名结果**：在 Sub-Store 脚本编辑界面点击"预览"，可实时看到每个节点的清洗前后对比。
 
 ---
 
