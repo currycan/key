@@ -1,5 +1,13 @@
 # 说明
 
+[vernesong/OpenClash: A Clash Client For OpenWrt](https://github.com/vernesong/OpenClash)
+
+[OpenClash/master/smart at core · vernesong/OpenClash](https://github.com/vernesong/OpenClash/tree/core/master/smart)
+
+[Release Config Clash Meta - 2026-03-04 02:34 · rtaserver/Config-Open-ClashMeta](https://github.com/rtaserver/Config-Open-ClashMeta/releases/tag/latest)
+
+https://raw.githubusercontent.com/vernesong/OpenClash/core/master/smart/clash-linux-arm64.tar.gz
+
 ## AdGuardHome 1（**不启用 DNS 缓存**）
 
 功能：
