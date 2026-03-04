@@ -197,7 +197,7 @@ check_version "Sub-Store Back"  "$SUB_STORE_BACKEND_VERSION"  "SUB_STORE_BACKEND
 check_version "s-ui"            "$SUI_TAG"                    "SUI_VERSION"                "1.3.11"
 check_version "Dufs"            "$DUFS_TAG"                   "DUFS_VERSION"               "0.45.0"
 check_version "Cloudflared"      "$CLOUDFLARED_VERSION"        "CLOUDFLARED_VERSION"        "2026.2.0"
-check_version "3x-ui"           "$XUI_TAG"                    "XUI_VERSION"                "2.8.10"
+check_version "3x-ui"           "$XUI_TAG"                    "XUI_VERSION"                "2.8.11"
 check_version "Sing-box"        "$SING_BOX_TAG"               "SING_BOX_VERSION"           "1.13.0"
 check_version "Xray"            "$XRAY_TAG"                   "XRAY_VERSION"               "26.2.6"
 
