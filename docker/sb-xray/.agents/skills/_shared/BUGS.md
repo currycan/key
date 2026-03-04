@@ -176,6 +176,51 @@ description: 跨 Skill 的 Bug 修复记录，所有 Agent 工作时必须优先
 
 ---
 
+### Bug #010 — OneSmartPro.yaml `AND,((DST-PORT,443),(NETWORK,UDP)),REJECT` 在 OpenWrt TPROXY 下导致客户端无法上网
+
+| 字段 | 内容 |
+|:---|:---|
+| **涉及文件** | `templates/client_template/OneSmartPro.yaml` |
+| **函数** | `rules` 规则块 QUIC 阻断规则 |
+| **触发条件** | OpenClash（OpenWrt）以 TPROXY 模式运行，客户端访问 QUIC（UDP/443）网站时 |
+| **错误现象** | 路由器上"网络测试"节点健康正常，但 LAN 客户端所有网站均无法打开，表现为连接超时 |
+| **根本原因** | 客户端 UDP/443 被 iptables TPROXY 重定向到 mihomo，mihomo 执行 `REJECT` 需要发送 ICMP Port Unreachable 给客户端。但 ICMP 的源 IP 是 fake IP（`198.20.x.x`），该地址不属于路由器本地接口，OpenWrt 防火墙（rp_filter / 出向规则）会拦截这类异常源 IP 的出向包，ICMP 永远无法送达客户端。客户端等待 QUIC 超时（1-3 秒），现代浏览器（Chrome/Safari）每次连接都要经历此过程，用户感知为"无法上网" |
+| **修复方案** | 删除 `AND,((DST-PORT,443),(NETWORK,UDP)),REJECT` 规则，让 QUIC 流量正常走代理处理。若需阻断 QUIC，应在 OpenWrt iptables/nftables 层面 DROP，而非在 mihomo 规则层发送 REJECT |
+| **预防措施** | 在 TPROXY 透明代理场景下，mihomo 的 `REJECT` 动作对 UDP 流量不可靠（ICMP 回包路由异常）；需要静默丢弃时使用 iptables DROP，需要让浏览器快速回退时同样用 DROP（客户端会因无响应快速切 TCP） |
+| **记录时间** | 2026-03-04 |
+
+---
+
+### Bug #011 — OneSmartPro.yaml `hosts: ".dev": 127.0.0.1` 误劫持所有 `.dev` TLD 域名
+
+| 字段 | 内容 |
+|:---|:---|
+| **涉及文件** | `templates/client_template/OneSmartPro.yaml` |
+| **函数** | DNS 配置块 `hosts` |
+| **触发条件** | 客户端访问任意 `.dev` TLD 域名（如 `web.dev`、`dart.dev`） |
+| **错误现象** | `.dev` TLD 域名全部解析到 `127.0.0.1`，连接路由器本地，实际网站不可达 |
+| **根本原因** | `hosts` 中 `".dev": 127.0.0.1` 是从 Clash 开发环境模板复制的（开发时用 `.dev` 后缀模拟域名），但 `.dev` 在 2019 年后已成为 Google 注册的真实 TLD；在生产路由器上此条目错误地将所有 `.dev` 真实网站劫持到本地 |
+| **修复方案** | 删除 `hosts` 中的 `".dev": 127.0.0.1` 和 `".local": 127.0.0.1` 条目；只保留 `"*.clash.dev"` 和 `"alpha.clash.dev"` 等明确的开发用域名 |
+| **预防措施** | `hosts` 段不得使用通配 TLD（`.dev`、`.local`、`.test` 等）作为 Key，除非明确知道该 TLD 不存在真实网站；`.local` 是 mDNS 保留域名也不应映射到 127.0.0.1 |
+| **记录时间** | 2026-03-04 |
+
+---
+
+### Bug #012 — `fake-ip-filter` 引用运行时 rule-set 导致 DNS 模块启动阻塞，OpenClash 客户端全部无法上网
+
+| 字段 | 内容 |
+|:---|:---|
+| **涉及文件** | `templates/client_template/FallBackPro.yaml`、`templates/client_template/OneSmartPro.yaml` |
+| **函数** | DNS 配置块 `fake-ip-filter` |
+| **触发条件** | OpenClash（OpenWrt）启动 mihomo，`fake-ip-filter` 中包含 `"rule-set:fakeipfilter_domain"` 且该规则集需从网络下载时 |
+| **错误现象** | OpenClash 网络测试正常（代理节点可达），但所有 LAN 客户端 DNS 解析失败，完全无法上网；客户端手动设置外部 DNS（如 `114.114.114.114`）后恢复正常 |
+| **根本原因** | mihomo 初始化 DNS 模块时，必须先加载 `fake-ip-filter` 引用的所有规则集，才能启动 DNS 服务器（端口 7874）。`rule-set:fakeipfilter_domain` 是 HTTP 类型规则集，需在 mihomo 启动时从网络下载（`raw.githubusercontent.com`），但此时 OpenClash 的代理尚未建立、国内直连 GitHub 成功率低，下载失败或超时导致 DNS 模块一直无法完成初始化，客户端发往路由器 IP 的 DNS 查询永远无响应 |
+| **修复方案** | 从 `fake-ip-filter` 中删除 `"rule-set:fakeipfilter_domain"` 引用，同时从 `rule-providers` 中删除该规则集定义；`fake-ip-filter` 仅保留内置数据源：`+.lan`、`+.local`、`"geosite:cn"`（mihomo 内置 geosite.dat，随时可用，不阻塞启动） |
+| **预防措施** | `fake-ip-filter` 中**禁止**引用 HTTP 类型（需下载）的 rule-set；只使用 `geosite:xxx`（内置）和 `+.domain` 字面量；如需补充 fakeip 过滤，等 mihomo 启动完成后由路由规则下载，不放在 fake-ip-filter 中 |
+| **记录时间** | 2026-03-04 |
+
+---
+
 ## 新增 Bug 记录模板
 
 > 修复 Bug 后，复制以下模板追加到对应分区末尾：

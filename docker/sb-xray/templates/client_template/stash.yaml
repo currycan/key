@@ -122,7 +122,6 @@ rules:
   - RULE-SET,Tracking / Domain,REJECT
   - RULE-SET,Advertising / Domain,REJECT
   - RULE-SET,AdvertisingIP / IP,REJECT,no-resolve
-  - AND,((DST-PORT,443),(NETWORK,UDP)),REJECT  # 阻止 QUIC
   - RULE-SET,Block / Domain,REJECT
   # - GEOSITE,category-ads-all,REJECT
   # Test
@@ -194,7 +193,7 @@ BehaviorCL:   &BehaviorCL   {type: http, behavior: classical, format: text, inte
 # 规则提供者
 rule-providers:
   # FakeIP过滤规则
-  fakeipfilter_domain:       {<<: *BehaviorDN, url: https://raw.githubusercontent.com/wwqgtxx/clash-rules/release/fakeip-filter.mrs}
+  fakeipfilter_domain:       {<<: *BehaviorDN, url: https://gh-proxy.com/raw.githubusercontent.com/wwqgtxx/clash-rules/release/fakeip-filter.mrs}
   # 拦截规则
   Tracking / Domain:        {<<: *BehaviorDN, url: https://gh-proxy.com/raw.githubusercontent.com/666OS/rules/release/mihomo/domain/Tracking.mrs}
   Advertising / Domain:     {<<: *BehaviorDN, url: https://gh-proxy.com/raw.githubusercontent.com/666OS/rules/release/mihomo/domain/Advertising.mrs}
@@ -262,9 +261,6 @@ ipv6: true
 allow-lan: true
 log-level: warning
 
-# 管理面板
-external-controller: 0.0.0.0:9099
-secret: yyds666
 
 # 配置存储
 profile:
@@ -307,10 +303,13 @@ dns:
     - +.local
     - "geosite:cn"
     - "rule-set:fakeipfilter_domain"
+
+  # 支持通配符域名 (例如: *.clash.dev, *.foo.*.example.com )
+  # 不使用通配符的域名优先级高于使用通配符的域名 (例如: foo.example.com > *.example.com > .example.com )
+  # 注意: +.foo.com 的效果等同于 .foo.com 和 foo.com
   hosts:
     "*.clash.dev": 127.0.0.1
-    ".dev": 127.0.0.1
-    ".local": 127.0.0.1
     "alpha.clash.dev": "::1"
+  # 跳过证书验证,解决部分兼容性问题 https://help.nextdns.io/t/g9hdkjz
   skip-cert-verify: false
 # ==================== EOF ====================
