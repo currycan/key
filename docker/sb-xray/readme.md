@@ -412,9 +412,11 @@ docker exec -it sb-xray bash
 | **metacubex/meta-rules-dat** | Mihomo 官方 GeoSite 规则（GitHub、Reddit、Steam 等） | [metacubex/meta-rules-dat](https://github.com/metacubex/meta-rules-dat) |
 | **liandu2024/clash** | 自定义扩展规则（Gemini、Grok、Copilot 等） | [liandu2024/clash](https://github.com/liandu2024/clash) |
 | **liandu2024/little** | YAML 文件处理工具 | [liandu2024/little](https://github.com/liandu2024/little/tree/main/yaml) |
+| **qichiyuhub/rule** | Clash、Sing-box、等分流规则 | [qichiyuhub/rule](https://github.com/qichiyuhub/rule/tree/main) |
 | **Loyalsoldier/v2ray-rules-dat** | Xray GeoIP/GeoSite 数据库 | [Loyalsoldier/v2ray-rules-dat](https://github.com/Loyalsoldier/v2ray-rules-dat) |
 | **chocolate4u/Iran-v2ray-rules** | 伊朗地区 GeoIP/GeoSite 数据库 | [chocolate4u/Iran-v2ray-rules](https://github.com/chocolate4u/Iran-v2ray-rules) |
 | **runetfreedom/russia-v2ray-rules-dat** | 俄罗斯地区 GeoIP/GeoSite 数据库 | [runetfreedom/russia-v2ray-rules-dat](https://github.com/runetfreedom/russia-v2ray-rules-dat) |
+| **v2fly/domain-list-community** | 社区维护的域名列表 | [v2fly/domain-list-community](https://github.com/v2fly/domain-list-community) |
 
 ### 📐 技术标准与理论文献
 
