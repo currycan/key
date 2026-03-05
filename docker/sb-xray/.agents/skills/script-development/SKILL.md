@@ -5,15 +5,17 @@ description: entrypoint.sh 与 rename.js 脚本架构、编码规范、已知 Bu
 
 # Shell 脚本开发规范
 
+> ⚠️ **重要提醒**：修改 Shell 脚本前，请先阅读 `.agents/skills/_shared/BUGS.md` 中 `entrypoint.sh` 分区的所有条目，避免重复踩坑。
+
 ## 脚本文件概览
 
-| 脚本 | 行数 | 职责 |
-|:---|:---|:---|
-| `scripts/entrypoint.sh` | ~1080 | 核心入口脚本，16段 §N 架构，系统启动流水线 |
-| `scripts/check_ip_type.sh` | 564 | IP 质量体检 (ASN/流媒体/风控检测) |
-| `scripts/show-config.sh` | 160 | 展示生成的配置与订阅链接 |
-| `scripts/geo_update.sh` | ~50 | GeoIP/Geosite 数据库更新 |
-| `scripts/stop-supervisor.sh` | ~15 | Supervisord 优雅停止 |
+| 脚本 | 职责 |
+|:---|:---|
+| `scripts/entrypoint.sh` | 核心入口脚本，16段 §N 架构，系统启动流水线 |
+| `scripts/check_ip_type.sh` | IP 质量体检 (ASN/流媒体/风控检测) |
+| `scripts/show-config.sh` | 展示生成的配置与订阅链接 |
+| `scripts/geo_update.sh` | GeoIP/Geosite 数据库更新 |
+| `scripts/stop-supervisor.sh` | Supervisord 优雅停止 |
 
 ---
 

@@ -11,6 +11,8 @@ description: 核心工作流程底线，所有任务必须遵守，不可绕过
 3. **文档同步（强制）**: 修改代码后同一任务内完成文档同步，未同步视为任务未完成。
    - 映射规则见 `.agents/skills/documentation/SKILL.md` § 代码-文档映射参照表
    - 批量同步可调用 `doc-updater` 子代理独立执行
+   - **回复末尾必须二选一**：① 说明更新了哪些文档章节；② 说明为何无需更新（如：仅修改注释/格式/内部变量名）
+   - 沉默不确认视为任务未完成
 
 4. **Bug 记录（强制）**: 修复 Bug 后同一任务内写入 `.agents/skills/_shared/BUGS.md`，编码前先查阅对应分区。
    - 记录格式见 `.agents/skills/documentation/SKILL.md` § Bug 记录规范

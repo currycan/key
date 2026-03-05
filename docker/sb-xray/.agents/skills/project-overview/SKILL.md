@@ -42,7 +42,7 @@ sb-xray/
 ├── build.sh                # 自动化构建脚本 (获取最新版本 + docker buildx)
 ├── release.sh              # Git Release 自动化 (与 Xray 版本同步)
 ├── scripts/
-│   ├── entrypoint.sh       # 🔑 核心入口 (~1080行, 16段 §N 架构)
+│   ├── entrypoint.sh       # 🔑 核心入口 (16段 §N 架构，核心主流程)
 │   ├── check_ip_type.sh    # IP 质量体检 (ASN/流媒体解锁/风控检测)
 │   ├── show-config.sh      # 展示生成的配置与订阅链接
 │   ├── geo_update.sh       # Geosite/GeoIP 数据库定时更新
