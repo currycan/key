@@ -9,12 +9,26 @@
  * 5. 排序优化   — 按预设地理优先级排列（香港 > 台湾 > 日本 …）。
  * 6. 预格式化兼容 — 已标准化的节点（含 ✈）直接保留；简单节点走完整清洗流水线。
  *
- * 架构: Constants → CleaningRules → RegionMap → CountryDB → FlagRules → Utils → Pipeline → operator()
+ * 函数声明顺序规则:
+ *   - 纯数据（Constants / Rules / DB）最先定义
+ *   - 初始化 IIFE 紧随数据定义之后
+ *   - Utils 工具函数按依赖复杂度递增排列（无外部依赖 → 需要 initFlagRules 的）
+ *   - Pipeline 内部：私有辅助函数全部先于阶段入口声明，阶段入口严格按运行顺序排列
+ *   - operator() 入口最后声明
+ *
+ * 段落索引:
+ *   §1  常量与配置       (Constants)
+ *   §2  清理规则         (CleaningRules)
+ *   §3  地区关键词映射   (RegionMap)
+ *   §4  国家/地区数据库  (CountryDB)
+ *   §5  国旗匹配规则     (FlagRules)
+ *   §6  常量初始化       (initFlagRules IIFE)
+ *   §7  工具函数         (Utils)
+ *   §8  处理流水线       (Pipeline)
+ *   §9  脚本入口         (operator)
  */
 
-// ============================================================================
-// 第一部分: 基础配置与数据
-// ============================================================================
+// ── §1  常量与配置 ────────────────────────────────────────────────────────────
 
 const Constants = {
     SEPARATOR: ' ✈ ',
@@ -35,8 +49,9 @@ const Constants = {
     ]
 };
 
-// 1.1 清理规则
+// ── §2  清理规则 ──────────────────────────────────────────────────────────────
 // 按顺序执行正则替换，每条规则含描述、正则和替换值。
+
 const CleaningRules = [
     { desc: "移除残留序号 [N]", regex: /\[\d+\]/g, value: "" },
     { desc: "提取倍率 (x2 -> 2x)", regex: /\|\s*x(\d+(?:\.\d+)?)(?:倍)?/gi, value: " $1×" },
@@ -77,8 +92,9 @@ const CleaningRules = [
     { desc: "标准化 UDPN 大写", regex: /udpn\b/i, value: "UDPN" }
 ];
 
-// 1.2 地区关键词映射
+// ── §3  地区关键词映射 ────────────────────────────────────────────────────────
 // 将各语言地名统一为中文简称（如 'HK' / 'Hong Kong' → '香港'）
+
 const RegionMap = {
     // 亚洲
     "香港": /((?:\bHK\b)|Hong[\s-]?Kong|HONG[\s-]?KONG|Hongkong|香港|深港|沪港|呼港|京港|广港|杭港|HKT)+/gi,
@@ -130,8 +146,9 @@ const RegionMap = {
     "南非": /((?:\bZA\b)|South[\s-]?Africa|Johannesburg|Cape[\s-]?Town|南非|约翰内斯堡|开普敦)+/gi
 };
 
-// 1.3 国家/地区数据库
+// ── §4  国家/地区数据库 ───────────────────────────────────────────────────────
 // 字段: flag(旗帜), code(二位代码), name(中文简称), full(英文全称)
+
 const CountryDB = [
    { flag: '🇦🇨', code: 'AC', name: '阿森松岛', full: 'Ascension Island' },
    { flag: '🇦🇩', code: 'AD', name: '安道尔', full: 'Andorra' },
@@ -177,7 +194,7 @@ const CountryDB = [
    { flag: '🇨🇫', code: 'CF', name: '中非共和国', full: 'Central African Republic' },
    { flag: '🇨🇬', code: 'CG', name: '刚果(布)', full: 'Congo - Brazzaville' },
    { flag: '🇨🇭', code: 'CH', name: '瑞士', full: 'Switzerland' },
-   { flag: '🇨🇮', code: 'CI', name: '科特迪瓦', full: 'Côte d’Ivoire' },
+   { flag: '🇨🇮', code: 'CI', name: '科特迪瓦', full: "Côte d'Ivoire" },
    { flag: '🇨🇰', code: 'CK', name: '库克群岛', full: 'Cook Islands' },
    { flag: '🇨🇱', code: 'CL', name: '智利', full: 'Chile' },
    { flag: '🇨🇲', code: 'CM', name: '喀麦隆', full: 'Cameroon' },
@@ -393,10 +410,11 @@ const CountryDB = [
    { flag: '🇿🇼', code: 'ZW', name: '津巴布韦', full: 'Zimbabwe' },
 ];
 
-// 1.4 动态国旗匹配规则
-// 手动优先规则 + 从 CountryDB 自动生成的规则
+// ── §5  国旗匹配规则 ──────────────────────────────────────────────────────────
+// 手动优先规则（覆盖 CountryDB 自动生成的规则，处理简繁体变体和常见城市名）
+// §6 IIFE 会继续追加从 CountryDB 自动生成的规则。
+
 const FlagRules = [
-    // 手动优先规则（覆盖 CountryDB 自动生成的规则，处理简体/繁体变体和常见城市名）
     { regex: /(波斯尼亚和黑塞哥维那|波黑|萨拉热窝|Bosnia|Sarajevo)/i, emoji: '🇧🇦' },
     { regex: /专属纯净住宅/i, emoji: '🇺🇸' },
     { regex: /(美[国國]|华盛顿|波特兰|达拉斯|俄勒冈|凤凰城|菲尼克斯|费利蒙|弗里蒙特|硅谷|旧金山|拉斯维加斯|洛杉|圣何塞|圣荷西|圣塔?克拉拉|西雅图|芝加哥|哥伦布|纽约|阿什本|纽瓦克|丹佛|加利福尼亚|弗吉尼亚|马纳萨斯|俄亥俄|得克萨斯|[佐乔]治亚|亚特兰大|佛罗里达|迈阿密)/i, emoji: '🇺🇸' },
@@ -415,7 +433,11 @@ const FlagRules = [
     { regex: /(中[国國]|[广廣贵貴]州|深圳|北京|上海|[广廣山][东東西]|[河湖][北南]|天津|重[庆慶]|[辽遼][宁寧]|吉林|黑[龙龍]江|江[苏蘇西]|浙江|安徽|福建|[海云雲]南|四川|[陕陝]西|甘[肃肅]|青海|[内內]蒙古|西藏|[宁寧]夏|新疆)/i, emoji: '🇨🇳' }
 ];
 
-// 自动从 CountryDB 填充 FlagRules，并缓存全局常量
+// ── §6  常量初始化 (IIFE) ─────────────────────────────────────────────────────
+// 从 CountryDB 动态填充 FlagRules 并在 Constants 上缓存派生常量。
+// 必须在 §5 FlagRules 声明之后、§7 Utils 使用之前执行。
+// 产出: Constants.ALL_REGIONS, Constants.SORTED_COUNTRY_KEYS, Constants.COUNTRY_MAP
+
 (function initFlagRules() {
     const escapeRegExp = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const flagMap = {};
@@ -439,12 +461,15 @@ const FlagRules = [
     ];
 })();
 
-
-// ============================================================================
-// 第二部分: 工具函数
-// ============================================================================
+// ── §7  工具函数 (Utils) ──────────────────────────────────────────────────────
+// 按依赖复杂度递增排列:
+//   纯函数（仅依赖 Constants）→ CleaningRules 依赖 → RegionMap 依赖
+//   → 需要 initFlagRules 产出（Constants.ALL_REGIONS / FlagRules / COUNTRY_MAP）
 
 const Utils = {
+
+    // ── 纯函数（仅依赖 Constants 原始字段）────────────────────────────────────
+
     /** 从名称中提取 Emoji 国旗和剩余内容 */
     extractFlag: (name) => {
         const m = name.match(Constants.FLAG_REGEX);
@@ -456,16 +481,6 @@ const Utils = {
 
     /** 判断字符串是否为已知协议名 */
     isKnownProtocol: (str) => Constants.KNOWN_PROTOCOLS.test(str),
-
-    /** 对预格式化段落执行清理（跳过 skipInPreformat 规则）+ / 拆分 */
-    cleanPreformatted: (segment) => {
-        let cleaned = segment;
-        for (const rule of CleaningRules) {
-            if (rule.skipInPreformat) continue;
-            cleaned = cleaned.replace(rule.regex, rule.value);
-        }
-        return cleaned.split('/').map(s => s.trim()).filter(s => s !== '');
-    },
 
     /** 协议互斥判断：高级特征出现时是否应隐藏底层协议 */
     shouldHideProtocol: (fullName, protocol) => {
@@ -484,6 +499,14 @@ const Utils = {
             .trim();
     },
 
+    /** 提取名称中的数字（用于排序） */
+    getNum: (name) => {
+        const match = name.match(/(\d+)(?=\D*$)/);
+        return match ? parseInt(match[1], 10) : 0;
+    },
+
+    // ── CleaningRules 依赖 ────────────────────────────────────────────────────
+
     /** 基础清理：按 CleaningRules 顺序执行正则替换 */
     cleanName: (name) => {
         let cleaned = name;
@@ -493,6 +516,18 @@ const Utils = {
         return cleaned;
     },
 
+    /** 对预格式化段落执行清理（跳过 skipInPreformat 规则）+ / 拆分 */
+    cleanPreformatted: (segment) => {
+        let cleaned = segment;
+        for (const rule of CleaningRules) {
+            if (rule.skipInPreformat) continue;
+            cleaned = cleaned.replace(rule.regex, rule.value);
+        }
+        return cleaned.split('/').map(s => s.trim()).filter(s => s !== '');
+    },
+
+    // ── RegionMap 依赖 ────────────────────────────────────────────────────────
+
     /** 地名标准化：将各语言地名统一为中文简称 */
     standardizeRegion: (name) => {
         let standardized = name;
@@ -501,6 +536,8 @@ const Utils = {
         }
         return standardized;
     },
+
+    // ── 需要 initFlagRules 产出（Constants.ALL_REGIONS）──────────────────────
 
     /** 拆分与去重：分割字符串，移除重复项，深度拆分组合地名 */
     splitAndDedup: (name) => {
@@ -548,6 +585,14 @@ const Utils = {
         return result;
     },
 
+    /** 获取排序优先级（基于 ALL_REGIONS 有序列表的下标） */
+    getPriority: (name) => {
+        const index = Constants.ALL_REGIONS.findIndex(k => name.includes(k));
+        return index === -1 ? 9999 : index;
+    },
+
+    // ── 需要 initFlagRules 产出（FlagRules / SORTED_COUNTRY_KEYS / COUNTRY_MAP）
+
     /** 智能国旗检测 */
     detectFlag: (name) => {
         for (const rule of FlagRules) {
@@ -560,37 +605,28 @@ const Utils = {
         }
         return '🏳️';
     },
-
-    /** 获取排序优先级（基于 ALL_REGIONS 有序列表的下标） */
-    getPriority: (name) => {
-        const index = Constants.ALL_REGIONS.findIndex(k => name.includes(k));
-        return index === -1 ? 9999 : index;
-    },
-
-    /** 提取名称中的数字（用于排序） */
-    getNum: (name) => {
-        const match = name.match(/(\d+)(?=\D*$)/);
-        return match ? parseInt(match[1], 10) : 0;
-    }
 };
 
-// ============================================================================
-// 第三部分: 处理流水线
-// ============================================================================
+// ── §8  处理流水线 (Pipeline) ─────────────────────────────────────────────────
+// 内部结构：
+//   私有辅助函数（工具层）全部先于阶段入口声明，以反映「工具先于业务」原则。
+//   阶段入口严格按运行时执行顺序排列: filter → format → sort → renumber。
+//
+// operator() 调用链: filter → format → sort → renumber
 
 const Pipeline = {
 
-    /** 阶段零：过滤无效节点 */
-    filter: (proxies) => proxies.filter(p => !Constants.INVALID_REGEX.test(p.name)),
+    // ── 私有辅助函数（format 的子处理函数）──────────────────────────────────
+    // 依赖: Utils.cleanPreformatted, Utils.standardizeRegion, Utils.isKnownProtocol,
+    //       Utils.extractFlag, Utils.cleanName, Utils.splitAndDedup, Utils.promoteRegion,
+    //       Utils.detectFlag, Constants.SEPARATOR, Constants.EMOJI_REMOVE_REGEX
 
-    // ── 阶段一: 逐节点格式化 ──
-
-    /** 处理已含 ✈ 的预格式化节点（快速通道） */
-    processPreFormatted: (p, flag, remainingName, protocol) => {
+    /** 处理已含 ✈ 的预格式化节点（快速通道，供 format 调用） */
+    _processPreFormatted: (p, flag, remainingName, protocol) => {
         p.isPreFormatted = true;
         p.flag = flag;
         let parts = remainingName.split('✈').flatMap(Utils.cleanPreformatted);
-        // 将英文地名转为中文（如 "Hong Kong" → "香港"），并清理 cleanPreformatted 跳过的残留分隔符（| - _）
+        // 将英文地名转为中文（如 "Hong Kong" → "香港"），并清理残留分隔符（| - _）
         parts = parts
             .map(part => Utils.standardizeRegion(part))
             .map(part => part.replace(/^[-_||\s]+|[-_||\s]+$/g, '').trim())
@@ -599,7 +635,7 @@ const Pipeline = {
         let protocolPrefix = firstIsProtocol
             ? parts.shift()
             : (protocol && protocol !== 'unknown' ? protocol : '');
-        // 移除与协议名重复的部分（不区分大小写），优先保留大小写更规范的版本（如 anytls → AnyTLS）
+        // 移除与协议名重复的部分（不区分大小写），优先保留大小写更规范的版本
         if (protocolPrefix) {
             const betterCasing = parts.find(part => part.toLowerCase() === protocolPrefix.toLowerCase() && part !== protocolPrefix);
             if (betterCasing) protocolPrefix = betterCasing;
@@ -610,8 +646,8 @@ const Pipeline = {
         return p;
     },
 
-    /** 处理原始节点（完整清洗流水线） */
-    processRawNode: (p, protocol) => {
+    /** 处理原始节点（完整清洗流水线，供 format 调用） */
+    _processRawNode: (p, protocol) => {
         // 先剥离 Emoji 国旗前缀，防止其阻断后续 splitAndDedup 的 startsWith 地区匹配
         const { rest: nameWithoutFlag } = Utils.extractFlag(p.name);
         let name = Utils.cleanName(nameWithoutFlag || p.name);
@@ -659,31 +695,12 @@ const Pipeline = {
         return p;
     },
 
-    /** 阶段一入口：逐节点格式化 */
-    format: (proxies) => proxies.map(p => {
-        const protocol = p.type ? p.type.toLowerCase() : 'unknown';
-        const { flag, rest } = Utils.extractFlag(p.name);
+    // ── 私有辅助函数（renumber 的子处理函数）────────────────────────────────
+    // 依赖: Constants.ALL_REGIONS, Constants.SEPARATOR, Utils.shouldHideProtocol,
+    //       Utils.cleanFinalName
 
-        // 已含 ✈ 且有 Emoji → 预格式化快速通道
-        if (flag && rest.includes('✈')) {
-            return Pipeline.processPreFormatted(p, flag, rest, protocol);
-        }
-        // 其余节点 → 完整清洗流水线
-        return Pipeline.processRawNode(p, protocol);
-    }),
-
-    /** 阶段二：排序（地区优先级 → 序号） */
-    sort: (proxies) => proxies.sort((a, b) => {
-        const prioA = Utils.getPriority(a.name);
-        const prioB = Utils.getPriority(b.name);
-        if (prioA !== prioB) return prioA - prioB;
-        return Utils.getNum(a.name) - Utils.getNum(b.name);
-    }),
-
-    // ── 阶段三: 重编号与最终输出 ──
-
-    /** 从 processedName 中提取地区键和后缀 */
-    extractRegionKey: (processedName) => {
+    /** 从 processedName 中提取地区键和后缀（供 renumber 调用） */
+    _extractRegionKey: (processedName) => {
         const content = processedName || '';
         const contentNoIPv6 = content.replace(/^IPv6\s+/, '');
         let keyPart = contentNoIPv6;
@@ -705,7 +722,7 @@ const Pipeline = {
             suffixPart = suffixPart.replace(/IPv6/ig, '').replace(/^[\s✈]+|[\s✈]+$/g, '').trim();
         }
 
-        // 去掉末尾的 [N] 或纯数字序号（$锚点只匹配一次，g 标志冗余已移除）
+        // 去掉末尾的 [N] 或纯数字序号
         const cleanKey = keyPart.replace(/(\[\s*\d*\s*\]|\d+)$/, '').trim();
 
         let baseRegion = cleanKey;
@@ -719,8 +736,8 @@ const Pipeline = {
         return { cleanKey, suffixPart, isIPv6, baseRegion };
     },
 
-    /** 构建最终节点名称 */
-    buildFinalName: (p, cleanKey, suffixPart, isIPv6) => {
+    /** 构建最终节点名称（供 renumber 调用） */
+    _buildFinalName: (p, cleanKey, suffixPart, isIPv6) => {
         const prefix = isIPv6 ? 'IPv6 ' : '';
         let newName = `${prefix}${cleanKey}`;
 
@@ -751,8 +768,8 @@ const Pipeline = {
         return Utils.cleanFinalName(raw);
     },
 
-    /** 清理临时属性并重组对象键序 */
-    cleanupProxy: (p) => {
+    /** 清理临时属性并重组对象键序（供 renumber 调用） */
+    _cleanupProxy: (p) => {
         delete p.processedName;
         delete p.flag;
         delete p.multiplier;
@@ -761,7 +778,37 @@ const Pipeline = {
         return { name, type, ...restProps };
     },
 
-    /** 阶段三入口：重编号与最终输出 */
+    // ── 流水线阶段（严格按运行时执行顺序排列）──────────────────────────────
+
+    /** 阶段 0: 过滤无效节点
+     *  依赖: Constants.INVALID_REGEX */
+    filter: (proxies) => proxies.filter(p => !Constants.INVALID_REGEX.test(p.name)),
+
+    /** 阶段 1: 逐节点格式化
+     *  依赖: Utils.extractFlag, _processPreFormatted, _processRawNode */
+    format: (proxies) => proxies.map(p => {
+        const protocol = p.type ? p.type.toLowerCase() : 'unknown';
+        const { flag, rest } = Utils.extractFlag(p.name);
+
+        // 已含 ✈ 且有 Emoji → 预格式化快速通道
+        if (flag && rest.includes('✈')) {
+            return Pipeline._processPreFormatted(p, flag, rest, protocol);
+        }
+        // 其余节点 → 完整清洗流水线
+        return Pipeline._processRawNode(p, protocol);
+    }),
+
+    /** 阶段 2: 排序（地区优先级 → 序号）
+     *  依赖: Utils.getPriority, Utils.getNum */
+    sort: (proxies) => proxies.sort((a, b) => {
+        const prioA = Utils.getPriority(a.name);
+        const prioB = Utils.getPriority(b.name);
+        if (prioA !== prioB) return prioA - prioB;
+        return Utils.getNum(a.name) - Utils.getNum(b.name);
+    }),
+
+    /** 阶段 3: 重编号与最终输出
+     *  依赖: _extractRegionKey, _buildFinalName, _cleanupProxy */
     renumber: (proxies) => {
         // 第一遍：构建所有节点的最终名称
         const result = proxies.map(p => {
@@ -770,9 +817,9 @@ const Pipeline = {
                 const { name, type, ...restProps } = p;
                 return { name, type, ...restProps };
             }
-            const { cleanKey, suffixPart, isIPv6 } = Pipeline.extractRegionKey(p.processedName);
-            p.name = Pipeline.buildFinalName(p, cleanKey, suffixPart, isIPv6);
-            return Pipeline.cleanupProxy(p);
+            const { cleanKey, suffixPart, isIPv6 } = Pipeline._extractRegionKey(p.processedName);
+            p.name = Pipeline._buildFinalName(p, cleanKey, suffixPart, isIPv6);
+            return Pipeline._cleanupProxy(p);
         });
 
         // 第二遍：统计重复名称，仅对实际重名节点追加零填充序号（01, 02 …）
@@ -791,9 +838,8 @@ const Pipeline = {
     }
 };
 
-// ============================================================================
-// 第四部分: 脚本入口
-// ============================================================================
+// ── §9  脚本入口 (operator) ───────────────────────────────────────────────────
+// 执行链: filter(过滤) → format(格式化) → sort(排序) → renumber(重编号)
 
 /**
  * Sub-Store 脚本入口
