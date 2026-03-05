@@ -77,7 +77,7 @@ Token 在容器首次启动时**自动生成**。
 **查看当前 Token**：
 
 ```bash
-docker exec sb-xray cat /sb-xray/.env | grep SUBSCRIBE_TOKEN
+docker exec sb-xray grep SUBSCRIBE_TOKEN /.env/sb-xray
 ```
 
 **使用方法**：在订阅 URL 后添加 `?token=YOUR_TOKEN` 参数：

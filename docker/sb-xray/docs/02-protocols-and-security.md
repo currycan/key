@@ -105,7 +105,7 @@ graph LR
 
 #### 服务端入站
 
-* **配置文件**: `templates/sing-box/11_hysteria2_inbounds.json`
+* **配置文件**: `templates/sing-box/01_hysteria2_inbounds.json`
 * **监听地址**: `::` (All Interfaces)
 * **路径**: **直连**（不经过 Nginx，不经过 Xray）
 
