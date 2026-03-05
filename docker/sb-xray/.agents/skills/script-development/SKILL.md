@@ -1,6 +1,6 @@
 ---
 name: Shell 脚本开发规范
-description: entrypoint.sh 架构说明、编码规范、环境变量缓存系统和调试指南
+description: entrypoint.sh 与 rename.js 脚本架构、编码规范、已知 Bug 速查和调试指南
 ---
 
 # Shell 脚本开发规范
@@ -9,7 +9,7 @@ description: entrypoint.sh 架构说明、编码规范、环境变量缓存系�
 
 | 脚本 | 行数 | 职责 |
 |:---|:---|:---|
-| `scripts/entrypoint.sh` | 1073 | 核心入口脚本，系统启动流水线 |
+| `scripts/entrypoint.sh` | ~1080 | 核心入口脚本，16段 §N 架构，系统启动流水线 |
 | `scripts/check_ip_type.sh` | 564 | IP 质量体检 (ASN/流媒体/风控检测) |
 | `scripts/show-config.sh` | 160 | 展示生成的配置与订阅链接 |
 | `scripts/geo_update.sh` | ~50 | GeoIP/Geosite 数据库更新 |
@@ -17,72 +17,21 @@ description: entrypoint.sh 架构说明、编码规范、环境变量缓存系�
 
 ---
 
-## entrypoint.sh 函数索引
+## entrypoint.sh 架构概览
 
-### 扇区一：全局能力层 (1-172 行)
+16段 §N 分层架构，分层原则与段落含义见 `.agents/skills/project-overview/SKILL.md`。
 
-| 函数 | 行号 | 用途 |
+修改脚本时需了解的关键函数：
+
+| 函数 | 所在段 | 关键点 |
 |:---|:---|:---|
-| `log()` | 34-44 | 统一日志输出 (INFO/WARN/ERROR/DEBUG + 颜色 + 时间戳) |
-| `log_summary_box()` | 47-63 | 信息汇总仪表盘展示 |
-| `show_progress()` / `end_progress()` | 66-71 | 进度条显示/清除 |
-| `http_probe()` | 74-84 | HTTP 探测 (HEAD 请求，返回状态码) |
-| `http_trace_url()` | 87-92 | URL 重定向终点追踪 |
-| `generateRandomStr()` | 95-110 | 随机字符串/端口/UUID/密码生成器 |
-| `ensure_var()` | 113-135 | **核心：环境变量缓存系统** |
-| `ensure_key_pair()` | 138-161 | 密钥对生成与缓存 |
-| `checkRequiredEnv()` | 163-172 | 必填环境变量断言校验 |
-
-### 扇区二：网络探测 (175-557 行)
-
-| 函数 | 用途 |
-|:---|:---|
-| `detect_ip_strategy_api()` | IPv4/IPv6 双栈检测 |
-| `check_ip_type()` | ASN 类型检测 (isp/hosting/business) |
-| `get_geo_info()` | GeoIP 地理区域获取 |
-| `check_brutal_status()` | TCP_Brutal 内核模块检测 |
-| `get_fallback_proxy()` | 代理回退寻址 |
-| `check_netflix_access()` | Netflix 解锁检测 |
-| `check_disney_access()` | Disney+ 解锁检测 |
-| `check_youtube_access()` | YouTube 连通检测 |
-| `check_social_media_access()` | 社交媒体 (Telegram/Twitter) 连通检测 |
-| `check_tiktok_access()` | TikTok 区域风控检测 |
-| `check_chatgpt_access()` | ChatGPT WAF 检测 |
-| `check_claude_access()` | Claude 重定向检测 |
-| `check_gemini_access()` | Gemini 解锁 (支持手动覆盖) |
-| `speed_test()` | 下载测速 (返回 Mbps) |
-| `analyze_base_env()` | 基础环境变量初始化入口 |
-| `analyze_ai_routing_env()` | AI/流媒体路由变量初始化入口 |
-
-### 扇区三：证书管理 (559-612 行)
-
-| 函数 | 用途 |
-|:---|:---|
-| `issueCertificate()` | ACME 证书申请/续期/安装 (支持多域名多 DNS 提供商) |
-
-### 扇区四：服务端配置 (615-700 行)
-
-| 函数 | 用途 |
-|:---|:---|
-| `process_single_isp()` | 构建 ISP 代理出站 JSON (Xray + Sing-box 双格式) |
-| `createConfig()` | 全量模板渲染总入口 |
-| `apply_tpl()` | 内嵌模板渲染引擎 (envsubst + jq 校验) |
-
-### 扇区五：客户端输出 (703-964 行)
-
-| 函数 | 用途 |
-|:---|:---|
-| `evaluate_isp_and_build_client_config()` | ISP 代理测速评估 |
-| `apply_isp_routing_logic()` | ISP 路由策略决策 (核心选路逻辑) |
-| `run_speed_tests_if_needed()` | 测速总调度 (带缓存跳过机制) |
-| `build_client_and_server_configs()` | 客户端配置文件生成 |
-| `generateProxyProvidersConfig()` | Proxy Provider 配置生成 |
-
-### 主控 (970-1073 行)
-
-| 函数 | 用途 |
-|:---|:---|
-| `main_init()` | 12步启动流水线总入口 |
+| `ensure_var()` | §6 | 环境变量缓存系统核心，见下节详解 |
+| `_apply_tpl()` | §5 | 模板渲染引擎（envsubst + jq 校验） |
+| `_is_restricted_region()` | §8 | 地区限制判断，影响所有流媒体/AI检测分支 |
+| `apply_isp_routing_logic()` | §10 | ISP 路由策略决策，核心选路逻辑 |
+| `issueCertificate()` | §12 | ACME 证书申请/续期，acme.sh 集成 |
+| `createConfig()` | §13 | 全量模板渲染总入口 |
+| `main_init()` | §16 | 12步启动流水线总入口 |
 
 ---
 
@@ -96,13 +45,12 @@ ensure_var "KEY" "command to generate value"
 ensure_var "KEY" --no-persist "command"
 ```
 
-**逻辑流程：**
-1. 检查持久化文件 `/.env/sb-xray` 中是否存在 `export KEY=...`
-2. **命中缓存**：跳过计算，直接使用缓存值
-3. **未命中缓存**：
-   - 执行指定命令获取值
-   - `export` 到当前环境
-   - 如果不是 `--no-persist`，写入持久化文件
+**逻辑流程（三分支，见 Bug #015）：**
+1. **已在 shell**：变量已 export 到当前进程 → 直接返回，无 I/O
+2. **在文件不在 shell**：从 `/.env/sb-xray` 读取并 `export` 到当前 shell → 返回
+3. **两者均无**：执行指定命令获取值，`export` 到当前环境，写入持久化文件（`--no-persist` 跳过写文件）
+
+> ⚠️ 不能只检查文件存在性就返回，必须同时 export 到当前 shell（Bug #015 根本原因）。
 
 ### 两级持久化文件
 
@@ -340,6 +288,48 @@ parts = parts
 let parts = remainingName.split('✈').flatMap(Utils.cleanPreformatted);
 // 直接使用 parts，Hong Kong 不会变成 香港
 ```
+
+---
+
+## 代码重构规范
+
+### Bash 脚本重构（entrypoint.sh 类）
+
+1. **先呈方案，再动手**: 列出所有拟修复的问题点，获得用户批准后再开始编写代码
+2. **红绿测试驱动**:
+   - 重构前：先写测试套件（`scripts/test_*.sh`），确认测试能暴露已知 bug（红灯）
+   - 重构后：运行测试，全部通过才算完成（绿灯），任何失败必须修复
+3. **可测性设计**: 脚本必须支持 `source` 模式执行，用 `BASH_SOURCE` 保护入口，且路径变量（`ENV_FILE` 等）需允许外部覆盖（`${ENV_FILE:-/default/path}`）
+4. **跨平台兼容**: 所有 `sed -i` 改用封装函数 `_sed_i()`，管道末端 `tr | head -c` 须加 `|| true` 防 SIGPIPE，避免使用 Linux 专属命令（如 `shuf`，改用 `$(( RANDOM % N + base ))`）
+5. **函数声明顺序**（按分层原则，被依赖的先声明）:
+
+   | 层次 | 内容 |
+   |:---|:---|
+   | 工具层 | 纯函数：日志、HTTP、随机生成、模板渲染、持久化 |
+   | 探测层 | 网络环境探测、选路辅助（`_is_restricted_region` 等） |
+   | 速度层 | 测速函数 |
+   | ISP 层 | ISP 节点构建、测速、选路决策 |
+   | 业务层 | 流媒体/AI 可达性检测、证书管理、配置渲染、密钥解密 |
+   | 流程层 | 主流程各阶段函数（严格按运行时调用顺序声明） |
+   | 入口层 | `main_init` + exec 保护 |
+
+6. **结构清晰**: 大脚本用 `§N 段落名` 注释分段（建议 14-16 段），`main_init` 内步骤注释须标注对应的 `daemon.ini` priority 值
+7. **Bug 记录**: 重构时消灭的 bug 必须同步写入 BUGS.md
+
+### JavaScript 脚本重构（rename.js 类）
+
+1. **段落标记统一**: 使用 `// ── §N 段落名 ──` 风格分段，全文保持一致
+2. **Utils 方法声明顺序**（按依赖复杂度递增）:
+   - 第一层：纯函数（无任何项目数据依赖，如 `getNum`、`extractFlag`、`shortProtocol`）
+   - 第二层：依赖 `CleaningRules` 等静态配置的函数（如 `cleanName`、`cleanPreformatted`）
+   - 第三层：依赖 `RegionMap` 的函数（如 `standardizeRegion`）
+   - 第四层：依赖 IIFE 初始化产出（如 `flagRules`）的函数（如 `splitAndDedup`、`getPriority`、`detectFlag`）
+   - IIFE 初始化函数（如 `initFlagRules()`）紧随被初始化数据（如 `RegionMap`）之后声明，注释标注「产出」变量
+3. **Pipeline/业务对象内部顺序**:
+   - 私有辅助方法一律加 `_` 前缀，整体前置（在所有阶段入口之前）
+   - 阶段入口方法严格按运行时执行顺序排列（如 `filter → format → sort → renumber`）
+   - 每个阶段入口添加 `// 依赖: _xxx, _yyy` 注释
+4. **算子入口 `operator()`**: 在注释中标注完整执行链，便于快速理解数据流向
 
 ---
 

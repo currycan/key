@@ -174,11 +174,11 @@ readme.md                        ← 汇总配置参考 / 部署示例变更
 
 | 源文件 / 目录 | 对应文档 | 关注内容 |
 |:---|:---|:---|
-| `scripts/entrypoint.sh` 扇区一 (全局能力层) | `04-ops-and-troubleshooting.md` | `ensure_var()`、日志系统、环境变量缓存 |
-| `scripts/entrypoint.sh` 扇区二 (网络探测) | `03-routing-and-clients.md` | IP 检测、流媒体/AI 解锁、路由策略决策 |
-| `scripts/entrypoint.sh` 扇区三 (证书管理) | `02-protocols-and-security.md` | ACME 证书申请/续期流程 |
-| `scripts/entrypoint.sh` 扇区四 (配置生成) | `01-architecture-and-traffic.md` | `apply_tpl()` 渲染引擎、模板调用链 |
-| `scripts/entrypoint.sh` 扇区五 (客户端输出) | `03-routing-and-clients.md` | ISP 测速评估、客户端配置生成 |
+| `scripts/entrypoint.sh` §1-6 (基础工具层) | `04-ops-and-troubleshooting.md` | `ensure_var()`、日志系统、环境变量缓存 |
+| `scripts/entrypoint.sh` §7-9 (网络探测层) | `03-routing-and-clients.md` | IP 检测、流媒体/AI 解锁、路由策略决策 |
+| `scripts/entrypoint.sh` §12 (证书管理) | `02-protocols-and-security.md` | ACME 证书申请/续期流程 |
+| `scripts/entrypoint.sh` §13 (配置渲染) | `01-architecture-and-traffic.md` | `apply_tpl()` 渲染引擎、模板调用链 |
+| `scripts/entrypoint.sh` §15 (主流程各阶段) | `03-routing-and-clients.md` | ISP 测速评估、客户端配置生成 |
 | `sources/hack/rename.js` | `03-routing-and-clients.md` § 3 | 清洗流水线架构（3.1）、核心清洗动作（3.2）、处理效果对比（3.3）、扩展维护（3.5）|
 | `sources/hack/rename.js` — `RegionMap` | `03-routing-and-clients.md` § 3.2 | 新增地区支持时同步更新地名归化说明 |
 | `sources/hack/rename.js` — `CleaningRules` | `03-routing-and-clients.md` § 3.2 | 新增/修改清洗规则时同步更新"核心清洗动作"表 |
@@ -266,60 +266,6 @@ readme.md                        ← 汇总配置参考 / 部署示例变更
 
 ---
 
-## Bug 记录规范
-
-> **强制要求**：每次 Agent 解决 Bug 后，**必须**在同一任务内将修复经验写入 `.agents/skills/_shared/BUGS.md`，不可推迟。
-
-### 触发条件
-
-以下任一情况发生时，必须追加 Bug 记录：
-
-- 修复了代码中一个真实存在的 Bug（含逻辑错误、副作用、性能问题）
-- 发现并删除了错误数据（如重复配置、冗余代码）
-- 修正了正则、算法或数据结构的使用方式
-- 任何"我以为对，但实际错了"的修正
-
-### 记录位置
-
-| Bug 来源 | 写入 BUGS.md 分区 |
-|:---|:---|
-| `sources/hack/*.js` | `rename.js / Sub-Store 脚本` |
-| `scripts/entrypoint.sh` | `entrypoint.sh / Shell 脚本` |
-| `templates/xray/*.json` | `Xray 配置模板` |
-| `templates/sing-box/*.json` | `Sing-box 配置模板` |
-| `Dockerfile`, `build.sh` | `Nginx / Docker 构建` |
-
-### 记录格式
-
-```markdown
-### Bug #NNN — [一句话描述，清晰说明是什么出了问题]
-
-| 字段 | 内容 |
-|:---|:---|
-| **涉及文件** | `path/to/file` |
-| **函数** | `functionName`（Shell 函数名或 JS 函数名） |
-| **触发条件** | 什么输入/操作/情况下会触发此 Bug |
-| **错误现象** | 外部观察到的错误表现（具体，带例子）|
-| **根本原因** | 代码层面为什么会出现此问题（要找到真正的原因）|
-| **修复方案** | 具体怎么改的（可附代码片段，before/after 对比最佳）|
-| **预防措施** | 编写类似代码时的注意事项（让其他 Agent 少踩坑）|
-| **记录时间** | YYYY-MM-DD |
-```
-
-### 编号规则
-
-- 每条记录的 `#NNN` 编号全库唯一，递增
-- 同一文件/函数的多个 Bug 写在同一分区，编号不连续无关系
-- 禁止修改已有编号
-
-### 记录质量要求
-
-1. **错误现象要具体**：写"输出 `Ruia`（`Russia` 被误删）"而不是"输出错误"
-2. **根本原因要准确**：说清楚"因为正则无词边界，`ss` 匹配到单词内部"而不是"正则写错了"
-3. **预防措施要可操作**：写出其他 Agent 下次能直接遵循的规则
-
----
-
 ## 安全操作约束
 
 > **警告**: 以下约束在文档更新过程中必须严格遵守。
@@ -340,7 +286,7 @@ readme.md                        ← 汇总配置参考 / 部署示例变更
 
 | 参考领域 | 文件路径 | 关注重点 |
 |:---|:---|:---|
-| 配置生成逻辑 | `scripts/entrypoint.sh` | 五大扇区架构、`ensure_var()` 缓存体系、`apply_tpl()` 渲染引擎、`main_init()` 启动流水线 |
+| 配置生成逻辑 | `scripts/entrypoint.sh` | 16段 §N 架构、`ensure_var()` 缓存体系、`apply_tpl()` 渲染引擎、`main_init()` 启动流水线 |
 | 服务端 Xray 配置 | `templates/xray/` | Reality / XHTTP / VMess-WS 入站模板，主配置文件路由与出站结构 |
 | 服务端 Sing-box 配置 | `templates/sing-box/` | Hysteria2 / TUIC / AnyTLS 入站模板，主配置文件路由与 DNS 结构 |
 | 客户端模板 | `templates/client_template/` | OneSmartPro / FallBackPro / surge 订阅模板，变量占位符格式 |

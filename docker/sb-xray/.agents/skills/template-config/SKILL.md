@@ -7,7 +7,7 @@ description: 模板目录结构、变量替换机制、各核心组件的配置�
 
 ## 模板引擎机制
 
-项目使用 `envsubst` 作为模板渲染引擎，配合 `apply_tpl()` 函数（位于 `scripts/entrypoint.sh` 第 666-685 行）实现自动化配置生成。
+项目使用 `envsubst` 作为模板渲染引擎，配合 `apply_tpl()` 函数（位于 `scripts/entrypoint.sh` §5 模板渲染段）实现自动化配置生成。
 
 ### apply_tpl() 工作流程
 
@@ -98,7 +98,7 @@ description: 模板目录结构、变量替换机制、各核心组件的配置�
 
 ## 模板渲染调用链
 
-`createConfig()` 函数（`entrypoint.sh` 第 661-700 行）按以下顺序渲染所有模板：
+`createConfig()` 函数（`entrypoint.sh` §13 配置渲染段）按以下顺序渲染所有模板：
 
 ```
 1. supervisord.conf → /etc/supervisord.conf

@@ -42,7 +42,7 @@ sb-xray/
 ├── build.sh                # 自动化构建脚本 (获取最新版本 + docker buildx)
 ├── release.sh              # Git Release 自动化 (与 Xray 版本同步)
 ├── scripts/
-│   ├── entrypoint.sh       # 🔑 核心入口 (1073行, 五大扇区架构)
+│   ├── entrypoint.sh       # 🔑 核心入口 (~1080行, 16段 §N 架构)
 │   ├── check_ip_type.sh    # IP 质量体检 (ASN/流媒体解锁/风控检测)
 │   ├── show-config.sh      # 展示生成的配置与订阅链接
 │   ├── geo_update.sh       # Geosite/GeoIP 数据库定时更新
@@ -57,23 +57,22 @@ sb-xray/
 │   ├── supervisord/        # Supervisord 进程管理模板
 │   └── dufs/               # Dufs 文件服务配置模板
 ├── sources/                # 静态资源 (ACL4SSR规则集/伪装站点/zashboard面板)
+│   └── hack/rename.js      # 节点重命名流水线（§N 段架构）
 └── docs/                   # 技术文档 (5篇)
 ```
 
 ---
 
-## entrypoint.sh 五大扇区架构
+## entrypoint.sh 16段 §N 架构
 
-入口脚本是系统核心，按以下扇区组织：
+入口脚本（`scripts/entrypoint.sh`）按功能层次分为 16 段，函数声明严格遵循「被依赖的先声明」原则：
 
-| 扇区 | 行范围 | 职责 |
+| 层次 | 段落 | 职责 |
 |:---|:---|:---|
-| **扇区一** | 1-172 | 全局环境与通用能力层 (`log`, `ensure_var`, `ensure_key_pair`, `generateRandomStr`, `http_probe`) |
-| **扇区二** | 175-557 | 网络环境探测与测速决策 (IP检测、流媒体/AI解锁诊断、速度测试、ISP路由策略) |
-| **扇区三** | 559-612 | 安全层与证书发放 (`issueCertificate` - ACME.sh 集成) |
-| **扇区四** | 615-700 | 服务端配置生成 (`createConfig` - 模板渲染引擎 `apply_tpl`) |
-| **扇区五** | 703-964 | 客户端输出与管控 (ISP测速评估、客户端配置生成、Provider生成) |
-| **主控** | 970-1073 | `main_init` 12步启动流水线，最终交给 Supervisord |
+| **基础工具层** | §1 颜色与常量 · §2 日志工具 · §3 HTTP工具 · §4 随机值生成 · §5 模板渲染 · §6 环境变量持久化 | 无业务状态依赖的纯工具函数 |
+| **网络探测层** | §7 网络环境探测 · §8 选路辅助 · §9 测速 | IP/ASN/GeoIP 检测、流媒体/AI 解锁探测、速度测试 |
+| **业务层** | §10 ISP节点处理 · §11 流媒体/AI可达性检测 · §12 证书管理 · §13 配置渲染 · §14 远端密钥解密 | 依赖探测结果的核心业务逻辑 |
+| **流程与入口层** | §15 主流程各阶段 · §16 主入口 | `main_init` 启动流水线，最终交给 Supervisord |
 
 ---
 
