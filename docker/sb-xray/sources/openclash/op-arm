@@ -1,3 +1,28 @@
+
+config config_subscribe
+	option name 'OneSmartPro'
+	option address ''
+	option sub_ua 'clash.meta'
+	option sub_convert '0'
+	option emoji 'false'
+	option udp 'false'
+	option skip_cert_verify 'false'
+	option sort 'false'
+	option node_type 'false'
+	option rule_provider 'false'
+
+config config_subscribe
+	option name 'FallBackPro'
+	option address ''
+	option sub_ua 'clash.meta'
+	option sub_convert '0'
+	option emoji 'false'
+	option udp 'false'
+	option skip_cert_verify 'false'
+	option sort 'false'
+	option node_type 'false'
+	option rule_provider 'false'
+
 config config_subscribe
 	option enabled '1'
 	option name 'AllOne'
