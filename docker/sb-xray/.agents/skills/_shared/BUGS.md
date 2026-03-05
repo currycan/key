@@ -221,6 +221,23 @@ description: 跨 Skill 的 Bug 修复记录，所有 Agent 工作时必须优先
 
 ---
 
+## OpenClash 系统配置 (op-amd / op-arm)
+
+### Bug #013 — OpenClash Smart 模式开启"ASN 优先"导致 DNS 泄露
+
+| 字段 | 内容 |
+|:---|:---|
+| **涉及文件** | `sources/openclash/op-amd`、`sources/openclash/op-arm` |
+| **函数** | UCI 配置块 `smart_prefer_asn` 选项 |
+| **触发条件** | OpenClash 开启 Smart 模式（`smart_enable '1'`）且 `smart_prefer_asn '1'` 时 |
+| **错误现象** | DNS 泄露：本应走代理解析的域名被直接发往本地/ISP DNS，隐私保护失效 |
+| **根本原因** | Smart 模式"ASN 优先"会优先按 ASN 路由流量，此逻辑会绕过 fake-ip DNS 拦截，导致部分 DNS 查询直接发往上游而非 mihomo 内部 DNS 处理 |
+| **修复方案** | 将 `option smart_prefer_asn` 设为 `'0'`，禁用 ASN 优先；两个架构配置文件均需修改（op-amd 第 408 行、op-arm 第 409 行） |
+| **预防措施** | OpenClash Smart 模式配置中，`smart_prefer_asn` 必须保持 `'0'`；升级 OpenClash 或重置配置后需检查该值是否被重置为 `'1'` |
+| **记录时间** | 2026-03-05 |
+
+---
+
 ## 新增 Bug 记录模板
 
 > 修复 Bug 后，复制以下模板追加到对应分区末尾：
