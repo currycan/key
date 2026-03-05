@@ -1,4 +1,3 @@
-
 config config_subscribe
 	option enabled '1'
 	option name 'AllOne'
