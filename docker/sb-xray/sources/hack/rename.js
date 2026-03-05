@@ -523,7 +523,7 @@ const Utils = {
             if (rule.skipInPreformat) continue;
             cleaned = cleaned.replace(rule.regex, rule.value);
         }
-        return cleaned.split('/').map(s => s.trim()).filter(s => s !== '');
+        return cleaned.split(/[\/丨]/).map(s => s.trim()).filter(s => s !== '');
     },
 
     // ── RegionMap 依赖 ────────────────────────────────────────────────────────
@@ -629,7 +629,7 @@ const Pipeline = {
         // 将英文地名转为中文（如 "Hong Kong" → "香港"），并清理残留分隔符（| - _）
         parts = parts
             .map(part => Utils.standardizeRegion(part))
-            .map(part => part.replace(/^[-_||\s]+|[-_||\s]+$/g, '').trim())
+            .map(part => part.replace(/^[-_|丨\s]+|[-_|丨\s]+$/g, '').trim())
             .filter(part => part !== '');
         const firstIsProtocol = parts.length > 0 && Utils.isKnownProtocol(parts[0]);
         let protocolPrefix = firstIsProtocol
