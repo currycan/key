@@ -122,7 +122,93 @@ description: 跨 Skill 的 Bug 修复记录，所有 Agent 工作时必须优先
 
 ## entrypoint.sh / Shell 脚本
 
-*（此分区待记录）*
+### Bug #014 — http_probe 使用 eval 拼接 URL 存在命令注入风险
+
+| 字段 | 内容 |
+|:---|:---|
+| **涉及文件** | `scripts/entrypoint.sh` |
+| **函数** | `http_probe` |
+| **触发条件** | `URL` 参数含特殊 shell 字符（如空格、引号、反引号）时 |
+| **错误现象** | `eval "$head_cmd \"$url\""` 会执行 URL 中注入的命令 |
+| **根本原因** | 使用 `eval` 拼接带外部输入的字符串，破坏命令边界 |
+| **修复方案** | 改用数组参数：`local args=(-I -s ...); curl "${args[@]}" "$url"` |
+| **预防措施** | 任何含外部输入的命令绝不使用 `eval`；参数数组 `"${args[@]}"` 是唯一安全做法 |
+| **记录时间** | 2026-03-05 |
+
+---
+
+### Bug #015 — ensure_var 从文件检测后未将变量加载到当前 shell
+
+| 字段 | 内容 |
+|:---|:---|
+| **涉及文件** | `scripts/entrypoint.sh` |
+| **函数** | `ensure_var` |
+| **触发条件** | 变量已写入 `ENV_FILE` 但当前 shell 未 export（如容器重启后重新加载） |
+| **错误现象** | `grep -q` 检测到文件中存在变量后直接 `return`，变量在当前 shell 中仍为空 |
+| **根本原因** | 原逻辑仅作存在性检查，未将文件内容 `source` 或 `export` 到当前进程 |
+| **修复方案** | 检测到后用 `grep + sed` 提取值并 `export "${key}=${val}"` |
+| **预防措施** | `ensure_var` 三分支（已在 shell / 已在文件→加载 / 都没有→计算）必须每支都显式 export |
+| **记录时间** | 2026-03-05 |
+
+---
+
+### Bug #016 — apply_isp_routing_logic L754 死代码条件永不成立
+
+| 字段 | 内容 |
+|:---|:---|
+| **涉及文件** | `scripts/entrypoint.sh` |
+| **函数** | `apply_isp_routing_logic` |
+| **触发条件** | 任何调用路径 |
+| **错误现象** | `if [[ "${ISP_TAG}" != "direct" && -z "${ISP_TAG}" && -n "${first_tag}" ]]` 条件永远为 false |
+| **根本原因** | `ISP_TAG != "direct"` 与 `-z ISP_TAG` 矛盾：if-else 结构已保证进入该分支时 `ISP_TAG` 已赋值（非空），故 `-z ISP_TAG` 恒 false |
+| **修复方案** | 改为防御性兜底：`if [[ -z "${ISP_TAG:-}" && -n "${first_tag:-}" ]]` |
+| **预防措施** | 死代码通常出现在多次修改后条件没有跟随逻辑更新。重构前先分析每个条件的不变量 |
+| **记录时间** | 2026-03-05 |
+
+---
+
+### Bug #017 — speed_test 通过全局 CurlARG 传递代理参数导致状态污染
+
+| 字段 | 内容 |
+|:---|:---|
+| **涉及文件** | `scripts/entrypoint.sh` |
+| **函数** | `speed_test` |
+| **触发条件** | 先调用代理测速，再调用直连测速时 |
+| **错误现象** | 直连测速意外带上代理参数，导致测速结果不准确 |
+| **根本原因** | 代理参数通过全局变量 `CurlARG` 传递，函数调用后未清理 |
+| **修复方案** | 将代理参数改为函数参数 `speed_test <url> <name> [proxy] [proxy_auth]`，构造局部 `args` 数组 |
+| **预防措施** | 函数间通信优先用参数，不用全局变量；必须通信时在函数结束前显式 `unset` |
+| **记录时间** | 2026-03-05 |
+
+---
+
+### Bug #018 — sed -i 在 macOS BSD sed 上不加空字符串参数会报错
+
+| 字段 | 内容 |
+|:---|:---|
+| **涉及文件** | `scripts/entrypoint.sh` |
+| **函数** | `ensure_var`、`ensure_key_pair`、`apply_isp_routing_logic` 等 |
+| **触发条件** | 在 macOS 上运行脚本或测试时 |
+| **错误现象** | `sed: 1: "...": invalid command code f` |
+| **根本原因** | macOS BSD sed 的 `-i` 选项必须跟空字符串 `sed -i ''`，而 GNU sed 不接受这个格式 |
+| **修复方案** | 在 §2 封装跨平台函数：`if [[ "$(uname)" == "Darwin" ]]; then _sed_i() { sed -i '' "$@"; }; else _sed_i() { sed -i "$@"; }; fi`，所有 `sed -i` 改用 `_sed_i` |
+| **预防措施** | 任何需要原地编辑文件的 sed 调用都必须通过 `_sed_i`，不要直接使用 `sed -i` |
+| **记录时间** | 2026-03-05 |
+
+---
+
+### Bug #019 — tr | head -c 管道在 pipefail 模式下触发 SIGPIPE 误退出
+
+| 字段 | 内容 |
+|:---|:---|
+| **涉及文件** | `scripts/entrypoint.sh` |
+| **函数** | `generateRandomStr` |
+| **触发条件** | `set -eo pipefail` 下调用 `generateRandomStr password/path`，或在子 shell 中通过 `$()` 调用 |
+| **错误现象** | 脚本以退出码 141（SIGPIPE）退出，后续代码不执行 |
+| **根本原因** | `head -c N` 读完所需字节后退出，`tr` 写入关闭的管道得到 SIGPIPE；`pipefail` 将管道退出码设为 141；`set -e` 导致脚本立即退出 |
+| **修复方案** | 末尾加 `|| true`：`LC_ALL=C tr -dc 'A-Za-z0-9' < /dev/urandom \| head -c "$length" \|\| true` |
+| **预防措施** | 任何 `producer | head` 类管道在 `pipefail` 脚本中都必须用 `|| true` 抑制 SIGPIPE；同理适用于 `| grep -m1` 等提前退出的消费者 |
+| **记录时间** | 2026-03-05 |
 
 ---
 
@@ -234,6 +320,51 @@ description: 跨 Skill 的 Bug 修复记录，所有 Agent 工作时必须优先
 | **根本原因** | Smart 模式"ASN 优先"会优先按 ASN 路由流量，此逻辑会绕过 fake-ip DNS 拦截，导致部分 DNS 查询直接发往上游而非 mihomo 内部 DNS 处理 |
 | **修复方案** | 将 `option smart_prefer_asn` 设为 `'0'`，禁用 ASN 优先；两个架构配置文件均需修改（op-amd 第 408 行、op-arm 第 409 行） |
 | **预防措施** | OpenClash Smart 模式配置中，`smart_prefer_asn` 必须保持 `'0'`；升级 OpenClash 或重置配置后需检查该值是否被重置为 `'1'` |
+| **记录时间** | 2026-03-05 |
+
+---
+
+### Bug #020 — createConfig() 使用 shuf 在非 GNU 环境报错
+
+| 字段 | 内容 |
+|:---|:---|
+| **涉及文件** | `scripts/entrypoint.sh` |
+| **函数** | `createConfig` |
+| **触发条件** | 在 macOS 或 Alpine busybox（无 GNU coreutils）上运行 |
+| **错误现象** | `shuf: command not found`，RANDOM_NUM 未赋值，配置渲染可能失败 |
+| **根本原因** | `shuf` 是 GNU coreutils 专属命令，macOS / busybox 不提供 |
+| **修复方案** | `RANDOM_NUM=$(( RANDOM % 10 ))`，使用 bash 内置 `RANDOM` 变量（0-32767），取模 10 得 0-9 |
+| **预防措施** | 编写 bash 脚本不依赖 `shuf`；随机整数范围用 `$(( RANDOM % N + base ))` |
+| **记录时间** | 2026-03-05 |
+
+---
+
+### Bug #021 — analyze_ai_routing_env() 使用 eval 调用函数名
+
+| 字段 | 内容 |
+|:---|:---|
+| **涉及文件** | `scripts/entrypoint.sh` |
+| **函数** | `analyze_ai_routing_env` |
+| **触发条件** | 任何调用路径 |
+| **错误现象** | 当 `cmd` 变量值含 shell 元字符时，`eval "$cmd"` 会执行意外命令 |
+| **根本原因** | 对单纯函数名调用使用了 `eval`，存在二次解析风险；且与同文件 `ensure_var` 中 `val=$($cmd)` 的写法不一致 |
+| **修复方案** | 改为 `val=$($cmd)` 直接调用，无需 `eval` |
+| **预防措施** | 函数名变量直接用 `$($cmd)` 调用；`eval` 仅用于必须进行字符串到命令转换的场景，且需严格校验输入来源 |
+| **记录时间** | 2026-03-05 |
+
+---
+
+### Bug #022 — 工具函数 _apply_tpl 归入业务节导致声明顺序混乱
+
+| 字段 | 内容 |
+|:---|:---|
+| **涉及文件** | `scripts/entrypoint.sh` |
+| **函数** | `_apply_tpl`（工具）→ 原位于 `createConfig` 业务节 |
+| **触发条件** | 代码审查 / 结构检查 |
+| **错误现象** | 工具函数夹杂在业务函数节中，违反「工具先声明」规则，阅读和维护困难 |
+| **根本原因** | 未按「工具层 → 探测层 → 业务层 → 流程层」的分层原则组织函数 |
+| **修复方案** | 新建 §5「模板渲染工具」节，将 `_apply_tpl` 移至工具区；选路辅助（`_is_restricted_region`、`get_fallback_proxy`、`get_isp_preferred_strategy`）新建 §8「选路辅助」节独立存放 |
+| **预防措施** | 每次新增函数时，先判断属于哪一层，再放入对应节；工具函数以 `_` 前缀命名辅助识别 |
 | **记录时间** | 2026-03-05 |
 
 ---
