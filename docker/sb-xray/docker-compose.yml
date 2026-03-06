@@ -38,7 +38,7 @@ services:
       - ./sub-store:/sub-store/data
       - ./nginx/http:/etc/nginx/conf.d
       - ./nginx/tcp:/etc/nginx/stream.d
-      - ./nginx/dhparam:/etc/nginx/dhparam
+      - ./nginx-dhparam:/etc/nginx/dhparam
       - ./data:/data
       - ./logs:/var/log
       # - /lib/modules:/lib/modules:ro
