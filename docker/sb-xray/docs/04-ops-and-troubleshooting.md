@@ -1,16 +1,17 @@
 # 04. 运维管理与故障排查手册
 
-> 覆盖系统管理面板导航、订阅端点安全防护、证书运维、GeoIP 数据更新与常见故障排查。
+> 覆盖系统管理面板导航、环境变量完整参考、订阅端点安全防护、证书运维、GeoIP 数据更新与常见故障排查。
 
 ---
 
 ## 目录
 
 1. [系统控制面板导航](#1-系统控制面板导航)
-2. [订阅端点安全体系](#2-订阅端点安全体系)
-3. [证书管理运维](#3-证书管理运维)
-4. [GeoIP/GeoSite 数据更新](#4-geoipgeosite-数据更新)
-5. [故障排查实战手册](#5-故障排查实战手册)
+2. [环境变量完整参考](#2-环境变量完整参考)
+3. [订阅端点安全体系](#3-订阅端点安全体系)
+4. [证书管理运维](#4-证书管理运维)
+5. [GeoIP/GeoSite 数据更新](#5-geoipgeosite-数据更新)
+6. [故障排查实战手册](#6-故障排查实战手册)
 
 ---
 
@@ -22,10 +23,10 @@ SB-Xray 集成了多个可视化管理面板，全部通过 CDN 域名的子路�
 
 | 面板 | 入口路径 | 功能 | 默认凭据来源 |
 |:---|:---|:---|:---|
-| **X-UI (3x-ui)** | `https://${CDNDOMAIN}/${XUI_WEBBASEPATH}` | Xray 协议与用户管理 | 环境变量 `XUI_ACCOUNT` |
-| **S-UI** | `https://${CDNDOMAIN}/${SUI_WEBBASEPATH}` | Sing-box 入站与出站监控 | 环境变量 |
+| **X-UI (3x-ui)** | `https://${CDNDOMAIN}/${XUI_WEBBASEPATH}` | Xray 协议与用户管理 | `/.env/secret` 中 `PUBLIC_USER/PASSWORD` |
+| **S-UI** | `https://${CDNDOMAIN}/${SUI_WEBBASEPATH}` | Sing-box 入站与出站监控 | 同上 |
 | **Sub-Store** | `https://${CDNDOMAIN}/sub-store` | 订阅源管理与节点清洗 | 无需认证 |
-| **Dufs** | `https://${CDNDOMAIN}/${DUFS_PATH_PREFIX}` | 文件上传/下载网盘 | HTTP Basic 认证 |
+| **Dufs** | `https://${CDNDOMAIN}/${DUFS_PATH_PREFIX}` | 文件上传/下载网盘 | HTTP Basic 认证（同上凭据） |
 | **Yacd/Zashboard** | `https://${CDNDOMAIN}:9090/ui` | 实时流量与策略组监控 | Secret: `yyds666` |
 
 > **安全提醒**：所有面板路径均通过 Nginx 的 `location` 指令保护，建议首次登录后立即修改默认 WebBasePath。
@@ -36,12 +37,9 @@ SB-Xray 集成了多个可视化管理面板，全部通过 CDN 域名的子路�
 environment:
   # X-UI
   - XUI_WEBBASEPATH=3xadmin      # 自定义面板路径
-  - XUI_ACCOUNT=admin             # 默认用户名
-  - XUI_PORT=8888                 # 内部端口
 
   # S-UI
   - SUI_WEBBASEPATH=sui           # 自定义面板路径
-  - SUI_PORT=3095                 # 内部端口
 
   # Dufs 文件服务
   - DUFS_PATH_PREFIX=/myfiles     # 文件网盘的 URL 前缀
@@ -50,11 +48,154 @@ environment:
 
 ---
 
-## 2. 订阅端点安全体系
+## 2. 环境变量完整参考
+
+### 2.1 优先级模型
+
+容器启动时，变量按以下顺序加载，**序号越小优先级越高**（后加载的覆盖先设的值）：
+
+| 优先级 | 来源 | 加载时机 | 典型内容 |
+|:---|:---|:---|:---|
+| **1（最高）** | `/.env/status` | `main_init` 步骤 3，最后 source | 流媒体/AI 检测结果（`*_OUT` 变量） |
+| **2** | `/.env/sb-xray` | `main_init` 步骤 3 | UUID、端口、密钥、`ISP_TAG` 等 |
+| **3** | `/.env/secret` | `main_init` 步骤 2 | 面板凭据、ISP 节点凭据 |
+| **4** | `docker-compose environment` | 容器启动时注入 | 用户显式配置 |
+| **5（最低）** | `Dockerfile ENV` | 镜像构建时烘焙 | 安全默认值 |
+
+> **实践说明**：各层通常包含不同的变量，实际覆盖冲突极少。`ensure_var` 的三分支逻辑确保自动生成的变量首次计算后即永久缓存，不会被重复生成。
+
+### 2.2 用户配置变量（在 docker-compose 设置）
+
+#### 必填（无默认值，缺少则容器退出）
+
+| 变量 | 说明 |
+|:---|:---|
+| `DOMAIN` | 主域名（Reality TLS 伪装目标所在域） |
+| `CDNDOMAIN` | CDN 域名（Cloudflare 代理，Nginx Web 层监听此 SNI） |
+| `DECODE` | 远端密钥库解密密钥（由 `crypctl` 使用） |
+
+#### 核心可选
+
+| 变量 | Dockerfile 默认 | 说明 |
+|:---|:---|:---|
+| `LISTENING_PORT` | `443` | Nginx 主监听端口 |
+| `DEST_HOST` | `www.microsoft.com` | Reality SNI 伪装目标（建议改为 `speed.cloudflare.com`） |
+| `DEFAULT_ISP` | `LA_ISP` | ISP 出口模式：非空=锁定到指定前缀出口（跳过测速）；**显式置空=启用测速自动选路**。Dockerfile 默认 `LA_ISP`，不覆盖则永远锁定 LA 出口 |
+| `GEMINI_DIRECT` | `""` | Gemini 路由：`true`=强制直连，`false`=代理，空=自动判断 |
+| `NODE_SUFFIX` | `""` | 订阅节点名称后缀（如 ` ✈ 高速`） |
+| `PROVIDERS` | `""` | 外部订阅源，多行格式 |
+| `TZ` | `Asia/Singapore` | 容器时区 |
+
+#### ACME 证书
+
+| 变量 | Dockerfile 默认 | 说明 |
+|:---|:---|:---|
+| `ACMESH_SERVER_NAME` | `zerossl` | ACME CA：`zerossl` / `google` |
+| `ACMESH_REGISTER_EMAIL` | `""` | ACME 注册邮箱 |
+| `ACMESH_DEBUG` | `2` | ACME 调试级别（生产可改为 `1`） |
+| `ACMESH_EAB_KID` | — | Google CA 专用 EAB Key ID |
+| `ACMESH_EAB_HMAC_KEY` | — | Google CA 专用 EAB HMAC Key |
+| `SSL_PATH` | `/pki` | 证书存储路径 |
+
+#### X-UI 面板
+
+| 变量 | Dockerfile 默认 | 说明 |
+|:---|:---|:---|
+| `XUI_WEBBASEPATH` | `xui` | 面板访问路径 |
+| `XUI_LOG_LEVEL` | `info` | 日志级别 |
+| `XUI_DEBUG` | `false` | 调试模式 |
+
+#### S-UI 面板
+
+| 变量 | Dockerfile 默认 | 说明 |
+|:---|:---|:---|
+| `SUI_WEBBASEPATH` | `sui` | 面板访问路径 |
+| `SUI_SUB_PATH` | `sub` | 订阅子路径 |
+| `SUI_PORT` | `3095` | S-UI 内部端口 |
+| `SUI_SUB_PORT` | `3096` | S-UI 订阅内部端口 |
+| `SUI_LOG_LEVEL` | `info` | 日志级别 |
+
+#### Dufs 文件服务
+
+| 变量 | Dockerfile 默认 | 说明 |
+|:---|:---|:---|
+| `DUFS_PATH_PREFIX` | `/dufs` | URL 前缀 |
+| `DUFS_SERVE_PATH` | `/data` | 文件存储根目录 |
+| `DUFS_ALLOW_UPLOAD` | `true` | 允许上传 |
+| `DUFS_ALLOW_DELETE` | `true` | 允许删除 |
+
+### 2.3 远端密钥变量（`/.env/secret`，由 `DECODE` 解密注入）
+
+这些变量从加密的远端密钥库中读取，**不应出现在 `docker-compose.yml`** 中：
+
+| 变量 | 说明 |
+|:---|:---|
+| `PUBLIC_USER` | 统一用户名（X-UI / S-UI / HTTP Basic Auth 共用） |
+| `PUBLIC_PASSWORD` | 统一密码 |
+| `<PREFIX>_ISP_IP` | ISP 落地节点 IP（如 `LA_ISP_IP`） |
+| `<PREFIX>_ISP_PORT` | ISP 落地节点端口 |
+| `<PREFIX>_ISP_USER` | ISP 落地节点用户名 |
+| `<PREFIX>_ISP_SECRET` | ISP 落地节点密码 |
+
+> `<PREFIX>` 可自定义（如 `LA`、`KR`），需在 `DEFAULT_ISP` 中指定全局兜底前缀。
+
+### 2.4 自动生成变量（`/.env/sb-xray`，首次启动后永久缓存）
+
+> ⚠️ **禁止在 docker-compose 中手动设置**，否则会锁死随机值，重建容器无法刷新。
+
+| 变量 | 生成方式 | 说明 |
+|:---|:---|:---|
+| `XRAY_UUID` | `uuidgen` | Xray VLESS 用户 ID |
+| `SB_UUID` | `uuidgen` | Sing-box 用户 ID |
+| `PASSWORD` | 随机 16 位 | 通用密码 |
+| `SUBSCRIBE_TOKEN` | 随机 32 位 | 订阅 URL 鉴权 Token |
+| `XRAY_REALITY_SHORTID` | `openssl rand -hex 8` | Reality ShortId |
+| `XRAY_REALITY_PRIVATE_KEY` | `xray x25519` | Reality 私钥（配对生成） |
+| `XRAY_REALITY_PUBLIC_KEY` | `xray x25519` | Reality 公钥 |
+| `XRAY_MLKEM768_SEED` | `xray mlkem768` | ML-KEM 种子（配对生成） |
+| `XRAY_MLKEM768_CLIENT` | `xray mlkem768` | ML-KEM 客户端密钥 |
+| `XRAY_URL_PATH` | 随机 32 位 | XHTTP 路径 |
+| `PORT_HYSTERIA2` | 随机高位端口 | Hysteria2 UDP 端口 |
+| `PORT_TUIC` | 随机高位端口 | TUIC UDP 端口 |
+| `PORT_ANYTLS` | 随机高位端口 | AnyTLS TCP 端口 |
+| `XUI_LOCAL_PORT` | 随机端口 | X-UI 实际监听端口 |
+| `DUFS_PORT` | 随机高位端口 | Dufs 内部监听端口 |
+| `SUB_STORE_FRONTEND_BACKEND_PATH` | 随机 32 位路径 | Sub-Store 后端 API 路径（每次部署唯一，防扫描） |
+| `STRATEGY` | API 检测 | 双栈 / 纯 IPv4 / 纯 IPv6 |
+| `GEOIP_INFO` | API 检测 | GeoIP 归属字符串 |
+| `IS_BRUTAL` | 内核探测 | BBR/Brutal 支持状态 |
+| `IP_TYPE` | API 检测 | `isp` / `hosting` 等 |
+| `ISP_TAG` | 测速选路 | 胜出的 ISP 代理 tag |
+| `IS_8K_SMOOTH` | 速度计算 | `true`/`false`，8K 流畅度标志 |
+
+### 2.5 自动检测变量（`/.env/status`，可清除重新检测）
+
+删除 `/.env/status` 并重启容器即可强制重新探测所有流媒体/AI 可达性：
+
+```bash
+docker exec sb-xray rm -f /.env/status
+docker compose restart
+```
+
+| 变量 | 含义 |
+|:---|:---|
+| `CHATGPT_OUT` | ChatGPT 出口策略 tag |
+| `NETFLIX_OUT` | Netflix 出口策略 tag |
+| `DISNEY_OUT` | Disney+ 出口策略 tag |
+| `YOUTUBE_OUT` | YouTube 出口策略 tag |
+| `GEMINI_OUT` | Gemini 出口策略 tag |
+| `CLAUDE_OUT` | Claude 出口策略 tag |
+| `SOCIAL_MEDIA_OUT` | 社交媒体出口策略 tag |
+| `TIKTOK_OUT` | TikTok 出口策略 tag |
+| `ISP_OUT` | ISP 首选策略 tag |
+
+---
+
+## 3. 订阅端点安全体系
 
 订阅配置文件（`/sb-xray/`）包含所有代理连接信息，安全性至关重要。系统对此端点设计了多层防御策略。
 
-### 2.1 安全体系总览
+### 3.1 安全体系总览
 
 ```mermaid
 graph TD
@@ -70,7 +211,7 @@ graph TD
     style F fill:#ff7675,stroke:#d63031,stroke-width:2px
 ```
 
-### 2.2 认证方式一：Token 认证（推荐）
+### 3.2 认证方式一：Token 认证（推荐）
 
 Token 在容器首次启动时**自动生成**。
 
@@ -93,22 +234,16 @@ environment:
   - SUBSCRIBE_TOKEN=your_custom_secure_token_32_chars
 ```
 
-### 2.3 认证方式二：HTTP 基础认证（备用）
+### 3.3 认证方式二：HTTP 基础认证（备用）
 
-使用与 X-UI / S-UI 相同的用户名和密码：
-
-```yaml
-environment:
-  - PUBLIC_USER=admin
-  - PUBLIC_PASSWORD=your_secure_password
-```
+使用与 X-UI / S-UI 相同的用户名和密码（来自 `/.env/secret`）：
 
 **使用方法**：
 
 * 浏览器：访问链接时会弹出认证对话框
 * 客户端：`https://admin:password@your-domain.com/sb-xray/MihomoPro.yaml`
 
-### 2.4 安全加固措施
+### 3.4 安全加固措施
 
 | 措施 | 实现方式 | 效果 |
 |:---|:---|:---|
@@ -119,7 +254,7 @@ environment:
 | **安全响应头** | `X-Content-Type-Options: nosniff` | 防 MIME 嗅探、点击劫持 |
 | **禁止缓存** | `Cache-Control: no-store` | 防敏感配置被中间节点缓存 |
 
-### 2.5 监控与日志
+### 3.5 监控与日志
 
 ```bash
 # 查看成功的订阅访问
@@ -134,13 +269,13 @@ docker exec sb-xray awk '{print $1}' /var/log/nginx/subscribe_scan.log | sort | 
 
 ---
 
-## 3. 证书管理运维
+## 4. 证书管理运维
 
-### 3.1 日常运维命令
+### 4.1 日常运维命令
 
 ```bash
 # 查看证书状态
-docker exec sb-xray openssl x509 -in /pki/fullchain.pem -text -noout | grep -E "Not (Before|After)"
+docker exec sb-xray openssl x509 -in /pki/sb_xray_bundle.crt -text -noout | grep -E "Not (Before|After)"
 
 # 强制重新签发（删除旧证书后重启）
 rm -rf ./pki/* ./acmecerts/*
@@ -150,7 +285,7 @@ docker compose restart
 docker exec sb-xray /acme.sh/acme.sh --renew -d ${DOMAIN} -d ${CDNDOMAIN} --force
 ```
 
-### 3.2 多域名证书策略
+### 4.2 多域名证书策略
 
 系统默认申请**泛域名 + 主域名**双SAN证书：
 
@@ -159,7 +294,7 @@ SAN[0]: *.example.com     (泛域名，覆盖所有子域名)
 SAN[1]: example.com       (主域名)
 ```
 
-### 3.3 DH 参数安全加固
+### 4.3 DH 参数安全加固
 
 首次启动时，系统自动生成 2048-bit DH 密钥参数：
 
@@ -171,15 +306,15 @@ SAN[1]: example.com       (主域名)
 
 ---
 
-## 4. GeoIP/GeoSite 数据更新
+## 5. GeoIP/GeoSite 数据更新
 
 `scripts/geo_update.sh` 负责更新 Xray 和 Sing-box 使用的地理信息数据库。
 
-### 4.1 自动更新
+### 5.1 自动更新
 
 系统通过 Supervisor 定时任务自动执行更新。
 
-### 4.2 手动更新
+### 5.2 手动更新
 
 ```bash
 # 手动触发更新
@@ -189,7 +324,7 @@ docker exec sb-xray /scripts/geo_update.sh
 docker exec sb-xray ls -la /usr/local/bin/bin/
 ```
 
-### 4.3 数据源
+### 5.3 数据源
 
 | 文件 | 用途 | 来源 |
 |:---|:---|:---|
@@ -200,9 +335,9 @@ docker exec sb-xray ls -la /usr/local/bin/bin/
 
 ---
 
-## 5. 故障排查实战手册
+## 6. 故障排查实战手册
 
-### 5.1 快速诊断流程
+### 6.1 快速诊断流程
 
 ```mermaid
 flowchart TD
@@ -216,7 +351,7 @@ flowchart TD
     Q3 -- "Hysteria2 超时" --> A5["检查 UDP 端口、防火墙"]
 ```
 
-### 5.2 常见故障排查表
+### 6.2 常见故障排查表
 
 #### ❌ 故障一：客户端连接 502 Bad Gateway
 
@@ -249,7 +384,7 @@ docker exec sb-xray tail -50 /var/log/nginx/error.log
 
 **排查顺序**：
 
-1. **Token 错误**：检查 URL 中的 Token 与 `.env` 中的是否一致
+1. **Token 错误**：检查 URL 中的 Token 与 `/.env/sb-xray` 中的是否一致
 2. **认证失败**：未携带 Token 时，输入的用户名/密码可能错误
 3. **文件名大小写**：文件名大小写敏感
 4. **触发限流**：请求过于频繁，等待一分钟
@@ -299,7 +434,7 @@ nc -zuv ${SERVER_IP} ${PORT_HYSTERIA2}
 | ISP 封锁 UDP | 切换其他协议 |
 | 客户端 UUID 错误 | 注意 Sing-box 使用 `SB_UUID` 而非 `XRAY_UUID` |
 
-### 5.3 日志检查速查表
+### 6.3 日志检查速查表
 
 | 日志位置 | 用途 |
 |:---|:---|
@@ -313,7 +448,7 @@ nc -zuv ${SERVER_IP} ${PORT_HYSTERIA2}
 | `/var/log/supervisord.log` | Supervisor 主日志 |
 | `/var/log/acme.sh.log` | 证书申请/续期日志 |
 
-### 5.4 快速运维命令汇总
+### 6.4 快速运维命令汇总
 
 ```bash
 # 容器状态

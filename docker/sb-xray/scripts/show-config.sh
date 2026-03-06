@@ -7,9 +7,11 @@ RED="\033[31m"; GREEN="\033[32m"; YELLOW="\033[33m"; BLUE="\033[34m"; MAGENTA="\
 # Env
 ENV_FILE="/.env/sb-xray"
 STATUS_FILE="/.env/status"
+SECRET_FILE="/.env/secret"
 [ -f "$ENV_FILE" ] || { echo -e "${RED}Error: $ENV_FILE missing${RESET}"; exit 1; }
 source "$ENV_FILE"
 [ -f "$STATUS_FILE" ] && source "$STATUS_FILE"
+[ -f "$SECRET_FILE" ] && source "$SECRET_FILE"
 
 # Ensure output directory exists immediately
 mkdir -p "${WORKDIR}/subscribe"
@@ -172,7 +174,7 @@ show_info_links() {
     # 提示用户
     if [ -n "$token_param" ]; then
         echo -e "💡 \033[33m已自动附加安全认证 Token，可直接导入客户端使用。\033[0m"
-        echo -e "🔒 \033[33m基础认证用户: ${PUBLIC_USER} / ${PUBLIC_PASSWORD}\033[0m"
+        echo -e "🔒 \033[33m基础认证用户: ${PUBLIC_USER:-未设置} / ${PUBLIC_PASSWORD:-未设置}\033[0m"
     fi
 
     print_colored ${GREEN} "\n*                                                                *\n *        Sing-box / Xray 多协议多传输客户端配置文件汇总         *\n******************************************************************"

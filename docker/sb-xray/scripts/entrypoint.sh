@@ -173,24 +173,33 @@ checkRequiredEnv() {
     fi
 }
 
-# 确保变量已设置，按以下优先级处理：
-#   1. 已在当前 shell → 跳过
-#   2. 已在 ENV_FILE  → 从文件加载并 export（修复：原版仅检查文件但不加载）
-#   3. 两者都没有     → 执行命令计算，按需写入文件
+# 确保变量已设置，遵循优先级：docker-compose > auto-gen (ENV_FILE) > Dockerfile 默认值
+#
+# 分支逻辑（见 Bug #015）：
+#   1. shell 中有值 → docker-compose 显式设置，直接返回
+#   2. 已在 ENV_FILE → 从文件加载并 export 到当前 shell（Bug #015 修复）
+#   3. 两者都没有   → 执行命令计算，按需写入文件
+#
 # 用法: ensure_var <KEY> [--no-persist] <cmd...>
 ensure_var() {
     local key=$1; shift
     local persist=true
-    [[ "${1:-}" == "--no-persist" ]] && { persist=false; shift; }
+
+    while [[ "${1:-}" == --* ]]; do
+        case "${1:-}" in
+            --no-persist) persist=false; shift ;;
+            *)            break ;;
+        esac
+    done
     local cmd="$*"
 
-    # 分支 1: 已在当前 shell 环境中
+    # 分支 1: 已在当前 shell 环境中（docker-compose 显式设置）
     if [[ -n "${!key:-}" ]]; then
         log DEBUG "[${key}] 已在当前环境，跳过"
         return
     fi
 
-    # 分支 2: 已在持久化文件中 → 加载到当前 shell
+    # 分支 2: 已在持久化文件中 → 加载到当前 shell（Bug #015 修复）
     if grep -q "^export ${key}=" "${ENV_FILE}" 2>/dev/null; then
         local val
         val=$(grep "^export ${key}=" "${ENV_FILE}" | tail -1 \
@@ -801,7 +810,8 @@ _init_dirs() {
 analyze_base_env() {
     log INFO "[阶段 1] 初始化基础环境变量..."
 
-    # 格式: "KEY|生成命令"，全部持久化到 ENV_FILE
+    # 格式: "KEY|生成命令"
+    # auto-gen 变量在 Dockerfile 中不设默认值（置空），确保此处 auto-gen 优先于 Dockerfile
     local -a vars=(
         "XUI_LOCAL_PORT|generateRandomStr port"
         "DUFS_PORT|generateRandomStr port"
@@ -825,6 +835,7 @@ analyze_base_env() {
         IFS='|' read -r key cmd <<< "$entry"
         ensure_var "$key" $cmd
     done
+
     log INFO "[阶段 1] 完成"
 }
 

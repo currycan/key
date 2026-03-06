@@ -78,28 +78,40 @@ sb-xray/
 
 ## 关键环境变量
 
-### 必填变量
+> 完整参考见 `docs/04-ops-and-troubleshooting.md §2`。
+
+### 优先级（高→低）
+
+`/.env/status` > `/.env/sb-xray` > `/.env/secret` > `docker-compose environment` > `Dockerfile ENV`
+
+### 必填（docker-compose 设置，无默认值）
 | 变量 | 说明 |
 |:---|:---|
 | `DOMAIN` | 主域名 |
 | `CDNDOMAIN` | CDN 域名 (Cloudflare) |
-| `DECODE` | 远端密文解密密钥 |
+| `DECODE` | 远端密钥库解密密钥 |
 
-### 重要可选变量
-| 变量 | 默认值 | 说明 |
+### 常用可选（docker-compose 覆盖 Dockerfile 默认）
+| 变量 | Dockerfile 默认 | 说明 |
 |:---|:---|:---|
 | `LISTENING_PORT` | `443` | 主监听端口 |
+| `DEST_HOST` | `www.microsoft.com` | Reality SNI 伪装目标 |
 | `NODE_SUFFIX` | 空 | 节点名称后缀 |
-| `DEFAULT_ISP` | 空 | 强制指定 ISP 代理 |
-| `GEMINI_DIRECT` | 空 | Gemini 直连控制 (true/false/空=自动) |
-| `DEST_HOST` | `speed.cloudflare.com` | TLS SNI 伪装目标 |
+| `DEFAULT_ISP` | `LA_ISP` | 全局兜底 ISP 代理前缀 |
+| `GEMINI_DIRECT` | 空 | Gemini 路由 (true/false/空=自动) |
 | `PROVIDERS` | 空 | 自定义订阅源 (多行格式) |
+| `XUI_WEBBASEPATH` | `xui` | X-UI 面板路径 |
+| `SUI_WEBBASEPATH` | `sui` | S-UI 面板路径 |
+| `DUFS_PATH_PREFIX` | `/dufs` | 文件服务 URL 前缀 |
 
-### 自动生成变量 (持久化到 `/.env/sb-xray`)
-`XRAY_UUID`, `SB_UUID`, `PASSWORD`, `SUBSCRIBE_TOKEN`, `XRAY_REALITY_SHORTID`, `XRAY_URL_PATH`, `PORT_HYSTERIA2`, `PORT_TUIC`, `PORT_ANYTLS`, `IP_TYPE`, `STRATEGY`, `GEOIP_INFO`, `IS_BRUTAL`
+### 远端密钥变量（`/.env/secret`，由 `DECODE` 解密，勿放 docker-compose）
+`PUBLIC_USER`, `PUBLIC_PASSWORD`, `<PREFIX>_ISP_IP/PORT/USER/SECRET`
 
-### 运行时状态变量 (持久化到 `/.env/status`)
-`ISP_TAG`, `IS_8K_SMOOTH`, `CHATGPT_OUT`, `NETFLIX_OUT`, `DISNEY_OUT`, `YOUTUBE_OUT`, `GEMINI_OUT`, `CLAUDE_OUT`, `SOCIAL_MEDIA_OUT`, `TIKTOK_OUT`
+### 自动生成变量（`/.env/sb-xray`，首次生成后永久缓存，勿手动设置）
+`XRAY_UUID`, `SB_UUID`, `PASSWORD`, `SUBSCRIBE_TOKEN`, `XRAY_REALITY_SHORTID`, `XRAY_REALITY_PRIVATE_KEY`, `XRAY_REALITY_PUBLIC_KEY`, `XRAY_MLKEM768_SEED`, `XRAY_MLKEM768_CLIENT`, `XRAY_URL_PATH`, `PORT_HYSTERIA2`, `PORT_TUIC`, `PORT_ANYTLS`, `XUI_LOCAL_PORT`, `DUFS_PORT`, `SUB_STORE_FRONTEND_BACKEND_PATH`, `STRATEGY`, `GEOIP_INFO`, `IS_BRUTAL`, `IP_TYPE`, `ISP_TAG`, `IS_8K_SMOOTH`
+
+### 自动检测变量（`/.env/status`，删除文件后重启可重新探测）
+`CHATGPT_OUT`, `NETFLIX_OUT`, `DISNEY_OUT`, `YOUTUBE_OUT`, `GEMINI_OUT`, `CLAUDE_OUT`, `SOCIAL_MEDIA_OUT`, `TIKTOK_OUT`, `ISP_OUT`
 
 ---
 

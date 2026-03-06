@@ -37,22 +37,75 @@ description: entrypoint.sh 与 rename.js 脚本架构、编码规范、已知 Bu
 
 ---
 
+## 环境变量设计规范
+
+### 变量分类
+
+| 类型 | 在 Dockerfile 中 | 在 entrypoint 中 | 优先级来源 |
+|:---|:---|:---|:---|
+| **用户配置变量** | 设置有意义的默认值 | 不处理（docker-compose 直接 override） | docker-compose > Dockerfile |
+| **auto-gen 变量** | **必须置空** `ENV VAR=""` | `analyze_base_env` 中 ensure_var | docker-compose > ENV_FILE缓存 > auto-gen |
+| **远端密钥变量** | 不声明 | `crypctl` 解密写入 `/.env/secret` | `/.env/secret` 文件 |
+| **自动检测变量** | 不声明 | `analyze_ai_routing_env` 中 ensure_var `--no-persist` 至 STATUS_FILE | `/.env/status` 文件 |
+
+### 设计规则
+
+**规则 1：auto-gen 变量在 Dockerfile 中必须置空**
+
+```dockerfile
+# ✅ 正确：置空，entrypoint 会 auto-gen 随机值
+ENV DUFS_PORT=""
+ENV SUB_STORE_FRONTEND_BACKEND_PATH=""
+
+# ❌ 错误：有默认值，ensure_var 分支 1 命中，auto-gen 永远不执行
+ENV DUFS_PORT="8889"
+```
+
+**规则 2：用户配置变量设置有意义的 Dockerfile 默认值**
+
+```dockerfile
+# ✅ 正确：用户可以通过 docker-compose 覆盖，不覆盖则用此默认值
+ENV LISTENING_PORT="443"
+ENV DEST_HOST="www.microsoft.com"
+ENV XUI_WEBBASEPATH="xui"
+```
+
+**规则 3：新增变量的判断标准**
+
+- 需要随机/动态生成 → auto-gen 变量，Dockerfile 置空，加入 `analyze_base_env`
+- 用户可能需要自定义 → 用户配置变量，Dockerfile 给有意义默认值，不加入 `analyze_base_env`
+- 敏感凭证 → 远端密钥变量，不放 Dockerfile，由 `crypctl` 解密
+- 网络探测结果 → 自动检测变量，不放 Dockerfile，缓存至 `/.env/status`
+
+---
+
 ## 环境变量缓存系统
 
 ### ensure_var() 工作原理
 
+**优先级设计（高→低）：docker-compose > auto-gen (ENV_FILE) > Dockerfile 默认值**
+
 ```bash
 ensure_var "KEY" "command to generate value"
-# 或
 ensure_var "KEY" --no-persist "command"
 ```
 
-**逻辑流程（三分支，见 Bug #015）：**
-1. **已在 shell**：变量已 export 到当前进程 → 直接返回，无 I/O
-2. **在文件不在 shell**：从 `/.env/sb-xray` 读取并 `export` 到当前 shell → 返回
+**逻辑流程（见 Bug #015）：**
+1. **shell 中有值**：docker-compose 显式设置 → 直接返回，无 I/O
+2. **在 ENV_FILE 不在 shell**：从 `/.env/sb-xray` 读取并 `export` 到当前 shell → 返回
 3. **两者均无**：执行指定命令获取值，`export` 到当前环境，写入持久化文件（`--no-persist` 跳过写文件）
 
 > ⚠️ 不能只检查文件存在性就返回，必须同时 export 到当前 shell（Bug #015 根本原因）。
+
+> ⚠️ **auto-gen 变量**（需要随机生成的）在 Dockerfile 中必须置空（`ENV VAR=""`），否则 Dockerfile 默认值会进入 shell，ensure_var 分支 1 直接返回，auto-gen 永远不执行。
+
+**`analyze_base_env` 中的变量格式：**
+
+```bash
+# 格式: "KEY|生成命令"
+"XRAY_UUID|generateRandomStr uuid"
+"SUB_STORE_FRONTEND_BACKEND_PATH|echo /$(generateRandomStr path 32)"
+```
 
 ### 两级持久化文件
 

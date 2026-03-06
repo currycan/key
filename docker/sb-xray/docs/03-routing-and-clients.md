@@ -41,27 +41,47 @@ flowchart TD
 
 ### 1.3 多 ISP 环境注入实操
 
-在 `docker-compose.yml` 文件中，按以下规则配置环境变量：
+ISP 节点凭据属于敏感信息，**不放入 `docker-compose.yml`**，而是通过远端加密密钥库下发，由 `crypctl` 解密后写入 `/.env/secret`。
+
+#### 远端密钥库格式（`/.env/secret` 内容示例）
+
+```bash
+# ISP 1: 洛杉矶原生家宽（变量名前缀必须以 _ISP 结尾）
+export LA_ISP_IP='1.2.3.4'
+export LA_ISP_PORT='2000'
+export LA_ISP_USER='alice'
+export LA_ISP_SECRET='pwd123'
+
+# ISP 2: 韩国原生家宽
+export KR_ISP_IP='5.6.7.8'
+export KR_ISP_PORT='3000'
+export KR_ISP_USER='bob'
+export KR_ISP_SECRET='pwd456'
+```
+
+> `entrypoint.sh` 启动时自动 source `/.env/secret`，无需手动操作。
+
+#### docker-compose.yml 中只需设置兜底出口
 
 ```yaml
 environment:
-  # ISP 1: 洛杉矶原生家宽（变量名必须以 _ISP_IP 结尾）
-  - LA_ISP_IP=1.2.3.4
-  - LA_ISP_PORT=2000
-  - LA_ISP_USER=alice
-  - LA_ISP_SECRET=pwd123
+  # 锁定模式：强制使用 LA ISP 出口，跳过测速自动选路
+  - DEFAULT_ISP=LA_ISP
 
-  # ISP 2: 韩国原生家宽
-  - KR_ISP_IP=5.6.7.8
-  - KR_ISP_PORT=3000
-  - KR_ISP_USER=bob
-  - KR_ISP_SECRET=pwd456
-
-  # 默认全局兜底落地出口
-  - DEFAULT_ISP=LA
+  # 自动模式：置空，由测速与地区检测自动决策最优出口
+  - DEFAULT_ISP=
 ```
 
-配置完成后，`entrypoint.sh` 的 `process_single_isp` 函数会自动将其渲染为底层内核支持的 JSON 节点格式。所有的解锁动作在服务器端默默完成，客户端无需任何繁琐的前置设置。
+**`DEFAULT_ISP` 的两种模式：**
+
+| 值 | 行为 |
+|:---|:---|
+| `LA_ISP`（或任意前缀） | **锁定模式**：强制使用该 ISP 出口，完全跳过测速自动选路逻辑 |
+| `""`（空值） | **自动模式**：启动时测速，根据地区检测 + 速度对比自动选最优出口 |
+
+> **为什么要显式设置 `DEFAULT_ISP=`（空）？** Dockerfile 默认值为 `LA_ISP`，不覆盖则永远锁定 LA 出口。只有在 docker-compose 中显式置空，才能解锁自动选路能力。
+
+配置生效后，`entrypoint.sh` 的 `process_single_isp` 函数会自动将凭据渲染为底层内核支持的 SOCKS5 出站 JSON。所有的解锁动作在服务器端完成，客户端无需额外配置。
 
 ---
 
