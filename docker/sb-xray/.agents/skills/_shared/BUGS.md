@@ -369,6 +369,63 @@ description: 跨 Skill 的 Bug 修复记录，所有 Agent 工作时必须优先
 
 ---
 
+### Bug #023 — ISP_TAG 持久化到 ENV_FILE，删除 STATUS_FILE 无法触发重新测速
+
+| 字段 | 内容 |
+|:---|:---|
+| **涉及文件** | `scripts/entrypoint.sh` |
+| **函数** | `apply_isp_routing_logic` |
+| **触发条件** | 用户删除 `/.env/status` 并重启容器，期望重新测速选路 |
+| **错误现象** | `[阶段 2] ISP_TAG 已缓存 (proxy-xxx)，跳过测速` — 测速完全跳过 |
+| **根本原因** | `apply_isp_routing_logic` 将 `ISP_TAG` 和 `IS_8K_SMOOTH` 持久化到 `ENV_FILE`（`/.env/sb-xray`），而非 `STATUS_FILE`（`/.env/status`）；`run_speed_tests_if_needed` 在 step 3 source ENV_FILE 后即检测到 ISP_TAG 非空而提前返回 |
+| **修复方案** | 将持久化目标从 `ENV_FILE` 改为 `STATUS_FILE`：`_sed_i '/^export IS_8K_SMOOTH=/d; /^export ISP_TAG=/d' "${STATUS_FILE}"` |
+| **预防措施** | 区分两类持久化变量：稳定配置（UUID/端口/密钥）→ ENV_FILE；网络运行时状态（ISP_TAG/IS_8K_SMOOTH/流媒体检测结果）→ STATUS_FILE |
+| **记录时间** | 2026-03-06 |
+
+---
+
+### Bug #024 — show_progress / end_progress 的 `\r` 在非 TTY Docker 日志中遮蔽后续 log 行
+
+| 字段 | 内容 |
+|:---|:---|
+| **涉及文件** | `scripts/entrypoint.sh` |
+| **函数** | `speed_test`（调用 `show_progress` / `end_progress`） |
+| **触发条件** | 在非 TTY 环境下查看 Docker logs（`docker logs sb-xray`）时 |
+| **错误现象** | 测速循环的每轮采样结果（`[测速] 样本 N/M: XX KB/s → XX Mbps`）在日志中完全不可见，用户无法确认多采样是否正常执行 |
+| **根本原因** | `show_progress` 用 `echo -ne "\r..."` 输出无换行符的行首覆写，`end_progress` 用 `\r\033[K` 清行；在非 TTY 的 Docker JSON log driver 中，`\r` 不触发行覆写，而是与下一段内容合并为同一行缓冲区，导致紧随其后的 `log INFO` 样本行被视觉遮蔽或挤占 |
+| **修复方案** | 在 `speed_test` 的采样循环中移除 `show_progress` 和 `end_progress` 调用，改为直接在 curl 完成后用 `log INFO "[测速] ${name} \| 第 ${i}/${SPEED_SAMPLES} 轮: ${kbps} KB/s → ${mbps} Mbps"` 输出持久化日志行 |
+| **预防措施** | `show_progress` / `end_progress` 仅适合交互式 TTY 终端的短暂进度提示；在需要持久化记录的循环体内（测速、批量处理等）只使用 `log` 函数，不混用进度覆写 |
+| **记录时间** | 2026-03-06 |
+
+### Bug #025 — ISP_TAG 重新评估后 *_OUT 服务路由缓存未联动清除
+
+| 字段 | 内容 |
+|:---|:---|
+| **涉及文件** | `scripts/entrypoint.sh` |
+| **函数** | `run_speed_tests_if_needed` / `analyze_ai_routing_env` |
+| **触发条件** | 容器重启后 STATUS_FILE 中 ISP_TAG 被清除（或不存在），触发重新测速；但 `*_OUT`（CHATGPT_OUT、ISP_OUT、NETFLIX_OUT 等）在 STATUS_FILE 中仍保留上次的旧值 |
+| **错误现象** | 测速选出新的最快 ISP（如 `proxy-la-isp`），但 CHATGPT_OUT/ISP_OUT/NETFLIX_OUT 等仍指向上次的旧代理（如 `proxy-us-isp`），导致流媒体/AI 路由未使用最快 ISP |
+| **根本原因** | `analyze_ai_routing_env()` 通过 `[[ -n "${!key:-}" ]]` 检查缓存——旧 `*_OUT` 值在启动时从 STATUS_FILE source 进 shell，非空则跳过重新评估，即使 ISP_TAG 已更新为新代理 |
+| **修复方案** | 在 `run_speed_tests_if_needed()` 中 ISP_TAG 缓存未命中时，立即通过 `_sed_i` 从 STATUS_FILE 删除所有 `*_OUT` 行并 `unset` shell 变量，确保后续 `analyze_ai_routing_env()` 基于新 ISP_TAG 重新评估 |
+| **附带修复** | `env \| grep "_ISP_IP="` 管道在无匹配时 grep 返回 1，`set -eou pipefail` 导致脚本退出；已在三处添加 `\|\| true` |
+| **预防措施** | 涉及缓存依赖链的变量（ISP_TAG → *_OUT），上游变更时必须联动清除下游缓存 |
+| **记录时间** | 2026-03-06 |
+
+### Bug #026 — speed_test 有效样本阈值为 0，极小速度被误计为有效采样
+
+| 字段 | 内容 |
+|:---|:---|
+| **涉及文件** | `scripts/entrypoint.sh` |
+| **函数** | `speed_test` |
+| **触发条件** | ISP SOCKS5 节点无法正常下载，curl 返回极低速度（< 1 KB/s）时 |
+| **错误现象** | 日志显示 `3/3 有效样本，均值 0.00 Mbps`，实际应为"全部采样失败"；误导运维判断 |
+| **根本原因** | 有效样本判定条件为 `$raw > 0`，curl 连接失败时仍返回极小的非零浮点数，被误计为有效样本 |
+| **修复方案** | 阈值从 `> 0` 改为 `> 1024`（bytes/sec，即 1 KB/s）；低于此值视为连接失败，不计入有效样本 |
+| **预防措施** | 网络测速类函数的有效样本阈值不得使用 `> 0`；以 1 KB/s 作为"连接成功"的最低判定基准 |
+| **记录时间** | 2026-03-07 |
+
+---
+
 ## 新增 Bug 记录模板
 
 > 修复 Bug 后，复制以下模板追加到对应分区末尾：

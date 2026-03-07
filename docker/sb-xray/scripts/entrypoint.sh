@@ -32,8 +32,8 @@ set -eou pipefail
 # §1  颜色与常量
 # ==============================================================================
 if [ -t 1 ]; then
-    RED='\033[1;31m' GREEN='\033[1;32m' YELLOW='\033[1;33m' CYAN='\033[1;36m' NC='\033[0m'
-    BOLD='\033[1m'   RESET_BOLD='\033[22m'
+    RED=$'\033[1;31m' GREEN=$'\033[1;32m' YELLOW=$'\033[1;33m' CYAN=$'\033[1;36m' NC=$'\033[0m'
+    BOLD=$'\033[1m'   RESET_BOLD=$'\033[22m'
 else
     RED='' GREEN='' YELLOW='' CYAN='' NC=''
     BOLD='' RESET_BOLD=''
@@ -46,6 +46,10 @@ STATUS_FILE="${STATUS_FILE:-/.env/status}"
 
 # 测速目标 URL
 _SPEED_TEST_URL="https://speed.cloudflare.com/__down?bytes=25000000"
+# 每节点采样次数（取均值，平滑偶发抖动）
+SPEED_SAMPLES=3
+# ISP 节点间切换容差百分比：新节点须超出当前最优该比例才替换（防止微小差距反复横跳）
+SPEED_TOLERANCE=15
 
 # ==============================================================================
 # §2  日志工具
@@ -311,7 +315,7 @@ get_fallback_proxy() {
         echo "${ISP_TAG}"; return
     fi
     local first_var
-    first_var=$(env | grep "_ISP_IP=" | head -n 1 | cut -d= -f1)
+    first_var=$(env | grep "_ISP_IP=" | head -n 1 | cut -d= -f1) || true
     if [[ -n "$first_var" ]]; then
         local prefix="${first_var%_IP}"
         echo "proxy-$(echo "${prefix}" | sed 's/_ISP//' | tr '[:upper:]_ ' '[:lower:]-')"
@@ -334,18 +338,39 @@ get_isp_preferred_strategy() {
 # §9  测速
 # ==============================================================================
 
-# 下载测速，返回速度字符串（Mbps，保留两位小数）
+# 下载测速，返回速度均值（Mbps，保留两位小数）
 # 用法: speed_test <url> <name> [socks5h://ip:port] [user:pass]
-# 修复: 原版通过全局 CurlARG 传递代理参数，存在全局污染风险；改为局部参数
+# 采样: 执行 SPEED_SAMPLES 次，取非零样本均值；全部失败则返回 0
 speed_test() {
     local url=$1 name=$2 proxy=${3:-} proxy_auth=${4:-}
     local args=(-s --connect-timeout 5 -L -o /dev/null -m 5 -w '%{speed_download}')
     [[ -n "$proxy" ]]      && args+=(-x "$proxy")
     [[ -n "$proxy_auth" ]] && args+=(--proxy-user "$proxy_auth")
-    show_progress "测速: ${name}"
-    local raw; raw=$(curl "${args[@]}" "$url" 2>/dev/null)
-    end_progress
-    awk -v s="$raw" 'BEGIN { printf "%.2f", s * 8 / 1024 / 1024 }'
+    log INFO "[测速] 开始: ${name}${proxy:+ | 代理: ${proxy}} | 测速源: ${url} | 采样: ${SPEED_SAMPLES}次"
+
+    local total=0 count=0 i
+    for (( i=1; i<=SPEED_SAMPLES; i++ )); do
+        local raw; raw=$(curl "${args[@]}" "$url" 2>/dev/null || echo "0")
+        local kbps mbps
+        kbps=$(awk -v s="$raw" 'BEGIN { printf "%.0f", s / 1024 }')
+        mbps=$(awk -v s="$raw" 'BEGIN { printf "%.2f", s * 8 / 1024 / 1024 }')
+        log INFO "[测速] ${name} | 第 ${i}/${SPEED_SAMPLES} 轮: ${kbps} KB/s → ${mbps} Mbps"
+        # 有效样本阈值: > 1024 bytes/sec (1 KB/s)；低于此值视为连接失败
+        if (( $(echo "$raw > 1024" | bc 2>/dev/null || echo 0) )); then
+            total=$(awk -v t="$total" -v s="$raw" 'BEGIN { printf "%.0f", t + s }')
+            (( count++ )) || true
+        fi
+    done
+
+    local result
+    if [[ "$count" -eq 0 ]]; then
+        result="0.00"
+        log WARN "[测速] ${name}: 全部 ${SPEED_SAMPLES} 次采样失败，返回 0"
+    else
+        result=$(awk -v t="$total" -v c="$count" 'BEGIN { printf "%.2f", t * 8 / c / 1024 / 1024 }')
+        log INFO "[测速] ${name}: ${count}/${SPEED_SAMPLES} 有效样本，均值 ${result} Mbps"
+    fi
+    echo "$result"
 }
 
 # 将测速结果格式化输出到 stderr（8K 播放能力评级）
@@ -413,37 +438,62 @@ EOF
 )
 }
 
-# 对单个 ISP 节点执行测速并更新最优代理记录
+# 对单个 ISP 节点执行测速并更新最优代理记录（含容差带）
 # 用法: _test_isp_node <prefix> <ip> <port> <user> <pass> <tag>
+# 容差带: 新节点需超出当前最优 SPEED_TOLERANCE% 才替换，防止小差距反复横跳
 _test_isp_node() {
     local prefix=$1 ip=$2 port=$3 user=$4 pass=$5 tag=$6
     local speed
     speed=$(speed_test "$_SPEED_TEST_URL" "$prefix" \
                        "socks5h://${ip}:${port}" "${user}:${pass}")
-    log INFO "[测速] ${prefix}: ${speed} Mbps"
     show_report "$speed" "$prefix"
-    if (( $(echo "$speed > ${proxy_max_speed:-0}" | bc 2>/dev/null || echo 0) )); then
+
+    # 首个有效节点直接成为当前最优；后续节点须超出容差阈值才替换
+    local _prev_max="${proxy_max_speed:-0}"
+    local threshold
+    threshold=$(awk -v m="${proxy_max_speed:-0}" -v t="${SPEED_TOLERANCE}" \
+                'BEGIN { printf "%.2f", m * (1 + t / 100) }')
+    if (( $(echo "$speed > $threshold" | bc 2>/dev/null || echo 0) )); then
         export proxy_max_speed="$speed"
         export FASTEST_PROXY_TAG="$tag"
-        log INFO "[测速] 最优代理更新: ${FASTEST_PROXY_TAG} (${proxy_max_speed} Mbps)"
+        log INFO "[测速] 容差判断: ${speed} Mbps > 阈值 ${threshold} Mbps (前最优 ${_prev_max} × 1.${SPEED_TOLERANCE}) → 更新最优: ${FASTEST_PROXY_TAG}"
+    else
+        log INFO "[测速] 容差判断: ${speed} Mbps ≤ 阈值 ${threshold} Mbps (前最优 ${_prev_max} × 1.${SPEED_TOLERANCE}) → 保持最优: ${FASTEST_PROXY_TAG:-未定}"
     fi
 }
 
 # 根据测速结果和环境信息决定最终 ISP_TAG，并计算 IS_8K_SMOOTH
 # 依赖外部变量（由 run_speed_tests_if_needed 注入）:
 #   first_tag, DIRECT_SPEED, proxy_max_speed, FASTEST_PROXY_TAG
-# 修复: 原 L754 死代码 `ISP_TAG != "direct" && -z ISP_TAG` 永远不成立
+#
+# 选路原则：ISP 代理目的是解锁 geo 限制（ChatGPT/Netflix 等），不与直连竞速。
+#   有 ISP 代理 → 始终使用最快代理；直连仅为无代理时的兜底。
 apply_isp_routing_logic() {
     local manual_isp_tag=""
     if [[ -n "${DEFAULT_ISP:-}" ]]; then
         manual_isp_tag="proxy-$(echo "${DEFAULT_ISP%_ISP}" | tr '[:upper:]_ ' '[:lower:]-')"
     fi
 
+    # 打印完整决策上下文
+    local _region="${GEOIP_INFO%%|*}"
+    local _ip_label; case "${IP_TYPE:-unknown}" in isp) _ip_label="住宅/ISP IP" ;; hosting) _ip_label="机房/托管 IP" ;; *) _ip_label="未知" ;; esac
+    log INFO "[选路] ════════════════════════════════════════════"
+    log INFO "[选路] 决策输入:"
+    log INFO "[选路]   IP_TYPE       = ${IP_TYPE:-未知} (${_ip_label})"
+    log INFO "[选路]   地区          = ${_region:-未知}"
+    log INFO "[选路]   DEFAULT_ISP   = ${DEFAULT_ISP:-未设置（自动选路）}"
+    log INFO "[选路]   直连速度      = ${DIRECT_SPEED:-0} Mbps（不参与选路）"
+    log INFO "[选路]   最优 ISP 代理 = ${FASTEST_PROXY_TAG:-无} (${proxy_max_speed:-0} Mbps)"
+    log INFO "[选路] 原则: ISP代理用于Geo解锁(ChatGPT/Netflix等)，有代理始终优先；直连为无代理兜底"
+    log INFO "[选路] ────────────────────────────────────────────"
+
     if [[ -n "${manual_isp_tag}" ]]; then
+        # 锁定模式：DEFAULT_ISP 非空，强制使用指定出口，跳过测速结果
         log INFO "[选路] 手动覆盖 DEFAULT_ISP=${DEFAULT_ISP} → ${manual_isp_tag}"
         export ISP_TAG="$manual_isp_tag"
 
     elif _is_restricted_region; then
+        # 受限地区（中国大陆/香港等）：必须走代理，无代理则回退直连
         if [[ -n "${first_tag:-}" ]]; then
             log WARN "[选路] 受限地区 (${GEOIP_INFO%%|*})，强制使用代理: ${first_tag}"
             export ISP_TAG="${first_tag}"
@@ -452,46 +502,58 @@ apply_isp_routing_logic() {
             export ISP_TAG="direct"
         fi
 
-    elif [[ "${IP_TYPE:-unknown}" != "isp" && -n "${FASTEST_PROXY_TAG:-}" ]]; then
-        log INFO "[选路] 非住宅 IP (${IP_TYPE})，使用最优代理: ${FASTEST_PROXY_TAG}"
-        export ISP_TAG="${FASTEST_PROXY_TAG}"
-
-    elif [[ -n "${FASTEST_PROXY_TAG:-}" ]] && \
-         (( $(echo "${proxy_max_speed:-0} > ${DIRECT_SPEED:-0}" | bc 2>/dev/null || echo 0) || \
-            $(echo "${DIRECT_SPEED:-0} < 60"                    | bc 2>/dev/null || echo 0) )); then
-        log INFO "[选路] 代理 (${proxy_max_speed} Mbps) 优于直连 (${DIRECT_SPEED:-0} Mbps)，使用: ${FASTEST_PROXY_TAG}"
+    elif [[ -n "${FASTEST_PROXY_TAG:-}" ]]; then
+        # 有可用 ISP 代理：始终使用，目的是解锁 geo 限制（不与直连竞速）
+        log INFO "[选路] 使用最优 ISP 代理: ${FASTEST_PROXY_TAG} (${proxy_max_speed:-0} Mbps)"
         export ISP_TAG="${FASTEST_PROXY_TAG}"
 
     else
-        log INFO "[选路] 直连优先"
+        # 无任何 ISP 节点：回退直连
+        log INFO "[选路] 无可用 ISP 节点，回退直连"
         export ISP_TAG="direct"
     fi
 
-    # 兜底：if-else 已保证 ISP_TAG 非空，此处仅作防御性检查
+    # 防御性兜底（正常情况不应触发）
     if [[ -z "${ISP_TAG:-}" && -n "${first_tag:-}" ]]; then
         export ISP_TAG="$first_tag"
         log WARN "[选路] ISP_TAG 意外为空，回退到第一节点: ${ISP_TAG}"
     fi
 
-    # 计算 IS_8K_SMOOTH：住宅 IP 或直连出口以直连速度为准，否则以代理速度为准
+    # IS_8K_SMOOTH：基于实际出口的均值速度，阈值 100 Mbps
+    # - 使用 ISP 代理 → 以代理均值为准 → show-config.sh 生成 "good" 标签
+    # - 回退直连     → 以直连均值为准 → show-config.sh 结合 IP_TYPE 决定 "super" 标签
     local ref_speed
-    if [[ "${IP_TYPE:-unknown}" == "isp" || "${ISP_TAG:-}" == "direct" ]]; then
-        ref_speed="${DIRECT_SPEED:-0}"
-    else
+    if [[ "${ISP_TAG:-}" != "direct" ]]; then
         ref_speed="${proxy_max_speed:-0}"
+    else
+        ref_speed="${DIRECT_SPEED:-0}"
     fi
-    if (( $(echo "$ref_speed > 60" | bc 2>/dev/null || echo 0) )); then
+    if (( $(echo "$ref_speed > 100" | bc 2>/dev/null || echo 0) )); then
         export IS_8K_SMOOTH="true"
     else
         export IS_8K_SMOOTH="false"
     fi
 
-    # 持久化
-    {   _sed_i '/^export IS_8K_SMOOTH=/d; /^export ISP_TAG=/d' "${ENV_FILE}" 2>/dev/null || true
-        echo "export IS_8K_SMOOTH='${IS_8K_SMOOTH:-false}'" >> "${ENV_FILE}"
-        echo "export ISP_TAG='${ISP_TAG:-}'"                >> "${ENV_FILE}"
+    # 持久化到 STATUS_FILE（与流媒体检测结果同文件，删除可触发重新测速）
+    {   _sed_i '/^export IS_8K_SMOOTH=/d; /^export ISP_TAG=/d' "${STATUS_FILE}" 2>/dev/null || true
+        echo "export IS_8K_SMOOTH='${IS_8K_SMOOTH:-false}'" >> "${STATUS_FILE}"
+        echo "export ISP_TAG='${ISP_TAG:-}'"                >> "${STATUS_FILE}"
     }
-    log INFO "[选路] 最终出口: ${ISP_TAG:-direct}  8K流畅: ${IS_8K_SMOOTH:-false}"
+
+    # IS_8K_SMOOTH → 节点标签映射说明
+    local _label_hint
+    if [[ "${IS_8K_SMOOTH}" == "true" ]]; then
+        if [[ "${ISP_TAG:-}" != "direct" ]]; then
+            _label_hint="→ show-config.sh 将生成 ✈ good 标签 (OpenClash +10分)"
+        else
+            _label_hint="→ IP_TYPE=isp 时 show-config.sh 将生成 ✈ super 标签 (OpenClash +30分)"
+        fi
+    else
+        _label_hint="→ 无质量标签（速度 ${ref_speed} Mbps 未达 100 Mbps 阈值）"
+    fi
+    log INFO "[选路] IS_8K_SMOOTH: 出口=${ISP_TAG} | 参考速度=${ref_speed} Mbps | 阈值=100 Mbps → ${IS_8K_SMOOTH}  ${_label_hint}"
+    log INFO "[选路] ✓ 最终决策: ISP_TAG=${ISP_TAG:-direct} | IS_8K_SMOOTH=${IS_8K_SMOOTH:-false}"
+    log INFO "[选路] ════════════════════════════════════════════"
 }
 
 # ==============================================================================
@@ -801,6 +863,8 @@ decryptSecretsEnv() {
 _init_dirs() {
     mkdir -p "$(dirname "${ENV_FILE}")" "$(dirname "${STATUS_FILE}")"
     touch "${ENV_FILE}" "${STATUS_FILE}"
+    # 迁移清理: ISP_TAG/IS_8K_SMOOTH 曾错误写入 ENV_FILE（Bug #023），确保只存于 STATUS_FILE
+    _sed_i '/^export ISP_TAG=/d; /^export IS_8K_SMOOTH=/d' "${ENV_FILE}" 2>/dev/null || true
     mkdir -p "${LOGDIR:=/var/log}"/{supervisor,xray,sing-box,dufs,nginx,x-ui,s-ui}
     mkdir -p "${SUI_DB_FOLDER:-/opt/s-ui}" "${SUB_STORE_DATA_BASE_PATH:-/opt/substore}"
 }
@@ -850,18 +914,34 @@ run_speed_tests_if_needed() {
         return
     fi
 
+    # ISP_TAG 需要重新评估：清除所有依赖 ISP_TAG 的服务路由缓存
+    # 防止旧缓存值与新选路结果不一致（Bug #025）
+    log INFO "[阶段 2] 清除服务路由缓存（与 ISP_TAG 同步刷新）..."
+    _sed_i '/^export ISP_OUT=/d; /^export CHATGPT_OUT=/d; /^export NETFLIX_OUT=/d; /^export DISNEY_OUT=/d; /^export YOUTUBE_OUT=/d; /^export GEMINI_OUT=/d; /^export CLAUDE_OUT=/d; /^export SOCIAL_MEDIA_OUT=/d; /^export TIKTOK_OUT=/d' "${STATUS_FILE}" 2>/dev/null || true
+    unset ISP_OUT CHATGPT_OUT NETFLIX_OUT DISNEY_OUT YOUTUBE_OUT GEMINI_OUT CLAUDE_OUT SOCIAL_MEDIA_OUT TIKTOK_OUT
+
     unset ISP_TAG TOP_ISP_TAG proxy_max_speed FASTEST_PROXY_TAG IS_8K_SMOOTH DIRECT_SPEED
     export proxy_max_speed=0
     local first_tag=""   # 第一个检测到的 ISP 节点，用于受限地区兜底
 
-    # 直连基准测速
+    log INFO "[阶段 2] 环境: IP_TYPE=${IP_TYPE:-未知} | 地区=${GEOIP_INFO%%|*} | DEFAULT_ISP=${DEFAULT_ISP:-未设置}"
+
+    # 直连基准测速（不用于选路决策，仅用于：
+    #   1. show_report 展示基准参考
+    #   2. 无 ISP 代理时 IS_8K_SMOOTH 的判定依据（super 标签场景）
     export DIRECT_SPEED
     DIRECT_SPEED=$(speed_test "$_SPEED_TEST_URL" "Direct")
-    log INFO "[测速] 直连: ${DIRECT_SPEED} Mbps"
     show_report "${DIRECT_SPEED}" "Direct"
+    log INFO "[阶段 2] 直连基准: ${DIRECT_SPEED} Mbps（不参与选路；无代理时用于 IS_8K_SMOOTH 判定）"
 
-    # 遍历所有 *_ISP_IP 环境变量，依次测速
-    local env_vars; env_vars=$(env | grep "_ISP_IP=" | cut -d= -f1)
+    # 遍历所有 *_ISP_IP 环境变量，依次测速（多采样均值 + 容差带，见 §9）
+    local env_vars; env_vars=$(env | grep "_ISP_IP=" | cut -d= -f1) || true
+    local _node_count=0; [[ -n "$env_vars" ]] && _node_count=$(echo "$env_vars" | wc -l | tr -d ' ')
+    if [[ "$_node_count" -eq 0 ]]; then
+        log WARN "[阶段 2] 未发现 ISP 节点（无 *_ISP_IP 环境变量），将回退直连"
+    else
+        log INFO "[阶段 2] 发现 ISP 节点: ${_node_count} 个，开始逐节点测速（采样=${SPEED_SAMPLES}次，容差=${SPEED_TOLERANCE}%）..."
+    fi
     for var in $env_vars; do
         local prefix="${var%_IP}" ip="${!var}"
         local port_var="${prefix}_PORT" user_var="${prefix}_USER" pass_var="${prefix}_SECRET"
@@ -926,7 +1006,7 @@ build_client_and_server_configs() {
     export SB_SOCKS5_OUTBOUND_CONFIG="" CUSTOM_OUTBOUNDS="" SB_CUSTOM_OUTBOUNDS="" \
            CLASH_ISP_PROXIES="" SURGE_ISP_PROXIES="" clash_proxies="" surge_proxies=""
 
-    local env_vars; env_vars=$(env | grep "_ISP_IP=" | cut -d= -f1)
+    local env_vars; env_vars=$(env | grep "_ISP_IP=" | cut -d= -f1) || true
 
     # 构建所有 ISP 节点的 Clash / Surge dialer 条目
     for var in $env_vars; do
@@ -993,7 +1073,7 @@ main_init() {
     source "${SECRET_FILE}"
 
     log INFO "[步骤 3]  加载持久化状态"
-    # 同时加载 ENV_FILE（UUID/端口/ISP_TAG 等）和 STATUS_FILE（流媒体检测结果）
+    # 同时加载 ENV_FILE（UUID/端口等永久配置）和 STATUS_FILE（ISP_TAG/流媒体检测结果）
     source "${ENV_FILE}"
     source "${STATUS_FILE}"
 

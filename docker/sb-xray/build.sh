@@ -165,13 +165,15 @@ check_version() {
     if [ -z "$version" ] || [ "$version" == "null" ]; then
         if [ -n "$default_version" ]; then
             if [ "$USE_DEFAULT_VERSIONS" == "true" ]; then
-                # 默认模式:直接显示使用的版本,不显示"获取失败"
                 printf "%-25s ${GREEN}%s${NC}\n" "${name}:" "${default_version}"
             else
-                # 正常模式:显示获取失败警告
                 printf "%-25s ${YELLOW}获取失败! 使用默认版本: %s${NC}\n" "${name}:" "${default_version}"
             fi
             BUILD_ARGS="${BUILD_ARGS} --build-arg ${arg_name}=${default_version}"
+            # 版本获取失败时同样记录版本号用于镜像 Tag
+            if [ "$name" == "Xray" ]; then
+                XRAY_VERSION_FINAL=$default_version
+            fi
         else
             printf "%-25s ${RED}获取失败! 停止构建${NC}\n" "${name}:"
             exit 1
@@ -181,8 +183,6 @@ check_version() {
         clean_version=${version#v}
         printf "%-25s ${GREEN}%s${NC}\n" "${name}:" "${clean_version}"
         BUILD_ARGS="${BUILD_ARGS} --build-arg ${arg_name}=${clean_version}"
-
-        # 特殊处理: Xray 版本用于镜像 Tag
         if [ "$name" == "Xray" ]; then
             XRAY_VERSION_FINAL=$clean_version
         fi
@@ -223,24 +223,17 @@ if [ "$USE_DEFAULT_VERSIONS" != "true" ]; then
     fi
 fi
 
-# 确定镜像 Tag (如果 Xray 获取失败，则回退到 'manual')
-if [ -z "$XRAY_VERSION_FINAL" ]; then
-    if [ "$USE_DEFAULT_VERSIONS" != "true" ]; then
-        echo -e "${YELLOW}警告: 无法获取 Xray 版本用于 Tag。将使用 'manual' 作为 Tag。${NC}"
-    fi
-    TAG_VERSION="manual"
-else
-    TAG_VERSION=$XRAY_VERSION_FINAL
-fi
+TAG_VERSION=$XRAY_VERSION_FINAL
 
 echo -e "${BLUE}开始构建 Docker 镜像...${NC}"
-echo -e "Tags: currycan/sb-xray:${TAG_VERSION}, currycan/sb-xray:latest"
+echo -e "Tags: currycan/sb-xray:${TAG_VERSION}  currycan/sb-xray:latest"
 
-# 构建命令
 # shellcheck disable=SC2086
 docker buildx build \
   --platform linux/amd64,linux/arm64 \
   $BUILD_ARGS \
-  --tag currycan/sb-xray:${TAG_VERSION} \
+  --tag currycan/sb-xray:"${TAG_VERSION}" \
   --tag currycan/sb-xray:latest \
   --push .
+
+echo -e "${GREEN}✓ 构建完成: currycan/sb-xray:${TAG_VERSION} + :latest${NC}"

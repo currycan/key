@@ -85,6 +85,94 @@ environment:
 
 ---
 
+### 1.4 节点质量标签自动生成链路
+
+这是项目花大量代码进行网络探测的核心原因：**服务端的测速结果，最终通过节点名称中的质量标签，驱动客户端 OpenClash 的智能调度评分**。
+
+```mermaid
+flowchart LR
+    subgraph 服务端启动阶段
+        P["ISP_TAG 未缓存\n触发重新测速"] --> CL["联动清除 *_OUT 缓存\nISP_OUT / CHATGPT_OUT\nNETFLIX_OUT 等共 9 项"]
+        CL --> A["ISP SOCKS5 节点逐一测速\n（3次采样取均值；< 1 KB/s 视为失败）"]
+        A --> T["容差带筛优\n超出当前最优×1.15\n才替换"]
+        T --> B["选出最优 ISP 代理\nISP_TAG"]
+        T --> C{"最优代理速度\n> 100 Mbps?"}
+        C -- "是" --> D["IS_8K_SMOOTH = true"]
+        C -- "否" --> E["IS_8K_SMOOTH = false"]
+        F["VPS 直连测速\n（住宅VPS直出场景）"] --> G{"IP_TYPE=isp\n且 > 100 Mbps?"}
+    end
+
+    subgraph show-config.sh 订阅生成
+        D --> H{"ISP_TAG\n已激活?"}
+        H -- "是 → good" --> I["NODE_SUFFIX += ✈ good\n+10分标签"]
+        G -- "是 → super" --> J["NODE_SUFFIX += ✈ super\n+30分标签"]
+        H -- "否（直出住宅）" --> G
+    end
+
+    subgraph OpenClash 节点评分
+        I --> K["节点名:\n🇺🇸 Reality ✈ host ✈ good ✈ isp"]
+        J --> L["节点名:\n🇺🇸 Reality ✈ host ✈ super ✈ isp"]
+        K --> M["Policy-Priority 命中 good:+10\n流媒体/家宽策略组优先选中"]
+        L --> N["Policy-Priority 命中 super:+30\n最高优先级，无视延迟差距"]
+    end
+
+    style I fill:#fdcb6e,stroke:#e17055,color:black
+    style J fill:#00b894,stroke:#00b894,color:white
+    style M fill:#74b9ff,color:white
+    style N fill:#a29bfe,color:white
+```
+
+#### 启动日志结构示例
+
+容器启动时，`docker logs sb-xray` 会打印完整决策链路，可直接对照排查：
+
+```
+[阶段 2] 测速与选路...
+[阶段 2] 清除服务路由缓存（与 ISP_TAG 同步刷新）...
+[阶段 2] 环境: IP_TYPE=hosting | 地区=US | DEFAULT_ISP=未设置（自动选路）
+[阶段 2] 直连基准: 28.50 Mbps（不参与选路；无代理时用于 IS_8K_SMOOTH 判定）
+[阶段 2] 发现 ISP 节点: 2 个，开始逐节点测速（采样=3次，容差=15%）...
+[测速] KR_ISP | 第 1/3 轮: 9830 KB/s → 75.00 Mbps
+[测速] KR_ISP | 第 2/3 轮: 10240 KB/s → 78.12 Mbps
+[测速] KR_ISP | 第 3/3 轮: 9600 KB/s → 73.24 Mbps
+[测速] KR_ISP: 3/3 有效样本，均值 75.45 Mbps
+[测速] 容差判断: 75.45 Mbps > 阈值 0.00 Mbps (前最优 0 × 1.15) → 更新最优: proxy-kr-isp
+[测速] JP_ISP | 第 1/3 轮: ...
+[测速] JP_ISP: 3/3 有效样本，均值 70.00 Mbps
+[测速] 容差判断: 70.00 Mbps ≤ 阈值 86.77 Mbps (前最优 75.45 × 1.15) → 保持最优: proxy-kr-isp
+[选路] ════════════════════════════════════════════
+[选路] 决策输入:
+[选路]   IP_TYPE       = hosting (机房/托管 IP)
+[选路]   地区          = US
+[选路]   DEFAULT_ISP   = 未设置（自动选路）
+[选路]   直连速度      = 28.50 Mbps（不参与选路）
+[选路]   最优 ISP 代理 = proxy-kr-isp (75.45 Mbps)
+[选路] 原则: ISP代理用于Geo解锁(ChatGPT/Netflix等)，有代理始终优先；直连为无代理兜底
+[选路] 使用最优 ISP 代理: proxy-kr-isp (75.45 Mbps)
+[选路] IS_8K_SMOOTH: 出口=proxy-kr-isp | 参考速度=75.45 Mbps | 阈值=100 Mbps → false  → 无质量标签
+[选路] ✓ 最终决策: ISP_TAG=proxy-kr-isp | IS_8K_SMOOTH=false
+[选路] ════════════════════════════════════════════
+```
+
+#### 两种质量标签的含义
+
+| 标签 | 触发条件 | 含义 | OpenClash 加分 |
+|:---|:---|:---|:---:|
+| `✈ good` | ISP 代理激活 + 代理速度 > 100 Mbps | 通过 SOCKS5 代理实现 8K 流畅，适合所有需要解锁的业务 | **+10** |
+| `✈ super` | VPS 本身 IP 为住宅类型（`IP_TYPE=isp`）+ 直连速度 > 100 Mbps | VPS 直出即为原生家宽，无需代理即可 8K，稀缺最高质量 | **+30** |
+
+> **关键设计理念**：ISP SOCKS5 代理的目的是**绕过节点的 geo 限制**（解锁 ChatGPT/Netflix 等），而非与直连竞速。选路逻辑在所有可用 ISP 代理中优选最快者，直连仅作为无代理时的兜底，或用于判断 VPS 本身是否具备 `super` 能力。
+
+#### 8K 判定阈值
+
+| 速度 | 能力 | 标签生成 |
+|:---|:---|:---|
+| ≥ 100 Mbps | 8K HDR/60fps 流畅 | IS_8K_SMOOTH=true → 生成质量标签 |
+| 25–100 Mbps | 4K 流畅，8K 可能卡顿 | IS_8K_SMOOTH=false → 无质量标签 |
+| < 25 Mbps | 1080P 勉强 | IS_8K_SMOOTH=false → 无质量标签 |
+
+---
+
 ## 2. OpenClash Policy-Priority 智能调度
 
 本章深入解析在 OpenClash（Mihomo 内核）的 Smart 模式下，如何通过精密的 `filter`（筛选）和 `policy-priority`（排序）配合 `tolerance`（容忍度）机制，实现真正的**多场景智能路由**。
@@ -125,7 +213,7 @@ graph LR
 | 维度类别 | 提取示例 | 在系统中的用途 |
 |:---|:---|:---|
 | **地区标识** | `🇭🇰HK`, `🇺🇸US`, `🇯🇵JP` | 定点分流，如 AI 节点强行加权美国区 |
-| **特性标签** | `super`, `good`, `高速` | 业务定速，识别具有极佳体验的专线 |
+| **特性标签** | `super`, `good`, `高速` | 业务定速，识别具有极佳体验的专线（`good`/`super` 由服务端测速自动写入，见 §1.4） |
 | **协议类型** | `Reality`, `Hysteria2`, `VMess` | 降延迟与抗封锁，新一代协议天然高分 |
 | **质量后缀** | `super`, `good` | 区分节点池的头等舱和经济舱 |
 
@@ -287,7 +375,7 @@ proxy-groups:
 
 ## 3. Sub-Store 节点深层清洗与重命名
 
-对于将外部机场节点引入本系统的用户，环境节点命名往往杂乱无章。SB-Xray 利用内嵌的 Sub-Store 与强大的 `rename.js` 脚本进行全自动清洗。
+对于将外部代理服务提供商节点引入本系统的用户，环境节点命名往往杂乱无章。SB-Xray 利用内嵌的 Sub-Store 与强大的 `rename.js` 脚本进行全自动清洗。
 
 ### 3.1 清洗流转架构
 

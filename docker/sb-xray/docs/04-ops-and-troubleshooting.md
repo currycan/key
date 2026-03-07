@@ -56,7 +56,7 @@ environment:
 
 | 优先级 | 来源 | 加载时机 | 典型内容 |
 |:---|:---|:---|:---|
-| **1（最高）** | `/.env/status` | `main_init` 步骤 3，最后 source | 流媒体/AI 检测结果（`*_OUT` 变量） |
+| **1（最高）** | `/.env/status` | `main_init` 步骤 3，最后 source | 流媒体/AI 检测结果（`*_OUT` 变量）；当 ISP_TAG 需要重新评估时，所有 `*_OUT` 行会被联动清除后重新写入 |
 | **2** | `/.env/sb-xray` | `main_init` 步骤 3 | UUID、端口、密钥、`ISP_TAG` 等 |
 | **3** | `/.env/secret` | `main_init` 步骤 2 | 面板凭据、ISP 节点凭据 |
 | **4** | `docker-compose environment` | 容器启动时注入 | 用户显式配置 |
@@ -165,12 +165,10 @@ environment:
 | `GEOIP_INFO` | API 检测 | GeoIP 归属字符串 |
 | `IS_BRUTAL` | 内核探测 | BBR/Brutal 支持状态 |
 | `IP_TYPE` | API 检测 | `isp` / `hosting` 等 |
-| `ISP_TAG` | 测速选路 | 胜出的 ISP 代理 tag |
-| `IS_8K_SMOOTH` | 速度计算 | `true`/`false`，8K 流畅度标志 |
 
 ### 2.5 自动检测变量（`/.env/status`，可清除重新检测）
 
-删除 `/.env/status` 并重启容器即可强制重新探测所有流媒体/AI 可达性：
+删除 `/.env/status` 并重启容器即可强制重新探测所有网络状态（含测速选路）：
 
 ```bash
 docker exec sb-xray rm -f /.env/status
@@ -179,6 +177,8 @@ docker compose restart
 
 | 变量 | 含义 |
 |:---|:---|
+| `ISP_TAG` | 胜出的 ISP 代理 tag（测速选路结果）；`direct` 表示无代理回退直连 |
+| `IS_8K_SMOOTH` | `true`/`false`，实际出口速度是否 ≥ 100 Mbps；驱动 show-config.sh 生成 `✈ good`（代理出口）或 `✈ super`（住宅直出）节点标签 |
 | `CHATGPT_OUT` | ChatGPT 出口策略 tag |
 | `NETFLIX_OUT` | Netflix 出口策略 tag |
 | `DISNEY_OUT` | Disney+ 出口策略 tag |
@@ -438,6 +438,7 @@ nc -zuv ${SERVER_IP} ${PORT_HYSTERIA2}
 
 | 日志位置 | 用途 |
 |:---|:---|
+| `docker logs sb-xray` | **entrypoint 启动日志**（测速、选路、证书、配置渲染全流程） |
 | `/var/log/xray/access.log` | Xray 访问日志 |
 | `/var/log/xray/error.log` | Xray 错误日志 |
 | `/var/log/sing-box/sing-box.log` | Sing-box 日志 |
@@ -469,3 +470,101 @@ docker exec sb-xray /scripts/show-config.sh
 # 进入容器终端
 docker exec -it sb-xray bash
 ```
+
+### 6.5 解读测速选路启动日志
+
+entrypoint 启动时会在 `docker logs sb-xray` 中打印完整的测速与选路决策链路，方便运维人员判断选路是否符合预期。
+
+#### 阶段 2 日志结构
+
+```
+[阶段 2] 测速与选路...
+[阶段 2] 环境: IP_TYPE=<类型> | 地区=<国家> | DEFAULT_ISP=<值>    ← 决策上下文
+[阶段 2] 直连基准: XX.XX Mbps（不参与选路；无代理时用于 IS_8K_SMOOTH 判定）
+[阶段 2] 发现 ISP 节点: N 个，开始逐节点测速（采样=3次，容差=15%）...
+
+[测速] <节点> | 第 1/3 轮: XXXX KB/s → XX.XX Mbps    ← 每轮单次结果
+[测速] <节点> | 第 2/3 轮: ...
+[测速] <节点> | 第 3/3 轮: ...
+[测速] <节点>: 3/3 有效样本，均值 XX.XX Mbps          ← 有效样本均值（单次 < 1 KB/s 不计入）
+  或
+[测速] <节点>: 全部 3 次采样失败，返回 0               ← 全部采样低于 1 KB/s 阈值
+
+[测速] 容差判断: XX Mbps > 阈值 YY Mbps (前最优 ZZ × 1.15) → 更新最优: <tag>
+  或
+[测速] 容差判断: XX Mbps ≤ 阈值 YY Mbps (前最优 ZZ × 1.15) → 保持最优: <tag>
+
+[选路] ════════════════════════════════════════════
+[选路] 决策输入:
+[选路]   IP_TYPE       = <值> (<描述>)
+[选路]   地区          = <国家>
+[选路]   DEFAULT_ISP   = <值>
+[选路]   直连速度      = XX.XX Mbps（不参与选路）
+[选路]   最优 ISP 代理 = <tag> (XX.XX Mbps)
+[选路] <路由判断结果>
+[选路] IS_8K_SMOOTH: 出口=<tag> | 参考速度=XX.XX Mbps | 阈值=100 Mbps → <true/false>  → <标签提示>
+[选路] ✓ 最终决策: ISP_TAG=<tag> | IS_8K_SMOOTH=<true/false>
+[选路] ════════════════════════════════════════════
+```
+
+#### 常见选路场景对照
+
+| 日志关键字 | 含义 |
+|:---|:---|
+| `DEFAULT_ISP=未设置（自动选路）` | docker-compose 已置空，测速自动决策 |
+| `DEFAULT_ISP=LA_ISP（锁定模式）` | 强制使用 LA 出口，测速跳过 |
+| `未发现 ISP 节点` | `/.env/secret` 中无 `*_ISP_IP` 变量，检查密钥库 |
+| `ISP_TAG 已缓存` | `/.env/status` 存有旧结果，删除后重启可重新测速 |
+| `清除服务路由缓存（与 ISP_TAG 同步刷新）` | ISP_TAG 未命中缓存，触发重新测速；同时联动清除所有 `*_OUT` 旧缓存，确保流媒体/AI 路由基于新 ISP_TAG 重新评估 |
+| `受限地区 (中国\|香港)，强制使用代理` | GeoIP 检测到受限地区，无论速度必须走代理 |
+| `→ 更新最优: proxy-xx` | 该节点速度超过前一最优的 115%，成为新最优 |
+| `→ 保持最优: proxy-xx` | 该节点速度未显著优于当前最优（容差 15%），保持不变 |
+| `IS_8K_SMOOTH → true → ✈ good 标签` | 代理均值 > 100 Mbps，节点将附加 good 标签 |
+| `IS_8K_SMOOTH → false → 无质量标签` | 速度不足 100 Mbps，节点无 good/super 标签 |
+
+#### ❌ 故障五：ISP 测速结果不符预期 / 选路错误
+
+**现象**：选路走了不期望的出口，或 IS_8K_SMOOTH 结果与实际网速不符
+
+**排查步骤**：
+
+```bash
+# 查看完整启动日志，重点看 [阶段 2] 和 [选路] 段
+docker logs sb-xray 2>&1 | grep -E "\[阶段 2\]|\[测速\]|\[选路\]"
+
+# 强制重新测速：清空运行时状态后重启
+docker exec sb-xray rm /.env/status
+docker compose restart
+```
+
+**常见原因**：
+
+| 原因 | 日志特征 | 解决方案 |
+|:---|:---|:---|
+| `DEFAULT_ISP` 非空导致跳过测速 | `ISP_TAG 已缓存` 或 `手动覆盖 DEFAULT_ISP=xxx` | docker-compose 中显式设置 `DEFAULT_ISP=` |
+| 缓存未清除 | `ISP_TAG 已缓存 (proxy-xxx)，跳过测速` | `rm /.env/status` 后重启 |
+| 无 ISP 节点注入 | `未发现 ISP 节点` | 检查 `/.env/secret` 中的 `*_ISP_IP` 变量 |
+| 节点速度均低于 100 Mbps | `IS_8K_SMOOTH → false` | 正常现象，速度不足则无 good 标签 |
+| 全部采样显示 0 Mbps | `全部 N 次采样失败，返回 0` | curl 下载速度低于 1 KB/s 阈值（连接失败）；检查节点连通性：`curl -x socks5h://IP:PORT https://speed.cloudflare.com/__down?bytes=1000 -o /dev/null -w '%{speed_download}'` |
+
+#### ❌ 故障六：ISP_TAG 已更新但流媒体/AI 路由仍走旧出口
+
+**现象**：删除 `/.env/status` 重启后，`[选路]` 段显示已选出新的最优 ISP（如 `proxy-jp-isp`），但实际 ChatGPT、Netflix 等流量仍走上次的旧代理（如 `proxy-us-isp`）
+
+**根本原因**：早期版本中，`*_OUT` 服务路由缓存（`CHATGPT_OUT`、`NETFLIX_OUT` 等）写入 `/.env/status` 后不会随 ISP_TAG 重置而联动清除。下次启动时 `analyze_ai_routing_env()` 检测到这些变量非空，直接复用旧值，导致路由不一致。
+
+此问题已在 Bug #025 中修复：`run_speed_tests_if_needed()` 现在在 ISP_TAG 未命中缓存时，会立即清除所有 `*_OUT` 行及对应 shell 变量，确保后续流媒体/AI 路由基于新 ISP_TAG 重新评估。启动日志中会出现：
+
+```
+[阶段 2] 清除服务路由缓存（与 ISP_TAG 同步刷新）...
+```
+
+**排查步骤**（仅针对未升级到修复版本的环境）：
+
+```bash
+# 同时清除 ISP_TAG 与所有 *_OUT 缓存
+docker exec sb-xray sed -i '/^export ISP_TAG=/d; /^export ISP_OUT=/d; /^export CHATGPT_OUT=/d; /^export NETFLIX_OUT=/d; /^export DISNEY_OUT=/d; /^export YOUTUBE_OUT=/d; /^export GEMINI_OUT=/d; /^export CLAUDE_OUT=/d; /^export SOCIAL_MEDIA_OUT=/d; /^export TIKTOK_OUT=/d' /.env/status
+docker compose restart
+```
+
+> **注意**：升级到修复版本后，仅删除 `/.env/status` 并重启即可触发完整的缓存联动清除，无需手动执行上述命令。

@@ -185,13 +185,21 @@ first_tag=""
 apply_isp_routing_logic
 assert_eq "T4-4: 住宅 IP 直连" "direct" "${ISP_TAG:-}"
 
-# T4-5: 代理快于直连 → 使用代理
+# T4-5: 有 ISP 代理时始终使用（不与直连竞速，即使直连更慢也用代理）
 _reset_routing
 export GEOIP_INFO="SG|1.2.3.4" IP_TYPE="isp" FASTEST_PROXY_TAG="proxy-fast" \
        proxy_max_speed=100 DIRECT_SPEED=30
 first_tag=""
 apply_isp_routing_logic
-assert_eq "T4-5: 代理更快时使用代理" "proxy-fast" "${ISP_TAG:-}"
+assert_eq "T4-5: 有 ISP 代理时始终使用代理（不与直连竞速）" "proxy-fast" "${ISP_TAG:-}"
+
+# T4-7: 住宅 IP + 有 ISP 代理 → 依然使用代理（解锁用途，非速度竞争）
+_reset_routing
+export GEOIP_INFO="SG|1.2.3.4" IP_TYPE="isp" FASTEST_PROXY_TAG="proxy-kr" \
+       proxy_max_speed=80 DIRECT_SPEED=200
+first_tag=""
+apply_isp_routing_logic
+assert_eq "T4-7: 住宅 IP 有代理也用代理，不因直连更快而走直连" "proxy-kr" "${ISP_TAG:-}"
 
 # T4-6: 原 L754 死代码修复验证
 #        原条件: `ISP_TAG != "direct" && -z ISP_TAG && first_tag` — 但 if-else 已保证 ISP_TAG 非空
@@ -209,27 +217,27 @@ assert_eq "T4-6: 无代理无 first_tag → direct" "direct" "${ISP_TAG:-}"
 echo ""
 echo "▶ [T5] IS_8K_SMOOTH"
 
-# T5-1: 住宅 IP + 直连 >60 → true
+# T5-1: 住宅 IP + 直连 >100 → true
 _reset_routing
-export IP_TYPE="isp" DIRECT_SPEED=80 proxy_max_speed=0
+export IP_TYPE="isp" DIRECT_SPEED=120 proxy_max_speed=0
 first_tag=""
 apply_isp_routing_logic
-assert_eq "T5-1: 住宅 IP 直连 >60 → smooth=true" "true" "${IS_8K_SMOOTH:-}"
+assert_eq "T5-1: 住宅 IP 直连 >100 → smooth=true" "true" "${IS_8K_SMOOTH:-}"
 
-# T5-2: 机房 IP + 代理 >60 → true
+# T5-2: 机房 IP + 代理 >100 → true
 _reset_routing
 export GEOIP_INFO="SG|1.2.3.4" IP_TYPE="hosting" FASTEST_PROXY_TAG="proxy-x" \
-       proxy_max_speed=100 DIRECT_SPEED=20
+       proxy_max_speed=150 DIRECT_SPEED=20
 first_tag=""
 apply_isp_routing_logic
-assert_eq "T5-2: 机房 IP 代理 >60 → smooth=true" "true" "${IS_8K_SMOOTH:-}"
+assert_eq "T5-2: 机房 IP 代理 >100 → smooth=true" "true" "${IS_8K_SMOOTH:-}"
 
-# T5-3: 直连 <60 且无代理 → false
+# T5-3: 直连 <100 且无代理 → false
 _reset_routing
 export IP_TYPE="isp" DIRECT_SPEED=30 proxy_max_speed=0
 first_tag=""
 apply_isp_routing_logic
-assert_eq "T5-3: 直连 <60 → smooth=false" "false" "${IS_8K_SMOOTH:-}"
+assert_eq "T5-3: 直连 <100 → smooth=false" "false" "${IS_8K_SMOOTH:-}"
 
 # ==============================================================================
 # T6  speed_test — 无全局 CurlARG 污染
@@ -290,6 +298,107 @@ _is_restricted_region && assert_eq "T8-2: 美国 → 未受限" "未受限" "受
 
 export GEOIP_INFO="香港|1.2.3.4"
 _is_restricted_region && assert_eq "T8-3: 香港 → 受限" "0" "0" || assert_eq "T8-3: 香港 → 受限" "受限" "未受限"
+
+# ==============================================================================
+# T9  speed_test — 多采样平均 & 部分失败容错
+# ==============================================================================
+echo ""
+echo "▶ [T9] speed_test 多采样平均"
+
+# T9-1: 3 次采样均成功 → 返回均值
+# 3145728 bytes/sec × 8 / 1024 / 1024 = 24.00 Mbps
+curl() { echo "3145728"; }
+result9a=$(speed_test "https://example.com/__down" "T9-AllValid")
+assert_eq "T9-1: 全部采样成功 → 均值 24.00 Mbps" "24.00" "$result9a"
+
+# T9-2: 3 次采样中 2 次失败（返回 0），1 次成功 → 取成功样本均值
+_t9_curl_n=0
+curl() {
+    (( _t9_curl_n++ )) || true
+    [[ "$_t9_curl_n" -eq 1 ]] && echo "3145728" || echo "0"
+}
+result9b=$(speed_test "https://example.com/__down" "T9-TwoFail")
+assert_eq "T9-2: 1次成功 2次失败 → 仍返回 24.00 Mbps（非 0）" "24.00" "$result9b"
+
+# T9-3: 全部采样失败 → 返回 "0.00"
+curl() { echo "0"; }
+result9c=$(speed_test "https://example.com/__down" "T9-AllFail")
+assert_eq "T9-3: 全部失败 → 0.00" "0.00" "$result9c"
+
+# T9-4: 极小正数（如 100 bytes/sec）→ 应视为失败
+# curl 返回 100 bytes/sec → kbps≈0, mbps≈0.00，但 raw > 0 为真
+# 修复前: 被计为"有效样本"，日志显示 "3/3 有效样本，均值 0.00 Mbps"（矛盾）
+# 修复后: 低于阈值的样本不计入有效 → 日志显示"全部采样失败"
+curl() { echo "100"; }
+_t9d_log=$(speed_test "https://example.com/__down" "T9-TinySpeed" 2>&1 >/dev/null)
+echo "$_t9d_log" | grep -q "采样失败" && _t9d_hit="yes" || _t9d_hit="no"
+assert_eq "T9-4: 极小速度（100 B/s）→ 日志应显示采样失败" "yes" "$_t9d_hit"
+
+curl() { :; }   # 恢复默认
+
+# ==============================================================================
+# T10  _test_isp_node — 容差阈值（tolerance band）
+# ==============================================================================
+echo ""
+echo "▶ [T10] _test_isp_node 容差阈值"
+
+proxy_max_speed=0
+unset FASTEST_PROXY_TAG
+
+# T10-1: 首个代理（阈值 = 0 × 1.15 = 0）→ 任何速度均成为最优
+speed_test() { echo "50.00"; }
+_test_isp_node "T10-Node1" "1.2.3.4" 1080 "user" "pass" "proxy-node1"
+assert_eq "T10-1: 首个代理成为最优" "proxy-node1" "${FASTEST_PROXY_TAG:-}"
+assert_eq "T10-1: proxy_max_speed 更新为 50.00" "50.00" "${proxy_max_speed:-}"
+
+# T10-2: 第二个代理速度在容差内（50 × 1.15 = 57.5，55 < 57.5）→ 不替换
+speed_test() { echo "55.00"; }
+_test_isp_node "T10-Node2" "1.2.3.4" 1081 "user" "pass" "proxy-node2"
+assert_eq "T10-2: 容差内（55 < 57.5）→ 不替换最优" "proxy-node1" "${FASTEST_PROXY_TAG:-}"
+assert_eq "T10-2: proxy_max_speed 不变" "50.00" "${proxy_max_speed:-}"
+
+# T10-3: 第三个代理明显更快（70 > 57.5）→ 替换最优
+speed_test() { echo "70.00"; }
+_test_isp_node "T10-Node3" "1.2.3.4" 1082 "user" "pass" "proxy-node3"
+assert_eq "T10-3: 超过容差阈值（70 > 57.5）→ 替换最优" "proxy-node3" "${FASTEST_PROXY_TAG:-}"
+assert_eq "T10-3: proxy_max_speed 更新为 70.00" "70.00" "${proxy_max_speed:-}"
+
+# ==============================================================================
+# T11  run_speed_tests_if_needed — ISP_TAG 重新评估时清除服务路由旧缓存
+# ==============================================================================
+echo ""
+echo "▶ [T11] ISP_TAG 重新评估时服务路由缓存联动清除"
+
+# 构造旧缓存场景：ISP_TAG 未缓存（空），但 *_OUT 有上次遗留的旧代理值
+unset ISP_TAG
+export CHATGPT_OUT="proxy-stale" ISP_OUT="proxy-stale" NETFLIX_OUT="proxy-stale"
+> "$ENV_FILE"
+# STATUS_FILE 也写入旧值，验证 _sed_i 能正确清除文件内容
+cat > "$STATUS_FILE" <<'EOF'
+export CHATGPT_OUT='proxy-stale'
+export ISP_OUT='proxy-stale'
+export NETFLIX_OUT='proxy-stale'
+EOF
+
+# mock: 速度测试直接返回定值；选路设置新 ISP_TAG
+speed_test()             { echo "50.00"; }
+show_report()            { :; }
+apply_isp_routing_logic() {
+    export ISP_TAG="proxy-new-isp"
+    export IS_8K_SMOOTH="false"
+    echo "export ISP_TAG='proxy-new-isp'"    >> "$STATUS_FILE"
+    echo "export IS_8K_SMOOTH='false'"       >> "$STATUS_FILE"
+}
+
+run_speed_tests_if_needed
+
+assert_eq "T11-1: 旧 CHATGPT_OUT 缓存已清除" "" "${CHATGPT_OUT:-}"
+assert_eq "T11-2: 旧 ISP_OUT 缓存已清除"     "" "${ISP_OUT:-}"
+assert_eq "T11-3: 旧 NETFLIX_OUT 缓存已清除" "" "${NETFLIX_OUT:-}"
+assert_eq "T11-4: 新 ISP_TAG 正确设置"       "proxy-new-isp" "${ISP_TAG:-}"
+# 验证 STATUS_FILE 中旧 *_OUT 行已被 _sed_i 删除
+assert_eq "T11-5: STATUS_FILE 无残留 CHATGPT_OUT" "" "$(grep '^export CHATGPT_OUT=' "$STATUS_FILE" || true)"
+assert_eq "T11-6: STATUS_FILE 无残留 ISP_OUT"     "" "$(grep '^export ISP_OUT=' "$STATUS_FILE" || true)"
 
 # ==============================================================================
 # 汇总

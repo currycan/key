@@ -1,11 +1,17 @@
 ---
-name: Shell 脚本开发规范
+name: 脚本开发规范
 description: entrypoint.sh 与 rename.js 脚本架构、编码规范、已知 Bug 速查和调试指南
 ---
 
 # Shell 脚本开发规范
 
 > ⚠️ **重要提醒**：修改 Shell 脚本前，请先阅读 `.agents/skills/_shared/BUGS.md` 中 `entrypoint.sh` 分区的所有条目，避免重复踩坑。
+
+修改 entrypoint.sh 中任何核心函数（测速、选路、变量缓存等）**之前**，必须：
+
+1. 先写测试，确认测试能暴露待修问题（红灯）
+2. 完成代码修改后运行测试，全部通过才算完成（绿灯）
+3. 禁止跳过测试直接提交代码
 
 ## 脚本文件概览
 
@@ -114,6 +120,47 @@ ensure_var "KEY" --no-persist "command"
 | `/.env/sb-xray` | 核心参数 (UUID/端口/密钥等)，长期不变 | 需手动删除 |
 | `/.env/status` | 运行时状态 (ISP_TAG/流媒体检测结果)，可能随网络变化 | 删除可触发重新检测 |
 | `/.env/secret` | 远端解密的敏感配置 | 拉取后长期缓存 |
+
+---
+
+## ISP 测速与节点质量标签架构
+
+> ⚠️ **修改测速或选路逻辑前必读**：该模块不仅决定出口路由，还驱动客户端 OpenClash 的智能评分，影响范围远超 entrypoint.sh 本身。
+
+### 核心设计原则
+
+1. **ISP SOCKS5 代理的目的是解锁 geo 限制**（ChatGPT、Netflix 等），**不是与直连竞速**。只要有 ISP 代理配置，必然使用代理出口；直连仅为无代理时的兜底。
+
+2. **直连测速的唯一目的**：判断 VPS 本身是否具备 `super` 标签能力（IP_TYPE=isp 且速度 > 100 Mbps）。不参与"要不要用代理"的决策。
+
+3. **IS_8K_SMOOTH 是跨系统的关键变量**，其值由 entrypoint 测速决定，由 show-config.sh 消费，最终影响 OpenClash 节点评分。
+
+### 完整价值链
+
+```
+run_speed_tests_if_needed()
+  ├── 测速所有 ISP SOCKS5 节点 → 选最快 → ISP_TAG
+  └── 最快代理速度 → IS_8K_SMOOTH (> 100 Mbps = true)
+
+show-config.sh
+  ├── ISP_TAG != direct + IS_8K_SMOOTH=true → NODE_SUFFIX += " ✈ good"   (+10分)
+  └── IP_TYPE=isp + IS_8K_SMOOTH=true       → NODE_SUFFIX += " ✈ super"  (+30分)
+
+订阅节点名: "🇺🇸 Reality ✈ host ✈ good ✈ isp"
+  └── OpenClash Policy-Priority: good命中+10 → 流媒体/家宽策略组优先选中
+```
+
+### IS_8K_SMOOTH 阈值
+
+| 速度 | IS_8K_SMOOTH | 产生标签 |
+|:---|:---:|:---|
+| ≥ 100 Mbps | true | good 或 super |
+| < 100 Mbps | false | 无 |
+
+### 变量持久化位置
+
+- `ISP_TAG` / `IS_8K_SMOOTH` → `/.env/status`（可删除重新测速，见 Bug #023）
+- 删除 `/.env/status` 重启 → 重新测速 → 重新生成质量标签 → 订阅更新
 
 ---
 

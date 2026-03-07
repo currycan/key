@@ -57,36 +57,36 @@ export GITHUB_TOKEN=ghp_xxxxxxxxxxxxxxxxxxxx
 
 ### 2.1 基本用法
 
-```bash
-# 自动获取最新版本并构建（推荐）
-./build.sh
+一条命令完成构建并同时推送 `:版本号` 和 `:latest` 两个 tag，两者始终指向同一 Image ID。
 
-# 使用默认版本构建（跳过 API 调用，适合离线环境）
-./build.sh default
+```bash
+./build.sh              # 自动获取最新版本（推荐）
+./build.sh default      # 使用默认版本（适合离线/限速环境）
 ```
 
 ### 2.2 工作流程
 
 ```mermaid
 flowchart TD
-    Start(("./build.sh")) --> Mode{"传入参数?"}
-    Mode -- "无参数" --> Fetch["调用 GitHub API 获取 11 个组件最新版本"]
+    Start(("./build.sh\n[参数]")) --> Mode{"传入参数?"}
+
+    Mode -- "无参数" --> Fetch["调用 GitHub API\n获取 11 个组件最新版本"]
     Mode -- "default" --> Default["使用硬编码的默认版本号"]
 
     Fetch --> Check["逐一检查版本获取结果"]
     Default --> Check
 
     Check --> Version{"版本获取成功?"}
-    Version -- "成功" --> Clean["去除 v 前缀"]
-    Version -- "失败" --> Fallback["使用默认版本"]
-    Clean --> Args["构建 --build-arg 参数"]
-    Fallback --> Args
+    Version -- "成功" --> Clean["去除 v 前缀\n记录 XRAY_VERSION_FINAL"]
+    Version -- "失败" --> Fallback["使用默认版本\n同样记录 XRAY_VERSION_FINAL"]
 
-    Args --> Tag["确定镜像 Tag: Xray 版本号"]
-    Tag --> Build["docker buildx build 多架构推送"]
+    Clean --> Build["docker buildx build\n--tag :VERSION\n--tag :latest\n--push"]
+    Fallback --> Build
+
+    Build --> Done(["✅ 构建完成\n:VERSION + :latest\nImage ID 一致"])
 
     style Start fill:#0984e3,stroke:#fff,color:white
-    style Build fill:#00b894,stroke:#fff,color:white
+    style Done fill:#00b894,stroke:#fff,color:white
 ```
 
 ### 2.3 版本获取策略
@@ -242,11 +242,19 @@ docker buildx build \
 
 ### 5.2 多架构构建并推送
 
+推荐直接使用 `build.sh`（自动获取版本 + 同时推送两个 tag）：
+
+```bash
+./build.sh
+```
+
+如需手动指定版本构建：
+
 ```bash
 docker buildx build \
   --platform linux/amd64,linux/arm64 \
   --build-arg XRAY_VERSION=26.2.6 \
-  --build-arg SING_BOX_VERSION=1.12.22 \
+  --build-arg SING_BOX_VERSION=1.13.1 \
   --tag currycan/sb-xray:26.2.6 \
   --tag currycan/sb-xray:latest \
   --push .
@@ -318,7 +326,13 @@ docker run --rm currycan/sb-xray:latest bash -c "
 "
 ```
 
-### Q6: 构建后镜像体积过大？
+### Q6: 版本 tag 和 `:latest` 的 Image ID 不一致？
+
+**原因**: 在 `build.sh` 之外又单独执行了一次 `docker buildx build`，导致其中一个 tag 被新构建覆盖。
+
+**解决**: 只用 `./build.sh` 构建，它在同一次 `docker buildx build` 中同时传入 `--tag :VERSION --tag :latest`，两个 tag 天然指向同一 Image ID。
+
+### Q7: 构建后镜像体积过大？
 
 **预期体积**: 约 300-400 MB (compressed)
 
@@ -405,14 +419,15 @@ flowchart TD
 
 ```mermaid
 graph LR
-    Build["build.sh<br/>构建 Docker 镜像"] -- "镜像 Tag: 26.2.6" --> Registry["Docker Hub"]
-    Release["release.sh<br/>发布 Git Release"] -- "Git Tag: v26.2.6" --> GitHub["GitHub Releases"]
     API(("GitHub API<br/>Xray 版本")) --> Build
     API --> Release
 
-    style Build fill:#74b9ff,color:white
+    Build["build.sh"] -- ":VERSION + :latest\n同一 Image ID" --> Registry["Docker Hub"]
+    Release["release.sh<br/>发布 Git Release"] -- "Git Tag: v26.2.6" --> GitHub["GitHub Releases"]
+
+    style Build fill:#00b894,color:white
     style Release fill:#a29bfe,color:white
     style API fill:#ffeaa7
 ```
 
-两个脚本共享同一版本源（Xray-core 最新 Tag），确保 Docker 镜像版本与 Git Release 版本始终一致。推荐在成功执行 `build.sh` 后运行 `release.sh`。
+推荐执行顺序：`./build.sh` → `./release.sh`。两个脚本共享同一版本源，确保 Docker 镜像版本与 Git Release 版本始终一致。
