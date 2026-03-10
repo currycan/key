@@ -450,21 +450,25 @@ _test_isp_node() {
 
     # 首个有效节点直接成为当前最优；后续节点须超出容差阈值才替换
     local _prev_max="${proxy_max_speed:-0}"
+    local _multiplier
+    _multiplier=$(awk -v t="${SPEED_TOLERANCE}" 'BEGIN{printf "%.4f", 1 + t/100}')
     local threshold
     threshold=$(awk -v m="${proxy_max_speed:-0}" -v t="${SPEED_TOLERANCE}" \
                 'BEGIN { printf "%.2f", m * (1 + t / 100) }')
     if (( $(echo "$speed > $threshold" | bc 2>/dev/null || echo 0) )); then
         export proxy_max_speed="$speed"
         export FASTEST_PROXY_TAG="$tag"
-        log INFO "[测速] 容差判断: ${speed} Mbps > 阈值 ${threshold} Mbps (前最优 ${_prev_max} × 1.${SPEED_TOLERANCE}) → 更新最优: ${FASTEST_PROXY_TAG}"
+        log INFO "[测速] 容差判断: ${speed} Mbps > 阈值 ${threshold} Mbps (前最优 ${_prev_max} × ${_multiplier}) → 更新最优: ${FASTEST_PROXY_TAG}"
     else
-        log INFO "[测速] 容差判断: ${speed} Mbps ≤ 阈值 ${threshold} Mbps (前最优 ${_prev_max} × 1.${SPEED_TOLERANCE}) → 保持最优: ${FASTEST_PROXY_TAG:-未定}"
+        log INFO "[测速] 容差判断: ${speed} Mbps ≤ 阈值 ${threshold} Mbps (前最优 ${_prev_max} × ${_multiplier}) → 保持最优: ${FASTEST_PROXY_TAG:-未定}"
     fi
 }
 
 # 根据测速结果和环境信息决定最终 ISP_TAG，并计算 IS_8K_SMOOTH
+# 参数:
+#   $1 - first_tag: 第一个检测到的 ISP 节点 tag，用于受限地区兜底（可为空）
 # 依赖外部变量（由 run_speed_tests_if_needed 注入）:
-#   first_tag, DIRECT_SPEED, proxy_max_speed, FASTEST_PROXY_TAG
+#   DIRECT_SPEED, proxy_max_speed, FASTEST_PROXY_TAG
 #
 # 选路原则：ISP 代理目的是解锁 geo 限制（ChatGPT/Netflix 等），不与直连竞速。
 #   有 ISP 代理 → 始终使用最快代理；直连仅为无代理时的兜底。
@@ -494,9 +498,9 @@ apply_isp_routing_logic() {
 
     elif _is_restricted_region; then
         # 受限地区（中国大陆/香港等）：必须走代理，无代理则回退直连
-        if [[ -n "${first_tag:-}" ]]; then
-            log WARN "[选路] 受限地区 (${GEOIP_INFO%%|*})，强制使用代理: ${first_tag}"
-            export ISP_TAG="${first_tag}"
+        if [[ -n "${1:-}" ]]; then
+            log WARN "[选路] 受限地区 (${GEOIP_INFO%%|*})，强制使用代理: ${1}"
+            export ISP_TAG="${1}"
         else
             log ERROR "[选路] 受限地区但无可用 ISP 节点！回退直连"
             export ISP_TAG="direct"
@@ -514,8 +518,8 @@ apply_isp_routing_logic() {
     fi
 
     # 防御性兜底（正常情况不应触发）
-    if [[ -z "${ISP_TAG:-}" && -n "${first_tag:-}" ]]; then
-        export ISP_TAG="$first_tag"
+    if [[ -z "${ISP_TAG:-}" && -n "${1:-}" ]]; then
+        export ISP_TAG="${1}"
         log WARN "[选路] ISP_TAG 意外为空，回退到第一节点: ${ISP_TAG}"
     fi
 
@@ -953,7 +957,7 @@ run_speed_tests_if_needed() {
         _test_isp_node "$prefix" "$ip" "$port" "$user" "$pass" "$tag"
     done
 
-    apply_isp_routing_logic
+    apply_isp_routing_logic "$first_tag"
     log INFO "[阶段 2] 完成"
 }
 

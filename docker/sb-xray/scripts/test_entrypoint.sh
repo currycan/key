@@ -159,15 +159,13 @@ _reset_routing() {
 # T4-1: DEFAULT_ISP 手动覆盖
 _reset_routing
 export DEFAULT_ISP="MYISP_ISP" DIRECT_SPEED=30 proxy_max_speed=0
-first_tag="proxy-fallback"
-apply_isp_routing_logic
+apply_isp_routing_logic "proxy-fallback"
 assert_eq "T4-1: DEFAULT_ISP 强制覆盖" "proxy-myisp" "${ISP_TAG:-}"
 
 # T4-2: 受限地区 + first_tag 存在 → 使用 first_tag
 _reset_routing
 export GEOIP_INFO="中国|1.2.3.4" IP_TYPE="hosting" DIRECT_SPEED=50 proxy_max_speed=0
-first_tag="proxy-first"
-apply_isp_routing_logic
+apply_isp_routing_logic "proxy-first"
 assert_eq "T4-2: 受限地区使用 first_tag" "proxy-first" "${ISP_TAG:-}"
 
 # T4-3: 非住宅 IP + 有最优代理 → 使用最优代理
@@ -371,13 +369,21 @@ echo "▶ [T11] ISP_TAG 重新评估时服务路由缓存联动清除"
 
 # 构造旧缓存场景：ISP_TAG 未缓存（空），但 *_OUT 有上次遗留的旧代理值
 unset ISP_TAG
-export CHATGPT_OUT="proxy-stale" ISP_OUT="proxy-stale" NETFLIX_OUT="proxy-stale"
+export CHATGPT_OUT="proxy-stale" ISP_OUT="proxy-stale" NETFLIX_OUT="proxy-stale" \
+       DISNEY_OUT="proxy-stale" YOUTUBE_OUT="proxy-stale" GEMINI_OUT="proxy-stale" \
+       CLAUDE_OUT="proxy-stale" SOCIAL_MEDIA_OUT="proxy-stale" TIKTOK_OUT="proxy-stale"
 > "$ENV_FILE"
 # STATUS_FILE 也写入旧值，验证 _sed_i 能正确清除文件内容
 cat > "$STATUS_FILE" <<'EOF'
 export CHATGPT_OUT='proxy-stale'
 export ISP_OUT='proxy-stale'
 export NETFLIX_OUT='proxy-stale'
+export DISNEY_OUT='proxy-stale'
+export YOUTUBE_OUT='proxy-stale'
+export GEMINI_OUT='proxy-stale'
+export CLAUDE_OUT='proxy-stale'
+export SOCIAL_MEDIA_OUT='proxy-stale'
+export TIKTOK_OUT='proxy-stale'
 EOF
 
 # mock: 速度测试直接返回定值；选路设置新 ISP_TAG
@@ -395,10 +401,23 @@ run_speed_tests_if_needed
 assert_eq "T11-1: 旧 CHATGPT_OUT 缓存已清除" "" "${CHATGPT_OUT:-}"
 assert_eq "T11-2: 旧 ISP_OUT 缓存已清除"     "" "${ISP_OUT:-}"
 assert_eq "T11-3: 旧 NETFLIX_OUT 缓存已清除" "" "${NETFLIX_OUT:-}"
+assert_eq "T11-3b: 旧 DISNEY_OUT 缓存已清除"       "" "${DISNEY_OUT:-}"
+assert_eq "T11-3c: 旧 YOUTUBE_OUT 缓存已清除"      "" "${YOUTUBE_OUT:-}"
+assert_eq "T11-3d: 旧 GEMINI_OUT 缓存已清除"       "" "${GEMINI_OUT:-}"
+assert_eq "T11-3e: 旧 CLAUDE_OUT 缓存已清除"       "" "${CLAUDE_OUT:-}"
+assert_eq "T11-3f: 旧 SOCIAL_MEDIA_OUT 缓存已清除" "" "${SOCIAL_MEDIA_OUT:-}"
+assert_eq "T11-3g: 旧 TIKTOK_OUT 缓存已清除"       "" "${TIKTOK_OUT:-}"
 assert_eq "T11-4: 新 ISP_TAG 正确设置"       "proxy-new-isp" "${ISP_TAG:-}"
 # 验证 STATUS_FILE 中旧 *_OUT 行已被 _sed_i 删除
 assert_eq "T11-5: STATUS_FILE 无残留 CHATGPT_OUT" "" "$(grep '^export CHATGPT_OUT=' "$STATUS_FILE" || true)"
 assert_eq "T11-6: STATUS_FILE 无残留 ISP_OUT"     "" "$(grep '^export ISP_OUT=' "$STATUS_FILE" || true)"
+assert_eq "T11-5-netflix: STATUS_FILE 无残留 NETFLIX_OUT" "" "$(grep '^export NETFLIX_OUT=' "$STATUS_FILE" || true)"
+assert_eq "T11-5b: STATUS_FILE 无残留 DISNEY_OUT"       "" "$(grep '^export DISNEY_OUT=' "$STATUS_FILE" || true)"
+assert_eq "T11-5c: STATUS_FILE 无残留 YOUTUBE_OUT"      "" "$(grep '^export YOUTUBE_OUT=' "$STATUS_FILE" || true)"
+assert_eq "T11-5d: STATUS_FILE 无残留 GEMINI_OUT"       "" "$(grep '^export GEMINI_OUT=' "$STATUS_FILE" || true)"
+assert_eq "T11-5e: STATUS_FILE 无残留 CLAUDE_OUT"       "" "$(grep '^export CLAUDE_OUT=' "$STATUS_FILE" || true)"
+assert_eq "T11-5f: STATUS_FILE 无残留 SOCIAL_MEDIA_OUT" "" "$(grep '^export SOCIAL_MEDIA_OUT=' "$STATUS_FILE" || true)"
+assert_eq "T11-5g: STATUS_FILE 无残留 TIKTOK_OUT"       "" "$(grep '^export TIKTOK_OUT=' "$STATUS_FILE" || true)"
 
 # ==============================================================================
 # 汇总
