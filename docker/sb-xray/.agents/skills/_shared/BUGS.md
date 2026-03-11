@@ -426,6 +426,21 @@ description: 跨 Skill 的 Bug 修复记录，所有 Agent 工作时必须优先
 
 ---
 
+### Bug #027 — 受限地区强制 ISP_TAG=first_tag，IS_8K_SMOOTH 参考速度错用 proxy_max_speed
+
+| 字段 | 内容 |
+|:---|:---|
+| **涉及文件** | `scripts/entrypoint.sh` |
+| **函数** | `apply_isp_routing_logic` |
+| **触发条件** | 服务器 GeoIP 处于受限地区（香港/中国大陆/俄罗斯/澳门），且存在多个 ISP 节点，其中测速最快的不是遍历顺序第一个 |
+| **错误现象** | `ISP_TAG=proxy-us-isp`（第一个节点，62 Mbps），但 `IS_8K_SMOOTH=true`（参考速度 121 Mbps，属于 LA_ISP）；show-config.sh 错误生成 `✈ good` 标签 |
+| **根本原因** | 受限地区分支 `ISP_TAG="${1}"` 使用 `first_tag`（首个遍历节点），而 `ref_speed=proxy_max_speed` 存储的是 `FASTEST_PROXY_TAG` 的速度；两者节点不一致时 IS_8K_SMOOTH 基准错误 |
+| **修复方案** | 重构为条件化决策链：`elif _is_restricted_region \|\| IP_TYPE != "isp"` 表示需要代理，非空 `FASTEST_PROXY_TAG` 则使用，空则回退直连（ERROR）；住宅 IP + 非受限地区走 `else` 直连兜底；`_is_restricted_region` 降级为日志修饰，不再控制分支走向；移除 `first_tag` 变量及传参 |
+| **预防措施** | 受限地区选路和正常选路应使用同一套"最快节点"逻辑；`ref_speed` 来源必须与实际 `ISP_TAG` 对应的节点绑定，不能共享全局最大值变量；IP 类型（住宅/机房）应作为选路条件之一，与地区受限同级评估 |
+| **记录时间** | 2026-03-11 |
+
+---
+
 ## 新增 Bug 记录模板
 
 > 修复 Bug 后，复制以下模板追加到对应分区末尾：
