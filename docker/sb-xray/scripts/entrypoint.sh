@@ -338,9 +338,10 @@ get_isp_preferred_strategy() {
 # §9  测速
 # ==============================================================================
 
-# 下载测速，返回速度均值（Mbps，保留两位小数）
+# 下载测速，返回截断均值（Mbps，保留两位小数）
 # 用法: speed_test <url> <name> [socks5h://ip:port] [user:pass]
-# 采样: 执行 SPEED_SAMPLES 次，取非零样本均值；全部失败则返回 0
+# 采样: 执行 SPEED_SAMPLES 次；有效样本≥3时去最大最小取中间均值（截断均值）；
+#       全部失败返回 0；日志输出标准差与稳定性标注（[稳定]/[轻微波动]/[波动较大]）
 speed_test() {
     local url=$1 name=$2 proxy=${3:-} proxy_auth=${4:-}
     local args=(-s --connect-timeout 5 -L -o /dev/null -m 5 -w '%{speed_download}')
@@ -348,7 +349,7 @@ speed_test() {
     [[ -n "$proxy_auth" ]] && args+=(--proxy-user "$proxy_auth")
     log INFO "[测速] 开始: ${name}${proxy:+ | 代理: ${proxy}} | 测速源: ${url} | 采样: ${SPEED_SAMPLES}次"
 
-    local total=0 count=0 i
+    local samples=() i
     for (( i=1; i<=SPEED_SAMPLES; i++ )); do
         local raw; raw=$(curl "${args[@]}" "$url" 2>/dev/null || echo "0")
         local kbps mbps
@@ -357,19 +358,65 @@ speed_test() {
         log INFO "[测速] ${name} | 第 ${i}/${SPEED_SAMPLES} 轮: ${kbps} KB/s → ${mbps} Mbps"
         # 有效样本阈值: > 1024 bytes/sec (1 KB/s)；低于此值视为连接失败
         if (( $(echo "$raw > 1024" | bc 2>/dev/null || echo 0) )); then
-            total=$(awk -v t="$total" -v s="$raw" 'BEGIN { printf "%.0f", t + s }')
-            (( count++ )) || true
+            samples+=("$raw")
         fi
     done
 
-    local result
+    local count=${#samples[@]}
+    local result="0.00"
+
     if [[ "$count" -eq 0 ]]; then
-        result="0.00"
         log WARN "[测速] ${name}: 全部 ${SPEED_SAMPLES} 次采样失败，返回 0"
-    else
-        result=$(awk -v t="$total" -v c="$count" 'BEGIN { printf "%.2f", t * 8 / c / 1024 / 1024 }')
-        log INFO "[测速] ${name}: ${count}/${SPEED_SAMPLES} 有效样本，均值 ${result} Mbps"
+        echo "$result"
+        return
     fi
+
+    # 截断均值 + 标准差：全部在一个 awk 脚本中完成
+    # 输入：每行一个原始 bytes/sec 值
+    # 输出：3 个空格分隔的值 → 截断均值(Mbps)  标准差(Mbps)  稳定性标注
+    local stats
+    stats=$(printf '%s\n' "${samples[@]}" | awk -v n="$count" '
+    { vals[NR] = $1 }
+    END {
+        # 冒泡排序（样本量≤5，够用）
+        for (i = 1; i <= n; i++)
+            for (j = i+1; j <= n; j++)
+                if (vals[j] < vals[i]) { t=vals[i]; vals[i]=vals[j]; vals[j]=t }
+
+        # 截断范围：≥3 个样本时去掉最小(1)和最大(n)
+        s = (n >= 3) ? 2 : 1
+        e = (n >= 3) ? n-1 : n
+
+        # 截断均值（bytes/s → Mbps）
+        tsum = 0; tn = 0
+        for (i = s; i <= e; i++) { tsum += vals[i]; tn++ }
+        tmean = tsum * 8 / tn / 1024 / 1024
+
+        # 全样本均值（用于标准差基准）
+        fsum = 0
+        for (i = 1; i <= n; i++) fsum += vals[i] * 8 / 1024 / 1024
+        fmean = fsum / n
+
+        # 总体标准差
+        sum2 = 0
+        for (i = 1; i <= n; i++) sum2 += (vals[i] * 8 / 1024 / 1024 - fmean)^2
+        sd = sqrt(sum2 / n)
+
+        # 变异系数 → 稳定性标注
+        cv = (tmean > 0) ? sd / tmean : 0
+        if      (cv < 0.2) lbl = "[稳定]"
+        else if (cv < 0.5) lbl = "[轻微波动]"
+        else               lbl = "[波动较大]"
+
+        printf "%.2f %.2f %s\n", tmean, sd, lbl
+    }')
+
+    result=$(echo "$stats" | awk '{print $1}')
+    local stddev lbl
+    stddev=$(echo "$stats" | awk '{print $2}')
+    lbl=$(echo "$stats" | awk '{print $3}')
+
+    log INFO "[测速] ${name}: ${count}/${SPEED_SAMPLES} 有效样本，截断均值 ${result} Mbps，标准差 ${stddev} Mbps ${lbl}"
     echo "$result"
 }
 
