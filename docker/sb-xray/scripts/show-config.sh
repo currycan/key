@@ -102,8 +102,12 @@ generate_links() {
     local vmes_json="{\"v\":\"2\",\"ps\":\"${FLAG_PREFIX}Vmess ✈ ${region_name}${NODE_SUFFIX}\",\"add\":\"${CDNDOMAIN}\",\"port\":\"${LISTENING_PORT}\",\"id\":\"${XRAY_UUID}\",\"aid\":\"0\",\"scy\":\"auto\",\"net\":\"ws\",\"type\":\"none\",\"host\":\"${CDNDOMAIN}\",\"path\":\"/${XRAY_URL_PATH}-vmessws\",\"tls\":\"tls\",\"sni\":\"${CDNDOMAIN}\",\"alpn\":\"h2\",\"fp\":\"chrome\"}"
 
     # 基础链接 (Clash 支持部分)
-    local link_hysteria2="hysteria2://${SB_UUID}@${DOMAIN}:${PORT_HYSTERIA2}/?sni=${DOMAIN}&${h2_alpn}#${FLAG_PREFIX}Hysteria2 ✈ ${region_name}${NODE_SUFFIX}"
-    local link_tuic="tuic://${SB_UUID}:${SB_UUID}@${DOMAIN}:${PORT_TUIC}?${h2_alpn}&congestion_control=bbr#${FLAG_PREFIX}TUIC ✈ ${region_name}${NODE_SUFFIX}"
+    local hy2_mport_param=""
+    [[ -n "${HY2_HOP_RANGE:-}" ]] && hy2_mport_param="&mport=443,${HY2_HOP_RANGE%-*}-${HY2_HOP_RANGE#*-}"
+    local link_hysteria2="hysteria2://${SB_UUID}@${DOMAIN}:443/?sni=${DOMAIN}&${h2_alpn}${hy2_mport_param}#${FLAG_PREFIX}Hysteria2 ✈ ${region_name}${NODE_SUFFIX}"
+    local tuic_mport_param=""
+    [[ -n "${TUIC_HOP_RANGE:-}" ]] && tuic_mport_param="&mport=8443,${TUIC_HOP_RANGE%-*}-${TUIC_HOP_RANGE#*-}"
+    local link_tuic="tuic://${SB_UUID}:${SB_UUID}@${DOMAIN}:8443?${h2_alpn}&congestion_control=bbr${tuic_mport_param}#${FLAG_PREFIX}TUIC ✈ ${region_name}${NODE_SUFFIX}"
     local link_anytls="anytls://${SB_UUID}@${DOMAIN}:${PORT_ANYTLS}?security=tls&type=tcp#${FLAG_PREFIX}AnyTLS ✈ ${region_name}${NODE_SUFFIX}"
     local link_vmess="vmess://$(echo -n "$vmes_json" | base64 -w0)"
     local link_vless_vision="vless://${XRAY_UUID}@${DOMAIN}:${LISTENING_PORT}?encryption=none&flow=xtls-rprx-vision&security=reality&sni=${DEST_HOST}&fp=chrome&pbk=${XRAY_REALITY_PUBLIC_KEY}&sid=${XRAY_REALITY_SHORTID}&spx=%2F&type=tcp&headerType=none#${FLAG_PREFIX}Reality ✈ ${region_name}${NODE_SUFFIX}"
