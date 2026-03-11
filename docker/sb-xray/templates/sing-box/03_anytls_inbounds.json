@@ -3,8 +3,8 @@
         {
             "type": "anytls",
             "tag": "sing-box anytls",
-            "listen": "unix",
-            "listen_path": "/dev/shm/anytls.sock",
+            "listen": "127.0.0.1",
+            "listen_port": 18443,
             "proxy_protocol": true,
             "users": [
                 {
