@@ -449,26 +449,6 @@ flowchart TD
 | **拦截** | `block` | Blackhole | 丢弃被屏蔽的流量（广告、恶意 IP 等） |
 | **ISP 代理** | `proxy-*` | Socks | 转发给指定的落地 Socks5 代理，用于流媒体解锁 |
 
-### 6.3 配置方式
-
-通过在 `docker-compose.yml` 中填入 ISP 环境变量，容器即可在启动扇区二自检打流，判断落地是否有效，继而动态写入 Xray/Sing-box 的智能路由表。
-
-```yaml
-environment:
-  # ISP 1: 洛杉矶原生家宽（变量名必须以 _ISP_IP 结尾）
-  - LA_ISP_IP=1.2.3.4
-  - LA_ISP_PORT=2000
-  - LA_ISP_USER=alice
-  - LA_ISP_SECRET=pwd123
-  # ISP 2: 韩国原生家宽
-  - KR_ISP_IP=5.6.7.8
-  - KR_ISP_PORT=3000
-  - KR_ISP_USER=bob
-  - KR_ISP_SECRET=pwd456
-  # 默认全局兜底落地出口
-  - DEFAULT_ISP=LA
-```
-
 > **全程透明**：所有的解锁动作在服务器端默默完成，客户端无需任何繁琐的前置 (Dialer) 设置。
 
 ---
