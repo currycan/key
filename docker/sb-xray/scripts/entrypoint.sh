@@ -357,7 +357,7 @@ speed_test() {
         mbps=$(awk -v s="$raw" 'BEGIN { printf "%.2f", s * 8 / 1024 / 1024 }')
         log INFO "[测速] ${name} | 第 ${i}/${SPEED_SAMPLES} 轮: ${kbps} KB/s → ${mbps} Mbps"
         # 有效样本阈值: > 1024 bytes/sec (1 KB/s)；低于此值视为连接失败
-        if (( $(echo "$raw > 1024" | bc 2>/dev/null || echo 0) )); then
+        if awk -v r="$raw" 'BEGIN { exit (r + 0 > 1024 ? 0 : 1) }'; then
             samples+=("$raw")
         fi
     done
@@ -376,8 +376,9 @@ speed_test() {
     # 输出：3 个空格分隔的值 → 截断均值(Mbps)  标准差(Mbps)  稳定性标注
     local stats
     stats=$(printf '%s\n' "${samples[@]}" | awk -v n="$count" '
-    { vals[NR] = $1 }
+    $1 + 0 == $1 { vals[NR] = $1 }
     END {
+        n = NR
         # 冒泡排序（样本量≤5，够用）
         for (i = 1; i <= n; i++)
             for (j = i+1; j <= n; j++)
@@ -392,7 +393,7 @@ speed_test() {
         for (i = s; i <= e; i++) { tsum += vals[i]; tn++ }
         tmean = tsum * 8 / tn / 1024 / 1024
 
-        # 全样本均值（用于标准差基准）
+        # 全样本均值（用于标准差基准；用全样本而非截断样本，使标准差反映原始波动幅度）
         fsum = 0
         for (i = 1; i <= n; i++) fsum += vals[i] * 8 / 1024 / 1024
         fmean = fsum / n
@@ -402,6 +403,7 @@ speed_test() {
         for (i = 1; i <= n; i++) sum2 += (vals[i] * 8 / 1024 / 1024 - fmean)^2
         sd = sqrt(sum2 / n)
 
+        # CV 阈值参考统计学经验值：<0.2 低离散，0.2~0.5 中等，>0.5 高离散
         # 变异系数 → 稳定性标注
         cv = (tmean > 0) ? sd / tmean : 0
         if      (cv < 0.2) lbl = "[稳定]"
@@ -411,10 +413,8 @@ speed_test() {
         printf "%.2f %.2f %s\n", tmean, sd, lbl
     }')
 
-    result=$(echo "$stats" | awk '{print $1}')
     local stddev lbl
-    stddev=$(echo "$stats" | awk '{print $2}')
-    lbl=$(echo "$stats" | awk '{print $3}')
+    read -r result stddev lbl <<< "$stats"
 
     log INFO "[测速] ${name}: ${count}/${SPEED_SAMPLES} 有效样本，截断均值 ${result} Mbps，标准差 ${stddev} Mbps ${lbl}"
     echo "$result"
