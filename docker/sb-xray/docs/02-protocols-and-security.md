@@ -499,7 +499,7 @@ graph TD
 
 | 错误 | 原因 | 解决方案 |
 |:---|:---|:---|
-| `invalid decryption` | 客户端和服务端 MLKEM Seed 不匹配 | 确保 `encryption` 与 `decryption` 一致 |
+| `invalid decryption` | 客户端 CLIENT 密钥与服务端 SEED 不匹配 | 确保 `encryption`（CLIENT）与 `decryption`（SEED）值对应 |
 | `connection timeout` | 客户端 Xray 版本过低 | 升级到 Xray 1.8.8+ |
 | `time sync error` | 时间差超过 90 秒 | 同步系统时间 |
 
