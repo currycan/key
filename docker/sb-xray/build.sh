@@ -111,6 +111,7 @@ update_script_default() {
 
 # 检查是否使用默认版本模式
 USE_DEFAULT_VERSIONS=false
+XRAY_VERSION_FINAL=""
 if [ "$1" == "default" ]; then
     USE_DEFAULT_VERSIONS=true
     echo -e "${YELLOW}使用默认版本模式，跳过 API 调用...${NC}"

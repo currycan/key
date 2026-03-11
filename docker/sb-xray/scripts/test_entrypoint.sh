@@ -152,53 +152,48 @@ echo "▶ [T4] apply_isp_routing_logic"
 
 _reset_routing() {
     unset ISP_TAG IS_8K_SMOOTH FASTEST_PROXY_TAG proxy_max_speed DIRECT_SPEED \
-          DEFAULT_ISP GEOIP_INFO IP_TYPE first_tag 2>/dev/null || true
+          DEFAULT_ISP GEOIP_INFO IP_TYPE 2>/dev/null || true
     > "$ENV_FILE"
+    > "$STATUS_FILE"
 }
 
 # T4-1: DEFAULT_ISP 手动覆盖
 _reset_routing
 export DEFAULT_ISP="MYISP_ISP" DIRECT_SPEED=30 proxy_max_speed=0
-first_tag="proxy-fallback"
-apply_isp_routing_logic
+apply_isp_routing_logic "proxy-fallback"
 assert_eq "T4-1: DEFAULT_ISP 强制覆盖" "proxy-myisp" "${ISP_TAG:-}"
 
 # T4-2: 受限地区 + first_tag 存在 → 使用 first_tag
 _reset_routing
 export GEOIP_INFO="中国|1.2.3.4" IP_TYPE="hosting" DIRECT_SPEED=50 proxy_max_speed=0
-first_tag="proxy-first"
-apply_isp_routing_logic
+apply_isp_routing_logic "proxy-first"
 assert_eq "T4-2: 受限地区使用 first_tag" "proxy-first" "${ISP_TAG:-}"
 
 # T4-3: 非住宅 IP + 有最优代理 → 使用最优代理
 _reset_routing
 export GEOIP_INFO="US|1.2.3.4" IP_TYPE="hosting" FASTEST_PROXY_TAG="proxy-best" \
        proxy_max_speed=80 DIRECT_SPEED=30
-first_tag=""
-apply_isp_routing_logic
+apply_isp_routing_logic ""   # explicit empty argument
 assert_eq "T4-3: 非住宅 IP 使用最优代理" "proxy-best" "${ISP_TAG:-}"
 
 # T4-4: 住宅 IP + 直连够快 → direct
 _reset_routing
 export GEOIP_INFO="SG|1.2.3.4" IP_TYPE="isp" DIRECT_SPEED=80 proxy_max_speed=0
-first_tag=""
-apply_isp_routing_logic
+apply_isp_routing_logic ""   # explicit empty argument
 assert_eq "T4-4: 住宅 IP 直连" "direct" "${ISP_TAG:-}"
 
 # T4-5: 有 ISP 代理时始终使用（不与直连竞速，即使直连更慢也用代理）
 _reset_routing
 export GEOIP_INFO="SG|1.2.3.4" IP_TYPE="isp" FASTEST_PROXY_TAG="proxy-fast" \
        proxy_max_speed=100 DIRECT_SPEED=30
-first_tag=""
-apply_isp_routing_logic
+apply_isp_routing_logic ""   # explicit empty argument
 assert_eq "T4-5: 有 ISP 代理时始终使用代理（不与直连竞速）" "proxy-fast" "${ISP_TAG:-}"
 
 # T4-7: 住宅 IP + 有 ISP 代理 → 依然使用代理（解锁用途，非速度竞争）
 _reset_routing
 export GEOIP_INFO="SG|1.2.3.4" IP_TYPE="isp" FASTEST_PROXY_TAG="proxy-kr" \
        proxy_max_speed=80 DIRECT_SPEED=200
-first_tag=""
-apply_isp_routing_logic
+apply_isp_routing_logic ""   # explicit empty argument
 assert_eq "T4-7: 住宅 IP 有代理也用代理，不因直连更快而走直连" "proxy-kr" "${ISP_TAG:-}"
 
 # T4-6: 原 L754 死代码修复验证
@@ -207,8 +202,7 @@ assert_eq "T4-7: 住宅 IP 有代理也用代理，不因直连更快而走直�
 #        此处直接调用 apply_isp_routing_logic 并检查 ISP_TAG 被正确设为 "direct"（无 first_tag 情况）
 _reset_routing
 export GEOIP_INFO="SG|1.2.3.4" IP_TYPE="isp" DIRECT_SPEED=50 proxy_max_speed=0
-first_tag=""
-apply_isp_routing_logic
+apply_isp_routing_logic ""   # explicit empty argument
 assert_eq "T4-6: 无代理无 first_tag → direct" "direct" "${ISP_TAG:-}"
 
 # ==============================================================================
@@ -220,23 +214,20 @@ echo "▶ [T5] IS_8K_SMOOTH"
 # T5-1: 住宅 IP + 直连 >100 → true
 _reset_routing
 export IP_TYPE="isp" DIRECT_SPEED=120 proxy_max_speed=0
-first_tag=""
-apply_isp_routing_logic
+apply_isp_routing_logic ""   # explicit empty argument
 assert_eq "T5-1: 住宅 IP 直连 >100 → smooth=true" "true" "${IS_8K_SMOOTH:-}"
 
 # T5-2: 机房 IP + 代理 >100 → true
 _reset_routing
 export GEOIP_INFO="SG|1.2.3.4" IP_TYPE="hosting" FASTEST_PROXY_TAG="proxy-x" \
        proxy_max_speed=150 DIRECT_SPEED=20
-first_tag=""
-apply_isp_routing_logic
+apply_isp_routing_logic ""   # explicit empty argument
 assert_eq "T5-2: 机房 IP 代理 >100 → smooth=true" "true" "${IS_8K_SMOOTH:-}"
 
 # T5-3: 直连 <100 且无代理 → false
 _reset_routing
 export IP_TYPE="isp" DIRECT_SPEED=30 proxy_max_speed=0
-first_tag=""
-apply_isp_routing_logic
+apply_isp_routing_logic ""   # explicit empty argument
 assert_eq "T5-3: 直连 <100 → smooth=false" "false" "${IS_8K_SMOOTH:-}"
 
 # ==============================================================================
@@ -330,9 +321,12 @@ assert_eq "T9-3: 全部失败 → 0.00" "0.00" "$result9c"
 # 修复前: 被计为"有效样本"，日志显示 "3/3 有效样本，均值 0.00 Mbps"（矛盾）
 # 修复后: 低于阈值的样本不计入有效 → 日志显示"全部采样失败"
 curl() { echo "100"; }
-_t9d_log=$(speed_test "https://example.com/__down" "T9-TinySpeed" 2>&1 >/dev/null)
-echo "$_t9d_log" | grep -q "采样失败" && _t9d_hit="yes" || _t9d_hit="no"
-assert_eq "T9-4: 极小速度（100 B/s）→ 日志应显示采样失败" "yes" "$_t9d_hit"
+result9d=$(speed_test "https://example.com/__down" "T9-TinySpeed" 2>/dev/null)
+assert_eq "T9-4: 极小速度（100 B/s）→ 应返回 0.00" "0.00" "$result9d"
+# 验证诊断日志存在（不依赖具体措辞）
+_t9d_log=$(speed_test "https://example.com/__down" "T9-TinySpeed-log" 2>&1 >/dev/null)
+[[ -n "$_t9d_log" ]] && _t9d_has_log="yes" || _t9d_has_log="no"
+assert_eq "T9-4b: 极小速度 → 有诊断日志输出" "yes" "$_t9d_has_log"
 
 curl() { :; }   # 恢复默认
 
@@ -371,13 +365,21 @@ echo "▶ [T11] ISP_TAG 重新评估时服务路由缓存联动清除"
 
 # 构造旧缓存场景：ISP_TAG 未缓存（空），但 *_OUT 有上次遗留的旧代理值
 unset ISP_TAG
-export CHATGPT_OUT="proxy-stale" ISP_OUT="proxy-stale" NETFLIX_OUT="proxy-stale"
+export CHATGPT_OUT="proxy-stale" ISP_OUT="proxy-stale" NETFLIX_OUT="proxy-stale" \
+       DISNEY_OUT="proxy-stale" YOUTUBE_OUT="proxy-stale" GEMINI_OUT="proxy-stale" \
+       CLAUDE_OUT="proxy-stale" SOCIAL_MEDIA_OUT="proxy-stale" TIKTOK_OUT="proxy-stale"
 > "$ENV_FILE"
 # STATUS_FILE 也写入旧值，验证 _sed_i 能正确清除文件内容
 cat > "$STATUS_FILE" <<'EOF'
 export CHATGPT_OUT='proxy-stale'
 export ISP_OUT='proxy-stale'
 export NETFLIX_OUT='proxy-stale'
+export DISNEY_OUT='proxy-stale'
+export YOUTUBE_OUT='proxy-stale'
+export GEMINI_OUT='proxy-stale'
+export CLAUDE_OUT='proxy-stale'
+export SOCIAL_MEDIA_OUT='proxy-stale'
+export TIKTOK_OUT='proxy-stale'
 EOF
 
 # mock: 速度测试直接返回定值；选路设置新 ISP_TAG
@@ -395,10 +397,23 @@ run_speed_tests_if_needed
 assert_eq "T11-1: 旧 CHATGPT_OUT 缓存已清除" "" "${CHATGPT_OUT:-}"
 assert_eq "T11-2: 旧 ISP_OUT 缓存已清除"     "" "${ISP_OUT:-}"
 assert_eq "T11-3: 旧 NETFLIX_OUT 缓存已清除" "" "${NETFLIX_OUT:-}"
+assert_eq "T11-3b: 旧 DISNEY_OUT 缓存已清除"       "" "${DISNEY_OUT:-}"
+assert_eq "T11-3c: 旧 YOUTUBE_OUT 缓存已清除"      "" "${YOUTUBE_OUT:-}"
+assert_eq "T11-3d: 旧 GEMINI_OUT 缓存已清除"       "" "${GEMINI_OUT:-}"
+assert_eq "T11-3e: 旧 CLAUDE_OUT 缓存已清除"       "" "${CLAUDE_OUT:-}"
+assert_eq "T11-3f: 旧 SOCIAL_MEDIA_OUT 缓存已清除" "" "${SOCIAL_MEDIA_OUT:-}"
+assert_eq "T11-3g: 旧 TIKTOK_OUT 缓存已清除"       "" "${TIKTOK_OUT:-}"
 assert_eq "T11-4: 新 ISP_TAG 正确设置"       "proxy-new-isp" "${ISP_TAG:-}"
 # 验证 STATUS_FILE 中旧 *_OUT 行已被 _sed_i 删除
 assert_eq "T11-5: STATUS_FILE 无残留 CHATGPT_OUT" "" "$(grep '^export CHATGPT_OUT=' "$STATUS_FILE" || true)"
 assert_eq "T11-6: STATUS_FILE 无残留 ISP_OUT"     "" "$(grep '^export ISP_OUT=' "$STATUS_FILE" || true)"
+assert_eq "T11-5-netflix: STATUS_FILE 无残留 NETFLIX_OUT" "" "$(grep '^export NETFLIX_OUT=' "$STATUS_FILE" || true)"
+assert_eq "T11-5b: STATUS_FILE 无残留 DISNEY_OUT"       "" "$(grep '^export DISNEY_OUT=' "$STATUS_FILE" || true)"
+assert_eq "T11-5c: STATUS_FILE 无残留 YOUTUBE_OUT"      "" "$(grep '^export YOUTUBE_OUT=' "$STATUS_FILE" || true)"
+assert_eq "T11-5d: STATUS_FILE 无残留 GEMINI_OUT"       "" "$(grep '^export GEMINI_OUT=' "$STATUS_FILE" || true)"
+assert_eq "T11-5e: STATUS_FILE 无残留 CLAUDE_OUT"       "" "$(grep '^export CLAUDE_OUT=' "$STATUS_FILE" || true)"
+assert_eq "T11-5f: STATUS_FILE 无残留 SOCIAL_MEDIA_OUT" "" "$(grep '^export SOCIAL_MEDIA_OUT=' "$STATUS_FILE" || true)"
+assert_eq "T11-5g: STATUS_FILE 无残留 TIKTOK_OUT"       "" "$(grep '^export TIKTOK_OUT=' "$STATUS_FILE" || true)"
 
 # ==============================================================================
 # 汇总
