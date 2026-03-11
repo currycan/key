@@ -930,8 +930,6 @@ analyze_base_env() {
         "SB_UUID|generateRandomStr uuid"
         "XRAY_REALITY_SHORTID|openssl rand -hex 8"
         "XRAY_URL_PATH|generateRandomStr path 32"
-        "PORT_HYSTERIA2|generateRandomStr port"
-        "PORT_TUIC|generateRandomStr port"
         "PORT_ANYTLS|generateRandomStr port"
         "SUBSCRIBE_TOKEN|generateRandomStr path 32"
         "STRATEGY|detect_ip_strategy_api"
@@ -947,6 +945,89 @@ analyze_base_env() {
     done
 
     log INFO "[阶段 1] 完成"
+}
+
+# 初始化端口跳跃环境变量（带默认值，空值=禁用）
+init_port_hop_env() {
+    # 迁移: 清理已废弃的 PORT_HYSTERIA2 / PORT_TUIC (Task 5)
+    local env_file="${ENV_FILE}"
+    if [[ -f "$env_file" ]]; then
+        if grep -qE '^(PORT_HYSTERIA2|PORT_TUIC)=' "$env_file" 2>/dev/null; then
+            log INFO "[迁移] PORT_HYSTERIA2/PORT_TUIC 已废弃，hy2→443, TUIC→8443"
+            sed_inplace '/^PORT_HYSTERIA2=/d' "$env_file"
+            sed_inplace '/^PORT_TUIC=/d' "$env_file"
+        fi
+    fi
+
+    : "${HY2_HOP_RANGE:=20000-37999}"
+    : "${TUIC_HOP_RANGE:=38000-48000}"
+    export HY2_HOP_RANGE TUIC_HOP_RANGE
+
+    # Clash/Stash `ports:` line for template rendering
+    if [[ -n "${HY2_HOP_RANGE}" ]]; then
+        export HY2_PORTS_LINE="    ports: 443,${HY2_HOP_RANGE%-*}-${HY2_HOP_RANGE#*-}"
+    else
+        export HY2_PORTS_LINE=""
+    fi
+    if [[ -n "${TUIC_HOP_RANGE}" ]]; then
+        export TUIC_PORTS_LINE="    ports: 8443,${TUIC_HOP_RANGE%-*}-${TUIC_HOP_RANGE#*-}"
+    else
+        export TUIC_PORTS_LINE=""
+    fi
+
+    log INFO "端口跳跃配置: HY2_HOP_RANGE=${HY2_HOP_RANGE:-禁用}, TUIC_HOP_RANGE=${TUIC_HOP_RANGE:-禁用}"
+}
+
+# 设置端口跳跃 iptables/nftables DNAT 规则
+# 使用自定义 chain SB_XRAY_HOP 管理规则，重启时清空避免堆积
+setup_port_hopping() {
+    if [[ -z "${HY2_HOP_RANGE}" ]] && [[ -z "${TUIC_HOP_RANGE}" ]]; then
+        log INFO "端口跳跃已禁用（HY2_HOP_RANGE 和 TUIC_HOP_RANGE 均为空）"
+        return 0
+    fi
+
+    if command -v iptables &>/dev/null && iptables -t nat -L -n &>/dev/null 2>&1; then
+        log INFO "使用 iptables 配置端口跳跃..."
+        iptables -t nat -N SB_XRAY_HOP 2>/dev/null || iptables -t nat -F SB_XRAY_HOP
+        iptables -t nat -C PREROUTING -j SB_XRAY_HOP 2>/dev/null || \
+            iptables -t nat -A PREROUTING -j SB_XRAY_HOP
+
+        if [[ -n "${HY2_HOP_RANGE}" ]]; then
+            local hy2_start="${HY2_HOP_RANGE%-*}"
+            local hy2_end="${HY2_HOP_RANGE#*-}"
+            iptables -t nat -A SB_XRAY_HOP -p udp --dport "${hy2_start}:${hy2_end}" -j DNAT --to-destination :443
+            log INFO "Hysteria2 端口跳跃: UDP ${hy2_start}-${hy2_end} → 443"
+        fi
+
+        if [[ -n "${TUIC_HOP_RANGE}" ]]; then
+            local tuic_start="${TUIC_HOP_RANGE%-*}"
+            local tuic_end="${TUIC_HOP_RANGE#*-}"
+            iptables -t nat -A SB_XRAY_HOP -p udp --dport "${tuic_start}:${tuic_end}" -j DNAT --to-destination :8443
+            log INFO "TUIC 端口跳跃: UDP ${tuic_start}-${tuic_end} → 8443"
+        fi
+    elif command -v nft &>/dev/null; then
+        log INFO "使用 nftables 配置端口跳跃..."
+        nft delete table inet sb_xray_hop 2>/dev/null || true
+        nft add table inet sb_xray_hop
+        nft add chain inet sb_xray_hop prerouting '{ type nat hook prerouting priority dstnat; policy accept; }'
+
+        if [[ -n "${HY2_HOP_RANGE}" ]]; then
+            local hy2_start="${HY2_HOP_RANGE%-*}"
+            local hy2_end="${HY2_HOP_RANGE#*-}"
+            nft add rule inet sb_xray_hop prerouting udp dport "${hy2_start}-${hy2_end}" dnat to :443
+            log INFO "Hysteria2 端口跳跃 (nft): UDP ${hy2_start}-${hy2_end} → 443"
+        fi
+
+        if [[ -n "${TUIC_HOP_RANGE}" ]]; then
+            local tuic_start="${TUIC_HOP_RANGE%-*}"
+            local tuic_end="${TUIC_HOP_RANGE#*-}"
+            nft add rule inet sb_xray_hop prerouting udp dport "${tuic_start}-${tuic_end}" dnat to :8443
+            log INFO "TUIC 端口跳跃 (nft): UDP ${tuic_start}-${tuic_end} → 8443"
+        fi
+    else
+        log WARN "iptables 和 nftables 均不可用，跳过端口跳跃配置"
+        log WARN "Hysteria2 仅监听 UDP 443，TUIC 仅监听 UDP 8443（无端口跳跃）"
+    fi
 }
 
 # 阶段 2: ISP 代理测速与选路（ISP_TAG 已缓存则跳过）
@@ -1124,6 +1205,9 @@ main_init() {
     log INFO "[步骤 4]  基础环境变量初始化"
     analyze_base_env
 
+    log INFO "[步骤 4b] 端口跳跃环境初始化"
+    init_port_hop_env
+
     log INFO "[步骤 5]  ISP 测速与选路"
     run_speed_tests_if_needed
 
@@ -1161,6 +1245,9 @@ main_init() {
     log INFO "[步骤 11] 渲染配置模板"
     createConfig
     generateProxyProvidersConfig
+
+    log INFO "[步骤 11b] 配置端口跳跃 DNAT 规则"
+    setup_port_hopping
 
     # 步骤 12: 初始化 X-UI / S-UI 管理面板（daemon.ini priority=5，最先启动）
     log INFO "[步骤 12] 初始化 X-UI / S-UI"
