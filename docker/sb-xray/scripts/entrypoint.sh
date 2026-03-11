@@ -502,7 +502,7 @@ _test_isp_node() {
     local threshold
     threshold=$(awk -v m="${proxy_max_speed:-0}" -v t="${SPEED_TOLERANCE}" \
                 'BEGIN { printf "%.2f", m * (1 + t / 100) }')
-    if (( $(echo "$speed > $threshold" | bc 2>/dev/null || echo 0) )); then
+    if awk -v s="$speed" -v t="$threshold" 'BEGIN { exit (s + 0 > t + 0 ? 0 : 1) }'; then
         export proxy_max_speed="$speed"
         export FASTEST_PROXY_TAG="$tag"
         log INFO "[测速] 容差判断: ${speed} Mbps > 阈值 ${threshold} Mbps (前最优 ${_prev_max} × ${_multiplier}) → 更新最优: ${FASTEST_PROXY_TAG}"
@@ -574,7 +574,7 @@ apply_isp_routing_logic() {
     else
         ref_speed="${DIRECT_SPEED:-0}"
     fi
-    if (( $(echo "$ref_speed > 100" | bc 2>/dev/null || echo 0) )); then
+    if awk -v s="$ref_speed" 'BEGIN { exit (s + 0 > 100 ? 0 : 1) }'; then
         export IS_8K_SMOOTH="true"
     else
         export IS_8K_SMOOTH="false"
