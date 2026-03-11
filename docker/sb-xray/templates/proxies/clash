@@ -2,7 +2,8 @@ proxies:
   - name: ${FLAG_PREFIX}Hysteria2 ✈ ${NODE_NAME}${NODE_SUFFIX}
     type: hysteria2
     server: ${DOMAIN}
-    port: ${PORT_HYSTERIA2}
+    port: 443
+${HY2_PORTS_LINE}
     sni: ${DOMAIN}
     alpn:
       - h3
@@ -14,7 +15,8 @@ proxies:
   - name: ${FLAG_PREFIX}TUIC ✈ ${NODE_NAME}${NODE_SUFFIX}
     type: tuic
     server: ${DOMAIN}
-    port: ${PORT_TUIC}
+    port: 8443
+${TUIC_PORTS_LINE}
     uuid: ${SB_UUID}
     password: ${SB_UUID}
     alpn:
