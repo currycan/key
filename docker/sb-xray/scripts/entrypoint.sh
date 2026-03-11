@@ -959,6 +959,10 @@ init_port_hop_env() {
         fi
     fi
 
+    : "${HY2_LISTEN_PORT:=443}"
+    : "${TUIC_LISTEN_PORT:=8443}"
+    export HY2_LISTEN_PORT TUIC_LISTEN_PORT
+
     : "${HY2_HOP_RANGE:=20000-37999}"
     : "${TUIC_HOP_RANGE:=38000-48000}"
 
@@ -976,16 +980,17 @@ init_port_hop_env() {
 
     # Clash/Stash `ports:` line for template rendering
     if [[ -n "${HY2_HOP_RANGE}" ]]; then
-        export HY2_PORTS_LINE="    ports: 443,${HY2_HOP_RANGE%-*}-${HY2_HOP_RANGE#*-}"
+        export HY2_PORTS_LINE="    ports: ${HY2_LISTEN_PORT},${HY2_HOP_RANGE%-*}-${HY2_HOP_RANGE#*-}"
     else
         export HY2_PORTS_LINE=""
     fi
     if [[ -n "${TUIC_HOP_RANGE}" ]]; then
-        export TUIC_PORTS_LINE="    ports: 8443,${TUIC_HOP_RANGE%-*}-${TUIC_HOP_RANGE#*-}"
+        export TUIC_PORTS_LINE="    ports: ${TUIC_LISTEN_PORT},${TUIC_HOP_RANGE%-*}-${TUIC_HOP_RANGE#*-}"
     else
         export TUIC_PORTS_LINE=""
     fi
 
+    log INFO "Hysteria2 监听端口: UDP ${HY2_LISTEN_PORT}, TUIC 监听端口: UDP ${TUIC_LISTEN_PORT}"
     log INFO "端口跳跃配置: HY2_HOP_RANGE=${HY2_HOP_RANGE:-禁用}, TUIC_HOP_RANGE=${TUIC_HOP_RANGE:-禁用}"
 }
 
@@ -1007,15 +1012,15 @@ setup_port_hopping() {
         if [[ -n "${HY2_HOP_RANGE}" ]]; then
             local hy2_start="${HY2_HOP_RANGE%-*}"
             local hy2_end="${HY2_HOP_RANGE#*-}"
-            iptables -t nat -A SB_XRAY_HOP -p udp --dport "${hy2_start}:${hy2_end}" -j DNAT --to-destination :443
-            log INFO "Hysteria2 端口跳跃: UDP ${hy2_start}-${hy2_end} → 443"
+            iptables -t nat -A SB_XRAY_HOP -p udp --dport "${hy2_start}:${hy2_end}" -j DNAT --to-destination :"${HY2_LISTEN_PORT}"
+            log INFO "Hysteria2 端口跳跃: UDP ${hy2_start}-${hy2_end} → ${HY2_LISTEN_PORT}"
         fi
 
         if [[ -n "${TUIC_HOP_RANGE}" ]]; then
             local tuic_start="${TUIC_HOP_RANGE%-*}"
             local tuic_end="${TUIC_HOP_RANGE#*-}"
-            iptables -t nat -A SB_XRAY_HOP -p udp --dport "${tuic_start}:${tuic_end}" -j DNAT --to-destination :8443
-            log INFO "TUIC 端口跳跃: UDP ${tuic_start}-${tuic_end} → 8443"
+            iptables -t nat -A SB_XRAY_HOP -p udp --dport "${tuic_start}:${tuic_end}" -j DNAT --to-destination :"${TUIC_LISTEN_PORT}"
+            log INFO "TUIC 端口跳跃: UDP ${tuic_start}-${tuic_end} → ${TUIC_LISTEN_PORT}"
         fi
     elif command -v nft &>/dev/null; then
         log INFO "使用 nftables 配置端口跳跃..."
@@ -1026,19 +1031,19 @@ setup_port_hopping() {
         if [[ -n "${HY2_HOP_RANGE}" ]]; then
             local hy2_start="${HY2_HOP_RANGE%-*}"
             local hy2_end="${HY2_HOP_RANGE#*-}"
-            nft add rule inet sb_xray_hop prerouting udp dport "${hy2_start}-${hy2_end}" dnat to :443
-            log INFO "Hysteria2 端口跳跃 (nft): UDP ${hy2_start}-${hy2_end} → 443"
+            nft add rule inet sb_xray_hop prerouting udp dport "${hy2_start}-${hy2_end}" dnat to :"${HY2_LISTEN_PORT}"
+            log INFO "Hysteria2 端口跳跃 (nft): UDP ${hy2_start}-${hy2_end} → ${HY2_LISTEN_PORT}"
         fi
 
         if [[ -n "${TUIC_HOP_RANGE}" ]]; then
             local tuic_start="${TUIC_HOP_RANGE%-*}"
             local tuic_end="${TUIC_HOP_RANGE#*-}"
-            nft add rule inet sb_xray_hop prerouting udp dport "${tuic_start}-${tuic_end}" dnat to :8443
-            log INFO "TUIC 端口跳跃 (nft): UDP ${tuic_start}-${tuic_end} → 8443"
+            nft add rule inet sb_xray_hop prerouting udp dport "${tuic_start}-${tuic_end}" dnat to :"${TUIC_LISTEN_PORT}"
+            log INFO "TUIC 端口跳跃 (nft): UDP ${tuic_start}-${tuic_end} → ${TUIC_LISTEN_PORT}"
         fi
     else
         log WARN "iptables 和 nftables 均不可用，跳过端口跳跃配置"
-        log WARN "Hysteria2 仅监听 UDP 443，TUIC 仅监听 UDP 8443（无端口跳跃）"
+        log WARN "Hysteria2 仅监听 UDP ${HY2_LISTEN_PORT}，TUIC 仅监听 UDP ${TUIC_LISTEN_PORT}（无端口跳跃）"
     fi
 }
 

@@ -4,7 +4,7 @@
             "type": "tuic",
             "tag": "sing-box tuic",
             "listen": "::",
-            "listen_port": 8443,
+            "listen_port": ${TUIC_LISTEN_PORT},
             "users": [
                 {
                     "uuid": "${SB_UUID}",

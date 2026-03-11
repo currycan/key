@@ -4,7 +4,7 @@
             "type": "hysteria2",
             "tag": "sing-box hysteria2",
             "listen": "::",
-            "listen_port": 443,
+            "listen_port": ${HY2_LISTEN_PORT},
             "users": [
                 {
                     "password": "${SB_UUID}"
