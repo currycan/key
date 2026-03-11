@@ -105,6 +105,14 @@ graph LR
 
 > **注意**: 证书由 acme.sh DNS 挑战申请，为 CA 签名证书，无需 `insecure=1`。客户端 URI 必须显式携带 `sni=` 参数，否则 xray-core 原生 hy2 实现可能无法从 URI 隐式推断 SNI，导致 TLS 握手失败。
 
+#### ISP 高峰期 UDP 限速
+
+> **注意**: Hysteria2 基于 UDP 传输。国内部分 ISP（尤其中国移动/联通）在高峰时段（北京时间约 21:00–24:00）对 UDP 流量实施 QoS 限速或丢包，可能导致连接不稳定甚至完全不可用。
+>
+> **客户端自动回退**：本项目的 OneSmartPro（smart 策略组）和 FallBackPro（fallback/url-test 策略组）均内置健康检查（180 秒间隔）。当 Hysteria2 节点健康检查失败时，客户端会自动切换到 TCP 协议节点（如 Reality、XHTTP），无需手动干预。
+>
+> 如需在高峰期获得最稳定体验，建议在 OpenClash 策略组中手动选择 TCP 协议节点（Reality / XHTTP）。
+
 #### 服务端入站
 
 * **配置文件**: `templates/sing-box/01_hysteria2_inbounds.json`
@@ -161,6 +169,10 @@ graph LR
   ```
 * **服务端配置文件**: `templates/sing-box/02_tuic_inbounds.json`
 * **路径**: **直连**（不经过 Nginx，不经过 Xray）
+
+#### ISP 高峰期 UDP 限速
+
+> **注意**: TUIC 与 Hysteria2 同属 UDP/QUIC 协议，受到相同的 ISP 高峰期限速影响（详见 [§1.2 Hysteria2 — ISP 高峰期 UDP 限速](#isp-高峰期-udp-限速)）。客户端策略组的健康检查机制会自动将流量切换到 TCP 协议节点。
 
 ---
 
