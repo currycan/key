@@ -88,13 +88,13 @@ graph LR
 
 ```mermaid
 graph LR
-    User((客户端)) -- "UDP 高位端口" --> Singbox(("Sing-box 核心"))
+    User((客户端)) -- "UDP 443 / 跳跃端口" --> Singbox(("Sing-box 核心"))
     Singbox -- "Hysteria2" --> Internet((互联网))
 ```
 
 #### 客户端配置
 
-* **连接方式**: UDP / 独立高位端口
+* **连接方式**: UDP / 443 端口（QUIC 伪装）
 * **URL 示例**:
   ```
   hysteria2://${SB_UUID}@${DOMAIN}:${PORT_HYSTERIA2}/?sni=${DOMAIN}&alpn=h3#🇺🇸 Hysteria2 ✈ ${NODE_NAME}${NODE_SUFFIX}
@@ -113,10 +113,36 @@ graph LR
 >
 > 如需在高峰期获得最稳定体验，建议在 OpenClash 策略组中手动选择 TCP 协议节点（Reality / XHTTP）。
 
+#### 端口跳跃（Port Hopping）
+
+Hysteria2 固定监听 **UDP 443**，伪装为标准 QUIC/HTTP3 流量。通过 iptables DNAT 实现端口跳跃，将多端口范围重定向至 443：
+
+| 项目 | 值 |
+|:---|:---|
+| **固定监听端口** | UDP 443（QUIC 伪装） |
+| **跳跃范围环境变量** | `HY2_HOP_RANGE` |
+| **默认范围** | `20000-37999` |
+| **禁用方式** | 设置 `HY2_HOP_RANGE=""` |
+| **容器要求** | `NET_ADMIN` capability（iptables 操作） |
+
+客户端连接时需携带 `mport=` 参数指定跳跃端口范围：
+
+```
+hysteria2://${SB_UUID}@${DOMAIN}:443?sni=${DOMAIN}&alpn=h3&mport=20000-37999#...
+```
+
+Clash/Mihomo 配置使用 `ports:` 字段：
+
+```yaml
+ports: 20000-37999
+```
+
+> **提示**：端口跳跃通过在多个端口间轮换来对抗 QoS 限速与端口封锁，显著提升 UDP 协议在高峰期的存活率。
+
 #### 服务端入站
 
 * **配置文件**: `templates/sing-box/01_hysteria2_inbounds.json`
-* **监听地址**: `::` (All Interfaces)
+* **监听地址**: `::` (All Interfaces)，端口 443
 * **路径**: **直连**（不经过 Nginx，不经过 Xray）
 
 #### Xray 原生客户端配置
@@ -151,13 +177,13 @@ graph LR
 
 另一种基于 QUIC 的高性能协议。
 
-* **连接方式**: UDP / 独立高位端口
+* **连接方式**: UDP / 8443 端口
 
 #### 流量图解
 
 ```mermaid
 graph LR
-    User((客户端)) -- "UDP 高位端口" --> Singbox(("Sing-box 核心"))
+    User((客户端)) -- "UDP 8443 / 跳跃端口" --> Singbox(("Sing-box 核心"))
     Singbox -- "TUIC V5 / QUIC" --> Internet((互联网))
 ```
 
@@ -165,10 +191,33 @@ graph LR
 
 * **URL 示例**:
   ```
-  tuic://${SB_UUID}:${SB_UUID}@${DOMAIN}:${PORT_TUIC}?alpn=h3&insecure=1&congestion_control=bbr#🇺🇸 TUIC ✈ ${NODE_NAME}${NODE_SUFFIX}
+  tuic://${SB_UUID}:${SB_UUID}@${DOMAIN}:8443?alpn=h3&insecure=1&congestion_control=bbr#🇺🇸 TUIC ✈ ${NODE_NAME}${NODE_SUFFIX}
   ```
 * **服务端配置文件**: `templates/sing-box/02_tuic_inbounds.json`
 * **路径**: **直连**（不经过 Nginx，不经过 Xray）
+
+#### 端口跳跃（Port Hopping）
+
+TUIC 固定监听 **UDP 8443**。与 Hysteria2 相同，通过 iptables DNAT 实现端口跳跃：
+
+| 项目 | 值 |
+|:---|:---|
+| **固定监听端口** | UDP 8443 |
+| **跳跃范围环境变量** | `TUIC_HOP_RANGE` |
+| **默认范围** | `38000-48000` |
+| **禁用方式** | 设置 `TUIC_HOP_RANGE=""` |
+
+客户端连接时携带 `mport=` 参数：
+
+```
+tuic://${SB_UUID}:${SB_UUID}@${DOMAIN}:8443?alpn=h3&mport=38000-48000&...
+```
+
+Clash/Mihomo 配置使用 `ports:` 字段：
+
+```yaml
+ports: 38000-48000
+```
 
 #### ISP 高峰期 UDP 限速
 

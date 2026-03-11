@@ -84,6 +84,8 @@ environment:
 | `GEMINI_DIRECT` | `""` | Gemini 路由：`true`=强制直连，`false`=代理，空=自动判断 |
 | `NODE_SUFFIX` | `""` | 订阅节点名称后缀（如 ` ✈ 高速`） |
 | `PROVIDERS` | `""` | 外部订阅源，多行格式 |
+| `HY2_HOP_RANGE` | `20000-37999` | Hysteria2 端口跳跃范围（iptables DNAT → UDP 443）；置空禁用 |
+| `TUIC_HOP_RANGE` | `38000-48000` | TUIC 端口跳跃范围（iptables DNAT → UDP 8443）；置空禁用 |
 | `TZ` | `Asia/Singapore` | 容器时区 |
 
 #### ACME 证书
@@ -155,8 +157,8 @@ environment:
 | `XRAY_MLKEM768_SEED` | `xray mlkem768` | ML-KEM 种子（配对生成） |
 | `XRAY_MLKEM768_CLIENT` | `xray mlkem768` | ML-KEM 客户端密钥 |
 | `XRAY_URL_PATH` | 随机 32 位 | XHTTP 路径 |
-| `PORT_HYSTERIA2` | 随机高位端口 | Hysteria2 UDP 端口 |
-| `PORT_TUIC` | 随机高位端口 | TUIC UDP 端口 |
+| ~~`PORT_HYSTERIA2`~~ | 已废弃 → 固定 `443` | Hysteria2 现固定 UDP 443（QUIC 伪装） |
+| ~~`PORT_TUIC`~~ | 已废弃 → 固定 `8443` | TUIC 现固定 UDP 8443 |
 | `PORT_ANYTLS` | 随机高位端口 | AnyTLS TCP 端口 |
 | `XUI_LOCAL_PORT` | 随机端口 | X-UI 实际监听端口 |
 | `DUFS_PORT` | 随机高位端口 | Dufs 内部监听端口 |
@@ -421,10 +423,10 @@ docker exec sb-xray cat /var/log/acme.sh.log
 docker exec sb-xray supervisorctl status sing-box
 
 # 检查 UDP 端口是否监听
-docker exec sb-xray ss -ulnp | grep ${PORT_HYSTERIA2}
+docker exec sb-xray ss -ulnp | grep 443
 
 # 外部测试 UDP 连通性
-nc -zuv ${SERVER_IP} ${PORT_HYSTERIA2}
+nc -zuv ${SERVER_IP} 443
 ```
 
 **常见原因**：
