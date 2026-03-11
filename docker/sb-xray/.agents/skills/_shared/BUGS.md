@@ -441,6 +441,21 @@ description: 跨 Skill 的 Bug 修复记录，所有 Agent 工作时必须优先
 
 ---
 
+### Bug #028 — hysteria2 URI 缺少 sni= 参数，xray-core 原生 hy2 TLS 握手失败
+
+| 字段 | 内容 |
+|:---|:---|
+| **涉及文件** | `scripts/show-config.sh`、`templates/sing-box/01_hysteria2_inbounds.json`、`templates/proxies/all`、`templates/proxies/clash` |
+| **函数** | `generate_links`（URI 生成）；sing-box hysteria2 inbound TLS 配置 |
+| **触发条件** | v2rayN 7.18+（xray-core v26.1.23+）使用原生 hy2 实现时，导入 hysteria2 URI |
+| **错误现象** | hysteria2 节点连接失败；v2rayN 旧版（外置 hy2 二进制）正常，升级后全部无法使用 |
+| **根本原因** | URI 格式 `/?alpn=h3` 无 `sni=` 参数；外置 hy2 二进制从连接地址隐式推断 SNI，但 xray-core 原生实现需要 URI 中显式提供 `sni=` 才能正确填充 TLS `serverName`；sing-box 入站 `server_name: ""` 为空，增加不确定性。另：`show-config.sh` 中两行 `sed '/# 需把 tls 里的 inSecure 设置为 true/d'` 为无效死代码（该注释早已不存在于订阅内容中） |
+| **修复方案** | ① URI 改为 `/?sni=${DOMAIN}&alpn=h3`；② sing-box 入站 `server_name` 改为 `"${DOMAIN}"`；③ Clash/all 模板 hysteria2 代理添加 `sni: ${DOMAIN}`；④ 删除两行 `sed` 死代码 |
+| **预防措施** | 所有代理协议 URI 必须显式包含 `sni=` 参数，不依赖客户端隐式推断；`allowInsecure` 已在 xray-core v26.2.x 废弃，CA 签名证书无需跳过验证；外置二进制升级为原生核心实现时需重新审查所有参数的显式性 |
+| **记录时间** | 2026-03-11 |
+
+---
+
 ## 新增 Bug 记录模板
 
 > 修复 Bug 后，复制以下模板追加到对应分区末尾：

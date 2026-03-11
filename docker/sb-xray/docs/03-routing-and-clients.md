@@ -147,7 +147,8 @@ flowchart LR
 [选路]   DEFAULT_ISP   = 未设置（自动选路）
 [选路]   直连速度      = 28.50 Mbps（不参与选路）
 [选路]   最优 ISP 代理 = proxy-kr-isp (75.45 Mbps)
-[选路] 原则: ISP代理用于Geo解锁(ChatGPT/Netflix等)，有代理始终优先；直连为无代理兜底
+[选路] 原则: 受限地区/非住宅IP→需代理解锁; 住宅IP+非受限→直连兜底
+[选路] 非住宅 IP (hosting)，需 ISP 代理解锁流媒体/AI
 [选路] 使用最优 ISP 代理: proxy-kr-isp (75.45 Mbps)
 [选路] IS_8K_SMOOTH: 出口=proxy-kr-isp | 参考速度=75.45 Mbps | 阈值=100 Mbps → false  → 无质量标签
 [选路] ✓ 最终决策: ISP_TAG=proxy-kr-isp | IS_8K_SMOOTH=false
@@ -161,7 +162,12 @@ flowchart LR
 | `✈ good` | ISP 代理激活 + 代理速度 > 100 Mbps | 通过 SOCKS5 代理实现 8K 流畅，适合所有需要解锁的业务 | **+10** |
 | `✈ super` | VPS 本身 IP 为住宅类型（`IP_TYPE=isp`）+ 直连速度 > 100 Mbps | VPS 直出即为原生家宽，无需代理即可 8K，稀缺最高质量 | **+30** |
 
-> **关键设计理念**：ISP SOCKS5 代理的目的是**绕过节点的 geo 限制**（解锁 ChatGPT/Netflix 等），而非与直连竞速。选路逻辑在所有可用 ISP 代理中优选最快者，直连仅作为无代理时的兜底，或用于判断 VPS 本身是否具备 `super` 能力。
+> **关键设计理念**：ISP SOCKS5 代理的目的是**解锁 geo 限制**（ChatGPT/Netflix 等）。选路决策链如下：
+> 1. `DEFAULT_ISP` 非空 → 手动锁定出口，跳过所有判断
+> 2. 受限地区（香港/中国大陆等）**或**非住宅 IP（机房 IP）→ 需要代理：优先使用最快 ISP 代理；无可用节点则回退直连（ERROR）
+> 3. 住宅 ISP IP + 非受限地区 → 兜底直连（VPS 本身即原生家宽，直出即可）
+>
+> `_is_restricted_region` 仅作日志修饰，不单独控制分支走向；IP 类型（`IP_TYPE`）与地区限制同级参与条件评估。
 
 #### 8K 判定阈值
 

@@ -97,11 +97,13 @@ graph LR
 * **连接方式**: UDP / 独立高位端口
 * **URL 示例**:
   ```
-  hysteria2://${SB_UUID}@${DOMAIN}:${PORT_HYSTERIA2}/?alpn=h3&insecure=1#🇺🇸 Hysteria2 ✈ ${NODE_NAME}${NODE_SUFFIX}
+  hysteria2://${SB_UUID}@${DOMAIN}:${PORT_HYSTERIA2}/?sni=${DOMAIN}&alpn=h3#🇺🇸 Hysteria2 ✈ ${NODE_NAME}${NODE_SUFFIX}
   ```
 * **核心参数**:
-  * `insecure`: `1`（自签名证书需开启跳过验证）
+  * `sni`: `${DOMAIN}`（显式指定 SNI，兼容 xray-core v26.1.23+ 原生 hy2 客户端）
   * `alpn`: `h3`
+
+> **注意**: 证书由 acme.sh DNS 挑战申请，为 CA 签名证书，无需 `insecure=1`。客户端 URI 必须显式携带 `sni=` 参数，否则 xray-core 原生 hy2 实现可能无法从 URI 隐式推断 SNI，导致 TLS 握手失败。
 
 #### 服务端入站
 
@@ -111,7 +113,7 @@ graph LR
 
 #### Xray 原生客户端配置
 
-从 Xray-core v24.9.30+ 开始原生支持 Hysteria2 出站：
+从 Xray-core v26.1.23+ 开始原生支持 Hysteria2 出站（v26.1.23 前需使用外置 hy2 二进制）：
 
 ```json
 {
@@ -127,12 +129,13 @@ graph LR
         "security": "tls",
         "tlsSettings": {
             "serverName": "${DOMAIN}",
-            "allowInsecure": true,
             "alpn": ["h3"]
         }
     }
 }
 ```
+
+> **注意**: `allowInsecure` 已在 xray-core v26.2.x 中废弃并移除（截止日期 UTC 2026.6.1），请勿使用。服务端使用 CA 签名证书，客户端无需跳过验证。
 
 ---
 
