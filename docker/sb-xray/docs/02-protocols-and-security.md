@@ -255,7 +255,7 @@ graph LR
 * **特点**: 速度最快，延迟最低
 * **URL 示例**:
   ```
-  vless://${XRAY_UUID}@${DOMAIN}:${LISTENING_PORT}?encryption=mlkem768x25519plus.native.600s.${XRAY_MLKEM768_SEED}&security=reality&sni=${DEST_HOST}&fp=chrome&pbk=${XRAY_REALITY_PUBLIC_KEY}&sid=${XRAY_REALITY_SHORTID}&type=xhttp&path=/${XRAY_URL_PATH}-xhttp&mode=auto#🇺🇸 Xhttp+Reality直连 ✈ ${NODE_NAME}${NODE_SUFFIX}
+  vless://${XRAY_UUID}@${DOMAIN}:${LISTENING_PORT}?encryption=mlkem768x25519plus.native.0rtt.${XRAY_MLKEM768_CLIENT}&security=reality&sni=${DEST_HOST}&fp=chrome&pbk=${XRAY_REALITY_PUBLIC_KEY}&sid=${XRAY_REALITY_SHORTID}&type=xhttp&path=/${XRAY_URL_PATH}-xhttp&mode=auto#🇺🇸 Xhttp+Reality直连 ✈ ${NODE_NAME}${NODE_SUFFIX}
   ```
 * **流量图解**:
   ```mermaid
@@ -403,7 +403,7 @@ graph TB
 ### 2.4 配置字符串逐段解析
 
 ```
-mlkem768x25519plus.native.600s.${XRAY_MLKEM768_SEED}
+mlkem768x25519plus.native.0rtt.${XRAY_MLKEM768_CLIENT}
 ```
 
 | 字段 | 含义 | 说明 |
@@ -411,8 +411,8 @@ mlkem768x25519plus.native.600s.${XRAY_MLKEM768_SEED}
 | `mlkem768` | MLKEM 安全级别 | NIST Level 3，相当于 AES-192 |
 | `x25519plus` | 混合模式 | 同时使用 MLKEM768 + X25519，双重保护 |
 | `native` | 外观模式 | 原生外观，流量特征类似 TLSv1.3 |
-| `600s` | Ticket 有效期 | 随机下发 300-600 秒的 ticket 以便 0-RTT 复用 |
-| `${XRAY_MLKEM768_SEED}` | 种子密钥 | 服务端预共享密钥，用于初始化 KEM |
+| `0rtt` | 握手模式 | 启用 0-RTT 快速握手，复用 ticket 免去完整 1-RTT 协商 |
+| `${XRAY_MLKEM768_CLIENT}` | 客户端密钥 | 客户端配置密钥（`xray mlkem768` 命令的 CLIENT 输出），与服务端 SEED 配对 |
 
 ### 2.5 外观模式对比
 
@@ -472,7 +472,7 @@ graph TD
 |:---|:---|:---|:---|
 | **第 1 层** | HTTP/2 (gRPC) | Nginx ↔ Xray | 无加密（内部通信） |
 | **第 2 层** | Reality TLS | 客户端 ↔ Nginx | Reality 公钥/私钥 |
-| **第 3 层** | MLKEM+X25519 | 客户端 ↔ Xray 核心 | MLKEM Seed + 临时密钥 |
+| **第 3 层** | MLKEM+X25519 | 客户端 ↔ Xray 核心 | MLKEM Client 密钥 + 临时密钥 |
 
 ### 2.8 本项目的配置策略
 
@@ -484,7 +484,7 @@ graph TD
 "fallbacks": [ ... ]            // 支持 Xhttp 回落
 
 // Xhttp 入站 (02_xhttp_inbounds.json)
-"decryption": "mlkem768x25519plus.native.600s.${SEED}"  // 防护 Nginx 中间节点
+"decryption": "mlkem768x25519plus.native.0rtt.${XRAY_MLKEM768_CLIENT}"  // 防护 Nginx 中间节点
 ```
 
 **设计理念**：
