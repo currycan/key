@@ -375,7 +375,7 @@ speed_test() {
     # 输入：每行一个原始 bytes/sec 值
     # 输出：3 个空格分隔的值 → 截断均值(Mbps)  标准差(Mbps)  稳定性标注
     local stats
-    stats=$(printf '%s\n' "${samples[@]}" | awk -v n="$count" '
+    stats=$(printf '%s\n' "${samples[@]}" | awk '
     $1 + 0 == $1 { vals[NR] = $1 }
     END {
         n = NR
@@ -426,11 +426,11 @@ show_report() {
     local speed=$1 name=${2:-直连}
     speed=$(echo "$speed" | sed 's/[^0-9.]//g')
     local status color
-    if   (( $(echo "$speed > 100" | bc 2>/dev/null || echo 0) )); then status="极速，流畅播放 8K (HDR/60fps)"; color=$GREEN
-    elif (( $(echo "$speed > 60"  | bc 2>/dev/null || echo 0) )); then status="流畅播放 8K";                   color=$GREEN
-    elif (( $(echo "$speed > 25"  | bc 2>/dev/null || echo 0) )); then status="流畅 4K，8K 可能卡顿";          color=$YELLOW
-    elif (( $(echo "$speed > 10"  | bc 2>/dev/null || echo 0) )); then status="满足 1080P/4K";                 color=$YELLOW
-    else                                                                status="网络较慢";                       color=$RED
+    if   awk -v s="$speed" 'BEGIN { exit (s + 0 > 100 ? 0 : 1) }'; then status="极速，流畅播放 8K (HDR/60fps)"; color=$GREEN
+    elif awk -v s="$speed" 'BEGIN { exit (s + 0 > 60  ? 0 : 1) }'; then status="流畅播放 8K";                   color=$GREEN
+    elif awk -v s="$speed" 'BEGIN { exit (s + 0 > 25  ? 0 : 1) }'; then status="流畅 4K，8K 可能卡顿";          color=$YELLOW
+    elif awk -v s="$speed" 'BEGIN { exit (s + 0 > 10  ? 0 : 1) }'; then status="满足 1080P/4K";                 color=$YELLOW
+    else                                                                     status="网络较慢";                       color=$RED
     fi
     cat >&2 <<EOF
 ========================================
