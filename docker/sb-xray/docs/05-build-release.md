@@ -201,15 +201,15 @@ supervisor dumb-init fail2ban acme.sh
 | 组件 | 默认版本 | Build Arg |
 |:---|:---|:---|
 | Shoutrrr | 0.8.0 | `SHOUTRRR_VERSION` |
-| Mihomo | 1.19.20 | `MIHOMO_VERSION` |
+| Mihomo | 1.19.0 | `MIHOMO_VERSION` |
 | Http-Meta | 1.0.6 | `HTTP_META_VERSION` |
-| Sub-Store 前端 | 2.16.17 | `SUB_STORE_FRONTEND_VERSION` |
-| Sub-Store 后端 | 2.21.28 | `SUB_STORE_BACKEND_VERSION` |
-| S-UI | 1.3.10 | `SUI_VERSION` |
+| Sub-Store 前端 | 2.16.13 | `SUB_STORE_FRONTEND_VERSION` |
+| Sub-Store 后端 | 2.21.21 | `SUB_STORE_BACKEND_VERSION` |
+| S-UI | 1.3.9 | `SUI_VERSION` |
 | Dufs | 0.45.0 | `DUFS_VERSION` |
 | Cloudflared | 2026.2.0 | `CLOUDFLARED_VERSION` |
 | 3x-ui | 2.8.10 | `XUI_VERSION` |
-| Sing-box | 1.12.22 | `SING_BOX_VERSION` |
+| Sing-box | 1.12.21 | `SING_BOX_VERSION` |
 | Xray | 26.2.6 | `XRAY_VERSION` |
 
 ### 4.2 版本覆盖
@@ -235,7 +235,7 @@ XRAY_VERSION=25.12.15 docker buildx build \
 docker buildx build \
   --platform linux/amd64 \
   --build-arg XRAY_VERSION=26.2.6 \
-  --build-arg SING_BOX_VERSION=1.12.22 \
+  --build-arg SING_BOX_VERSION=1.12.21 \
   --tag currycan/sb-xray:test \
   --load .
 ```
