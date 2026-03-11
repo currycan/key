@@ -93,7 +93,7 @@ environment:
 flowchart LR
     subgraph 服务端启动阶段
         P["ISP_TAG 未缓存\n触发重新测速"] --> CL["联动清除 *_OUT 缓存\nISP_OUT / CHATGPT_OUT\nNETFLIX_OUT 等共 9 项"]
-        CL --> A["ISP SOCKS5 节点逐一测速\n（3次采样取均值；< 1 KB/s 视为失败）"]
+        CL --> A["ISP SOCKS5 节点逐一测速\n（5次采样截断均值；< 1 KB/s 视为失败）"]
         A --> T["容差带筛优\n超出当前最优×1.15\n才替换"]
         T --> B["选出最优 ISP 代理\nISP_TAG"]
         T --> C{"最优代理速度\n> 100 Mbps?"}
@@ -131,15 +131,19 @@ flowchart LR
 [阶段 2] 清除服务路由缓存（与 ISP_TAG 同步刷新）...
 [阶段 2] 环境: IP_TYPE=hosting | 地区=US | DEFAULT_ISP=未设置（自动选路）
 [阶段 2] 直连基准: 28.50 Mbps（不参与选路；无代理时用于 IS_8K_SMOOTH 判定）
-[阶段 2] 发现 ISP 节点: 2 个，开始逐节点测速（采样=3次，容差=15%）...
-[测速] KR_ISP | 第 1/3 轮: 9830 KB/s → 75.00 Mbps
-[测速] KR_ISP | 第 2/3 轮: 10240 KB/s → 78.12 Mbps
-[测速] KR_ISP | 第 3/3 轮: 9600 KB/s → 73.24 Mbps
-[测速] KR_ISP: 3/3 有效样本，均值 75.45 Mbps
-[测速] 容差判断: 75.45 Mbps > 阈值 0.00 Mbps (前最优 0 × 1.15) → 更新最优: proxy-kr-isp
-[测速] JP_ISP | 第 1/3 轮: ...
-[测速] JP_ISP: 3/3 有效样本，均值 70.00 Mbps
-[测速] 容差判断: 70.00 Mbps ≤ 阈值 86.77 Mbps (前最优 75.45 × 1.15) → 保持最优: proxy-kr-isp
+[阶段 2] 发现 ISP 节点: 2 个，开始逐节点测速（采样=5次，容差=15%）...
+[测速] 开始: KR_ISP | 测速源: https://... | 采样: 5次
+[测速] KR_ISP | 第 1/5 轮: 9830 KB/s → 75.00 Mbps
+[测速] KR_ISP | 第 2/5 轮: 10240 KB/s → 78.12 Mbps
+[测速] KR_ISP | 第 3/5 轮: 9600 KB/s → 73.24 Mbps
+[测速] KR_ISP | 第 4/5 轮: 10150 KB/s → 77.54 Mbps
+[测速] KR_ISP | 第 5/5 轮: 9920 KB/s → 75.79 Mbps
+[测速] KR_ISP: 5/5 有效样本，截断均值 75.44 Mbps，标准差 1.73 Mbps [稳定]
+[测速] 容差判断: 75.44 Mbps > 阈值 0.00 Mbps (前最优 0 × 1.15) → 更新最优: proxy-kr-isp
+[测速] 开始: JP_ISP | 测速源: https://... | 采样: 5次
+[测速] JP_ISP | 第 1/5 轮: ...
+[测速] JP_ISP: 5/5 有效样本，截断均值 70.00 Mbps，标准差 2.10 Mbps [稳定]
+[测速] 容差判断: 70.00 Mbps ≤ 阈值 86.76 Mbps (前最优 75.44 × 1.15) → 保持最优: proxy-kr-isp
 [选路] ════════════════════════════════════════════
 [选路] 决策输入:
 [选路]   IP_TYPE       = hosting (机房/托管 IP)

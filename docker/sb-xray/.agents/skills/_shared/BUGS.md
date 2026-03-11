@@ -441,6 +441,21 @@ description: 跨 Skill 的 Bug 修复记录，所有 Agent 工作时必须优先
 
 ---
 
+### Bug #029 — speed_test bc 科学计数法导致 set -e 脚本崩溃
+
+| 字段 | 内容 |
+|:---|:---|
+| **涉及文件** | `scripts/entrypoint.sh` |
+| **函数** | `speed_test`、`show_report`、`apply_isp_routing_logic`（~line 505）、IS_8K_SMOOTH 判定（~line 577） |
+| **触发条件** | curl 返回科学计数法格式速度（如 `1.5e+06`）；或 speed 值为 `0.00` 时进入 `(( $(bc) ))` 判断 |
+| **错误现象** | `bc` 无法处理科学计数法，返回错误；`echo 0` fallback 使 `(( 0 ))` 以退出码 1 结束；`set -e` 触发脚本立即退出，后续代码全部不执行 |
+| **根本原因** | `(( $(echo "$x > $thresh" \| bc 2>/dev/null \|\| echo 0) ))` 模式在 `set -eou pipefail` 下不安全：bc 失败时 `|| echo 0` 仅保护 bc 子命令，但 `(( 0 ))` 本身退出码为 1，仍触发 `set -e` |
+| **修复方案** | 全文替换为 `awk -v s="$x" -v t="$thresh" 'BEGIN { exit (s + 0 > t + 0 ? 0 : 1) }'`；awk `+0` 运算自动处理科学计数法；exit 0/1 语义明确，不受 `set -e` 影响 |
+| **预防措施** | `set -eou pipefail` 脚本中禁止使用 `(( $(cmd) ))` 模式作数值比较；数值比较统一用 awk；bc 适用于高精度计算但不适合布尔判断 |
+| **记录时间** | 2026-03-11 |
+
+---
+
 ### Bug #028 — hysteria2 URI 缺少 sni= 参数，xray-core 原生 hy2 TLS 握手失败
 
 | 字段 | 内容 |
