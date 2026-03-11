@@ -930,7 +930,6 @@ analyze_base_env() {
         "SB_UUID|generateRandomStr uuid"
         "XRAY_REALITY_SHORTID|openssl rand -hex 8"
         "XRAY_URL_PATH|generateRandomStr path 32"
-        "PORT_ANYTLS|generateRandomStr port"
         "SUBSCRIBE_TOKEN|generateRandomStr path 32"
         "STRATEGY|detect_ip_strategy_api"
         "GEOIP_INFO|get_geo_info"
@@ -952,10 +951,11 @@ init_port_hop_env() {
     # 迁移: 清理已废弃的 PORT_HYSTERIA2 / PORT_TUIC
     local env_file="${ENV_FILE}"
     if [[ -f "$env_file" ]]; then
-        if grep -qE '^export (PORT_HYSTERIA2|PORT_TUIC)=' "$env_file" 2>/dev/null; then
-            log INFO "[迁移] PORT_HYSTERIA2/PORT_TUIC 已废弃，hy2→443, TUIC→8443"
+        if grep -qE '^export (PORT_HYSTERIA2|PORT_TUIC|PORT_ANYTLS)=' "$env_file" 2>/dev/null; then
+            log INFO "[迁移] PORT_HYSTERIA2/PORT_TUIC/PORT_ANYTLS 已废弃，hy2→443, TUIC→8443, AnyTLS→443(SNI)"
             _sed_i '/^export PORT_HYSTERIA2=/d' "$env_file"
             _sed_i '/^export PORT_TUIC=/d' "$env_file"
+            _sed_i '/^export PORT_ANYTLS=/d' "$env_file"
         fi
     fi
 
@@ -990,7 +990,11 @@ init_port_hop_env() {
         export TUIC_PORTS_LINE=""
     fi
 
+    # AnyTLS 通过 Nginx SNI 路由共享 TCP 443
+    export ANYTLS_DOMAIN="at.${DOMAIN}"
+
     log INFO "Hysteria2 监听端口: UDP ${HY2_LISTEN_PORT}, TUIC 监听端口: UDP ${TUIC_LISTEN_PORT}"
+    log INFO "AnyTLS 域名: ${ANYTLS_DOMAIN} (TCP 443 SNI 路由)"
     log INFO "端口跳跃配置: HY2_HOP_RANGE=${HY2_HOP_RANGE:-禁用}, TUIC_HOP_RANGE=${TUIC_HOP_RANGE:-禁用}"
 }
 
