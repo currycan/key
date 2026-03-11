@@ -46,8 +46,8 @@ STATUS_FILE="${STATUS_FILE:-/.env/status}"
 
 # 测速目标 URL
 _SPEED_TEST_URL="https://speed.cloudflare.com/__down?bytes=25000000"
-# 每节点采样次数（取均值，平滑偶发抖动）
-SPEED_SAMPLES=3
+# 每节点采样次数（截断均值：去最大最小后取中间样本，平滑突发峰值）
+SPEED_SAMPLES=5
 # ISP 节点间切换容差百分比：新节点须超出当前最优该比例才替换（防止微小差距反复横跳）
 SPEED_TOLERANCE=15
 
