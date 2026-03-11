@@ -465,13 +465,15 @@ _test_isp_node() {
 }
 
 # 根据测速结果和环境信息决定最终 ISP_TAG，并计算 IS_8K_SMOOTH
-# 参数:
-#   $1 - first_tag: 第一个检测到的 ISP 节点 tag，用于受限地区兜底（可为空）
 # 依赖外部变量（由 run_speed_tests_if_needed 注入）:
 #   DIRECT_SPEED, proxy_max_speed, FASTEST_PROXY_TAG
 #
-# 选路原则：ISP 代理目的是解锁 geo 限制（ChatGPT/Netflix 等），不与直连竞速。
-#   有 ISP 代理 → 始终使用最快代理；直连仅为无代理时的兜底。
+# 选路原则：
+#   1. 优选最快 ISP 代理（FASTEST_PROXY_TAG，由测速阶段确定）
+#   2. 受限地区 OR 非住宅 IP → 需要代理（解锁 geo / 流媒体 / AI）
+#   3. 需要代理 + 有可用节点 → ISP_TAG = FASTEST_PROXY_TAG
+#   4. 需要代理 + 无可用节点 → 回退直连（ERROR）
+#   5. 条件均不满足（住宅 IP + 非受限）→ 直连兜底
 apply_isp_routing_logic() {
     local manual_isp_tag=""
     if [[ -n "${DEFAULT_ISP:-}" ]]; then
@@ -488,39 +490,32 @@ apply_isp_routing_logic() {
     log INFO "[选路]   DEFAULT_ISP   = ${DEFAULT_ISP:-未设置（自动选路）}"
     log INFO "[选路]   直连速度      = ${DIRECT_SPEED:-0} Mbps（不参与选路）"
     log INFO "[选路]   最优 ISP 代理 = ${FASTEST_PROXY_TAG:-无} (${proxy_max_speed:-0} Mbps)"
-    log INFO "[选路] 原则: ISP代理用于Geo解锁(ChatGPT/Netflix等)，有代理始终优先；直连为无代理兜底"
+    log INFO "[选路] 原则: 受限地区/非住宅IP→需代理解锁; 住宅IP+非受限→直连兜底"
     log INFO "[选路] ────────────────────────────────────────────"
 
     if [[ -n "${manual_isp_tag}" ]]; then
-        # 锁定模式：DEFAULT_ISP 非空，强制使用指定出口，跳过测速结果
+        # 锁定模式：DEFAULT_ISP 非空，强制使用指定出口，跳过所有条件判断
         log INFO "[选路] 手动覆盖 DEFAULT_ISP=${DEFAULT_ISP} → ${manual_isp_tag}"
         export ISP_TAG="$manual_isp_tag"
 
-    elif _is_restricted_region; then
-        # 受限地区（中国大陆/香港等）：必须走代理，无代理则回退直连
-        if [[ -n "${1:-}" ]]; then
-            log WARN "[选路] 受限地区 (${GEOIP_INFO%%|*})，强制使用代理: ${1}"
-            export ISP_TAG="${1}"
+    elif _is_restricted_region || [[ "${IP_TYPE:-unknown}" != "isp" ]]; then
+        # 受限地区 或 非住宅 IP → 需要 ISP 代理解锁
+        _is_restricted_region \
+            && log WARN "[选路] 受限地区 (${GEOIP_INFO%%|*})，需要 ISP 代理"
+        [[ "${IP_TYPE:-unknown}" != "isp" ]] \
+            && log INFO "[选路] 非住宅 IP (${IP_TYPE:-unknown})，需 ISP 代理解锁流媒体/AI"
+        if [[ -n "${FASTEST_PROXY_TAG:-}" ]]; then
+            log INFO "[选路] 使用最优 ISP 代理: ${FASTEST_PROXY_TAG} (${proxy_max_speed:-0} Mbps)"
+            export ISP_TAG="${FASTEST_PROXY_TAG}"
         else
-            log ERROR "[选路] 受限地区但无可用 ISP 节点！回退直连"
+            log ERROR "[选路] 需要 ISP 代理但无可用节点！回退直连"
             export ISP_TAG="direct"
         fi
 
-    elif [[ -n "${FASTEST_PROXY_TAG:-}" ]]; then
-        # 有可用 ISP 代理：始终使用，目的是解锁 geo 限制（不与直连竞速）
-        log INFO "[选路] 使用最优 ISP 代理: ${FASTEST_PROXY_TAG} (${proxy_max_speed:-0} Mbps)"
-        export ISP_TAG="${FASTEST_PROXY_TAG}"
-
     else
-        # 无任何 ISP 节点：回退直连
-        log INFO "[选路] 无可用 ISP 节点，回退直连"
+        # 住宅 ISP IP + 非受限地区：兜底直连
+        log INFO "[选路] 住宅 ISP IP + 非受限地区，无需代理，直连"
         export ISP_TAG="direct"
-    fi
-
-    # 防御性兜底（正常情况不应触发）
-    if [[ -z "${ISP_TAG:-}" && -n "${1:-}" ]]; then
-        export ISP_TAG="${1}"
-        log WARN "[选路] ISP_TAG 意外为空，回退到第一节点: ${ISP_TAG}"
     fi
 
     # IS_8K_SMOOTH：基于实际出口的均值速度，阈值 100 Mbps
@@ -926,7 +921,6 @@ run_speed_tests_if_needed() {
 
     unset ISP_TAG TOP_ISP_TAG proxy_max_speed FASTEST_PROXY_TAG IS_8K_SMOOTH DIRECT_SPEED
     export proxy_max_speed=0
-    local first_tag=""   # 第一个检测到的 ISP 节点，用于受限地区兜底
 
     log INFO "[阶段 2] 环境: IP_TYPE=${IP_TYPE:-未知} | 地区=${GEOIP_INFO%%|*} | DEFAULT_ISP=${DEFAULT_ISP:-未设置}"
 
@@ -953,11 +947,10 @@ run_speed_tests_if_needed() {
         [[ -z "$ip" || -z "$port" ]] && continue
 
         local tag="proxy-$(echo "${prefix}" | tr '[:upper:]_ ' '[:lower:]-')"
-        [[ -z "${first_tag}" ]] && first_tag="$tag"
         _test_isp_node "$prefix" "$ip" "$port" "$user" "$pass" "$tag"
     done
 
-    apply_isp_routing_logic "$first_tag"
+    apply_isp_routing_logic
     log INFO "[阶段 2] 完成"
 }
 
