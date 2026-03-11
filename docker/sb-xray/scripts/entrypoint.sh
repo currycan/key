@@ -130,7 +130,7 @@ http_trace_url() {
 generateRandomStr() {
     local type=$1 length=${2:-12}
     case $type in
-        port)     echo $(( RANDOM % 6001 + 32000 )) ;;
+        port)     echo $(( RANDOM % 5001 + 60000 )) ;;
         uuid)     xray uuid ;;
         # || true: 避免 tr | head -c 管道在 pipefail 模式下因 SIGPIPE 误退出
         password) LC_ALL=C tr -dc 'A-Za-z0-9' < /dev/urandom | head -c "$length" || true ;;
