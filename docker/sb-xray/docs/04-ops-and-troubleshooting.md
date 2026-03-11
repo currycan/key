@@ -159,7 +159,7 @@ environment:
 | `XRAY_URL_PATH` | 随机 32 位 | XHTTP 路径 |
 | ~~`PORT_HYSTERIA2`~~ | 已废弃 → 固定 `443` | Hysteria2 现固定 UDP 443（QUIC 伪装） |
 | ~~`PORT_TUIC`~~ | 已废弃 → 固定 `8443` | TUIC 现固定 UDP 8443 |
-| ~~`PORT_ANYTLS`~~ | 已废弃 → TCP 443 SNI | AnyTLS 现通过 `at.${DOMAIN}` SNI 共享 TCP 443 |
+| `PORT_ANYTLS` | 随机高位端口 | AnyTLS TCP 端口 |
 | `XUI_LOCAL_PORT` | 随机端口 | X-UI 实际监听端口 |
 | `DUFS_PORT` | 随机高位端口 | Dufs 内部监听端口 |
 | `SUB_STORE_FRONTEND_BACKEND_PATH` | 随机 32 位路径 | Sub-Store 后端 API 路径（每次部署唯一，防扫描） |

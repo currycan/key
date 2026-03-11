@@ -3,9 +3,8 @@
         {
             "type": "anytls",
             "tag": "sing-box anytls",
-            "listen": "127.0.0.1",
-            "listen_port": 18443,
-            "proxy_protocol": true,
+            "listen": "::",
+            "listen_port": ${PORT_ANYTLS},
             "users": [
                 {
                     "password": "${SB_UUID}"
@@ -14,7 +13,6 @@
             "padding_scheme": [],
             "tls": {
                 "enabled": true,
-                "server_name": "at.${DOMAIN}",
                 "certificate_path": "${SSL_PATH}/sb_xray_bundle.crt",
                 "key_path": "${SSL_PATH}/sb_xray_bundle.key"
             }

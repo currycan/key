@@ -31,10 +31,9 @@ ${TUIC_PORTS_LINE}
 
   - name: ${FLAG_PREFIX}AnyTLS ✈ ${NODE_NAME}${NODE_SUFFIX}
     type: anytls
-    server: ${ANYTLS_DOMAIN}
-    port: ${LISTENING_PORT}
+    server: ${DOMAIN}
+    port: ${PORT_ANYTLS}
     password: ${SB_UUID}
-    sni: ${ANYTLS_DOMAIN}
     client-fingerprint: chrome
     udp: true
     idle-session-check-interval: 30

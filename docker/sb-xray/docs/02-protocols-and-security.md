@@ -227,17 +227,15 @@ ports: 38000-48000
 
 ### 1.4 AnyTLS (Sing-box) — TCP 伪装
 
-伪装成任意 HTTPS 流量的 TCP 协议。通过 Nginx SNI 路由共享 TCP 443 端口。
+伪装成任意 HTTPS 流量的 TCP 协议。
 
-* **连接方式**: TCP 443 / Nginx SNI 路由（`at.${DOMAIN}`）
-* **前置要求**: DNS 添加 `at.${DOMAIN}` A 记录指向服务器 IP
+* **连接方式**: TCP / 独立高位端口
 
 #### 流量图解
 
 ```mermaid
 graph LR
-    User((客户端)) -- "TCP 443 SNI=at.域名" --> Nginx{{"Nginx Stream"}}
-    Nginx -- "SNI 路由 → unix socket" --> Singbox(("Sing-box AnyTLS"))
+    User((客户端)) -- "TCP 高位端口 TLS" --> Singbox(("Sing-box 核心"))
     Singbox -- "AnyTLS 流量" --> Internet((互联网))
 ```
 
@@ -245,10 +243,10 @@ graph LR
 
 * **URL 示例**:
   ```
-  anytls://${SB_UUID}@${ANYTLS_DOMAIN}:${LISTENING_PORT}?security=tls&sni=${ANYTLS_DOMAIN}&type=tcp#🇺🇸 AnyTLS ✈ ${NODE_NAME}${NODE_SUFFIX}
+  anytls://${SB_UUID}@${DOMAIN}:${PORT_ANYTLS}?security=tls&type=tcp#🇺🇸 AnyTLS ✈ ${NODE_NAME}${NODE_SUFFIX}
   ```
 * **服务端配置文件**: `templates/sing-box/03_anytls_inbounds.json`
-* **路径**: TCP 443 → Nginx Stream SNI → `anytls.sock` → Sing-box（proxy_protocol）
+* **路径**: **直连**（不经过 Nginx，不经过 Xray）
 
 ---
 
