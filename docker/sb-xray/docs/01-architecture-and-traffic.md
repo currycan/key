@@ -58,13 +58,11 @@ graph TD
         P443["端口 443 TCP/UDP"]:::entry
         PHysteria["Hysteria2 端口 UDP"]:::entry
         PTuic["TUIC 端口 UDP"]:::entry
-        PAnyTLS["AnyTLS 端口 TCP"]:::entry
     end
 
     User ==> P443
     User ==> PHysteria
     User ==> PTuic
-    User ==> PAnyTLS
 
     subgraph 内部核心路由
         NginxStream{{"Nginx Stream 分流器"}}:::nginx
@@ -81,6 +79,7 @@ graph TD
 
     NginxStream -- "伪装域名 SNI" --> UDS_Reality --> XrayReality
     NginxStream -- "CDN 域名 SNI" --> UDS_CDN --> NginxWeb
+    NginxStream -- "at.域名 SNI" --> UDS_AnyTLS["anytls.sock"] --> SingBox
 
     XrayReality -- "Vision 验证通过" --> ProxyOut1["代理流量出站"]:::xray
     XrayReality -- "非 Vision 流量" --> UDS_Nginx
@@ -88,7 +87,6 @@ graph TD
 
     PHysteria --> SingBox
     PTuic --> SingBox
-    PAnyTLS --> SingBox
     SingBox --> ProxyOut2["代理流量出站"]:::sing
 
     ProxyOut1 -.-> ISP["ISP 落地代理"]:::entry
@@ -202,9 +200,11 @@ graph TD
 
 #### 场景三：独立端口直连模式
 
-* **适用协议**：Hysteria2 (UDP)、TUIC V5 (UDP)、AnyTLS (TCP)
-* **客户端行为**：连接服务器的**独立高位端口**
-* **流转过程**：流量直接到达高位端口，**Sing-box** 直接监听，不经过 Nginx，不经过 Xray。损耗最小。
+* **适用协议**：Hysteria2 (UDP)、TUIC V5 (UDP)
+* **客户端行为**：连接服务器的**独立 UDP 端口**（支持端口跳跃）
+* **流转过程**：流量直接到达 UDP 端口，**Sing-box** 直接监听，不经过 Nginx，不经过 Xray。损耗最小。
+
+> **AnyTLS** 已迁移至 TCP 443 通过 Nginx SNI 路由（`at.${DOMAIN}`），详见 §1.4。
 
 #### 场景四：管理与维护
 
