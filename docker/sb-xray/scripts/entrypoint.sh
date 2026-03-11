@@ -949,18 +949,29 @@ analyze_base_env() {
 
 # 初始化端口跳跃环境变量（带默认值，空值=禁用）
 init_port_hop_env() {
-    # 迁移: 清理已废弃的 PORT_HYSTERIA2 / PORT_TUIC (Task 5)
+    # 迁移: 清理已废弃的 PORT_HYSTERIA2 / PORT_TUIC
     local env_file="${ENV_FILE}"
     if [[ -f "$env_file" ]]; then
-        if grep -qE '^(PORT_HYSTERIA2|PORT_TUIC)=' "$env_file" 2>/dev/null; then
+        if grep -qE '^export (PORT_HYSTERIA2|PORT_TUIC)=' "$env_file" 2>/dev/null; then
             log INFO "[迁移] PORT_HYSTERIA2/PORT_TUIC 已废弃，hy2→443, TUIC→8443"
-            sed_inplace '/^PORT_HYSTERIA2=/d' "$env_file"
-            sed_inplace '/^PORT_TUIC=/d' "$env_file"
+            _sed_i '/^export PORT_HYSTERIA2=/d' "$env_file"
+            _sed_i '/^export PORT_TUIC=/d' "$env_file"
         fi
     fi
 
     : "${HY2_HOP_RANGE:=20000-37999}"
     : "${TUIC_HOP_RANGE:=38000-48000}"
+
+    # 验证 HOP_RANGE 格式: start-end, 1-65535, start < end
+    local range re='^([0-9]{1,5})-([0-9]{1,5})$'
+    for range in HY2_HOP_RANGE TUIC_HOP_RANGE; do
+        local val="${!range}"
+        if [[ -n "$val" ]] && ! [[ "$val" =~ $re && ${BASH_REMATCH[1]} -lt ${BASH_REMATCH[2]} && ${BASH_REMATCH[2]} -le 65535 ]]; then
+            log WARN "[${range}] 格式无效 '${val}'（期望: start-end），已禁用"
+            eval "export ${range}=''"
+        fi
+    done
+
     export HY2_HOP_RANGE TUIC_HOP_RANGE
 
     # Clash/Stash `ports:` line for template rendering
@@ -986,9 +997,10 @@ setup_port_hopping() {
         return 0
     fi
 
-    if command -v iptables &>/dev/null && iptables -t nat -L -n &>/dev/null 2>&1; then
+    if command -v iptables &>/dev/null && iptables -t nat -L -n >/dev/null 2>&1; then
         log INFO "使用 iptables 配置端口跳跃..."
-        iptables -t nat -N SB_XRAY_HOP 2>/dev/null || iptables -t nat -F SB_XRAY_HOP
+        iptables -t nat -N SB_XRAY_HOP 2>/dev/null || true
+        iptables -t nat -F SB_XRAY_HOP
         iptables -t nat -C PREROUTING -j SB_XRAY_HOP 2>/dev/null || \
             iptables -t nat -A PREROUTING -j SB_XRAY_HOP
 
