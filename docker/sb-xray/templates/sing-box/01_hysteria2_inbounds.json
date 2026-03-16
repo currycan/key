@@ -5,6 +5,10 @@
             "tag": "sing-box hysteria2",
             "listen": "::",
             "listen_port": ${PORT_HYSTERIA2},
+            "obfs": {
+                "type": "salamander",
+                "password": "${SB_UUID}"
+            },
             "users": [
                 {
                     "password": "${SB_UUID}"

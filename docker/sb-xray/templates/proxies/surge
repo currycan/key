@@ -1,5 +1,5 @@
 # Hysteria2
-${FLAG_PREFIX}Hysteria2 ✈ ${NODE_NAME}${NODE_SUFFIX}=hysteria2,${DOMAIN},${PORT_HYSTERIA2},password=${SB_UUID},skip-cert-verify=false,download-bandwidth=2500
+${FLAG_PREFIX}Hysteria2 ✈ ${NODE_NAME}${NODE_SUFFIX}=hysteria2,${DOMAIN},${PORT_HYSTERIA2},password=${SB_UUID},obfs=salamander,obfs-password=${SB_UUID},skip-cert-verify=false,download-bandwidth=2500
 # TUICv5
 ${FLAG_PREFIX}TUIC ✈ ${NODE_NAME}${NODE_SUFFIX}=tuic-v5,${DOMAIN},${PORT_TUIC},uuid=${SB_UUID},password=${SB_UUID},alpn=h3,sni=off,skip-cert-verify=false
 # VMESS TLS WS

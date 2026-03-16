@@ -4,6 +4,8 @@ proxies:
     server: ${DOMAIN}
     port: ${PORT_HYSTERIA2}
     sni: ${DOMAIN}
+    obfs: salamander
+    obfs-password: ${SB_UUID}
     alpn:
       - h3
     up: 2500 Mbps
