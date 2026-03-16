@@ -10,9 +10,7 @@
                     "password": "${SB_UUID}"
                 }
             ],
-            "padding_scheme": [
-                "default"
-            ],
+            "padding_scheme": [],
             "tls": {
                 "enabled": true,
                 "min_version": "1.3",
