@@ -2,9 +2,7 @@ proxies:
   - name: ${FLAG_PREFIX}Hysteria2 ✈ ${NODE_NAME}${NODE_SUFFIX}
     type: hysteria2
     server: ${DOMAIN}
-    port: ${HY2_LISTEN_PORT}
-${HY2_PORTS_LINE}
-    sni: ${DOMAIN}
+    port: ${PORT_HYSTERIA2}
     alpn:
       - h3
     up: 2500 Mbps
@@ -15,7 +13,7 @@ ${HY2_PORTS_LINE}
   - name: ${FLAG_PREFIX}TUIC ✈ ${NODE_NAME}${NODE_SUFFIX}
     type: tuic
     server: ${DOMAIN}
-    port: ${TUIC_LISTEN_PORT}
+    port: ${PORT_TUIC}
     uuid: ${SB_UUID}
     password: ${SB_UUID}
     alpn:

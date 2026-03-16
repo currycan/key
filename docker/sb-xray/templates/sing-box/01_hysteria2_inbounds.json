@@ -4,7 +4,7 @@
             "type": "hysteria2",
             "tag": "sing-box hysteria2",
             "listen": "::",
-            "listen_port": ${HY2_LISTEN_PORT},
+            "listen_port": ${PORT_HYSTERIA2},
             "users": [
                 {
                     "password": "${SB_UUID}"
@@ -13,7 +13,7 @@
             "ignore_client_bandwidth": false,
             "tls": {
                 "enabled": true,
-                "server_name": "${DOMAIN}",
+                "server_name": "",
                 "alpn": [
                     "h3"
                 ],
