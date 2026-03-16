@@ -214,13 +214,50 @@ description: 跨 Skill 的 Bug 修复记录，所有 Agent 工作时必须优先
 
 ## Xray 配置模板
 
-*（此分区待记录）*
+### Bug #032 — policy-priority 关键词大小写不符，AnyTLS 实际得 0 分
+
+| 字段 | 内容 |
+|:---|:---|
+| **涉及文件** | `templates/client_template/OneSmartPro.yaml`、`scripts/show-config.sh` |
+| **函数** | `policy-priority` 权重配置、`generate_links` 节点命名 |
+| **触发条件** | Mihomo Smart 模式加载含 AnyTLS/TUIC 节点的策略组时 |
+| **错误现象** | AnyTLS 节点实际得 0 分（anytls:1 不匹配节点名 "AnyTLS"）；TUIC 得 6 分高于 AnyTLS，优先级与实际稳定性（高峰期 TUIC UDP QoS 严重）相反；vless/hysteria2/tuic/vmess 小写关键词全部不匹配实际大写节点名，均为死权重 |
+| **根本原因** | Mihomo policy-priority 为**区分大小写**的字符串包含匹配；节点名使用大写首字母（`AnyTLS`/`TUIC`/`Hysteria2`/`Vmess`），但 policy-priority 中部分关键词为小写（`anytls`/`tuic`/`hysteria2`/`vmess`）；纯 Reality 节点名（`Reality ✈`）与 XHTTP+Reality 节点名同为 `Reality:20`，无法区分协议优先级 |
+| **修复方案** | ① `show-config.sh`：纯 Reality 节点改名 `XTLS-Reality ✈` 加入 XTLS 标记；② policy-priority 更新为 `高速:10;Reality:20;XTLS:8;Xhttp:5;Hysteria2:8;AnyTLS:5;TUIC:3;Vmess:2;super:30;good:10`；最终得分：XTLS-Reality(28) > Xhttp+Reality(25) > Hysteria2(8) > AnyTLS(5) > TUIC(3) > Vmess(2) |
+| **预防措施** | policy-priority 关键词必须与节点名实际大小写完全一致；新增协议时先确认节点名格式再写关键词；建议在注释中标注"节点名示例"供核对 |
+| **记录时间** | 2026-03-13 |
 
 ---
 
 ## Sing-box 配置模板
 
-*（此分区待记录）*
+### Bug #030 — sing-box rule_set 不支持 path 字段，导致 FATAL 启动失败
+
+| 字段 | 内容 |
+|:---|:---|
+| **涉及文件** | `templates/sing-box/sb.json` |
+| **函数** | `route.rule_set[]` 远程规则集配置 |
+| **触发条件** | 在 remote 类型 rule_set 配置中添加 `path` 字段时 |
+| **错误现象** | `FATAL[0000] decode config at .../sb.json: route.rule_set[0].path: json: unknown field "path"` |
+| **根本原因** | sing-box 的 remote rule_set 不支持 `path` 字段；规则集持久化通过 `experimental.cache_file`（BBolt cache.db）自动处理，无需手动指定磁盘路径 |
+| **修复方案** | 删除所有 remote rule_set 条目中的 `path` 字段；规则集缓存已由 `cache_file.path: "${WORKDIR}/sing-box/cache.db"` 统一处理 |
+| **预防措施** | sing-box remote rule_set 只支持 `tag`、`type`、`format`、`url`、`download_detour`、`update_interval` 字段；凡涉及 rule_set 持久化需求，查阅 `experimental.cache_file` 而非 rule_set 本身 |
+| **记录时间** | 2026-03-13 |
+
+---
+
+### Bug #031 — AnyTLS padding_scheme "default" 非法格式，导致 FATAL 启动失败
+
+| 字段 | 内容 |
+|:---|:---|
+| **涉及文件** | `templates/sing-box/03_anytls_inbounds.json` |
+| **函数** | AnyTLS inbound `padding_scheme` 配置 |
+| **触发条件** | 将 `padding_scheme` 设为字符串 `"default"` 或 `["default"]` 时 |
+| **错误现象** | `FATAL[0000] create service: initialize inbound[2]: incorrect padding scheme format` |
+| **根本原因** | `padding_scheme` 要求特定格式的规则对象数组，不接受字符串 "default"；空数组 `[]` 为合法值（表示禁用填充） |
+| **修复方案** | 回退为 `"padding_scheme": []`（空数组，禁用填充） |
+| **预防措施** | AnyTLS `padding_scheme` 不支持字符串枚举值；修改此字段前查阅 sing-box 官方文档确认格式；空数组是最安全的兜底值 |
+| **记录时间** | 2026-03-13 |
 
 ---
 

@@ -57,13 +57,14 @@ graph LR
 * **连接方式**: TCP / 443 端口
 * **URL 示例**:
   ```
-  vless://${XRAY_UUID}@${DOMAIN}:${LISTENING_PORT}?encryption=none&flow=xtls-rprx-vision&security=reality&sni=${DEST_HOST}&fp=chrome&pbk=${XRAY_REALITY_PUBLIC_KEY}&sid=${XRAY_REALITY_SHORTID}&type=tcp&headerType=none#🇺🇸 Reality ✈ ${NODE_NAME}${NODE_SUFFIX}
+  vless://${XRAY_UUID}@${DOMAIN}:${LISTENING_PORT}?encryption=none&flow=xtls-rprx-vision&security=reality&sni=${DEST_HOST}&fp=chrome&pbk=${XRAY_REALITY_PUBLIC_KEY}&sid=${XRAY_REALITY_SHORTID}&type=tcp&headerType=none#🇺🇸 XTLS-Reality ✈ ${NODE_NAME}${NODE_SUFFIX}
   ```
 * **核心参数**:
   * `flow`: `xtls-rprx-vision`（必须）
   * `security`: `reality`
   * `sni`: **必须是伪装域名**（即 `${DEST_HOST}`），而非您的主域名
   * `address`: 您的服务器主域名或 IP
+  * `sid`: shortId，服务端支持 3 个随机 shortId（`XRAY_REALITY_SHORTID` / `_2` / `_3`）+ 空串兜底，可为不同设备分配不同 shortId 独立轮换
 
 #### 服务端入站
 
@@ -94,56 +95,37 @@ graph LR
 
 #### 客户端配置
 
-* **连接方式**: UDP / 443 端口（QUIC 伪装）
+* **连接方式**: UDP / 随机高位端口（`PORT_HYSTERIA2`，范围 32000–38000）
 * **URL 示例**:
   ```
-  hysteria2://${SB_UUID}@${DOMAIN}:${PORT_HYSTERIA2}/?sni=${DOMAIN}&alpn=h3#🇺🇸 Hysteria2 ✈ ${NODE_NAME}${NODE_SUFFIX}
+  hysteria2://${SB_UUID}@${DOMAIN}:${PORT_HYSTERIA2}/?sni=${DOMAIN}&obfs=salamander&obfs-password=${SB_UUID}&alpn=h3#🇺🇸 Hysteria2 ✈ ${NODE_NAME}${NODE_SUFFIX}
   ```
 * **核心参数**:
   * `sni`: `${DOMAIN}`（显式指定 SNI，兼容 xray-core v26.1.23+ 原生 hy2 客户端）
+  * `obfs=salamander` + `obfs-password`: Salamander 混淆，将 QUIC 流量伪装为随机 UDP 噪声
   * `alpn`: `h3`
 
 > **注意**: 证书由 acme.sh DNS 挑战申请，为 CA 签名证书，无需 `insecure=1`。客户端 URI 必须显式携带 `sni=` 参数，否则 xray-core 原生 hy2 实现可能无法从 URI 隐式推断 SNI，导致 TLS 握手失败。
 
-#### ISP 高峰期 UDP 限速
+#### ISP 高峰期 UDP 限速对策
 
 > **注意**: Hysteria2 基于 UDP 传输。国内部分 ISP（尤其中国移动/联通）在高峰时段（北京时间约 21:00–24:00）对 UDP 流量实施 QoS 限速或丢包，可能导致连接不稳定甚至完全不可用。
->
-> **客户端自动回退**：本项目的 OneSmartPro（smart 策略组）和 FallBackPro（fallback/url-test 策略组）均内置健康检查（180 秒间隔）。当 Hysteria2 节点健康检查失败时，客户端会自动切换到 TCP 协议节点（如 Reality、XHTTP），无需手动干预。
->
-> 如需在高峰期获得最稳定体验，建议在 OpenClash 策略组中手动选择 TCP 协议节点（Reality / XHTTP）。
 
-#### 端口跳跃（Port Hopping）
+本项目采用 **Salamander 混淆**对抗 UDP QoS：
 
-Hysteria2 固定监听 **UDP 443**，伪装为标准 QUIC/HTTP3 流量。通过 iptables DNAT 实现端口跳跃，将多端口范围重定向至 443：
+| 方案 | 原理 | 效果 |
+|:---|:---|:---|
+| **Salamander 混淆** | 将 QUIC 数据包外观完全随机化，DPI 无法识别为 QUIC 流量 | 对抗基于协议识别的 QoS 限速 |
+| **随机高位端口** | 不使用固定 443，规避针对特定端口的 UDP 封锁 | 避免端口级别的 QoS 策略 |
 
-| 项目 | 值 |
-|:---|:---|
-| **固定监听端口** | UDP 443（QUIC 伪装） |
-| **跳跃范围环境变量** | `HY2_HOP_RANGE` |
-| **默认范围** | `20000-37999` |
-| **禁用方式** | 设置 `HY2_HOP_RANGE=""` |
-| **容器要求** | `NET_ADMIN` capability（iptables 操作） |
-
-客户端连接时需携带 `mport=` 参数指定跳跃端口范围：
-
-```
-hysteria2://${SB_UUID}@${DOMAIN}:443?sni=${DOMAIN}&alpn=h3&mport=20000-37999#...
-```
-
-Clash/Mihomo 配置使用 `ports:` 字段：
-
-```yaml
-ports: 20000-37999
-```
-
-> **提示**：端口跳跃通过在多个端口间轮换来对抗 QoS 限速与端口封锁，显著提升 UDP 协议在高峰期的存活率。
+> **客户端自动回退**：当 Hysteria2 节点健康检查失败时，OneSmartPro（Smart 策略组）和 FallBackPro（Fallback 策略组）均会自动切换到 TCP 协议节点（Reality / XHTTP / AnyTLS），无需手动干预。
 
 #### 服务端入站
 
 * **配置文件**: `templates/sing-box/01_hysteria2_inbounds.json`
-* **监听地址**: `::` (All Interfaces)，端口 443
+* **监听地址**: `::` (All Interfaces)，端口 `${PORT_HYSTERIA2}`（随机生成，容器首次启动后固定）
 * **路径**: **直连**（不经过 Nginx，不经过 Xray）
+* **Salamander 混淆**: 服务端和客户端使用同一 `SB_UUID` 作为混淆密码
 
 #### Xray 原生客户端配置
 
@@ -177,13 +159,13 @@ ports: 20000-37999
 
 另一种基于 QUIC 的高性能协议。
 
-* **连接方式**: UDP / 8443 端口
+* **连接方式**: UDP / 随机高位端口（`PORT_TUIC`，范围 32000–38000）
 
 #### 流量图解
 
 ```mermaid
 graph LR
-    User((客户端)) -- "UDP 8443 / 跳跃端口" --> Singbox(("Sing-box 核心"))
+    User((客户端)) -- "UDP 随机高位端口" --> Singbox(("Sing-box 核心"))
     Singbox -- "TUIC V5 / QUIC" --> Internet((互联网))
 ```
 
@@ -191,37 +173,14 @@ graph LR
 
 * **URL 示例**:
   ```
-  tuic://${SB_UUID}:${SB_UUID}@${DOMAIN}:8443?alpn=h3&insecure=1&congestion_control=bbr#🇺🇸 TUIC ✈ ${NODE_NAME}${NODE_SUFFIX}
+  tuic://${SB_UUID}:${SB_UUID}@${DOMAIN}:${PORT_TUIC}?alpn=h3&congestion_control=bbr#🇺🇸 TUIC ✈ ${NODE_NAME}${NODE_SUFFIX}
   ```
 * **服务端配置文件**: `templates/sing-box/02_tuic_inbounds.json`
 * **路径**: **直连**（不经过 Nginx，不经过 Xray）
 
-#### 端口跳跃（Port Hopping）
-
-TUIC 固定监听 **UDP 8443**。与 Hysteria2 相同，通过 iptables DNAT 实现端口跳跃：
-
-| 项目 | 值 |
-|:---|:---|
-| **固定监听端口** | UDP 8443 |
-| **跳跃范围环境变量** | `TUIC_HOP_RANGE` |
-| **默认范围** | `38000-48000` |
-| **禁用方式** | 设置 `TUIC_HOP_RANGE=""` |
-
-客户端连接时携带 `mport=` 参数：
-
-```
-tuic://${SB_UUID}:${SB_UUID}@${DOMAIN}:8443?alpn=h3&mport=38000-48000&...
-```
-
-Clash/Mihomo 配置使用 `ports:` 字段：
-
-```yaml
-ports: 38000-48000
-```
-
 #### ISP 高峰期 UDP 限速
 
-> **注意**: TUIC 与 Hysteria2 同属 UDP/QUIC 协议，受到相同的 ISP 高峰期限速影响（详见 [§1.2 Hysteria2 — ISP 高峰期 UDP 限速](#isp-高峰期-udp-限速)）。客户端策略组的健康检查机制会自动将流量切换到 TCP 协议节点。
+> **注意**: TUIC 与 Hysteria2 同属 UDP/QUIC 协议，受到相同的 ISP 高峰期限速影响。TUIC **无 Salamander 混淆**，高峰期抗 QoS 能力弱于 Hysteria2。客户端策略组健康检查失败时会自动切换到 AnyTLS 或 TCP 协议节点。
 
 ---
 

@@ -236,17 +236,19 @@ graph LR
 
 #### 评分标准对照表（与 `OneSmartPro.yaml` 严格同步）
 
-| 考核维度 | 关键字命中匹配 | 权重 (分值) | 机制说明 |
-|:---|:---|:---:|:---|
-| **质量标签** | `super` | +30 | 住宅流畅标识，最高质量节点 |
-| | `good` / `高速` | +10 | 代理流畅/高速标识 |
-| **协议性能** | `Reality` | +20 | 第一梯队隐蔽协议 |
-| | `vless` | +10 | 核心轻量协议 |
-| | `Hysteria2` / `hysteria2` | +8 | 优秀的 UDP 低阻力协议 |
-| | `TUIC` / `tuic` | +6 | 第二代 QUIC 协议 |
-| | `Vmess` / `vmess` | +3 | 常见老牌协议，保底分数 |
-| | `anytls` | +1 | 传统握手协议，仅留底分 |
-| **地区偏好** | *因策略而异* | *见下方各策略模板* | 不同场景有不同地区权重 |
+| 考核维度 | 关键字命中匹配 | 权重 (分值) | 实际节点名示例 | 机制说明 |
+|:---|:---|:---:|:---|:---|
+| **质量标签** | `super` | +30 | `✈ super` | 住宅流畅标识，最高质量节点 |
+| | `good` / `高速` | +10 | `✈ good` | 代理流畅/高速标识 |
+| **协议性能** | `Reality` + `XTLS` | +20+8=**28** | `XTLS-Reality ✈` | 纯 Reality Vision 节点（最高）|
+| | `Reality` + `Xhttp` | +20+5=**25** | `Xhttp+Reality直连 ✈` | XHTTP+Reality 直连节点 |
+| | `Hysteria2` | +8 | `Hysteria2 ✈` | UDP QUIC + Salamander 混淆 |
+| | `AnyTLS` | +5 | `AnyTLS ✈` | TCP TLS 伪装，高峰期稳定 |
+| | `TUIC` | +3 | `TUIC ✈` | UDP QUIC，高峰期无混淆较弱 |
+| | `Vmess` | +2 | `Vmess ✈` | WebSocket CDN 兜底 |
+| **地区偏好** | *因策略而异* | *见下方各策略模板* | — | 不同场景有不同地区权重 |
+
+> **关键词大小写敏感**：Mihomo 的 `policy-priority` 关键词匹配为**区分大小写**的字符串包含匹配。节点名中出现什么大小写形式，权重关键词就必须与之完全一致，否则不得分。
 
 ### 2.4 Filter 筛选器详解
 
@@ -294,42 +296,42 @@ xychart-beta
 #### PolicyDefault（默认策略，无地区偏置）
 
 ```yaml
-"高速:10;Reality:20;vless:10;Hysteria2:8;hysteria2:8;TUIC:6;tuic:6;Vmess:3;vmess:3;anytls:1;super:30;good:10"
+"高速:10;Reality:20;XTLS:8;Xhttp:5;Hysteria2:8;AnyTLS:5;TUIC:3;Vmess:2;super:30;good:10"
 ```
 
 #### PolicyISP（家宽策略）
 
 ```yaml
 # 地区偏好: 🇺🇸:20 > 🇰🇷:10 > 🇯🇵:6 > 🇸🇬:4 > 🇹🇼:2
-"高速:10;Reality:20;vless:10;Hysteria2:8;hysteria2:8;TUIC:6;tuic:6;Vmess:3;vmess:3;anytls:1;super:30;good:10;🇺🇸:20;🇰🇷:10;🇯🇵:6;🇸🇬:4;🇹🇼:2"
+"高速:10;Reality:20;XTLS:8;Xhttp:5;Hysteria2:8;AnyTLS:5;TUIC:3;Vmess:2;super:30;good:10;🇺🇸:20;🇰🇷:10;🇯🇵:6;🇸🇬:4;🇹🇼:2"
 ```
 
 #### PolicyMedia（流媒体策略）
 
 ```yaml
 # 地区偏好: 🇺🇸:15 > 🇰🇷:8 > 🇯🇵:6 > 🇸🇬:4 > 🇹🇼:2
-"高速:10;Reality:20;vless:10;Hysteria2:8;hysteria2:8;TUIC:6;tuic:6;Vmess:3;vmess:3;anytls:1;super:30;good:10;🇺🇸:15;🇰🇷:8;🇯🇵:6;🇸🇬:4;🇹🇼:2"
+"高速:10;Reality:20;XTLS:8;Xhttp:5;Hysteria2:8;AnyTLS:5;TUIC:3;Vmess:2;super:30;good:10;🇺🇸:15;🇰🇷:8;🇯🇵:6;🇸🇬:4;🇹🇼:2"
 ```
 
 #### PolicyFast（高速策略）
 
 ```yaml
 # 地区偏好: 🇺🇸:15 > 🇯🇵:10 > 🇰🇷:8 > 🇸🇬:4 > 🇹🇼:2
-"高速:10;Reality:20;vless:10;Hysteria2:8;hysteria2:8;TUIC:6;tuic:6;Vmess:3;vmess:3;anytls:1;super:30;good:10;🇺🇸:15;🇯🇵:10;🇰🇷:8;🇸🇬:4;🇹🇼:2"
+"高速:10;Reality:20;XTLS:8;Xhttp:5;Hysteria2:8;AnyTLS:5;TUIC:3;Vmess:2;super:30;good:10;🇺🇸:15;🇯🇵:10;🇰🇷:8;🇸🇬:4;🇹🇼:2"
 ```
 
 #### PolicyAI（AI 服务策略）
 
 ```yaml
 # 地区偏好: 🇺🇸:20 > 🇯🇵:10 > 🇰🇷:8 > 🇸🇬:4 > 🇹🇼:2
-"高速:10;Reality:20;vless:10;Hysteria2:8;hysteria2:8;TUIC:6;tuic:6;Vmess:3;vmess:3;anytls:1;super:30;good:10;🇺🇸:20;🇯🇵:10;🇰🇷:8;🇸🇬:4;🇹🇼:2"
+"高速:10;Reality:20;XTLS:8;Xhttp:5;Hysteria2:8;AnyTLS:5;TUIC:3;Vmess:2;super:30;good:10;🇺🇸:20;🇯🇵:10;🇰🇷:8;🇸🇬:4;🇹🇼:2"
 ```
 
 #### PolicyDialer（链式代理策略）
 
 ```yaml
 # 地区偏好: 🇭🇰:20 > 🇹🇼:15 > 🇨🇳:15 > 🇰🇷:10 > 🇯🇵:6 > 🇸🇬:4 > 🇺🇸:2
-"高速:10;Reality:20;vless:10;Hysteria2:8;hysteria2:8;TUIC:6;tuic:6;Vmess:3;vmess:3;anytls:1;super:30;good:10;🇭🇰:20;🇹🇼:15;🇨🇳:15;🇰🇷:10;🇯🇵:6;🇸🇬:4;🇺🇸:2"
+"高速:10;Reality:20;XTLS:8;Xhttp:5;Hysteria2:8;AnyTLS:5;TUIC:3;Vmess:2;super:30;good:10;🇭🇰:20;🇹🇼:15;🇨🇳:15;🇰🇷:10;🇯🇵:6;🇸🇬:4;🇺🇸:2"
 ```
 
 > **PolicyDialer 适用场景**：当需要通过距离较近的节点（如香港、台湾）作为链式代理前置来连接远端服务器时，优先选择低延迟地区。
