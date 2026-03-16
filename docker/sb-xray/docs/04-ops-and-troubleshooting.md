@@ -84,7 +84,7 @@ environment:
 | `GEMINI_DIRECT` | `""` | Gemini 路由：`true`=强制直连，`false`=代理，空=自动判断 |
 | `NODE_SUFFIX` | `""` | 订阅节点名称后缀（如 ` ✈ 高速`） |
 | `PROVIDERS` | `""` | 外部订阅源，多行格式 |
-| `HY2_HOP_RANGE` | `20000-37999` | Hysteria2 端口跳跃范围（iptables DNAT → UDP 443）；置空禁用。TUIC 协议不支持端口跳跃，无对应变量 |
+| `HY2_HOP_RANGE` | `38000-58000` | Hysteria2 端口跳跃范围（iptables DNAT → UDP 443）；置空禁用。TUIC 协议不支持端口跳跃，无对应变量 |
 | `TZ` | `Asia/Singapore` | 容器时区 |
 
 #### ACME 证书
