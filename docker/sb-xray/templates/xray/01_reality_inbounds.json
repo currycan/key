@@ -33,7 +33,8 @@
                     ],
                     "privateKey": "${XRAY_REALITY_PRIVATE_KEY}",
                     "shortIds": [
-                        "${XRAY_REALITY_SHORTID}"
+                        "${XRAY_REALITY_SHORTID}",
+                        ""
                     ]
                 },
                 "sockopt": {
@@ -50,8 +51,7 @@
                 "enabled": true,
                 "destOverride": [
                     "http",
-                    "tls",
-                    "quic"
+                    "tls"
                 ],
                 "metadataOnly": false,
                 "routeOnly": true

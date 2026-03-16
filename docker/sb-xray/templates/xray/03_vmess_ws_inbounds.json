@@ -32,8 +32,7 @@
                 "enabled": true,
                 "destOverride": [
                     "http",
-                    "tls",
-                    "quic"
+                    "tls"
                 ],
                 "metadataOnly": false,
                 "routeOnly": true

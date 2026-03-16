@@ -21,7 +21,7 @@
                     "path": "/${XRAY_URL_PATH}-xhttp",
                     "mode": "auto",
                     "extra": {
-                        "noSSEHeader": false,
+                        "noSSEHeader": true,
                         "scMaxEachPostBytes": 1000000,
                         "scMaxBufferedPosts": 30,
                         "xPaddingBytes": "100-1000"
@@ -39,8 +39,7 @@
                 "enabled": true,
                 "destOverride": [
                     "http",
-                    "tls",
-                    "quic"
+                    "tls"
                 ],
                 "metadataOnly": false,
                 "routeOnly": true
