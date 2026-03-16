@@ -15,6 +15,7 @@
             "zero_rtt_handshake": false,
             "tls": {
                 "enabled": true,
+                "server_name": "${DOMAIN}",
                 "alpn": [
                     "h3"
                 ],

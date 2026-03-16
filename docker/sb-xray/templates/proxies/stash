@@ -21,7 +21,7 @@ proxies:
     password: ${SB_UUID}
     alpn:
       - h3
-    disable-sni: true
+    sni: ${DOMAIN}
     reduce-rtt: true
     request-timeout: 8000
     udp-relay-mode: native
