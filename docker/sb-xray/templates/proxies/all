@@ -3,6 +3,7 @@ proxies:
     type: hysteria2
     server: ${DOMAIN}
     port: ${PORT_HYSTERIA2}
+    sni: ${DOMAIN}
     alpn:
       - h3
     up: 2500 Mbps

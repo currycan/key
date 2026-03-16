@@ -13,7 +13,7 @@
             "ignore_client_bandwidth": false,
             "tls": {
                 "enabled": true,
-                "server_name": "",
+                "server_name": "${DOMAIN}",
                 "alpn": [
                     "h3"
                 ],
