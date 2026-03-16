@@ -26,6 +26,7 @@ services:
       #   PROVIDERS=第一个|https://<host>/api/v1/client/subscribe?token=c02d1e8f9cd19dcae0f146c4ed71541a&flag=clash.meta|优
     ports:
       - '443:443/tcp'
+      - '443:443/udp' # use UDP for usage of HTTP/3
     volumes:
       - ./pki:/pki
       - ./acmecerts:/acmecerts
@@ -44,8 +45,9 @@ services:
     restart: always
     tty: true
     network_mode: host
-    cap_add:
-      - NET_ADMIN
+    # cap_add:
+    #   - NET_ADMIN
+    #   - SYS_MODULE
     ulimits:
       nproc: 65535
       nofile:
