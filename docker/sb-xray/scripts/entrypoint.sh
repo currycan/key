@@ -931,6 +931,7 @@ analyze_base_env() {
         "XRAY_REALITY_SHORTID|openssl rand -hex 8"
         "XRAY_URL_PATH|generateRandomStr path 32"
         "PORT_ANYTLS|generateRandomStr port"
+        "TUIC_LISTEN_PORT|generateRandomStr port"
         "SUBSCRIBE_TOKEN|generateRandomStr path 32"
         "STRATEGY|detect_ip_strategy_api"
         "GEOIP_INFO|get_geo_info"
@@ -953,15 +954,14 @@ init_port_hop_env() {
     local env_file="${ENV_FILE}"
     if [[ -f "$env_file" ]]; then
         if grep -qE '^export (PORT_HYSTERIA2|PORT_TUIC)=' "$env_file" 2>/dev/null; then
-            log INFO "[迁移] PORT_HYSTERIA2/PORT_TUIC 已废弃，hy2→443, TUIC→8443"
+            log INFO "[迁移] PORT_HYSTERIA2/PORT_TUIC 已废弃，hy2→443, TUIC→随机端口"
             _sed_i '/^export PORT_HYSTERIA2=/d' "$env_file"
             _sed_i '/^export PORT_TUIC=/d' "$env_file"
         fi
     fi
 
     : "${HY2_LISTEN_PORT:=443}"
-    : "${TUIC_LISTEN_PORT:=8443}"
-    export HY2_LISTEN_PORT TUIC_LISTEN_PORT
+    export HY2_LISTEN_PORT
 
     : "${HY2_HOP_RANGE:=38000-58000}"
 
@@ -983,7 +983,6 @@ init_port_hop_env() {
     fi
 
     log INFO "Hysteria2 监听端口: UDP ${HY2_LISTEN_PORT}, 端口跳跃: ${HY2_HOP_RANGE:-禁用}"
-    log INFO "TUIC 监听端口: UDP ${TUIC_LISTEN_PORT}（TUIC 协议不支持端口跳跃）"
 }
 
 # 设置端口跳跃 iptables/nftables DNAT 规则

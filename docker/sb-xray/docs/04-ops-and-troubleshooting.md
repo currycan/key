@@ -157,7 +157,8 @@ environment:
 | `XRAY_MLKEM768_CLIENT` | `xray mlkem768` | ML-KEM 客户端密钥 |
 | `XRAY_URL_PATH` | 随机 32 位 | XHTTP 路径 |
 | ~~`PORT_HYSTERIA2`~~ | 已废弃 → 固定 `443` | Hysteria2 现固定 UDP 443（QUIC 伪装） |
-| ~~`PORT_TUIC`~~ | 已废弃 → 固定 `8443` | TUIC 现固定 UDP 8443 |
+| ~~`PORT_TUIC`~~ | 已废弃 → `TUIC_LISTEN_PORT` | 旧变量名，已迁移至随机端口 |
+| `TUIC_LISTEN_PORT` | 随机高位端口 | TUIC UDP 端口（32000–38000，自动生成，持久化） |
 | `PORT_ANYTLS` | 随机高位端口 | AnyTLS TCP 端口 |
 | `XUI_LOCAL_PORT` | 随机端口 | X-UI 实际监听端口 |
 | `DUFS_PORT` | 随机高位端口 | Dufs 内部监听端口 |
