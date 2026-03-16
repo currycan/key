@@ -18,6 +18,8 @@
                 "alpn": [
                     "h3"
                 ],
+                "min_version": "1.3",
+                "max_version": "1.3",
                 "certificate_path": "${SSL_PATH}/sb_xray_bundle.crt",
                 "key_path": "${SSL_PATH}/sb_xray_bundle.key"
             }

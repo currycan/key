@@ -15,6 +15,7 @@
                 }
             ],
             "ignore_client_bandwidth": false,
+            "masquerade": "https://www.apple.com",
             "tls": {
                 "enabled": true,
                 "server_name": "${DOMAIN}",

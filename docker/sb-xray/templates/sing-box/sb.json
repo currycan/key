@@ -8,14 +8,21 @@
     "dns": {
         "servers": [
             {
-                "type": "udp",
-                "tag": "cloudflare",
-                "server": "1.1.1.1"
+                "type": "https",
+                "tag": "cloudflare-doh",
+                "server": "1.1.1.1",
+                "server_port": 443
+            },
+            {
+                "type": "https",
+                "tag": "google-doh",
+                "server": "8.8.8.8",
+                "server_port": 443
             },
             {
                 "type": "udp",
-                "tag": "google",
-                "server": "8.8.8.8"
+                "tag": "cloudflare",
+                "server": "1.1.1.1"
             }
         ]
     },
@@ -39,7 +46,7 @@
     ],
     "route": {
         "default_domain_resolver": {
-            "server": "cloudflare",
+            "server": "cloudflare-doh",
             "strategy": "${STRATEGY}"
         },
         "rule_set": [
@@ -47,84 +54,112 @@
                 "tag": "geosite-openai",
                 "type": "remote",
                 "format": "binary",
+                "download_detour": "direct",
+                "update_interval": "24h",
                 "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-openai.srs"
             },
             {
                 "tag": "geosite-netflix",
                 "type": "remote",
                 "format": "binary",
+                "download_detour": "direct",
+                "update_interval": "24h",
                 "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-netflix.srs"
             },
             {
                 "tag": "geosite-disney",
                 "type": "remote",
                 "format": "binary",
+                "download_detour": "direct",
+                "update_interval": "24h",
                 "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-disney.srs"
             },
             {
                 "tag": "geosite-youtube",
                 "type": "remote",
                 "format": "binary",
+                "download_detour": "direct",
+                "update_interval": "24h",
                 "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-youtube.srs"
             },
             {
                 "tag": "geosite-google",
                 "type": "remote",
                 "format": "binary",
+                "download_detour": "direct",
+                "update_interval": "24h",
                 "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-google.srs"
             },
             {
                 "tag": "geosite-anthropic",
                 "type": "remote",
                 "format": "binary",
+                "download_detour": "direct",
+                "update_interval": "24h",
                 "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-anthropic.srs"
             },
             {
                 "tag": "geosite-google-gemini",
                 "type": "remote",
                 "format": "binary",
+                "download_detour": "direct",
+                "update_interval": "24h",
                 "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-google-gemini.srs"
             },
             {
                 "tag": "geosite-tiktok",
                 "type": "remote",
                 "format": "binary",
+                "download_detour": "direct",
+                "update_interval": "24h",
                 "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-tiktok.srs"
             },
             {
                 "tag": "geosite-category-social-media-!cn",
                 "type": "remote",
                 "format": "binary",
+                "download_detour": "direct",
+                "update_interval": "24h",
                 "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-category-social-media-!cn.srs"
             },
             {
                 "tag": "geosite-amazon",
                 "type": "remote",
                 "format": "binary",
+                "download_detour": "direct",
+                "update_interval": "24h",
                 "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-amazon.srs"
             },
             {
                 "tag": "geosite-paypal",
                 "type": "remote",
                 "format": "binary",
+                "download_detour": "direct",
+                "update_interval": "24h",
                 "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-paypal.srs"
             },
             {
                 "tag": "geosite-ebay",
                 "type": "remote",
                 "format": "binary",
+                "download_detour": "direct",
+                "update_interval": "24h",
                 "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-ebay.srs"
             },
             {
                 "tag": "geosite-category-ads-all",
                 "type": "remote",
                 "format": "binary",
+                "download_detour": "direct",
+                "update_interval": "24h",
                 "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-category-ads-all.srs"
             },
             {
                 "tag": "geoip-cn",
                 "type": "remote",
                 "format": "binary",
+                "download_detour": "direct",
+                "update_interval": "24h",
                 "url": "https://raw.githubusercontent.com/SagerNet/sing-geoip/rule-set/geoip-cn.srs"
             }
         ],
