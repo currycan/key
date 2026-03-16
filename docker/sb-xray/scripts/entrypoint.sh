@@ -932,6 +932,7 @@ analyze_base_env() {
         "XRAY_URL_PATH|generateRandomStr path 32"
         "PORT_ANYTLS|generateRandomStr port"
         "TUIC_LISTEN_PORT|generateRandomStr port"
+        "HY2_LISTEN_PORT|generateRandomStr port"
         "SUBSCRIBE_TOKEN|generateRandomStr path 32"
         "STRATEGY|detect_ip_strategy_api"
         "GEOIP_INFO|get_geo_info"
@@ -954,14 +955,11 @@ init_port_hop_env() {
     local env_file="${ENV_FILE}"
     if [[ -f "$env_file" ]]; then
         if grep -qE '^export (PORT_HYSTERIA2|PORT_TUIC)=' "$env_file" 2>/dev/null; then
-            log INFO "[迁移] PORT_HYSTERIA2/PORT_TUIC 已废弃，hy2→443, TUIC→随机端口"
+            log INFO "[迁移] PORT_HYSTERIA2/PORT_TUIC 已废弃，hy2/TUIC→随机端口"
             _sed_i '/^export PORT_HYSTERIA2=/d' "$env_file"
             _sed_i '/^export PORT_TUIC=/d' "$env_file"
         fi
     fi
-
-    : "${HY2_LISTEN_PORT:=443}"
-    export HY2_LISTEN_PORT
 
     : "${HY2_HOP_RANGE:=38000-58000}"
 

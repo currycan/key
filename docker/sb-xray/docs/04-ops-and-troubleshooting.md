@@ -84,7 +84,7 @@ environment:
 | `GEMINI_DIRECT` | `""` | Gemini 路由：`true`=强制直连，`false`=代理，空=自动判断 |
 | `NODE_SUFFIX` | `""` | 订阅节点名称后缀（如 ` ✈ 高速`） |
 | `PROVIDERS` | `""` | 外部订阅源，多行格式 |
-| `HY2_HOP_RANGE` | `38000-58000` | Hysteria2 端口跳跃范围（iptables DNAT → UDP 443）；置空禁用。TUIC 协议不支持端口跳跃，无对应变量 |
+| `HY2_HOP_RANGE` | `38000-58000` | Hysteria2 端口跳跃范围（iptables DNAT → HY2_LISTEN_PORT）；置空禁用。TUIC 协议不支持端口跳跃，无对应变量 |
 | `TZ` | `Asia/Singapore` | 容器时区 |
 
 #### ACME 证书
@@ -156,7 +156,8 @@ environment:
 | `XRAY_MLKEM768_SEED` | `xray mlkem768` | ML-KEM 种子（配对生成） |
 | `XRAY_MLKEM768_CLIENT` | `xray mlkem768` | ML-KEM 客户端密钥 |
 | `XRAY_URL_PATH` | 随机 32 位 | XHTTP 路径 |
-| ~~`PORT_HYSTERIA2`~~ | 已废弃 → 固定 `443` | Hysteria2 现固定 UDP 443（QUIC 伪装） |
+| ~~`PORT_HYSTERIA2`~~ | 已废弃 → `HY2_LISTEN_PORT` | 旧变量名，已迁移至随机端口 |
+| `HY2_LISTEN_PORT` | 随机高位端口 | Hysteria2 UDP 端口（32000–38000，自动生成，持久化） |
 | ~~`PORT_TUIC`~~ | 已废弃 → `TUIC_LISTEN_PORT` | 旧变量名，已迁移至随机端口 |
 | `TUIC_LISTEN_PORT` | 随机高位端口 | TUIC UDP 端口（32000–38000，自动生成，持久化） |
 | `PORT_ANYTLS` | 随机高位端口 | AnyTLS TCP 端口 |
