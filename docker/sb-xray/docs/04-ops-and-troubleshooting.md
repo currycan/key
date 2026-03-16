@@ -177,8 +177,9 @@ docker compose restart
 
 | 变量 | 含义 |
 |:---|:---|
-| `ISP_TAG` | 胜出的 ISP 代理 tag（测速选路结果）；`direct` 表示无代理回退直连 |
+| `ISP_TAG` | 最快 ISP 代理 tag（测速选路结果）；`direct` 表示无代理回退直连。用于 IS_8K_SMOOTH 计算和节点标签生成 |
 | `IS_8K_SMOOTH` | `true`/`false`，实际出口速度是否 ≥ 100 Mbps；驱动 show-config.sh 生成 `✈ good`（代理出口）或 `✈ super`（住宅直出）节点标签 |
+| `HAS_ISP_NODES` | `true`/空，标识是否存在可用 ISP 节点。有节点时路由函数返回 `isp-auto`（健康选优），无节点返回 `direct` |
 | `CHATGPT_OUT` | ChatGPT 出口策略 tag |
 | `NETFLIX_OUT` | Netflix 出口策略 tag |
 | `DISNEY_OUT` | Disney+ 出口策略 tag |
@@ -481,18 +482,17 @@ entrypoint 启动时会在 `docker logs sb-xray` 中打印完整的测速与选�
 [阶段 2] 测速与选路...
 [阶段 2] 环境: IP_TYPE=<类型> | 地区=<国家> | DEFAULT_ISP=<值>    ← 决策上下文
 [阶段 2] 直连基准: XX.XX Mbps（不参与选路；无代理时用于 IS_8K_SMOOTH 判定）
-[阶段 2] 发现 ISP 节点: N 个，开始逐节点测速（采样=3次，容差=15%）...
+[阶段 2] 发现 ISP 节点: N 个，开始逐节点测速（采样=2次）...
 
-[测速] <节点> | 第 1/3 轮: XXXX KB/s → XX.XX Mbps    ← 每轮单次结果
-[测速] <节点> | 第 2/3 轮: ...
-[测速] <节点> | 第 3/3 轮: ...
-[测速] <节点>: 3/3 有效样本，均值 XX.XX Mbps          ← 有效样本均值（单次 < 1 KB/s 不计入）
+[测速] <节点> | 第 1/2 轮: XXXX KB/s → XX.XX Mbps    ← 每轮单次结果
+[测速] <节点> | 第 2/2 轮: ...
+[测速] <节点>: 2/2 有效样本，截断均值 XX.XX Mbps      ← 有效样本均值（单次 < 1 KB/s 不计入）
   或
-[测速] <节点>: 全部 3 次采样失败，返回 0               ← 全部采样低于 1 KB/s 阈值
+[测速] <节点>: 全部 2 次采样失败，返回 0               ← 全部采样低于 1 KB/s 阈值
 
-[测速] 容差判断: XX Mbps > 阈值 YY Mbps (前最优 ZZ × 1.15) → 更新最优: <tag>
+[测速] <tag>: XX.XX Mbps → 新最优                     ← 速度超过当前最优
   或
-[测速] 容差判断: XX Mbps ≤ 阈值 YY Mbps (前最优 ZZ × 1.15) → 保持最优: <tag>
+[测速] <tag>: XX.XX Mbps (最优仍: <tag> XX.XX Mbps)   ← 未超过最优
 
 [选路] ════════════════════════════════════════════
 [选路] 决策输入:
@@ -507,6 +507,17 @@ entrypoint 启动时会在 `docker logs sb-xray` 中打印完整的测速与选�
 [选路] ════════════════════════════════════════════
 ```
 
+#### 阶段 4 日志结构（健康检测配置生成）
+
+```
+[阶段 4] 生成客户端/服务端配置片段...
+[ISP] 注入出站: proxy-kr-isp (76.56 Mbps)              ← 按速度降序注入全部 ISP
+[ISP] 注入出站: proxy-jp-isp (70.00 Mbps)
+[ISP] Sing-box urltest 已生成: outbounds=[...]          ← urltest 包含所有 ISP + direct
+[ISP] Xray observatory + balancer 已生成: selector=[...]← balancer 精确匹配 ISP tags
+[阶段 4] 完成
+```
+
 #### 常见选路场景对照
 
 | 日志关键字 | 含义 |
@@ -517,8 +528,11 @@ entrypoint 启动时会在 `docker logs sb-xray` 中打印完整的测速与选�
 | `ISP_TAG 已缓存` | `/.env/status` 存有旧结果，删除后重启可重新测速 |
 | `清除服务路由缓存（与 ISP_TAG 同步刷新）` | ISP_TAG 未命中缓存，触发重新测速；同时联动清除所有 `*_OUT` 旧缓存，确保流媒体/AI 路由基于新 ISP_TAG 重新评估 |
 | `受限地区 (中国\|香港)，强制使用代理` | GeoIP 检测到受限地区，无论速度必须走代理 |
-| `→ 更新最优: proxy-xx` | 该节点速度超过前一最优的 115%，成为新最优 |
-| `→ 保持最优: proxy-xx` | 该节点速度未显著优于当前最优（容差 15%），保持不变 |
+| `→ 新最优` | 该节点速度超过当前最优，成为新的 FASTEST_PROXY_TAG |
+| `最优仍: proxy-xx` | 该节点速度未超过当前最优 |
+| `注入出站: proxy-xx (XX Mbps)` | 全部 ISP 节点按速度降序注入出站配置 |
+| `Sing-box urltest 已生成` | urltest 健康选优出站已构建（含所有 ISP + direct 回退） |
+| `Xray observatory + balancer 已生成` | observatory 探测 + balancer 选优已构建（fallbackTag: direct） |
 | `IS_8K_SMOOTH → true → ✈ good 标签` | 代理均值 > 100 Mbps，节点将附加 good 标签 |
 | `IS_8K_SMOOTH → false → 无质量标签` | 速度不足 100 Mbps，节点无 good/super 标签 |
 
@@ -547,7 +561,40 @@ docker compose restart
 | 节点速度均低于 100 Mbps | `IS_8K_SMOOTH → false` | 正常现象，速度不足则无 good 标签 |
 | 全部采样显示 0 Mbps | `全部 N 次采样失败，返回 0` | curl 下载速度低于 1 KB/s 阈值（连接失败）；检查节点连通性：`curl -x socks5h://IP:PORT https://speed.cloudflare.com/__down?bytes=1000 -o /dev/null -w '%{speed_download}'` |
 
-#### ❌ 故障六：ISP_TAG 已更新但流媒体/AI 路由仍走旧出口
+#### ❌ 故障六：ISP 代理运行中突然失效，流媒体/AI 不可用
+
+**现象**：容器已正常运行一段时间后，ChatGPT/Netflix 等突然无法访问
+
+**新版行为**：系统内置运行时健康检测（Sing-box `urltest` / Xray `observatory`），每 1 分钟探测所有 ISP 节点。ISP 故障后：
+- **Sing-box**：urltest 在下次探测后自动切换到存活节点，全部故障时回退 `direct`
+- **Xray**：observatory 标记不健康节点，balancer 选择存活节点或回退 `direct`（`fallbackTag`）
+
+**排查步骤**：
+
+```bash
+# 查看 Sing-box 日志确认 urltest 切换行为
+docker exec sb-xray tail -100 /var/log/sing-box/sing-box.log | grep -i "urltest\|outbound"
+
+# 查看 Xray 日志确认 observatory 探测结果
+docker exec sb-xray tail -100 /var/log/xray/access.log | grep -i "observatory\|balancer"
+
+# 手动测试 ISP 节点连通性
+docker exec sb-xray curl -x socks5h://ISP_IP:PORT -o /dev/null -w '%{http_code}' https://www.gstatic.com/generate_204
+```
+
+**常见原因**：
+
+| 原因 | 解决方案 |
+|:---|:---|
+| ISP 提供商临时维护 | 等待恢复，系统自动回退 direct 兜底 |
+| ISP 凭据过期 | 更新 `/.env/secret` 中对应 `*_ISP_*` 变量后重启 |
+| 回退 direct 也无法访问 | VPS 本身 IP 被目标服务封锁，需更换 ISP 节点 |
+
+> **与旧版对比**：旧版无运行时检测，ISP 故障后流量直接黑洞，需手动重启容器。新版自动检测并回退，最多 1 分钟恢复服务。
+
+---
+
+#### ❌ 故障七：ISP_TAG 已更新但流媒体/AI 路由仍走旧出口
 
 **现象**：删除 `/.env/status` 重启后，`[选路]` 段显示已选出新的最优 ISP（如 `proxy-jp-isp`），但实际 ChatGPT、Netflix 等流量仍走上次的旧代理（如 `proxy-us-isp`）
 

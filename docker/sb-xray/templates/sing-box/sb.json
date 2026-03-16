@@ -37,8 +37,8 @@
             "type": "direct",
             "tag": "direct"
         },
-        ${SB_SOCKS5_OUTBOUND_CONFIG}
         ${SB_CUSTOM_OUTBOUNDS}
+        ${SB_ISP_URLTEST}
         {
             "type": "block",
             "tag": "block"

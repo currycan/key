@@ -91,11 +91,14 @@ graph TD
     PAnyTLS --> SingBox
     SingBox --> ProxyOut2["代理流量出站"]:::sing
 
-    ProxyOut1 -.-> ISP["ISP 落地代理"]:::entry
-    ProxyOut2 -.-> ISP
+    ProxyOut1 -.-> ISPAuto["isp-auto 健康选优\n(urltest / balancer)"]:::entry
+    ProxyOut2 -.-> ISPAuto
+    ISPAuto -.-> ISP["ISP 落地代理池"]:::entry
+    ISPAuto -.-> DirectFB["direct 回退"]
     ProxyOut1 --> Internet((互联网))
     ProxyOut2 --> Internet
     ISP --> Internet
+    DirectFB --> Internet
 
     subgraph 内部应用与服务
         AppXHTTP["Xray XHTTP 协议"]:::xray
@@ -375,7 +378,8 @@ graph TD
 
 * **绝不测速发请求**：该阶段只读内存资源集
 * **客户端配置**：遍历 IP 环境变量拼凑出客户端需要的 YAML 切片 (`clash_proxies`)
-* **服务端组配**：全部应用 Bash 原生 `cat <<EOF` 注入器重写，彻底杜绝反斜杠拼接 JSON 的语法瘫痪
+* **服务端组配**：注入**全部** ISP 节点的 SOCKS5 出站 JSON（按测速速度降序排列），并生成 Sing-box `urltest` + Xray `observatory`/`balancer` 运行时健康检测配置
+* **动态路由规则**：`build_xray_service_rules()` 根据 `*_OUT` 变量值动态切换 `balancerTag`（isp-auto）或 `outboundTag`（direct/具体 tag）
 * **外显智能标识**：通过 `IS_8K_SMOOTH` 配合 `IP_TYPE` 判定，在外显订阅上动态渲染策略匹配后缀（住宅流畅标 ` ✈ super` 或代理流畅标 ` ✈ good`）
 
 ### 5.3 AI/媒体解锁探测决策流
@@ -422,7 +426,7 @@ flowchart TD
 
 ## 6. 出站路由与多 ISP 链式落地引擎
 
-为解决 VPS 机房 IP 无法观看 Netflix、Disney+ 及无法正常访问 ChatGPT 等服务的痛点，后端引擎配置了针对流媒体与海外 AI 的全自动链式跳板引擎。
+为解决 VPS 机房 IP 无法观看 Netflix、Disney+ 及无法正常访问 ChatGPT 等服务的痛点，后端引擎配置了针对流媒体与海外 AI 的全自动链式跳板引擎，并内置**运行时健康检测与自动回退**机制。
 
 ### 6.1 出站路由决策
 
@@ -431,14 +435,19 @@ flowchart TD
     classDef block fill:#ff7675,stroke:#d63031,stroke-width:2px,color:#fff
     classDef pass fill:#55efc4,stroke:#00b894,stroke-width:2px,color:#333
     classDef logic fill:#ffeaa7,stroke:#fdcb6e,stroke-width:2px,color:#333
+    classDef health fill:#74b9ff,stroke:#0984e3,stroke-width:2px,color:#fff
 
     In(("入站流量 已解密明文")) --> R1{"是否命中 GeoSite 黑名单?"}:::logic
     R1 -- "是: BT/广告/中国境内 IP" --> Drop["拦截出站: block"]:::block
 
     R1 -- "否" --> R2{"是否命中 ChatGPT/Netflix 解锁库?"}:::logic
-    R2 -- "是: 高度敏锁域名" --> Strategy["从环境池抓取原生 SOCKS5 ISP 代理 链式二级跳转"]:::pass
+    R2 -- "是: 高度敏锁域名" --> ISPAuto["isp-auto 健康选优出站"]:::health
 
     R2 -- "否: 普通海外流量" --> Out2["直连出站: Freedom Direct"]:::pass
+
+    ISPAuto --> HC{"运行时健康检测\n每 1 分钟探测"}:::health
+    HC -- "ISP 节点存活" --> Proxy["最优 ISP 代理出站"]:::pass
+    HC -- "全部 ISP 故障" --> Fallback["自动回退 direct"]:::pass
 ```
 
 ### 6.2 核心出站类型
@@ -447,9 +456,80 @@ flowchart TD
 |:---|:---|:---|:---|
 | **直连** | `direct` | Freedom | 直接连接目标网站，默认出站 |
 | **拦截** | `block` | Blackhole | 丢弃被屏蔽的流量（广告、恶意 IP 等） |
-| **ISP 代理** | `proxy-*` | Socks | 转发给指定的落地 Socks5 代理，用于流媒体解锁 |
+| **ISP 代理** | `proxy-*` | Socks | 各 ISP 落地 SOCKS5 代理节点，按测速排序注入 |
+| **健康选优** | `isp-auto` | urltest / balancer | 包裹所有 ISP + direct，运行时自动选优并回退 |
 
 > **全程透明**：所有的解锁动作在服务器端默默完成，客户端无需任何繁琐的前置 (Dialer) 设置。
+
+### 6.3 ISP 健康检测方案演进
+
+#### 旧方案（启动时选优，无运行时检测）
+
+```mermaid
+flowchart LR
+    classDef old fill:#dfe6e9,stroke:#636e72,stroke-width:2px,color:#333
+    classDef bad fill:#ff7675,stroke:#d63031,stroke-width:2px,color:#fff
+
+    Boot["容器启动\n逐节点测速\n5 次采样+容差带"] --> Best["选出最快 ISP\nFASTEST_PROXY_TAG"]:::old
+    Best --> Single["仅注入该节点\n为 Xray/Sing-box\n唯一 ISP 出站"]:::old
+    Single --> Route["所有服务路由\n指向该固定 tag"]:::old
+    Route --> Problem["ISP 挂了 → 流量黑洞\n无检测、无回退"]:::bad
+```
+
+| 特性 | 旧方案 |
+|:---|:---|
+| 出站节点数 | 仅注入 1 个（最快 ISP） |
+| 运行时检测 | **无** |
+| ISP 故障时 | **流量黑洞**（ChatGPT/Netflix 等全部不可用） |
+| 测速采样 | 5 次截断均值 + 15% 容差带 |
+| 路由指向 | 静态 `outboundTag: "proxy-xx-isp"` |
+
+#### 新方案（全量注入 + 运行时健康检测 + 自动回退）
+
+```mermaid
+flowchart LR
+    classDef new fill:#55efc4,stroke:#00b894,stroke-width:2px,color:#333
+    classDef good fill:#74b9ff,stroke:#0984e3,stroke-width:2px,color:#fff
+
+    Boot["容器启动\n逐节点测速\n2 次采样排序"] --> All["注入全部 ISP 节点\n按速度降序排列"]:::new
+    All --> URLTest["Sing-box: urltest\nXray: observatory\n+ balancer"]:::good
+    URLTest --> Auto["isp-auto 出站\n每 1 分钟探测\n自动选最低延迟"]:::good
+    Auto --> OK{"ISP 存活?"}
+    OK -- "是" --> Best["走最优 ISP"]:::new
+    OK -- "否" --> Direct["自动回退 direct"]:::new
+```
+
+| 特性 | 新方案 |
+|:---|:---|
+| 出站节点数 | **注入全部 ISP**（按速度排序） |
+| 运行时检测 | Sing-box `urltest` / Xray `observatory` 每 1 分钟探测 |
+| ISP 故障时 | **自动回退 direct**（Sing-box urltest 含 direct；Xray balancer `fallbackTag: "direct"`） |
+| 测速采样 | 2 次（仅用于初始排序，运行时由内核选优） |
+| 路由指向 | Sing-box: `outbound: "isp-auto"`；Xray: 动态生成 `balancerTag` / `outboundTag` |
+
+#### 双内核健康检测机制对比
+
+| 机制 | Sing-box | Xray |
+|:---|:---|:---|
+| **实现** | `urltest` 出站类型 | `observatory` + `balancer` |
+| **探测 URL** | `https://www.gstatic.com/generate_204` | 同左 |
+| **探测间隔** | 1 分钟 | 1 分钟 |
+| **选优策略** | 最低延迟（tolerance 300ms） | `leastPing`（最低延迟） |
+| **回退机制** | `outbounds` 列表末尾包含 `direct` | `fallbackTag: "direct"` |
+| **故障切换** | `interrupt_exist_connections: true` | observatory 自动标记不健康 |
+| **配置生成** | `build_sb_urltest()` → `${SB_ISP_URLTEST}` | `build_xray_balancer()` → `${XRAY_OBSERVATORY_SECTION}` + `${XRAY_BALANCERS_SECTION}` |
+
+#### Xray 动态路由规则
+
+由于 Xray 的 `balancerTag` 和 `outboundTag` 互斥（不能在同一条规则中共存），服务路由规则（openai/netflix/disney 等）**必须动态生成**：
+
+```
+*_OUT == "isp-auto" → {"balancerTag": "isp-auto"}     # 走 balancer 健康选优
+*_OUT == "direct"   → {"outboundTag": "direct"}        # 直连
+*_OUT == "proxy-xx" → {"outboundTag": "proxy-xx"}      # 指定出站（理论场景）
+```
+
+由 `build_xray_service_rules()` 在 `analyze_ai_routing_env()` 之后调用，遍历所有 `*_OUT` 变量动态拼接注入 `${XRAY_SERVICE_RULES}` 占位符。
 
 ---
 

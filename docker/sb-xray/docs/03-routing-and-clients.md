@@ -22,22 +22,29 @@ VPS 的 IP 通常被标记为 Hosting（机房），受阻于 Netflix、ChatGPT 
 
 ### 1.2 路由决策工作原理
 
-在 Xray (`xr.json`) 和 Sing-box (`sb.json`) 的底层核心中，配置了高度一致的路由决策引擎：
+在 Xray (`xr.json`) 和 Sing-box (`sb.json`) 的底层核心中，配置了高度一致的路由决策引擎，流媒体/AI 域名统一指向 `isp-auto` 健康选优出站：
 
 ```mermaid
 flowchart TD
     classDef block fill:#ff7675,stroke:#d63031,stroke-width:2px,color:#fff
     classDef pass fill:#55efc4,stroke:#00b894,stroke-width:2px,color:#333
     classDef logic fill:#ffeaa7,stroke:#fdcb6e,stroke-width:2px,color:#333
+    classDef health fill:#74b9ff,stroke:#0984e3,stroke-width:2px,color:#fff
 
     In(("入站流量 已解密明文")) --> R1{"是否命中黑名单?"}:::logic
     R1 -- "是: BT/广告/中国IP" --> Drop["拦截丢弃 block"]:::block
 
     R1 -- "否" --> R2{"是否触发特殊解锁策略?"}:::logic
-    R2 -- "是: 流媒体/AI 域名" --> Strategy["通过环境变量提取 SOCKS5 proxy-*"]:::pass
+    R2 -- "是: 流媒体/AI 域名" --> ISPAuto["isp-auto 健康选优"]:::health
 
     R2 -- "否: 普通域名" --> Out2["直连出站 direct"]:::pass
+
+    ISPAuto --> HC{"运行时每 1 分钟\n健康探测"}:::health
+    HC -- "存活" --> Best["最优 ISP 代理"]:::pass
+    HC -- "全部故障" --> Direct["自动回退 direct"]:::pass
 ```
+
+> **关键变化**：旧版将所有服务路由静态指向单个 ISP tag（如 `proxy-la-isp`），ISP 挂了流量直接黑洞。新版所有服务路由指向 `isp-auto`，由 Sing-box `urltest` / Xray `balancer` 在运行时自动选优并回退 `direct`。
 
 ### 1.3 多 ISP 环境注入实操
 
@@ -81,7 +88,7 @@ environment:
 
 > **为什么要显式设置 `DEFAULT_ISP=`（空）？** Dockerfile 默认值为 `LA_ISP`，不覆盖则永远锁定 LA 出口。只有在 docker-compose 中显式置空，才能解锁自动选路能力。
 
-配置生效后，`entrypoint.sh` 的 `process_single_isp` 函数会自动将凭据渲染为底层内核支持的 SOCKS5 出站 JSON。所有的解锁动作在服务器端完成，客户端无需额外配置。
+配置生效后，`entrypoint.sh` 自动将**所有** ISP 凭据渲染为底层内核支持的 SOCKS5 出站 JSON（按测速速度降序排列），并生成 `isp-auto` 健康选优出站（Sing-box `urltest` / Xray `balancer`）。运行时每 1 分钟探测各 ISP 存活状态，故障自动回退 `direct`。所有的解锁动作在服务器端完成，客户端无需额外配置。
 
 ---
 
@@ -93,10 +100,11 @@ environment:
 flowchart LR
     subgraph 服务端启动阶段
         P["ISP_TAG 未缓存\n触发重新测速"] --> CL["联动清除 *_OUT 缓存\nISP_OUT / CHATGPT_OUT\nNETFLIX_OUT 等共 9 项"]
-        CL --> A["ISP SOCKS5 节点逐一测速\n（5次采样截断均值；< 1 KB/s 视为失败）"]
-        A --> T["容差带筛优\n超出当前最优×1.15\n才替换"]
-        T --> B["选出最优 ISP 代理\nISP_TAG"]
-        T --> C{"最优代理速度\n> 100 Mbps?"}
+        CL --> A["ISP SOCKS5 节点逐一测速\n（2次采样；< 1 KB/s 视为失败）"]
+        A --> B["选出最快 ISP → ISP_TAG\n记录全部 ISP 速度到 ISP_SPEEDS"]
+        B --> INJ["注入全部 ISP 节点出站\n（按速度降序排列）"]
+        INJ --> UT["生成 urltest / balancer\nisp-auto 健康选优出站"]
+        B --> C{"最优代理速度\n> 100 Mbps?"}
         C -- "是" --> D["IS_8K_SMOOTH = true"]
         C -- "否" --> E["IS_8K_SMOOTH = false"]
         F["VPS 直连测速\n（住宅VPS直出场景）"] --> G{"IP_TYPE=isp\n且 > 100 Mbps?"}
@@ -131,32 +139,34 @@ flowchart LR
 [阶段 2] 清除服务路由缓存（与 ISP_TAG 同步刷新）...
 [阶段 2] 环境: IP_TYPE=hosting | 地区=US | DEFAULT_ISP=未设置（自动选路）
 [阶段 2] 直连基准: 28.50 Mbps（不参与选路；无代理时用于 IS_8K_SMOOTH 判定）
-[阶段 2] 发现 ISP 节点: 2 个，开始逐节点测速（采样=5次，容差=15%）...
-[测速] 开始: KR_ISP | 测速源: https://... | 采样: 5次
-[测速] KR_ISP | 第 1/5 轮: 9830 KB/s → 75.00 Mbps
-[测速] KR_ISP | 第 2/5 轮: 10240 KB/s → 78.12 Mbps
-[测速] KR_ISP | 第 3/5 轮: 9600 KB/s → 73.24 Mbps
-[测速] KR_ISP | 第 4/5 轮: 10150 KB/s → 77.54 Mbps
-[测速] KR_ISP | 第 5/5 轮: 9920 KB/s → 75.79 Mbps
-[测速] KR_ISP: 5/5 有效样本，截断均值 75.44 Mbps，标准差 1.73 Mbps [稳定]
-[测速] 容差判断: 75.44 Mbps > 阈值 0.00 Mbps (前最优 0 × 1.15) → 更新最优: proxy-kr-isp
-[测速] 开始: JP_ISP | 测速源: https://... | 采样: 5次
-[测速] JP_ISP | 第 1/5 轮: ...
-[测速] JP_ISP: 5/5 有效样本，截断均值 70.00 Mbps，标准差 2.10 Mbps [稳定]
-[测速] 容差判断: 70.00 Mbps ≤ 阈值 86.76 Mbps (前最优 75.44 × 1.15) → 保持最优: proxy-kr-isp
+[阶段 2] 发现 ISP 节点: 2 个，开始逐节点测速（采样=2次）...
+[测速] 开始: KR_ISP | 测速源: https://... | 采样: 2次
+[测速] KR_ISP | 第 1/2 轮: 9830 KB/s → 75.00 Mbps
+[测速] KR_ISP | 第 2/2 轮: 10240 KB/s → 78.12 Mbps
+[测速] KR_ISP: 2/2 有效样本，截断均值 76.56 Mbps，标准差 1.56 Mbps [稳定]
+[测速] proxy-kr-isp: 76.56 Mbps → 新最优
+[测速] 开始: JP_ISP | 测速源: https://... | 采样: 2次
+[测速] JP_ISP | 第 1/2 轮: ...
+[测速] JP_ISP: 2/2 有效样本，截断均值 70.00 Mbps，标准差 2.10 Mbps [稳定]
+[测速] proxy-jp-isp: 70.00 Mbps (最优仍: proxy-kr-isp 76.56 Mbps)
 [选路] ════════════════════════════════════════════
 [选路] 决策输入:
 [选路]   IP_TYPE       = hosting (机房/托管 IP)
 [选路]   地区          = US
 [选路]   DEFAULT_ISP   = 未设置（自动选路）
 [选路]   直连速度      = 28.50 Mbps（不参与选路）
-[选路]   最优 ISP 代理 = proxy-kr-isp (75.45 Mbps)
+[选路]   最优 ISP 代理 = proxy-kr-isp (76.56 Mbps)
 [选路] 原则: 受限地区/非住宅IP→需代理解锁; 住宅IP+非受限→直连兜底
 [选路] 非住宅 IP (hosting)，需 ISP 代理解锁流媒体/AI
-[选路] 使用最优 ISP 代理: proxy-kr-isp (75.45 Mbps)
-[选路] IS_8K_SMOOTH: 出口=proxy-kr-isp | 参考速度=75.45 Mbps | 阈值=100 Mbps → false  → 无质量标签
+[选路] 使用最优 ISP 代理: proxy-kr-isp (76.56 Mbps)
+[选路] IS_8K_SMOOTH: 出口=proxy-kr-isp | 参考速度=76.56 Mbps | 阈值=100 Mbps → false  → 无质量标签
 [选路] ✓ 最终决策: ISP_TAG=proxy-kr-isp | IS_8K_SMOOTH=false
 [选路] ════════════════════════════════════════════
+[阶段 4] 生成客户端/服务端配置片段...
+[ISP] 注入出站: proxy-kr-isp (76.56 Mbps)
+[ISP] 注入出站: proxy-jp-isp (70.00 Mbps)
+[ISP] Sing-box urltest 已生成: outbounds=["proxy-kr-isp", "proxy-jp-isp", "direct"]
+[ISP] Xray observatory + balancer 已生成: selector=["proxy-kr-isp", "proxy-jp-isp"]
 ```
 
 #### 两种质量标签的含义
@@ -168,10 +178,12 @@ flowchart LR
 
 > **关键设计理念**：ISP SOCKS5 代理的目的是**解锁 geo 限制**（ChatGPT/Netflix 等）。选路决策链如下：
 > 1. `DEFAULT_ISP` 非空 → 手动锁定出口，跳过所有判断
-> 2. 受限地区（香港/中国大陆等）**或**非住宅 IP（机房 IP）→ 需要代理：优先使用最快 ISP 代理；无可用节点则回退直连（ERROR）
+> 2. 受限地区（香港/中国大陆等）**或**非住宅 IP（机房 IP）→ 需要代理：有 ISP 节点时路由指向 `isp-auto`（运行时健康选优 + 自动回退 direct）；无可用节点则回退直连（ERROR）
 > 3. 住宅 ISP IP + 非受限地区 → 兜底直连（VPS 本身即原生家宽，直出即可）
 >
 > `_is_restricted_region` 仅作日志修饰，不单独控制分支走向；IP 类型（`IP_TYPE`）与地区限制同级参与条件评估。
+>
+> **运行时保障**：即使启动时选中的 ISP 在运行期间故障，Sing-box `urltest` / Xray `observatory` 会在下次探测（1 分钟间隔）后自动切换到存活节点或回退 `direct`，避免流量黑洞。
 
 #### 8K 判定阈值
 

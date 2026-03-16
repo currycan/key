@@ -46,10 +46,8 @@ STATUS_FILE="${STATUS_FILE:-/.env/status}"
 
 # 测速目标 URL
 _SPEED_TEST_URL="https://speed.cloudflare.com/__down?bytes=25000000"
-# 每节点采样次数（截断均值：去最大最小后取中间样本，平滑突发峰值；最小有效值 3，建议 5）
-SPEED_SAMPLES=5
-# ISP 节点间切换容差百分比：新节点须超出当前最优该比例才替换（防止微小差距反复横跳）
-SPEED_TOLERANCE=15
+# 每节点采样次数（urltest/balancer 运行时做延迟选优，启动测速仅影响初始排序）
+SPEED_SAMPLES=2
 
 # ==============================================================================
 # §2  日志工具
@@ -308,27 +306,21 @@ _is_restricted_region() {
     [[ "${GEOIP_INFO:-}" =~ (香港|Hong|HK|中国|China|CN|俄罗斯|Russia|RU|澳门|Macao|MO) ]]
 }
 
-# 当 ISP_TAG 为空或 direct 时，返回第一个可用 ISP 代理 tag；否则返回 ISP_TAG
+# 有 ISP 节点时返回 "isp-auto"（urltest/balancer），无则返回 "direct"
 # 用法: get_fallback_proxy
 get_fallback_proxy() {
-    if [[ -n "${ISP_TAG:-}" && "${ISP_TAG}" != "direct" ]]; then
-        echo "${ISP_TAG}"; return
-    fi
-    local first_var
-    first_var=$(env | grep "_ISP_IP=" | head -n 1 | cut -d= -f1) || true
-    if [[ -n "$first_var" ]]; then
-        local prefix="${first_var%_IP}"
-        echo "proxy-$(echo "${prefix}" | sed 's/_ISP//' | tr '[:upper:]_ ' '[:lower:]-')"
+    if [[ -n "${HAS_ISP_NODES:-}" ]]; then
+        echo "isp-auto"
     else
         echo "direct"
     fi
 }
 
 # 综合判断当前主 ISP 出口策略
-# 返回: ISP_TAG 值或 "direct"
+# 返回: "isp-auto"（有 ISP 节点时）或 "direct"
 get_isp_preferred_strategy() {
-    if [[ -n "${ISP_TAG:-}" && "${ISP_TAG:-}" != "direct" ]]; then
-        echo "${ISP_TAG}"
+    if [[ -n "${HAS_ISP_NODES:-}" ]]; then
+        echo "isp-auto"
     else
         echo "direct"
     fi
@@ -485,9 +477,135 @@ EOF
 )
 }
 
-# 对单个 ISP 节点执行测速并更新最优代理记录（含容差带）
+# 生成 Sing-box urltest 出站（包裹所有 ISP + direct，运行时自动选优/回退）
+# 依赖: ISP_SPEEDS 关联数组（由 _test_isp_node 填充）
+# 无 ISP 节点时输出空字符串
+build_sb_urltest() {
+    if [[ -z "${HAS_ISP_NODES:-}" ]]; then
+        export SB_ISP_URLTEST=""
+        return
+    fi
+    # 按速度降序排列 ISP tags
+    local sorted_tags
+    sorted_tags=$(for tag in "${!ISP_SPEEDS[@]}"; do
+        echo "${ISP_SPEEDS[$tag]} $tag"
+    done | sort -t' ' -k1 -rn | awk '{print $2}')
+
+    # 构建 outbounds 数组: ISP tags + direct
+    local outbounds_json=""
+    for tag in $sorted_tags; do
+        outbounds_json="${outbounds_json:+${outbounds_json}, }\"${tag}\""
+    done
+    outbounds_json="${outbounds_json}, \"direct\""
+
+    export SB_ISP_URLTEST
+    SB_ISP_URLTEST=$(cat <<EOF
+{
+  "type": "urltest",
+  "tag": "isp-auto",
+  "outbounds": [${outbounds_json}],
+  "url": "https://www.gstatic.com/generate_204",
+  "interval": "1m",
+  "tolerance": 300,
+  "interrupt_exist_connections": true
+},
+EOF
+)
+    log INFO "[ISP] Sing-box urltest 已生成: outbounds=[${outbounds_json}]"
+}
+
+# 生成 Xray observatory + balancer 配置（运行时健康检测与自动回退）
+# 依赖: ISP_SPEEDS 关联数组
+# 无 ISP 节点时所有变量置空
+build_xray_balancer() {
+    if [[ -z "${HAS_ISP_NODES:-}" ]]; then
+        export XRAY_OBSERVATORY_SECTION="" XRAY_BALANCERS_SECTION=""
+        return
+    fi
+    # 按速度降序排列 ISP tags
+    local sorted_tags
+    sorted_tags=$(for tag in "${!ISP_SPEEDS[@]}"; do
+        echo "${ISP_SPEEDS[$tag]} $tag"
+    done | sort -t' ' -k1 -rn | awk '{print $2}')
+
+    # 构建精确 selector 列表（不用前缀匹配，避免误匹配）
+    local selector_json=""
+    for tag in $sorted_tags; do
+        selector_json="${selector_json:+${selector_json}, }\"${tag}\""
+    done
+
+    export XRAY_OBSERVATORY_SECTION
+    XRAY_OBSERVATORY_SECTION=$(cat <<EOF
+"observatory": {
+    "subjectSelector": [${selector_json}],
+    "probeUrl": "https://www.gstatic.com/generate_204",
+    "probeInterval": "1m",
+    "enableConcurrency": true
+},
+EOF
+)
+
+    export XRAY_BALANCERS_SECTION
+    XRAY_BALANCERS_SECTION=$(cat <<EOF
+"balancers": [{
+    "tag": "isp-auto",
+    "selector": [${selector_json}],
+    "fallbackTag": "direct",
+    "strategy": {"type": "leastPing"}
+}],
+EOF
+)
+    log INFO "[ISP] Xray observatory + balancer 已生成: selector=[${selector_json}]"
+}
+
+# 动态生成 Xray 服务路由规则（balancerTag / outboundTag 按 *_OUT 值自动切换）
+# 依赖: 所有 *_OUT 变量（由 analyze_ai_routing_env 填充）
+# 必须在 analyze_ai_routing_env 之后调用
+build_xray_service_rules() {
+    local rules=""
+
+    # 服务列表: geosite域名 | 环境变量名 | ruleTag | 额外属性
+    local -a services=(
+        'geosite:openai|CHATGPT_OUT|fix_openai|"marktag": "fix_openai",'
+        'geosite:netflix|NETFLIX_OUT||'
+        'geosite:disney|DISNEY_OUT||'
+        'geosite:anthropic|CLAUDE_OUT||'
+        'geosite:google|GEMINI_OUT||'
+        'geosite:google-gemini|GEMINI_OUT||'
+        'geosite:youtube|YOUTUBE_OUT||'
+        'geosite:category-social-media-!cn|SOCIAL_MEDIA_OUT||'
+        'geosite:tiktok|TIKTOK_OUT||'
+        '"geosite:amazon","geosite:paypal","geosite:ebay"|ISP_OUT||'
+    )
+
+    for entry in "${services[@]}"; do
+        IFS='|' read -r domains out_var rule_tag extra <<< "$entry"
+        local out_val="${!out_var:-direct}"
+
+        # 构建 domain 数组
+        local domain_json="\"${domains}\""
+        # 如果 domains 已包含 ","（多域名情况），直接使用
+        if [[ "$domains" == *'","'* ]]; then
+            domain_json="${domains}"
+        fi
+
+        local rule
+        if [[ "$out_val" == "isp-auto" ]]; then
+            rule="{\"type\":\"field\",\"domain\":[${domain_json}],${extra}\"balancerTag\":\"isp-auto\"}"
+        else
+            rule="{\"type\":\"field\",\"domain\":[${domain_json}],${extra}\"outboundTag\":\"${out_val}\"}"
+        fi
+        rules="${rules:+${rules},
+            }${rule}"
+    done
+
+    # 末尾追加逗号，因为模板中 private-ip 规则紧随其后
+    export XRAY_SERVICE_RULES="${rules},"
+    log DEBUG "[ISP] Xray 服务路由规则已动态生成"
+}
+
+# 对单个 ISP 节点执行测速，记录速度到 ISP_SPEEDS 并追踪最快节点
 # 用法: _test_isp_node <prefix> <ip> <port> <user> <pass> <tag>
-# 容差带: 新节点需超出当前最优 SPEED_TOLERANCE% 才替换，防止小差距反复横跳
 _test_isp_node() {
     local prefix=$1 ip=$2 port=$3 user=$4 pass=$5 tag=$6
     local speed
@@ -495,19 +613,16 @@ _test_isp_node() {
                        "socks5h://${ip}:${port}" "${user}:${pass}")
     show_report "$speed" "$prefix"
 
-    # 首个有效节点直接成为当前最优；后续节点须超出容差阈值才替换
-    local _prev_max="${proxy_max_speed:-0}"
-    local _multiplier
-    _multiplier=$(awk -v t="${SPEED_TOLERANCE}" 'BEGIN{printf "%.4f", 1 + t/100}')
-    local threshold
-    threshold=$(awk -v m="${proxy_max_speed:-0}" -v t="${SPEED_TOLERANCE}" \
-                'BEGIN { printf "%.2f", m * (1 + t / 100) }')
-    if awk -v s="$speed" -v t="$threshold" 'BEGIN { exit (s + 0 > t + 0 ? 0 : 1) }'; then
+    # 保存每个 ISP 的速度用于排序
+    ISP_SPEEDS["$tag"]="$speed"
+
+    # 追踪最快节点（用于 IS_8K_SMOOTH 计算）
+    if awk -v s="$speed" -v m="${proxy_max_speed:-0}" 'BEGIN { exit (s + 0 > m + 0 ? 0 : 1) }'; then
         export proxy_max_speed="$speed"
         export FASTEST_PROXY_TAG="$tag"
-        log INFO "[测速] 容差判断: ${speed} Mbps > 阈值 ${threshold} Mbps (前最优 ${_prev_max} × ${_multiplier}) → 更新最优: ${FASTEST_PROXY_TAG}"
+        log INFO "[测速] ${tag}: ${speed} Mbps → 新最优"
     else
-        log INFO "[测速] 容差判断: ${speed} Mbps ≤ 阈值 ${threshold} Mbps (前最优 ${_prev_max} × ${_multiplier}) → 保持最优: ${FASTEST_PROXY_TAG:-未定}"
+        log INFO "[测速] ${tag}: ${speed} Mbps (最优仍: ${FASTEST_PROXY_TAG:-未定} ${proxy_max_speed:-0} Mbps)"
     fi
 }
 
@@ -959,6 +1074,23 @@ run_speed_tests_if_needed() {
 
     if [[ -n "${ISP_TAG:-}" ]]; then
         log INFO "[阶段 2] ISP_TAG 已缓存 (${ISP_TAG})，跳过测速"
+        # 重建 HAS_ISP_NODES 和 ISP_SPEEDS（build_client_and_server_configs 依赖）
+        declare -gA ISP_SPEEDS
+        local env_vars; env_vars=$(env | grep "_ISP_IP=" | cut -d= -f1) || true
+        for var in $env_vars; do
+            local prefix="${var%_IP}" ip="${!var}"
+            local port_var="${prefix}_PORT"; local port="${!port_var:-}"
+            [[ -z "$ip" || -z "$port" ]] && continue
+            local tag="proxy-$(echo "${prefix}" | tr '[:upper:]_ ' '[:lower:]-')"
+            ISP_SPEEDS["$tag"]="0"  # 无实际速度数据，设 0
+        done
+        if [[ ${#ISP_SPEEDS[@]} -gt 0 ]]; then
+            export HAS_ISP_NODES="true"
+            # 确保 ISP_TAG 对应的节点排在前面（设较大值）
+            if [[ -n "${ISP_SPEEDS[${ISP_TAG}]+_}" ]]; then
+                ISP_SPEEDS["${ISP_TAG}"]="999"
+            fi
+        fi
         return
     fi
 
@@ -968,8 +1100,9 @@ run_speed_tests_if_needed() {
     _sed_i '/^export ISP_OUT=/d; /^export CHATGPT_OUT=/d; /^export NETFLIX_OUT=/d; /^export DISNEY_OUT=/d; /^export YOUTUBE_OUT=/d; /^export GEMINI_OUT=/d; /^export CLAUDE_OUT=/d; /^export SOCIAL_MEDIA_OUT=/d; /^export TIKTOK_OUT=/d' "${STATUS_FILE}" 2>/dev/null || true
     unset ISP_OUT CHATGPT_OUT NETFLIX_OUT DISNEY_OUT YOUTUBE_OUT GEMINI_OUT CLAUDE_OUT SOCIAL_MEDIA_OUT TIKTOK_OUT
 
-    unset ISP_TAG TOP_ISP_TAG proxy_max_speed FASTEST_PROXY_TAG IS_8K_SMOOTH DIRECT_SPEED
+    unset ISP_TAG TOP_ISP_TAG proxy_max_speed FASTEST_PROXY_TAG IS_8K_SMOOTH DIRECT_SPEED HAS_ISP_NODES
     export proxy_max_speed=0
+    declare -gA ISP_SPEEDS
 
     log INFO "[阶段 2] 环境: IP_TYPE=${IP_TYPE:-未知} | 地区=${GEOIP_INFO%%|*} | DEFAULT_ISP=${DEFAULT_ISP:-未设置}"
 
@@ -987,7 +1120,8 @@ run_speed_tests_if_needed() {
     if [[ "$_node_count" -eq 0 ]]; then
         log WARN "[阶段 2] 未发现 ISP 节点（无 *_ISP_IP 环境变量），将回退直连"
     else
-        log INFO "[阶段 2] 发现 ISP 节点: ${_node_count} 个，开始逐节点测速（采样=${SPEED_SAMPLES}次，容差=${SPEED_TOLERANCE}%）..."
+        export HAS_ISP_NODES="true"
+        log INFO "[阶段 2] 发现 ISP 节点: ${_node_count} 个，开始逐节点测速（采样=${SPEED_SAMPLES}次）..."
     fi
     for var in $env_vars; do
         local prefix="${var%_IP}" ip="${!var}"
@@ -1049,7 +1183,8 @@ analyze_ai_routing_env() {
 build_client_and_server_configs() {
     log INFO "[阶段 4] 生成客户端/服务端配置片段..."
 
-    export SB_SOCKS5_OUTBOUND_CONFIG="" CUSTOM_OUTBOUNDS="" SB_CUSTOM_OUTBOUNDS="" \
+    export CUSTOM_OUTBOUNDS="" SB_CUSTOM_OUTBOUNDS="" SB_ISP_URLTEST="" \
+           XRAY_OBSERVATORY_SECTION="" XRAY_BALANCERS_SECTION="" XRAY_SERVICE_RULES="" \
            CLASH_ISP_PROXIES="" SURGE_ISP_PROXIES="" clash_proxies="" surge_proxies=""
 
     local env_vars; env_vars=$(env | grep "_ISP_IP=" | cut -d= -f1) || true
@@ -1083,22 +1218,70 @@ YAML
     export CLASH_ISP_PROXIES="${clash_proxies}"
     export SURGE_ISP_PROXIES="${surge_proxies}"
 
-    # 构建最优 ISP 的服务端出站 JSON
-    if [[ -n "${ISP_TAG:-}" && "${ISP_TAG:-}" != "direct" ]]; then
-        for var in $env_vars; do
-            local prefix="${var%_IP}"
-            local tag="proxy-$(echo "${prefix}" | tr '[:upper:]_ ' '[:lower:]-')"
-            if [[ "$tag" == "${ISP_TAG}" ]]; then
-                local ip="${!var}"
-                local port_var="${prefix}_PORT" user_var="${prefix}_USER" pass_var="${prefix}_SECRET"
-                local port="${!port_var:-}" user="${!user_var:-}" pass="${!pass_var:-}"
-                export ISP_IP="$ip" ISP_PORT="$port" ISP_USER="$user" ISP_SECRET="$pass"
-                log INFO "[ISP] 使用出口: ${ISP_TAG}"
-                process_single_isp "$prefix" "$ip" "$port" "$user" "$pass" "$tag"
-                break
-            fi
+    # 构建所有 ISP 的服务端出站 JSON（按测速结果速度降序排列）
+    if [[ -n "${HAS_ISP_NODES:-}" ]]; then
+        # 按速度降序排列 ISP tags
+        local sorted_tags
+        sorted_tags=$(for tag in "${!ISP_SPEEDS[@]}"; do
+            echo "${ISP_SPEEDS[$tag]} $tag"
+        done | sort -t' ' -k1 -rn | awk '{print $2}')
+
+        local xray_out="" sb_out=""
+        for tag in $sorted_tags; do
+            # 从环境变量逆向查找该 tag 对应的连接信息
+            for var in $env_vars; do
+                local prefix="${var%_IP}"
+                local derived_tag="proxy-$(echo "${prefix}" | tr '[:upper:]_ ' '[:lower:]-')"
+                if [[ "$derived_tag" == "$tag" ]]; then
+                    local ip="${!var}"
+                    local port_var="${prefix}_PORT" user_var="${prefix}_USER" pass_var="${prefix}_SECRET"
+                    local port="${!port_var:-}" user="${!user_var:-}" pass="${!pass_var:-}"
+
+                    # 保存最快 ISP 的连接信息（兼容旧引用）
+                    if [[ "$tag" == "${FASTEST_PROXY_TAG:-}" ]]; then
+                        export ISP_IP="$ip" ISP_PORT="$port" ISP_USER="$user" ISP_SECRET="$pass"
+                    fi
+
+                    # Xray SOCKS outbound
+                    xray_out="${xray_out}{
+  \"tag\": \"${tag}\",
+  \"protocol\": \"socks\",
+  \"settings\": {
+    \"servers\": [
+      {
+        \"address\": \"${ip}\",
+        \"port\": ${port},
+        \"users\": [{\"user\": \"${user}\", \"pass\": \"${pass}\"}]
+      }
+    ]
+  }
+},
+"
+                    # Sing-box SOCKS outbound
+                    sb_out="${sb_out}{
+  \"type\": \"socks\",
+  \"tag\": \"${tag}\",
+  \"server\": \"${ip}\",
+  \"server_port\": ${port},
+  \"username\": \"${user}\",
+  \"password\": \"${pass}\"
+},
+"
+                    log INFO "[ISP] 注入出站: ${tag} (${ISP_SPEEDS[$tag]:-?} Mbps)"
+                    break
+                fi
+            done
         done
+
+        export CUSTOM_OUTBOUNDS="$xray_out"
+        export SB_CUSTOM_OUTBOUNDS="$sb_out"
     fi
+
+    # 生成 urltest / balancer / 动态服务路由规则
+    build_sb_urltest
+    build_xray_balancer
+    build_xray_service_rules
+
     log INFO "[阶段 4] 完成"
 }
 
