@@ -15,7 +15,6 @@ ${HY2_PORTS_LINE}
     type: tuic
     server: ${DOMAIN}
     port: ${TUIC_LISTEN_PORT}
-${TUIC_PORTS_LINE}
     uuid: ${SB_UUID}
     password: ${SB_UUID}
     alpn:
