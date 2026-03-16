@@ -929,6 +929,8 @@ analyze_base_env() {
         "XRAY_UUID|generateRandomStr uuid"
         "SB_UUID|generateRandomStr uuid"
         "XRAY_REALITY_SHORTID|openssl rand -hex 8"
+        "XRAY_REALITY_SHORTID_2|openssl rand -hex 4"
+        "XRAY_REALITY_SHORTID_3|openssl rand -hex 6"
         "XRAY_URL_PATH|generateRandomStr path 32"
         "PORT_ANYTLS|generateRandomStr port"
         "PORT_HYSTERIA2|generateRandomStr port"

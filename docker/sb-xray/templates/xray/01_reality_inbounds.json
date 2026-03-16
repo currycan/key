@@ -34,6 +34,8 @@
                     "privateKey": "${XRAY_REALITY_PRIVATE_KEY}",
                     "shortIds": [
                         "${XRAY_REALITY_SHORTID}",
+                        "${XRAY_REALITY_SHORTID_2}",
+                        "${XRAY_REALITY_SHORTID_3}",
                         ""
                     ]
                 },
