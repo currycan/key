@@ -54,7 +54,6 @@
                 "tag": "geosite-openai",
                 "type": "remote",
                 "format": "binary",
-                "path": "${WORKDIR}/sing-box/rule-sets/geosite-openai.srs",
                 "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-openai.srs",
                 "download_detour": "direct",
                 "update_interval": "24h"
@@ -63,7 +62,6 @@
                 "tag": "geosite-netflix",
                 "type": "remote",
                 "format": "binary",
-                "path": "${WORKDIR}/sing-box/rule-sets/geosite-netflix.srs",
                 "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-netflix.srs",
                 "download_detour": "direct",
                 "update_interval": "24h"
@@ -72,7 +70,6 @@
                 "tag": "geosite-disney",
                 "type": "remote",
                 "format": "binary",
-                "path": "${WORKDIR}/sing-box/rule-sets/geosite-disney.srs",
                 "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-disney.srs",
                 "download_detour": "direct",
                 "update_interval": "24h"
@@ -81,7 +78,6 @@
                 "tag": "geosite-youtube",
                 "type": "remote",
                 "format": "binary",
-                "path": "${WORKDIR}/sing-box/rule-sets/geosite-youtube.srs",
                 "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-youtube.srs",
                 "download_detour": "direct",
                 "update_interval": "24h"
@@ -90,7 +86,6 @@
                 "tag": "geosite-google",
                 "type": "remote",
                 "format": "binary",
-                "path": "${WORKDIR}/sing-box/rule-sets/geosite-google.srs",
                 "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-google.srs",
                 "download_detour": "direct",
                 "update_interval": "24h"
@@ -99,7 +94,6 @@
                 "tag": "geosite-anthropic",
                 "type": "remote",
                 "format": "binary",
-                "path": "${WORKDIR}/sing-box/rule-sets/geosite-anthropic.srs",
                 "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-anthropic.srs",
                 "download_detour": "direct",
                 "update_interval": "24h"
@@ -108,7 +102,6 @@
                 "tag": "geosite-google-gemini",
                 "type": "remote",
                 "format": "binary",
-                "path": "${WORKDIR}/sing-box/rule-sets/geosite-google-gemini.srs",
                 "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-google-gemini.srs",
                 "download_detour": "direct",
                 "update_interval": "24h"
@@ -117,7 +110,6 @@
                 "tag": "geosite-tiktok",
                 "type": "remote",
                 "format": "binary",
-                "path": "${WORKDIR}/sing-box/rule-sets/geosite-tiktok.srs",
                 "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-tiktok.srs",
                 "download_detour": "direct",
                 "update_interval": "24h"
@@ -126,7 +118,6 @@
                 "tag": "geosite-category-social-media-!cn",
                 "type": "remote",
                 "format": "binary",
-                "path": "${WORKDIR}/sing-box/rule-sets/geosite-category-social-media-!cn.srs",
                 "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-category-social-media-!cn.srs",
                 "download_detour": "direct",
                 "update_interval": "24h"
@@ -135,7 +126,6 @@
                 "tag": "geosite-amazon",
                 "type": "remote",
                 "format": "binary",
-                "path": "${WORKDIR}/sing-box/rule-sets/geosite-amazon.srs",
                 "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-amazon.srs",
                 "download_detour": "direct",
                 "update_interval": "24h"
@@ -144,7 +134,6 @@
                 "tag": "geosite-paypal",
                 "type": "remote",
                 "format": "binary",
-                "path": "${WORKDIR}/sing-box/rule-sets/geosite-paypal.srs",
                 "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-paypal.srs",
                 "download_detour": "direct",
                 "update_interval": "24h"
@@ -153,7 +142,6 @@
                 "tag": "geosite-ebay",
                 "type": "remote",
                 "format": "binary",
-                "path": "${WORKDIR}/sing-box/rule-sets/geosite-ebay.srs",
                 "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-ebay.srs",
                 "download_detour": "direct",
                 "update_interval": "24h"
@@ -162,7 +150,6 @@
                 "tag": "geosite-category-ads-all",
                 "type": "remote",
                 "format": "binary",
-                "path": "${WORKDIR}/sing-box/rule-sets/geosite-category-ads-all.srs",
                 "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-category-ads-all.srs",
                 "download_detour": "direct",
                 "update_interval": "24h"
@@ -171,7 +158,6 @@
                 "tag": "geoip-cn",
                 "type": "remote",
                 "format": "binary",
-                "path": "${WORKDIR}/sing-box/rule-sets/geoip-cn.srs",
                 "url": "https://raw.githubusercontent.com/SagerNet/sing-geoip/rule-set/geoip-cn.srs",
                 "download_detour": "direct",
                 "update_interval": "24h"
