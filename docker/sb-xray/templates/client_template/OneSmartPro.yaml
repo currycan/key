@@ -48,31 +48,31 @@ FilterDialer:   &FilterDialer "^(?=.*(?i)(🇭🇰|🇹🇼|🇨🇳))(?!.*(DIRE
 #
 # 权重维度说明:
 #   - 特性标签: 高速(10)
-#   - 协议性能: Reality(20), vless(10), Hysteria2(8), hysteria2(8), TUIC(6), tuic(6), Vmess(3), vmess(3), anytls(1)
+#   - 协议性能: XTLS(8)+Reality(20)=28, Xhttp+Reality(20)+Xhttp(5)=25, Hysteria2(8), AnyTLS(5), TUIC(3), Vmess(2)
 #   - 质量后缀: super(30), good(10)
 #   - 地区偏好: 根据不同场景动态调整
 #
 # ==================== 基础权重配置(所有策略共享) ====================
-# 格式: 高速:10;Reality:20;vless:10;Hysteria2:8;hysteria2:8;TUIC:6;tuic:6;Vmess:3;vmess:3;anytls:1;super:30;good:10
+# 格式: 高速:10;Reality:20;XTLS:8;Xhttp:5;Hysteria2:8;AnyTLS:5;TUIC:3;Vmess:2;super:30;good:10
 # 说明: 以下所有策略都包含此基础权重,仅地区偏好部分有差异
 # ---------- 默认策略 ----------
 # 地区偏好: 无
-PolicyDefault:  &PolicyDefault  "高速:10;Reality:20;vless:10;Hysteria2:8;hysteria2:8;TUIC:6;tuic:6;Vmess:3;vmess:3;anytls:1;super:30;good:10"
+PolicyDefault:  &PolicyDefault  "高速:10;Reality:20;XTLS:8;Xhttp:5;Hysteria2:8;AnyTLS:5;TUIC:3;Vmess:2;super:30;good:10"
 # ---------- 家宽策略 ----------
 # 地区偏好: 🇺🇸:20 > 🇰🇷:10 > 🇯🇵:6 > 🇸🇬:4 > 🇹🇼:2
-PolicyISP:      &PolicyISP      "高速:10;Reality:20;vless:10;Hysteria2:8;hysteria2:8;TUIC:6;tuic:6;Vmess:3;vmess:3;anytls:1;super:30;good:10;🇺🇸:20;🇰🇷:10;🇯🇵:6;🇸🇬:4;🇹🇼:2"
+PolicyISP:      &PolicyISP      "高速:10;Reality:20;XTLS:8;Xhttp:5;Hysteria2:8;AnyTLS:5;TUIC:3;Vmess:2;super:30;good:10;🇺🇸:20;🇰🇷:10;🇯🇵:6;🇸🇬:4;🇹🇼:2"
 # ---------- 流媒体策略 ----------
 # 地区偏好: 🇺🇸:15 > 🇰🇷:8 > 🇯🇵:6 > 🇸🇬:4 > 🇹🇼:2
-PolicyMedia:    &PolicyMedia    "高速:10;Reality:20;vless:10;Hysteria2:8;hysteria2:8;TUIC:6;tuic:6;Vmess:3;vmess:3;anytls:1;super:30;good:10;🇺🇸:15;🇰🇷:8;🇯🇵:6;🇸🇬:4;🇹🇼:2"
+PolicyMedia:    &PolicyMedia    "高速:10;Reality:20;XTLS:8;Xhttp:5;Hysteria2:8;AnyTLS:5;TUIC:3;Vmess:2;super:30;good:10;🇺🇸:15;🇰🇷:8;🇯🇵:6;🇸🇬:4;🇹🇼:2"
 # ---------- 高速策略 ----------
 # 地区偏好: 🇺🇸:15 > 🇯🇵:10 > 🇰🇷:8 > 🇸🇬:4 > 🇹🇼:2
-PolicyFast:     &PolicyFast     "高速:10;Reality:20;vless:10;Hysteria2:8;hysteria2:8;TUIC:6;tuic:6;Vmess:3;vmess:3;anytls:1;super:30;good:10;🇺🇸:15;🇯🇵:10;🇰🇷:8;🇸🇬:4;🇹🇼:2"
+PolicyFast:     &PolicyFast     "高速:10;Reality:20;XTLS:8;Xhttp:5;Hysteria2:8;AnyTLS:5;TUIC:3;Vmess:2;super:30;good:10;🇺🇸:15;🇯🇵:10;🇰🇷:8;🇸🇬:4;🇹🇼:2"
 # ---------- AI 服务策略 ----------
 # 地区偏好: 🇺🇸:20 > 🇯🇵:10 > 🇰🇷:8 > 🇸🇬:4 > 🇹🇼:2
-PolicyAI:       &PolicyAI       "高速:10;Reality:20;vless:10;Hysteria2:8;hysteria2:8;TUIC:6;tuic:6;Vmess:3;vmess:3;anytls:1;super:30;good:10;🇺🇸:20;🇯🇵:10;🇰🇷:8;🇸🇬:4;🇹🇼:2"
+PolicyAI:       &PolicyAI       "高速:10;Reality:20;XTLS:8;Xhttp:5;Hysteria2:8;AnyTLS:5;TUIC:3;Vmess:2;super:30;good:10;🇺🇸:20;🇯🇵:10;🇰🇷:8;🇸🇬:4;🇹🇼:2"
 # ---------- 链式代理策略 ----------
 # 地区偏好: 🇭🇰:20 > 🇹🇼:15 > 🇨🇳:15 > 🇰🇷:10 > 🇯🇵:6 > 🇸🇬:4 > 🇺🇸:2
-PolicyDialer:   &PolicyDialer   "高速:10;Reality:20;vless:10;Hysteria2:8;hysteria2:8;TUIC:6;tuic:6;Vmess:3;vmess:3;anytls:1;super:30;good:10;🇭🇰:20;🇹🇼:15;🇨🇳:15;🇰🇷:10;🇯🇵:6;🇸🇬:4;🇺🇸:2"
+PolicyDialer:   &PolicyDialer   "高速:10;Reality:20;XTLS:8;Xhttp:5;Hysteria2:8;AnyTLS:5;TUIC:3;Vmess:2;super:30;good:10;🇭🇰:20;🇹🇼:15;🇨🇳:15;🇰🇷:10;🇯🇵:6;🇸🇬:4;🇺🇸:2"
 
 # 策略组代理列表模板 - 预定义的代理节点优先级排序
 DEFAULT:        &DEFAULT      {type: select, include-all: true, filter: *FilterALL, proxies: [高速-智选, LD-智选, AI-智选, 媒体-智选, 家宽-智选, 香港-智选, 台湾-智选, 日本-智选, 狮城-智选, 韩国-智选, 美国-智选, 其他-智选, 全球手动, 直接连接]}
@@ -103,6 +103,10 @@ proxy-groups:
   - {name: 高速-智选,   <<: *BaseSmart,    filter: *FilterFAST,  include-all: true, policy-priority: *PolicyFast,  icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Rocket.png}
   - {name: AI-智选,    <<: *StableSmart,  filter: *FilterAI,    include-all: true, policy-priority: *PolicyAI,    icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/ChatGPT.png}
   - {name: LD-智选,    <<: *BaseSmart,    include-all: true,   policy-priority: *PolicyDialer, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Round_Robin_1.png}
+  # ==================== AI 服务 ====================
+  - {name: Claude,     <<: *SelectISP,   icon: https://gh-proxy.com/raw.githubusercontent.com/currycan/key/master/icons/ClaudeCode.png}
+  - {name: Gemini,     <<: *SelectISP,   icon: https://gh-proxy.com/raw.githubusercontent.com/currycan/key/master/icons/gemini.png}
+  - {name: 人工智能,    <<: *SelectAI,    icon: https://gh-proxy.com/raw.githubusercontent.com/currycan/key/master/icons/AI.png}
   # ==================== 媒体服务 ====================
   - {name: TikTok,     <<: *SelectISP,   icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/TikTok.png}
   - {name: YouTube,    <<: *SelectFAST,  icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/YouTube.png}
@@ -113,10 +117,6 @@ proxy-groups:
   - {name: Emby,       <<: *SelectMedia, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Emby.png}
   - {name: 国际媒体,    <<: *SelectMedia, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/DomesticMedia.png}
   - {name: 新闻媒体,    <<: *SelectMedia, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Apple_News.png}
-  # ==================== AI 服务 ====================
-  - {name: Claude,     <<: *SelectISP,    icon: https://gh-proxy.com/raw.githubusercontent.com/currycan/key/master/icons/ClaudeCode.png}
-  - {name: Gemini,     <<: *SelectISP,    icon: https://gh-proxy.com/raw.githubusercontent.com/currycan/key/master/icons/gemini.png}
-  - {name: 人工智能,    <<: *SelectAI,    icon: https://gh-proxy.com/raw.githubusercontent.com/currycan/key/master/icons/AI.png}
   # ==================== 社交平台 ====================
   - {name: 推特社交,    <<: *SelectISP,    icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/X.png}
   - {name: 电报消息,    <<: *SelectISP,    icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Telegram_X.png}

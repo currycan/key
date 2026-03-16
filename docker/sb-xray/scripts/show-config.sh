@@ -106,7 +106,7 @@ generate_links() {
     local link_tuic="tuic://${SB_UUID}:${SB_UUID}@${DOMAIN}:${PORT_TUIC}?${h2_alpn}&congestion_control=bbr#${FLAG_PREFIX}TUIC ✈ ${region_name}${NODE_SUFFIX}"
     local link_anytls="anytls://${SB_UUID}@${DOMAIN}:${PORT_ANYTLS}?security=tls&type=tcp#${FLAG_PREFIX}AnyTLS ✈ ${region_name}${NODE_SUFFIX}"
     local link_vmess="vmess://$(echo -n "$vmes_json" | base64 -w0)"
-    local link_vless_vision="vless://${XRAY_UUID}@${DOMAIN}:${LISTENING_PORT}?encryption=none&flow=xtls-rprx-vision&security=reality&sni=${DEST_HOST}&fp=chrome&pbk=${XRAY_REALITY_PUBLIC_KEY}&sid=${XRAY_REALITY_SHORTID}&spx=%2F&type=tcp&headerType=none#${FLAG_PREFIX}Reality ✈ ${region_name}${NODE_SUFFIX}"
+    local link_vless_vision="vless://${XRAY_UUID}@${DOMAIN}:${LISTENING_PORT}?encryption=none&flow=xtls-rprx-vision&security=reality&sni=${DEST_HOST}&fp=chrome&pbk=${XRAY_REALITY_PUBLIC_KEY}&sid=${XRAY_REALITY_SHORTID}&spx=%2F&type=tcp&headerType=none#${FLAG_PREFIX}XTLS-Reality ✈ ${region_name}${NODE_SUFFIX}"
 
     # 高级/Xhttp 链接 (Mihomo / V2rayN / Sing-box 支持)
     local xhttp_base="encryption=mlkem768x25519plus.native.0rtt.${XRAY_MLKEM768_CLIENT}&security=reality&sni=${DEST_HOST}&fp=chrome&pbk=${XRAY_REALITY_PUBLIC_KEY}&sid=${XRAY_REALITY_SHORTID}&type=xhttp&path=%2F${XRAY_URL_PATH}-xhttp&mode=auto"
