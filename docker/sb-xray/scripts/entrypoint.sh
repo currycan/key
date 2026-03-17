@@ -108,7 +108,7 @@ http_probe() {
     local args=(-I -s --max-time 3 --retry 2 -A "Mozilla/5.0")
     [[ "$follow" == "true" ]] && args+=(-L)
     local res
-    res=$(curl "${args[@]}" "$url" 2>/dev/null | head -n 1 | awk '{print $2}')
+    res=$(curl "${args[@]}" "$url" 2>/dev/null | sed -n '1p' | awk '{print $2}')
     echo "${res:-Timeout}"
 }
 
@@ -213,7 +213,11 @@ ensure_var() {
 
     # 分支 3: 执行命令计算
     log DEBUG "[${key}] 计算中: ${cmd}"
-    local val; val=$($cmd)
+    local val
+    if ! val=$($cmd); then
+        log ERROR "[${key}] 计算失败: ${cmd}"
+        return 1
+    fi
     export "${key}=${val}"
 
     if [[ "$persist" == "true" ]]; then
@@ -283,7 +287,7 @@ check_ip_type() {
 # 返回格式: 城市省份|IP地址
 get_geo_info() {
     curl -fsSL --max-time 10 --retry 2 https://ip111.cn/ 2>/dev/null \
-        | grep '这是您访问国内网站所使用的IP' -B 2 | head -n 1 \
+        | grep '这是您访问国内网站所使用的IP' -B 2 | sed -n '1p' \
         | awk -F' ' '{print $2$3"|"$1}' | tr -d '</p>'
 }
 
@@ -1047,9 +1051,6 @@ analyze_base_env() {
         "XRAY_REALITY_SHORTID_2|openssl rand -hex 4"
         "XRAY_REALITY_SHORTID_3|openssl rand -hex 6"
         "XRAY_URL_PATH|generateRandomStr path 32"
-        "PORT_ANYTLS|generateRandomStr port"
-        "PORT_HYSTERIA2|generateRandomStr port"
-        "PORT_TUIC|generateRandomStr port"
         "SUBSCRIBE_TOKEN|generateRandomStr path 32"
         "STRATEGY|detect_ip_strategy_api"
         "GEOIP_INFO|get_geo_info"
@@ -1063,7 +1064,7 @@ analyze_base_env() {
         ensure_var "$key" $cmd
     done
 
-    log INFO "[阶段 1] 完成"
+    log INFO "[阶段 1] 完成 hy2=${PORT_HYSTERIA2} tuic=${PORT_TUIC} anytls=${PORT_ANYTLS}"
 }
 
 # 阶段 2: ISP 代理测速与选路（ISP_TAG 已缓存则跳过）

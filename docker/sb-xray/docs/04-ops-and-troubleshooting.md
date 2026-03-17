@@ -155,9 +155,9 @@ environment:
 | `XRAY_MLKEM768_SEED` | `xray mlkem768` | ML-KEM 种子（配对生成） |
 | `XRAY_MLKEM768_CLIENT` | `xray mlkem768` | ML-KEM 客户端密钥 |
 | `XRAY_URL_PATH` | 随机 32 位 | XHTTP 路径 |
-| `PORT_HYSTERIA2` | 随机高位端口 | Hysteria2 UDP 端口 |
-| `PORT_TUIC` | 随机高位端口 | TUIC UDP 端口 |
-| `PORT_ANYTLS` | 随机高位端口 | AnyTLS TCP 端口 |
+| `PORT_HYSTERIA2` | `6443`（Dockerfile ENV 固定值） | Hysteria2 UDP 端口 |
+| `PORT_TUIC` | `8443`（Dockerfile ENV 固定值） | TUIC UDP 端口 |
+| `PORT_ANYTLS` | `4433`（Dockerfile ENV 固定值） | AnyTLS TCP 端口 |
 | `XUI_LOCAL_PORT` | 随机端口 | X-UI 实际监听端口 |
 | `DUFS_PORT` | 随机高位端口 | Dufs 内部监听端口 |
 | `SUB_STORE_FRONTEND_BACKEND_PATH` | 随机 32 位路径 | Sub-Store 后端 API 路径（每次部署唯一，防扫描） |

@@ -519,9 +519,9 @@ graph TD
 | `${LISTENING_PORT}` | 监听端口 | `443` |
 | `${XRAY_UUID}` | Xray UUID | `xxxx-xxxx-xxxx` |
 | `${SB_UUID}` | Sing-box UUID | `yyyy-yyyy-yyyy` |
-| `${HY2_LISTEN_PORT}` | Hysteria2 监听端口 | `443` |
-| `${TUIC_LISTEN_PORT}` | TUIC 监听端口 | `8443` |
-| `${PORT_ANYTLS}` | AnyTLS 端口 | `60000+` |
+| `${PORT_HYSTERIA2}` | Hysteria2 监听端口 | `6443` |
+| `${PORT_TUIC}` | TUIC 监听端口 | `8443` |
+| `${PORT_ANYTLS}` | AnyTLS 端口 | `4433` |
 | `${XRAY_REALITY_PUBLIC_KEY}` | Reality 公钥 | `abcd1234...` |
 | `${XRAY_URL_PATH}` | WebSocket/XHTTP 路径 | `random32chars` |
 | `${CLASH_PROXY_PROVIDERS}` | 订阅源配置 | YAML 格式字符串 |

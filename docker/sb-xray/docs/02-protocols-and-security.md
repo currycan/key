@@ -95,7 +95,7 @@ graph LR
 
 #### 客户端配置
 
-* **连接方式**: UDP / 随机高位端口（`PORT_HYSTERIA2`，范围 32000–38000）
+* **连接方式**: UDP / 固定端口 6443（Dockerfile ENV 定义）
 * **URL 示例**:
   ```
   hysteria2://${SB_UUID}@${DOMAIN}:${PORT_HYSTERIA2}/?sni=${DOMAIN}&obfs=salamander&obfs-password=${SB_UUID}&alpn=h3#🇺🇸 Hysteria2 ✈ ${NODE_NAME}${NODE_SUFFIX}
@@ -116,14 +116,14 @@ graph LR
 | 方案 | 原理 | 效果 |
 |:---|:---|:---|
 | **Salamander 混淆** | 将 QUIC 数据包外观完全随机化，DPI 无法识别为 QUIC 流量 | 对抗基于协议识别的 QoS 限速 |
-| **随机高位端口** | 不使用固定 443，规避针对特定端口的 UDP 封锁 | 避免端口级别的 QoS 策略 |
+| **独立高位端口** | 不使用固定 443，规避针对特定端口的 UDP 封锁 | 避免端口级别的 QoS 策略 |
 
 > **客户端自动回退**：当 Hysteria2 节点健康检查失败时，OneSmartPro（Smart 策略组）和 FallBackPro（Fallback 策略组）均会自动切换到 TCP 协议节点（Reality / XHTTP / AnyTLS），无需手动干预。
 
 #### 服务端入站
 
 * **配置文件**: `templates/sing-box/01_hysteria2_inbounds.json`
-* **监听地址**: `::` (All Interfaces)，端口 `${PORT_HYSTERIA2}`（随机生成，容器首次启动后固定）
+* **监听地址**: `::` (All Interfaces)，端口 6443（Dockerfile ENV 固定值）
 * **路径**: **直连**（不经过 Nginx，不经过 Xray）
 * **Salamander 混淆**: 服务端和客户端使用同一 `SB_UUID` 作为混淆密码
 
@@ -159,13 +159,13 @@ graph LR
 
 另一种基于 QUIC 的高性能协议。
 
-* **连接方式**: UDP / 随机高位端口（`PORT_TUIC`，范围 32000–38000）
+* **连接方式**: UDP / 固定端口 8443（Dockerfile ENV 定义）
 
 #### 流量图解
 
 ```mermaid
 graph LR
-    User((客户端)) -- "UDP 随机高位端口" --> Singbox(("Sing-box 核心"))
+    User((客户端)) -- "UDP 8443" --> Singbox(("Sing-box 核心"))
     Singbox -- "TUIC V5 / QUIC" --> Internet((互联网))
 ```
 
@@ -188,13 +188,13 @@ graph LR
 
 伪装成任意 HTTPS 流量的 TCP 协议。
 
-* **连接方式**: TCP / 独立高位端口
+* **连接方式**: TCP / 固定端口 4433（Dockerfile ENV 定义）
 
 #### 流量图解
 
 ```mermaid
 graph LR
-    User((客户端)) -- "TCP 高位端口 TLS" --> Singbox(("Sing-box 核心"))
+    User((客户端)) -- "TCP 4433 TLS" --> Singbox(("Sing-box 核心"))
     Singbox -- "AnyTLS 流量" --> Internet((互联网))
 ```
 

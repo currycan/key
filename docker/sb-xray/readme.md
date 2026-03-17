@@ -202,7 +202,10 @@ docker compose up -d
 | `CDNDOMAIN` | *必填* | CDN 保护域名（如 `cdn.example.com`） |
 | `DECODE` | *空* | 自定义解码密钥 |
 | `DEST_HOST` | `www.microsoft.com` | Reality 伪装目标站点（推荐 `speed.cloudflare.com`） |
-| `LISTENING_PORT` | `443` | 主监听端口 |
+| `LISTENING_PORT` | `443` | 主监听端口（TCP，Nginx/Xray 共用） |
+| `PORT_HYSTERIA2` | `6443` | Hysteria2 协议 UDP 监听端口 |
+| `PORT_TUIC` | `8443` | TUIC 协议 UDP 监听端口 |
+| `PORT_ANYTLS` | `4433` | AnyTLS 协议 TCP 监听端口 |
 | `NODE_SUFFIX` | *空* | 节点名称后缀（如 ` ✈ 高速`），会附加在所有生成的节点名后 |
 
 #### 证书配置
