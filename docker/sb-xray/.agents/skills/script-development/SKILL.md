@@ -182,6 +182,10 @@ log ERROR "严重错误，可能导致退出"  # 红色
 log DEBUG "调试信息"          # 青色
 ```
 
+### 错误退出规范
+
+`set -e` 模式下脚本遇错会静默退出，排查困难。**任何可能失败的关键操作，必须在退出前打印 `log ERROR` 日志**，明确标识失败的变量名和命令。例如 `ensure_var` 中命令执行失败时，先 `log ERROR "[${key}] 计算失败: ${cmd}"` 再 `return 1`。禁止让 `set -e` 直接吞掉错误无日志退出。
+
 - 所有日志使用中文
 - 日志自动附带时间戳 `[YYYY-MM-DD HH:MM:SS]`
 - 日志输出到 stderr (`>&2`)
@@ -402,8 +406,9 @@ let parts = remainingName.split('✈').flatMap(Utils.cleanPreformatted);
    - 重构前：先写测试套件（`scripts/test_*.sh`），确认测试能暴露已知 bug（红灯）
    - 重构后：运行测试，全部通过才算完成（绿灯），任何失败必须修复
 3. **可测性设计**: 脚本必须支持 `source` 模式执行，用 `BASH_SOURCE` 保护入口，且路径变量（`ENV_FILE` 等）需允许外部覆盖（`${ENV_FILE:-/default/path}`）
-4. **跨平台兼容**: 所有 `sed -i` 改用封装函数 `_sed_i()`，管道末端 `tr | head -c` 须加 `|| true` 防 SIGPIPE，避免使用 Linux 专属命令（如 `shuf`，改用 `$(( RANDOM % N + base ))`）
-5. **函数声明顺序**（按分层原则，被依赖的先声明）:
+4. **跨平台兼容**: 所有 `sed -i` 改用封装函数 `_sed_i()`，避免使用 Linux 专属命令（如 `shuf`，改用 `$(( RANDOM % N + base ))`）
+5. **pipefail + SIGPIPE 防护**: `set -o pipefail` 下，管道上游输出多行而下游只读部分行时（如 `grep | head -n 1`），下游关闭管道会导致上游收到 SIGPIPE（退出码 141），整条管道被判定失败。**禁止在 pipefail 模式下使用 `head -n` 截取多行输出**，改用 `sed -n '1p'`（读完全部输入不触发 SIGPIPE）。仅 `tr | head -c` 等单行场景加 `|| true` 兜底
+6. **函数声明顺序**（按分层原则，被依赖的先声明）:
 
    | 层次 | 内容 |
    |:---|:---|
@@ -415,7 +420,7 @@ let parts = remainingName.split('✈').flatMap(Utils.cleanPreformatted);
    | 流程层 | 主流程各阶段函数（严格按运行时调用顺序声明） |
    | 入口层 | `main_init` + exec 保护 |
 
-6. **结构清晰**: 大脚本用 `§N 段落名` 注释分段（建议 14-16 段），`main_init` 内步骤注释须标注对应的 `daemon.ini` priority 值
+7. **结构清晰**: 大脚本用 `§N 段落名` 注释分段（建议 14-16 段），`main_init` 内步骤注释须标注对应的 `daemon.ini` priority 值
 7. **Bug 记录**: 重构时消灭的 bug 必须同步写入 BUGS.md
 
 ### JavaScript 脚本重构（rename.js 类）

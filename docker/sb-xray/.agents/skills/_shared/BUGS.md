@@ -493,6 +493,36 @@ description: 跨 Skill 的 Bug 修复记录，所有 Agent 工作时必须优先
 
 ---
 
+### Bug #033 — get_geo_info 管道 grep | head -n 1 在 pipefail 下触发 SIGPIPE 导致容器退出
+
+| 字段 | 内容 |
+|:---|:---|
+| **涉及文件** | `scripts/entrypoint.sh` |
+| **函数** | `get_geo_info`、`http_probe` |
+| **触发条件** | `set -eou pipefail` 下，`grep` 输出多行结果经 `head -n 1` 截取时 |
+| **错误现象** | 容器启动时日志显示 `[DEBUG] [GEOIP_INFO] 计算中: get_geo_info` 后静默退出，无错误日志 |
+| **根本原因** | `grep -B 2` 输出 3 行，`head -n 1` 读完第一行后关闭管道，`grep` 写剩余行时收到 SIGPIPE（退出码 141）；`pipefail` 将管道退出码设为 141，`set -e` 触发脚本退出。宿主机测试正常是因为未启用 `pipefail` |
+| **修复方案** | `head -n 1` → `sed -n '1p'`（sed 读完全部输入再输出第一行，不触发 SIGPIPE）；同步修复 `http_probe` 中相同模式 |
+| **预防措施** | `set -o pipefail` 下禁止使用 `head -n` 截取多行管道输出；改用 `sed -n 'Np'`；仅 `tr | head -c` 等单行场景可用 `|| true` 兜底。已写入 SKILL.md 第 5 条规则 |
+| **记录时间** | 2026-03-17 |
+
+---
+
+### Bug #034 — ensure_var 命令失败时 set -e 静默退出，无错误日志
+
+| 字段 | 内容 |
+|:---|:---|
+| **涉及文件** | `scripts/entrypoint.sh` |
+| **函数** | `ensure_var` |
+| **触发条件** | `ensure_var` 分支 3 中 `val=$($cmd)` 执行失败（任何网络探测函数返回非零） |
+| **错误现象** | 容器退出但日志中无任何 ERROR 信息，仅有最后一条 `[DEBUG] [变量名] 计算中: xxx`，排查困难 |
+| **根本原因** | `local val; val=$($cmd)` 失败时，`set -e` 立即终止脚本，跳过后续所有代码（包括日志输出） |
+| **修复方案** | 改为 `if ! val=$($cmd); then log ERROR "[${key}] 计算失败: ${cmd}"; return 1; fi`，确保退出前打印错误日志 |
+| **预防措施** | `set -e` 模式下任何可能失败的关键操作必须用 `if !` 或 trap 捕获，先打印 `log ERROR` 再退出。已写入 SKILL.md 错误退出规范 |
+| **记录时间** | 2026-03-17 |
+
+---
+
 ### Bug #028 — hysteria2 URI 缺少 sni= 参数，xray-core 原生 hy2 TLS 握手失败
 
 | 字段 | 内容 |

@@ -12,7 +12,10 @@ description: SB-Xray 项目约定，编写代码、注释和文档时必须遵�
 
 ## 环境变量
 
-- **默认值以 `Dockerfile` 中的 `ENV` 声明为准**，不自行假设默认值
+- **固定值变量必须且只能在 `Dockerfile ENV` 中定义默认值**，脚本中直接引用 `${VAR}`，禁止 `${VAR:-default}` 硬编码默认值
+- 只有随机生成的变量（UUID、端口、密钥等）才在 `entrypoint.sh` 的 `ensure_var` 中计算
+- **禁止跨脚本重复定义同一变量的默认值**——`show-config.sh` 等辅助脚本只消费变量，不定义默认值
+- `docker-compose.yml` 的 `environment:` 用于用户覆盖，Dockerfile ENV 用于项目默认值
 - 新增变量须同步更新 `readme.md` 配置参考表
 
 ## 代码重构
