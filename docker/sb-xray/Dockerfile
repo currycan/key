@@ -18,13 +18,13 @@ RUN set -ex; \
 
 # --- Http-Meta ---
 WORKDIR /sub-store/http-meta
-ARG HTTP_META_VERSION="1.0.6"
+ARG HTTP_META_VERSION="1.1.0"
 RUN set -ex; \
   curl -fsSL --retry 5 --retry-delay 5 "https://github.com/xream/http-meta/releases/download/${HTTP_META_VERSION}/http-meta.bundle.js" -o /sub-store/http-meta.bundle.js; \
   curl -fsSL --retry 5 --retry-delay 5 "https://github.com/xream/http-meta/releases/download/${HTTP_META_VERSION}/tpl.yaml" -o /sub-store/http-meta/tpl.yaml
 
 # --- Mihomo ---
-ARG MIHOMO_VERSION="1.19.0"
+ARG MIHOMO_VERSION="1.19.23"
 RUN set -ex; \
   curl -fsSL --retry 5 --retry-delay 5 "https://github.com/MetaCubeX/mihomo/releases/download/v${MIHOMO_VERSION}/mihomo-linux-${TARGETARCH}-v${MIHOMO_VERSION}.gz" | gzip -d > /tmp/http-meta; \
   chmod +x /tmp/http-meta; \
@@ -32,13 +32,13 @@ RUN set -ex; \
 
 # --- Sub-Store 后端 ---
 WORKDIR /sub-store
-ARG SUB_STORE_BACKEND_VERSION="2.21.21"
+ARG SUB_STORE_BACKEND_VERSION="2.21.94"
 RUN set -ex; \
   curl -fsSL --retry 5 --retry-delay 5 "https://github.com/sub-store-org/Sub-Store/releases/download/${SUB_STORE_BACKEND_VERSION}/sub-store.bundle.js" -o /sub-store/sub-store.bundle.js
 
 # --- Sub-Store 前端 ---
 WORKDIR /app/frontend
-ARG SUB_STORE_FRONTEND_VERSION="2.16.13"
+ARG SUB_STORE_FRONTEND_VERSION="2.16.52"
 ENV SUB_STORE_WEBBASEPATH="sub-store"
 RUN set -ex; \
   (git clone --depth 1 --branch ${SUB_STORE_FRONTEND_VERSION} https://github.com/sub-store-org/Sub-Store-Front-End /app/frontend || (sleep 5 && git clone --depth 1 --branch ${SUB_STORE_FRONTEND_VERSION} https://github.com/sub-store-org/Sub-Store-Front-End /app/frontend)); \
@@ -55,7 +55,7 @@ FROM node:alpine AS s-ui-front-builder
 
 RUN apk add --no-cache git curl
 
-ARG SUI_VERSION="1.3.9"
+ARG SUI_VERSION="1.4.1"
 RUN set -ex; \
   (git clone --depth 1 --branch v${SUI_VERSION} https://github.com/alireza0/s-ui /app/s-ui || (sleep 5 && git clone --depth 1 --branch v${SUI_VERSION} https://github.com/alireza0/s-ui /app/s-ui)); \
   (git clone --depth 1 --branch main https://github.com/alireza0/s-ui-frontend /app/s-ui-frontend || (sleep 5 && git clone --depth 1 --branch main https://github.com/alireza0/s-ui-frontend /app/s-ui-frontend)); \
@@ -83,6 +83,7 @@ RUN apk --no-cache --update add \
 ENV CGO_ENABLED=1
 ENV CGO_CFLAGS="-D_LARGEFILE64_SOURCE"
 ENV GOTOOLCHAIN=auto
+ENV GOPROXY=https://goproxy.cn,https://proxy.golang.org,direct
 
 WORKDIR /app
 
@@ -107,7 +108,7 @@ RUN set -ex; \
   mv /tmp/dufs /usr/local/bin/
 
 # --- Cloudflared ---
-ARG CLOUDFLARED_VERSION="2026.2.0"
+ARG CLOUDFLARED_VERSION="2026.3.0"
 RUN set -ex; \
   curl -fsSL --retry 5 --retry-delay 5 "https://github.com/cloudflare/cloudflared/releases/download/${CLOUDFLARED_VERSION}/cloudflared-linux-${TARGETARCH}" -o /tmp/cloudflared; \
   chmod +x /tmp/cloudflared; \
@@ -115,7 +116,7 @@ RUN set -ex; \
   mv /tmp/cloudflared /usr/local/bin/
 
 # --- X-UI ---
-ARG XUI_VERSION="2.8.10"
+ARG XUI_VERSION="2.8.11"
 RUN set -ex; \
   (git clone --recursive --depth 1 --shallow-submodules --branch v${XUI_VERSION} https://github.com/MHSanaei/3x-ui /app/xui || (sleep 5 && git clone --recursive --depth 1 --shallow-submodules --branch v${XUI_VERSION} https://github.com/MHSanaei/3x-ui /app/xui)); \
   cd /app/xui && go build -ldflags="-s -w" -trimpath -o x-ui main.go; \
@@ -131,13 +132,13 @@ RUN set -ex; \
   mv sui /usr/local/bin/
 
 # --- Sing-box ---
-ARG SING_BOX_VERSION="1.12.21"
+ARG SING_BOX_VERSION="1.13.8"
 RUN set -ex; \
   curl -fsSL --retry 5 --retry-delay 5 "https://github.com/SagerNet/sing-box/releases/download/v${SING_BOX_VERSION}/sing-box-${SING_BOX_VERSION}-linux-${TARGETARCH}.tar.gz" | tar --strip-components=1 -xzC /tmp/; \
   mv /tmp/sing-box /usr/local/bin/
 
 # --- Xray ---
-ARG XRAY_VERSION="26.2.6"
+ARG XRAY_VERSION="26.4.13"
 RUN set -ex; \
   case "${TARGETARCH}" in \
     amd64)   BINARY_FILE="Xray-linux-64.zip";; \

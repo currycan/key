@@ -17,6 +17,7 @@ BaseProvider:   &BaseProvider {type: http, interval: 86400, proxy: DIRECT, healt
 
 # 策略组类型模板 - 定义不同的策略组基础配置
 BaseFB:         &BaseFB      {type: fallback,     interval: 180, tolerance: 300,  lazy: true, url: "https://www.gstatic.com/generate_204"}
+BaseCH:         &BaseCH      {type: load-balance, interval: 180, tolerance: 300,  lazy: true, url: "https://www.gstatic.com/generate_204", strategy: consistent-hashing}
 BaseLB:         &BaseLB      {type: load-balance, interval: 180, tolerance: 300,  lazy: true, url: "https://www.gstatic.com/generate_204"}
 BaseSmart:      &BaseSmart   {type: smart,        interval: 180, tolerance: 300,  lazy: true, url: "https://www.gstatic.com/generate_204", uselightgbm: true, collectdata: true}
 MediaSmart:     &MediaSmart  {type: smart,        interval: 180, tolerance: 1000, lazy: true, url: "https://www.gstatic.com/generate_204", uselightgbm: true, collectdata: true}
@@ -83,6 +84,7 @@ SelectISP:      &SelectISP    {type: select, include-all: true, filter: *FilterA
 SelectMedia:    &SelectMedia  {type: select, include-all: true, filter: *FilterALL, proxies: [媒体-智选, 默认代理, 高速-智选, LD-智选, AI-智选, 家宽-智选, 香港-智选, 台湾-智选, 日本-智选, 狮城-智选, 韩国-智选, 美国-智选, 其他-智选, 全球手动, 直接连接]}
 SelectFAST:     &SelectFAST   {type: select, include-all: true, filter: *FilterALL, proxies: [高速-智选, 默认代理, LD-智选, AI-智选, 媒体-智选, 家宽-智选, 香港-智选, 台湾-智选, 日本-智选, 狮城-智选, 韩国-智选, 美国-智选, 其他-智选, 全球手动, 直接连接]}
 SelectAI:       &SelectAI     {type: select, include-all: true, filter: *FilterALL, proxies: [AI-智选, 默认代理, 高速-智选, LD-智选, 媒体-智选, 家宽-智选, 香港-智选, 台湾-智选, 日本-智选, 狮城-智选, 韩国-智选, 美国-智选, 其他-智选, 全球手动, 直接连接]}
+SelectStable:   &SelectStable {type: select, include-all: true, filter: *FilterALL, proxies: [家宽-锁定, 家宽-智选, AI-智选, 默认代理, 高速-智选, LD-智选, 媒体-智选, 香港-智选, 台湾-智选, 日本-智选, 狮城-智选, 韩国-智选, 美国-智选, 其他-智选, 全球手动, 直接连接]}
 
 
 # ==================== 代理提供者 ====================
@@ -99,13 +101,14 @@ proxy-groups:
   - {name: 网络测试,    <<: *OneSmart,     include-all: true,   filter: *FilterALL, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Speedtest.png}
   # ==================== 线路节点策略组 ====================
   - {name: 家宽-智选,   <<: *MediaSmart,   filter: *FilterISP,   include-all: true, policy-priority: *PolicyISP,   icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Area.png}
+  - {name: 家宽-锁定,   <<: *BaseFB,       filter: *FilterISP,   include-all: true, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Area.png}
   - {name: 媒体-智选,   <<: *MediaSmart,   filter: *FilterMedia, include-all: true, policy-priority: *PolicyMedia, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Clubhouse_1.png}
   - {name: 高速-智选,   <<: *BaseSmart,    filter: *FilterFAST,  include-all: true, policy-priority: *PolicyFast,  icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Rocket.png}
   - {name: AI-智选,    <<: *StableSmart,  filter: *FilterAI,    include-all: true, policy-priority: *PolicyAI,    icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/ChatGPT.png}
   - {name: LD-智选,    <<: *BaseSmart,    include-all: true,   policy-priority: *PolicyDialer, icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Round_Robin_1.png}
   # ==================== AI 服务 ====================
-  - {name: Claude,     <<: *SelectISP,   icon: https://gh-proxy.com/raw.githubusercontent.com/currycan/key/master/icons/ClaudeCode.png}
-  - {name: Gemini,     <<: *SelectISP,   icon: https://gh-proxy.com/raw.githubusercontent.com/currycan/key/master/icons/gemini.png}
+  - {name: Claude,     <<: *SelectStable, icon: https://gh-proxy.com/raw.githubusercontent.com/currycan/key/master/icons/ClaudeCode.png}
+  - {name: Gemini,     <<: *SelectStable, icon: https://gh-proxy.com/raw.githubusercontent.com/currycan/key/master/icons/gemini.png}
   - {name: 人工智能,    <<: *SelectAI,    icon: https://gh-proxy.com/raw.githubusercontent.com/currycan/key/master/icons/AI.png}
   # ==================== 媒体服务 ====================
   - {name: TikTok,     <<: *SelectISP,   icon: https://gh-proxy.com/raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/TikTok.png}
