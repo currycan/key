@@ -187,6 +187,8 @@ initial() {
     elif [[ "${release}" == "debian" ]] || [[ "${release}" == "ubuntu" ]]; then
         sudo echo "root:ZZT520.596msl*18" | chpasswd
         sudo echo "andrew:zzt2008zzt" | chpasswd
+        sudo apt update
+        sudo apt install --reinstall ca-certificates curl openssl -y
         apt_init
         sudo systemctl stop firewalld && systemctl disable firewalld
         FLAG_SUDO=$(grep andrew /etc/sudoers | wc -l)
