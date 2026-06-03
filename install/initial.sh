@@ -227,7 +227,8 @@ initial() {
     dkms status
 
     curl -o /usr/local/bin/tcp.sh https://raw.githubusercontent.com/ylx2016/Linux-NetSpeed/master/tcp.sh
-    curl -Lso /usr/local/bin/kernel.sh https://git.io/kernel.sh
+    # curl -Lso /usr/local/bin/kernel.sh https://git.io/kernel.sh
+    curl -o /usr/local/bin/kernel.sh https://raw.githubusercontent.com/jinwyp/one_click_script/master/install_kernel.sh
     curl -o /usr/local/bin/superspeed https://raw.githubusercontent.com/ernisn/superspeed/master/superspeed.sh
     chmod 700 /usr/local/bin/*
 
